@@ -1,0 +1,107 @@
+{
+  "schema": 1,
+  "start": {
+    "standing": {"aurelia": 0, "union": 0, "collective": 0, "wrenchers": 0, "kcg": 0},
+    "npcTrust": {"jonas": 0, "brann": 0, "nox": 0},
+    "aegis": 50
+  },
+  "missions": [
+    {
+      "id": "p1", "title": "Rückkehr", "main": true, "act": 0, "cell": [4, 1],
+      "text": "Mira Voss kehrt nach sieben Jahren nach Kestrel Bay zurück. Ihr Bruder Jonas, Datenanalyst bei Aurelia Holdings, ist verschwunden. Am Highway-Checkpoint hat das Überwachungsnetz Aegis ihr Kennzeichen erfasst. Ab jetzt ist sie im Netz.",
+      "onSuccess": [{"money": 200}, {"aegis": 5}]
+    },
+    {
+      "id": "p2", "title": "Erste Loyalität", "main": true, "act": 0, "cell": [1, 6],
+      "requires": [{"done": "p1"}],
+      "text": "Zwei Leute bieten Mira Arbeit und Unterschlupf an. Wem sie zuerst hilft, wird sie in Kestrel Bay lange begleiten.",
+      "choices": [{
+        "id": "p2_first", "text": "Wem hilfst du zuerst?",
+        "options": [
+          {"id": "union", "text": "Der Dockers' Union in Saltmarket", "effects": [{"standing": ["union", 20]}]},
+          {"id": "wrench", "text": "Den Rustline Wrenchers", "effects": [{"standing": ["wrenchers", 20]}]}
+        ]
+      }]
+    },
+    {
+      "id": "a1_job_union", "title": "Hafenfracht", "main": true, "act": 1, "cell": [7, 2],
+      "requires": [{"done": "p2"}, {"standing": ["union", ">=", 10]}],
+      "text": "Die Union braucht eine Fracht ohne Papiere quer durch die Stadt, bevor die Konzernwache die Kais abriegelt.",
+      "onSuccess": [{"standing": ["union", 15]}, {"money": 400}, {"aegis": 5}]
+    },
+    {
+      "id": "a1_job_wrench", "title": "Schrotthandel", "main": true, "act": 1, "cell": [1, 2],
+      "requires": [{"done": "p2"}, {"standing": ["wrenchers", ">=", 10]}],
+      "text": "Die Wrenchers lassen Mira ein frisiertes Fahrzeug über die Hügelstrecke überführen. Die Streife darf es nicht sehen.",
+      "onSuccess": [{"standing": ["wrenchers", 15]}, {"money": 400}, {"aegis": 5}]
+    },
+    {
+      "id": "w1_find", "title": "Der Fund", "main": true, "act": 1, "cell": [4, 4],
+      "requires": [{"any": [{"done": "a1_job_union"}, {"done": "a1_job_wrench"}]}],
+      "text": "Eine Spur führt zu Jonas: Er lebt. Er hat einen Datenträger, den Ledger-Kern, mit Beweisen gegen Aurelia versteckt und sendet Mira die Koordinaten. Wem zeigt sie den Fund?",
+      "choices": [{
+        "id": "w1_show", "text": "Wem zeigst du den Ledger-Kern?",
+        "options": [
+          {"id": "union", "text": "Der Union", "effects": [{"standing": ["union", 25]}, {"flag": ["ally", "union"]}, {"npcTrust": ["jonas", 1]}]},
+          {"id": "collective", "text": "Dem Lantern Collective", "effects": [{"standing": ["collective", 25]}, {"flag": ["ally", "collective"]}, {"npcTrust": ["jonas", 1]}]},
+          {"id": "corp", "text": "Aurelia Holdings", "effects": [{"standing": ["aurelia", 25]}, {"flag": ["ally", "corp"]}, {"npcTrust": ["jonas", -1]}]}
+        ]
+      }]
+    },
+    {
+      "id": "a2_union", "title": "Streikposten", "main": true, "act": 2, "cell": [7, 6],
+      "requires": [{"done": "w1_find"}, {"flag": ["ally", "==", "union"]}],
+      "text": "Die Union organisiert einen Streik, um die Hafenzufahrten zu sperren. Mira räumt die Umleitung frei.",
+      "onSuccess": [{"standing": ["union", 15]}, {"standing": ["aurelia", -10]}, {"money": 500}]
+    },
+    {
+      "id": "a2_collective", "title": "Kamera-Hack", "main": true, "act": 2, "cell": [2, 7],
+      "requires": [{"done": "w1_find"}, {"flag": ["ally", "==", "collective"]}],
+      "text": "Das Collective schaltet Aegis-Kameras in der Altstadt ab. Mira fährt das Hacker-Team zu den Knotenpunkten.",
+      "onSuccess": [{"standing": ["collective", 15]}, {"aegis": -10}, {"money": 500}]
+    },
+    {
+      "id": "a2_corp", "title": "Das Angebot", "main": true, "act": 2, "cell": [4, 7],
+      "requires": [{"done": "w1_find"}, {"flag": ["ally", "==", "corp"]}],
+      "text": "Aurelia lässt Mira in die Konzernzentrale bringen und macht ihr erste Zusagen. Dafür soll sie zwei Zeugen aus der Stadt fahren.",
+      "onSuccess": [{"standing": ["aurelia", 15]}, {"standing": ["union", -10]}, {"money": 700}]
+    },
+    {
+      "id": "w3_price", "title": "Der Preis", "main": true, "act": 2, "cell": [6, 4],
+      "requires": [{"any": [{"done": "a2_union"}, {"done": "a2_collective"}, {"done": "a2_corp"}]}],
+      "text": "Aurelia bietet an, Jonas freizulassen, Miras Kennzeichen zu löschen und ihr einen Posten zu geben. Der Preis: Verrat an ihren Verbündeten.",
+      "choices": [{
+        "id": "w3_offer", "text": "Wie antwortest du Aurelia?",
+        "options": [
+          {"id": "accept", "text": "Annehmen", "effects": [{"standing": ["aurelia", 40]}, {"standing": ["union", -30]}, {"standing": ["collective", -20]}, {"flag": ["sold_out", true]}]},
+          {"id": "refuse", "text": "Ablehnen", "effects": [{"standing": ["aurelia", -20]}, {"flag": ["refused", true]}]},
+          {"id": "fake", "text": "Zum Schein annehmen", "when": [{"npcTrust": ["jonas", ">=", 1]}], "effects": [{"standing": ["aurelia", 25]}, {"flag": ["double_play", true]}, {"aegis": -15}]}
+        ]
+      }]
+    },
+    {
+      "id": "w5_finale", "title": "Uplink", "main": true, "act": 3, "cell": [4, 8], "finale": true,
+      "requires": [{"done": "w3_price"}],
+      "text": "Am Sendemast über der Stadt liegt der Schlüssel zu Aegis. Wenn Phase Zwei live geht, gehört die Stadt dem Netz. Mira entscheidet, was damit geschieht.",
+      "choices": [{
+        "id": "w5_decision", "text": "Was tust du mit Aegis?",
+        "options": [
+          {"id": "take_over", "text": "Aegis übernehmen", "when": [{"standing": ["aurelia", ">=", 30]}], "effects": [{"flag": ["ending", "take_over"]}]},
+          {"id": "hold_port", "text": "Die Hafenkontrolle halten und Aegis aussperren", "when": [{"standing": ["union", ">=", 30]}], "effects": [{"flag": ["ending", "hold_port"]}]},
+          {"id": "shut_down", "text": "Den Uplink zerstören", "when": [{"standing": ["collective", ">=", 20]}], "effects": [{"flag": ["ending", "shut_down"]}]},
+          {"id": "flee", "text": "Mit Jonas die Stadt verlassen", "effects": [{"flag": ["ending", "flee"]}]}
+        ]
+      }]
+    }
+  ],
+  "endings": [
+    {"id": "E1", "title": "Goldener Käfig", "priority": 40, "when": [{"flag": ["ending", "==", "take_over"]}],
+     "epilogue": "Aegis geht live. Mira sitzt im Turm, sicher und gut bezahlt, und sieht von dort zu, wie die Stadt in Scores zerlegt wird."},
+    {"id": "E2", "title": "Hafenrepublik", "priority": 30, "when": [{"flag": ["ending", "==", "hold_port"]}],
+     "epilogue": "Die Docks erklären sich für unabhängig. Aegis kommt nicht in den Hafen, doch hinter den Kränen bleibt Kestrel Core unter Aurelia."},
+    {"id": "E3", "title": "Blackout", "priority": 30, "when": [{"flag": ["ending", "==", "shut_down"]}],
+     "epilogue": "Der Uplink fällt, das Netz stirbt, die Stadt wird dunkel. Es ist Anarchie und Hoffnung zugleich."},
+    {"id": "E4", "title": "Exil", "priority": 0, "when": [],
+     "epilogue": "Mira und Jonas fahren in der Nacht über die Route 9 aus der Stadt. Kestrel Bay bleibt, wie es ist."}
+  ]
+}

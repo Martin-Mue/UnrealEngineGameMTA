@@ -11,6 +11,11 @@ Oder `project.godot` im Godot-Editor öffnen (`godot --editor --path ...`).
 ## Steuerung
 W/S Gas/Bremse · A/D Lenken · Leertaste Handbremse · R zurücksetzen
 
+## Neu (Iteration 3): Story-Kern
+- Datengetriebene Story (`story.gd`, `data/story.json`): 10 Hauptmissionen, 4 Fraktionsstände, Entscheidungen mit Folgen, 4 Enden (Goldener Käfig, Hafenrepublik, Blackout, Exil)
+- Dialogfenster am Missionsziel: Optionen mit Tasten 1–4, Enter weiter; Story-Zustand wird mitgespeichert (Speicherstand v2)
+- Story-Simulator: `godot_console --headless --path . --script res://tests/story_sim.gd` (3000 Durchläufe, prüft Enden und Sackgassen)
+
 ## Neu (Iteration 2)
 - Fußgänger (60), Polizei mit Fahndungsstufen 0–5 (jagt per Straßenraster, Festnahme bei Stillstand), Kollisionen mit Verkehr
 - Missionen: gelber Marker, Geld und Zeitbonus; Minimap (rotiert mit dem Auto)

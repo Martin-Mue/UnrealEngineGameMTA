@@ -29,7 +29,7 @@
 
 ## 1. Ist-Zustand des Godot-Prototyps
 
-Gelesen wurden `godot/main.gd` (460 Zeilen, ein Skript auf der Wurzel von `main.tscn`), `godot/project.godot` und `godot/README.md`. Der frühere Three.js-Prototyp (`index.html`, `game.js`) bleibt als eingefrorene Referenz erhalten; er enthielt zusätzlich Polizei, Fußgänger, Missionsmarker, Minimap und Audio, die im Godot-Prototyp **noch nicht portiert** sind.
+Gelesen wurden `godot/main.gd`, `godot/project.godot` und `godot/README.md`. Der Prototyp entwickelt sich parallel weiter; die Tabelle gibt den **Arbeitsstand vom Abend des 19.11.2026** wieder (`main.gd` ≈ 930 Zeilen, dazu `minimap.gd`; der letzte Commit „SDFGI, Volumennebel, Laternen mit Lichtpools, Bäume, Gebäudedetails“ enthält davon nur einen Teil, Polizei/Fußgänger/Mission/Minimap liegen noch als **nicht eingecheckte Änderungen** vor; `README.md` ist veraltet). Der frühere Three.js-Prototyp (`index.html`, `game.js`) bleibt als eingefrorene Referenz erhalten; Audio ist daraus noch **nicht portiert**.
 
 | Bereich | Ist-Zustand (Godot) | Konsequenz |
 |---|---|---|
@@ -38,10 +38,11 @@ Gelesen wurden `godot/main.gd` (460 Zeilen, ein Skript auf der Wurzel von `main.
 | Gebäude | Je Lot ein `StaticBody3D` + `MeshInstance3D` (BoxMesh) + `CollisionShape3D`, ein gemeinsames `ShaderMaterial` mit `instance uniform tint`; Fenster und Nachtlicht rein im Fragment-Shader aus Weltposition (`night`-Uniform) | Keine Fenstertexturen nötig (gut); Nodes-Zahl wächst mit der Stadt → für größere Welt **MultiMeshInstance3D** und gebündelte Kollision je Chunk |
 | Zufall | `RandomNumberGenerator` mit `seed = 6` | Welt ist **reproduzierbar** (Vorteil gegenüber dem alten Prototyp) |
 | Fahrzeug | `VehicleBody3D` (1200 kg, Schwerpunkt abgesenkt), 4 × `VehicleWheel3D` (Federhärte 45, Reibung 3,2), Motorkraft 2000 je Antriebsrad bis 42 m/s, geschwindigkeitsabhängige Lenkung, Verfolgerkamera, `SpotLight3D` als Scheinwerfer; Optik aus Boxen | Spielbar; Godot-Doku warnt, dass `VehicleBody3D` nicht für realistische Fahrphysik gedacht ist [Q22] → Tuning im MVP, eigenes Raycast-Fahrzeug im Ausbau |
-| Verkehr | 28 `Agent`-Objekte (RefCounted) als **Linien-Agenten** (Achse, Linie, Richtung, Position) mit gewichteter Zufallsabbiegung; Knoten ohne Physik, weiche Annäherung an die Zielposition | Übernommen aus dem Browser-Prototyp; kein Abstandhalten, keine Ampeln, keine Kollision mit dem Spieler |
-| Umwelt | `WorldEnvironment` mit `ProceduralSkyMaterial`, ACES-Tonemapping, **SSAO, SSR, Glow**, Nebel (Dichte 0,0006), 1 `DirectionalLight3D` (Schatten bis 260 m); Tag/Nacht: 1 Stunde = 20 s | Sieht schon gut aus; SSR/SSAO sind dauerhaft an → Kosten messen (Kapitel 5) |
-| UI/Eingabe | Ein `Label` (km/h, Uhrzeit); `InputMap` im Code; `--test`-Modus für Headless-Test | Minimal; HUD, Karte, Menüs fehlen |
-| Nicht vorhanden | Polizei, Fußgänger, Missionen, Audio, Karte, Speichern, Chunk-Streaming, LOD | Alles Weitere in den Modulen M1–M15 |
+| Verkehr/Spielsysteme | 28 Verkehrs- und 60 Fußgänger-`Agent`-Objekte (RefCounted) als **Linien-Agenten** (Achse, Linie, Richtung, Position) mit gewichteter Zufallsabbiegung; Abstandhalten (`_blocked`), Stun/Ghost-Timer; **Polizei-Agenten** mit Fahndungswert (`heat`), Festnahme (`_bust`), Missionsmarker mit Zeitbonus, Geld, Toasts (Arbeitskopie) | Portierung des Browser-Prototyps läuft; weiterhin Linien statt Straßengraph, keine Ampeln, keine Sichtlinien; alles in einem Skript → in Autoloads/Szenen überführen |
+| Umwelt | `WorldEnvironment` mit `ProceduralSkyMaterial`, ACES, **SSAO, SSR, Glow, Volumennebel (Dichte 0,004, GI-Inject), SDFGI (3 Cascades, Occlusion)**, Adjustment (Kontrast 1,08, Sättigung 1,12), Nebel; 1 `DirectionalLight3D` (Schatten bis 260 m); Tag/Nacht: 1 Stunde = 20 s | SDFGI und Volumennebel sind bereits aktiv (im Konzept erst für „Hoch“ vorgesehen) → Kosten auf der RX 5700 XT messen (Kapitel 5.1); `--fps`-Modus gibt die FPS nach 6 s aus |
+| UI/Eingabe | HUD mit Geld, Fahndung, Mission, Toasts; **Minimap** (`minimap.gd`, `Control` mit `_draw`, Weltausschnitt dreht sich mit); `InputMap` im Code; `--test`- und `--fps`-Modus für Headless-/Messläufe | Gute Basis; Vollkarte, Menüs, Optionen fehlen |
+| Beleuchtung/Details | **Laternen** als zwei `MultiMeshInstance3D` (Masten, Köpfe) plus **Pool aus 8 `OmniLight3D`**, die alle 0,25 s den nächsten Laternen zugewiesen werden (derzeit Sortierung *aller* Laternenpositionen → Spatial Hash nötig); **Bäume** (Parks, 14 % der Blöcke) als zwei MultiMeshes; Dachaufbauten/Antennen als Einzel-Nodes | Gutes Muster für Props (Kapitel 5.3); Pool-Prinzip beibehalten |
+| Nicht vorhanden | Audio, Speichern, Chunk-Streaming, LOD, Straßengraph, Vollkarte, Story, Wetter | Alles Weitere in den Modulen M1–M15 |
 
 **Schwächen, die Erweiterungen blockieren:** alles in einer Datei, Zufall nicht zentralisiert, Gebäude als Einzel-Nodes, NPC-Autos ohne Kollisionskörper, Kamera/Fahrzeug/Welt vermischt, kein Profiler-Overlay.
 
@@ -428,7 +429,7 @@ Alle MVPs zusammen: grob **13–15 Arbeitswochen** (eine Person mit KI-Unterstü
 
 ### 5.1 Die Zielhardware und ihre Grenzen
 
-**AMD RX 5700 XT** (RDNA 1, 8 GB GDDR6, Vulkan-fähig, **kein Hardware-Raytracing**, keine Mesh Shader) + **Ryzen 5 3600** (6 Kerne/12 Threads). Godot-Forward+ läuft laut Nutzer nachweislich per Vulkan darauf. Konsequenz: Alles, was Raytracing braucht, entfällt; Godots Screen-Space- und Voxel/SDF-Verfahren sind die Mittel der Wahl.
+**AMD RX 5700 XT** (RDNA 1, 8 GB GDDR6, Vulkan-fähig, **kein Hardware-Raytracing**, keine Mesh Shader) + **Ryzen 5 3600** (6 Kerne/12 Threads). Godot-Forward+ läuft laut Nutzer nachweislich per Vulkan darauf. Konsequenz: Alles, was Raytracing braucht, entfällt; Godots Screen-Space- und Voxel/SDF-Verfahren sind die Mittel der Wahl. **Hinweis:** Der Prototyp hat SDFGI und Volumennebel bereits aktiviert; die Budgettabelle ist deshalb gegen eine Messung zu prüfen – fällt „Mittel“ unter 60 fps, werden SDFGI und Volumennebel zuerst abgeschaltet.
 
 **Frame-Budget bei 60 fps (16,6 ms), 1080p – Planwerte (Schätzung, per Visual Profiler zu bestätigen):**
 
@@ -883,7 +884,9 @@ Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `P
 - ✔ Projekt `godot/` (Godot 4.7.2, Forward+), Start per `godot --path …`
 - ✔ 8×8-Stadt mit Boden-Shader (Straßen/Markierungen) und Gebäuden mit Fenster-/Nachtlicht-Shader
 - ✔ Auto (`VehicleBody3D`, 4 Räder, Verfolgerkamera, Scheinwerfer), Steuerung W/S/A/D/Leertaste/R
-- ✔ 28 Verkehrsautos auf Linien-Agenten
+- ✔ 28 Verkehrsautos und 60 Fußgänger auf Linien-Agenten; Polizei mit Fahndungswert und Festnahme; Missionsmarker mit Zeitbonus; Minimap (Arbeitskopie, noch nicht committed)
+- ✔ Laternen als MultiMesh mit 8-Lichter-Pool, Bäume als MultiMesh, Parks, Gebäude-Details
+- ✔ SDFGI (3 Cascades) und Volumennebel bereits aktiviert (noch ohne Messung)
 - ✔ Tag/Nacht (20 s/Stunde), SSAO, SSR, Glow, ACES-Tonemapping
 - ✔ Reproduzierbarer Seed (`rng.seed = 6`), Headless-Test (`-- --test`)
 
@@ -892,7 +895,8 @@ Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `P
 - Seed als Kommandozeilenargument (`-- --seed=…`); Weltkonstanten als **Global Shader Uniforms** statt doppelter Konstanten.
 - Gebäude je Chunk als **`MultiMeshInstance3D`** (Shader-Tint über Instanzdaten), Kollision je Chunk gebündelt.
 - **Debug-Overlay (F3)** mit `Performance`-Monitoren; Qualitäts-Presets (Niedrig/Mittel/Hoch) als Ressource.
-- Polizei, Fußgänger und Missionsmarker aus dem Browser-Prototyp als Referenz notieren (Portierung in MS2/MS5/MS6).
+- Bereits portierte Spielsysteme (Polizei, Fußgänger, Mission, Minimap) in eigene Szenen/Autoloads überführen (`PoliceDispatcher`, `TrafficSystem`, `MissionRunner`, `minimap.tscn`); ihr Ausbau bleibt in MS2/MS5/MS6.
+- **Erste Messung:** `--fps`-Lauf auf der RX 5700 XT dokumentieren (mit und ohne SDFGI/Volumennebel); Ergebnis ersetzt die Planwerte aus Kapitel 5.1.
 - **Done:** (1) Spiel startet und läuft wie vorher (Fahren, Verkehr, Tag/Nacht, Reset-Taste). (2) Gleicher Seed → identische Stadt in zwei Läufen (Gebäudepositionen im Test verglichen). (3) Draw Calls im Overlay **≤ 600** (Basis: je Chunk ein MultiMesh) bei 64 Blöcken; **Frame-Zeit ≤ 8 ms** im Benchmark-Flug auf dem Referenzgerät. (4) `godot --headless -- --test` meldet Erfolg.
 
 #### Meilenstein 2 – Straßengraph und lebendiger Verkehr *(≈ 2 Wochen)*
@@ -1060,7 +1064,7 @@ E:\Projekte\GTA 6\
 2. **Kein Gott-Skript:** Die Wurzel von `main.tscn` enthält nur Instanzen und Verdrahtung; neue Funktionen kommen als Szene + Skript, nicht in `main.gd`.
 3. **Strangler-Muster:** Funktionen blockweise aus `main.gd` herauslösen (zuerst Uhr/Umwelt → `clock.gd`, dann Fahrzeug → `car_player.tscn`, dann Verkehr, dann Stadt), jeder Schritt bleibt lauffähig; `main.gd` wird zur dünnen Verdrahtung.
 4. **Typisierung:** GDScript-Typen (`var x: float`, `Array[Agent]`, `-> void`) verwenden – schneller und fehlerärmer.
-5. **Der Prototypstand ist derzeit nicht unter Versionskontrolle → `git init` als erster Schritt** (mit `.gitignore` für `.godot/`, Exportordner und große Assets bzw. Git-LFS für `assets/`).
+5. **Versionskontrolle besteht bereits** (`.git`; `.gitignore` enthält `.godot/` und `*.import`). Konvention: ein Commit je abgeschlossenem Teilschritt; Exportordner und große Binärassets ausschließen bzw. später per Git-LFS (`assets/`).
 
 ---
 
@@ -1127,7 +1131,7 @@ Das Ganze besteht aus 15 Modulen und 11 überprüfbaren Meilensteinen; **Meilens
 
 ### Die 5 wichtigsten nächsten Schritte
 
-1. **Versionskontrolle einrichten** (`git init`, `.gitignore` für `.godot/` und Exporte, erster Commit mit Godot-Prototyp) – danach MS1 starten.
+1. **Prototypstand sichern:** Die nicht eingecheckten Änderungen (Polizei, Fußgänger, Mission, Minimap) committen, `godot/README.md` aktualisieren – danach MS1 starten.
 2. **`main.gd` in Szenen und Autoloads zerlegen** (Kapitel 10): `EventBus`, `Config`/`Rng`, `Clock`, Fahrzeug-Szene, `TrafficSystem`; Global Shader Uniforms statt doppelter Konstanten; Verhalten unverändert.
 3. **Messgrundlage schaffen:** Debug-Overlay (F3) mit `Performance`-Monitoren, Benchmark-Flug und Qualitäts-Presets; erste echte Frame-Zeiten auf der RX 5700 XT festhalten (ersetzen die Planwerte aus Kapitel 5.1), inklusive Test **Jolt vs. Godot Physics** für `VehicleBody3D`.
 4. **Gebäude auf `MultiMeshInstance3D` je Chunk umstellen** und den **Straßengraph (`CityData`)** einführen; Verkehr darauf umstellen (MS2) – Grundlage für KI, Karte, GPS, Missionen und später die Zonen.

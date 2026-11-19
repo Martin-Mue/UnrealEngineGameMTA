@@ -124,7 +124,12 @@ func rr(k: float) -> float:
 func _ready() -> void:
 	rng.seed = 6
 	test_mode = "--test" in OS.get_cmdline_user_args()
+	if test_mode:
+		save_path = "user://test_save.json"
 	fps_mode = "--fps" in OS.get_cmdline_user_args()
+	story = StoryScript.new()
+	if not story.load_data("res://data/story.json"):
+		push_error("story.json konnte nicht geladen werden")
 	_setup_input()
 	_build_environment()
 	_build_ground()
@@ -496,6 +501,18 @@ var marker: Node3D
 var msg_label: Label
 var msg_timer := 0.0
 
+const StoryScript := preload("res://story.gd")
+var story
+var current_mission: Dictionary = {}   # leer = freie Kurierfahrt
+var dialog_open := false
+var dialog_panel: PanelContainer
+var dialog_label: Label
+var dialog_options: Array = []
+var dialog_queue: Array = []
+var dialog_choice: Dictionary = {}
+var dialog_mission: Dictionary = {}
+var dialog_stage := ""
+
 func _build_traffic() -> void:
 	for i in 28:
 		_spawn_agent("traffic")
@@ -789,11 +806,14 @@ func _update_game(dt: float) -> void:
 	mission_time -= dt
 	marker.rotation.y += dt
 	if Vector2(mission_pos.x - cp.x, mission_pos.z - cp.z).length() < 9.0:
-		var gain := 300 + int(maxf(0.0, mission_time) * 8.0)
-		money += gain
-		toast("Ziel erreicht!  +$%d" % gain)
-		_new_mission()
-		save_game()
+		if not current_mission.is_empty():
+			_complete_story_mission()
+		else:
+			var gain := 300 + int(maxf(0.0, mission_time) * 8.0)
+			money += gain
+			toast("Ziel erreicht!  +$%d" % gain)
+			_new_mission()
+			save_game()
 
 func _build_marker() -> void:
 	marker = Node3D.new()
@@ -816,6 +836,15 @@ func _build_marker() -> void:
 	add_child(marker)
 
 func _new_mission() -> void:
+	var av: Array = story.available()
+	if av.size() > 0:
+		current_mission = av[0]
+		var cell: Array = current_mission["cell"]
+		mission_pos = Vector3(rr(cell[0]), 0.0, rr(cell[1]))
+		mission_time = 0.0
+		marker.global_position = mission_pos
+		return
+	current_mission = {}
 	for t in 30:
 		var x := rr(rng.randi() % (N + 1))
 		var z := rr(rng.randi() % (N + 1))
@@ -826,8 +855,8 @@ func _new_mission() -> void:
 			marker.global_position = mission_pos
 			return
 
-const SAVE_PATH := "user://savegame.json"
-const SAVE_VERSION := 1
+var save_path := "user://savegame.json"
+const SAVE_VERSION := 2
 
 func save_game() -> bool:
 	var data := {
@@ -840,8 +869,9 @@ func save_game() -> bool:
 			"yaw": car.global_rotation.y,
 		},
 		"mission": {"pos": [mission_pos.x, mission_pos.z], "time": mission_time},
+		"story": story.to_dict(),
 	}
-	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	var f := FileAccess.open(save_path, FileAccess.WRITE)
 	if f == null:
 		toast("Speichern fehlgeschlagen")
 		return false
@@ -851,13 +881,13 @@ func save_game() -> bool:
 	return true
 
 func load_game() -> bool:
-	if not FileAccess.file_exists(SAVE_PATH):
+	if not FileAccess.file_exists(save_path):
 		toast("Kein Spielstand vorhanden")
 		return false
-	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var f := FileAccess.open(save_path, FileAccess.READ)
 	var parsed: Variant = JSON.parse_string(f.get_as_text())
 	f.close()
-	if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("version", 0)) != SAVE_VERSION:
+	if typeof(parsed) != TYPE_DICTIONARY or not [1, SAVE_VERSION].has(int(parsed.get("version", 0))):
 		toast("Spielstand unbrauchbar")
 		return false
 	money = int(parsed["money"])
@@ -868,14 +898,90 @@ func load_game() -> bool:
 	car.global_rotation = Vector3(0.0, float(c["yaw"]), 0.0)
 	car.linear_velocity = Vector3.ZERO
 	car.angular_velocity = Vector3.ZERO
-	var m: Dictionary = parsed["mission"]
-	mission_pos = Vector3(m["pos"][0], 0.0, m["pos"][1])
-	mission_time = float(m["time"])
-	marker.global_position = mission_pos
+	if parsed.has("story"):
+		if not story.from_dict(parsed["story"]):
+			story.reset()
+	else:
+		story.reset()
+	if dialog_open:
+		_close_dialog()
+	_new_mission()
 	for p: Agent in police.duplicate():
 		_remove_agent(p)
 	toast("Geladen (F9)")
 	return true
+
+func _apply_story_outputs() -> void:
+	money += story.out_money
+	story.out_money = 0
+	if story.out_heat > 0.0:
+		_add_heat(story.out_heat)
+	story.out_heat = 0.0
+
+func _show_dialog(title: String, text: String, options: Array) -> void:
+	dialog_options = options
+	var s := "%s\n\n%s\n\n" % [title, text]
+	for i in options.size():
+		s += "[%d] %s\n" % [i + 1, options[i]["text"]]
+	if options.is_empty():
+		s += "[Enter] Weiter"
+	dialog_label.text = s
+	dialog_panel.visible = true
+	dialog_open = true
+
+func _close_dialog() -> void:
+	dialog_panel.visible = false
+	dialog_open = false
+	dialog_stage = ""
+
+func _complete_story_mission() -> void:
+	dialog_mission = current_mission
+	dialog_queue = (current_mission.get("choices", []) as Array).duplicate()
+	dialog_stage = "text"
+	_show_dialog(current_mission["title"], current_mission.get("text", ""), [])
+
+func _next_choice_or_finish() -> void:
+	while not dialog_queue.is_empty():
+		var ch: Dictionary = dialog_queue.pop_front()
+		var opts: Array = story.options_available(ch)
+		if opts.is_empty():
+			continue
+		dialog_choice = ch
+		dialog_stage = "choice"
+		_show_dialog(dialog_mission["title"], ch["text"], opts)
+		return
+	_finish_story_mission()
+
+func _finish_story_mission() -> void:
+	story.complete(dialog_mission)
+	_apply_story_outputs()
+	var finale: bool = dialog_mission.get("finale", false)
+	toast("Auftrag abgeschlossen: %s" % dialog_mission["title"])
+	current_mission = {}
+	_new_mission()
+	save_game()
+	if finale:
+		var e: Dictionary = story.evaluate_ending()
+		dialog_stage = "ending"
+		_show_dialog("ENDE: " + e["title"], e["epilogue"] + "\n\nDu kannst weiter frei fahren.", [])
+	else:
+		_close_dialog()
+
+func _unhandled_input(event: InputEvent) -> void:
+	if not dialog_open or not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	if dialog_options.is_empty():
+		if event.keycode == KEY_ENTER or event.keycode == KEY_KP_ENTER:
+			if dialog_stage == "text":
+				_next_choice_or_finish()
+			elif dialog_stage == "ending":
+				_close_dialog()
+		return
+	var idx: int = event.keycode - KEY_1
+	if idx >= 0 and idx < dialog_options.size():
+		story.choose(dialog_choice, dialog_options[idx])
+		_apply_story_outputs()
+		_next_choice_or_finish()
 
 func toast(txt: String) -> void:
 	msg_label.text = txt
@@ -908,8 +1014,20 @@ func _build_hud() -> void:
 	mm.offset_top = 20.0
 	mm.offset_bottom = 230.0
 	layer.add_child(mm)
+	dialog_panel = PanelContainer.new()
+	dialog_panel.visible = false
+	dialog_panel.set_anchors_preset(Control.PRESET_CENTER)
+	dialog_panel.grow_horizontal = Control.GROW_DIRECTION_BOTH
+	dialog_panel.grow_vertical = Control.GROW_DIRECTION_BOTH
+	dialog_panel.custom_minimum_size = Vector2(780, 0)
+	dialog_label = Label.new()
+	dialog_label.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
+	dialog_label.custom_minimum_size = Vector2(740, 0)
+	dialog_label.add_theme_font_size_override("font_size", 24)
+	dialog_panel.add_child(dialog_label)
+	layer.add_child(dialog_panel)
 	var help := Label.new()
-	help.text = "W/S Gas/Bremse   A/D Lenken   Leertaste Handbremse   R Zuruecksetzen"
+	help.text = "W/S Gas/Bremse   A/D Lenken   Leertaste Handbremse   R Zuruecksetzen   F5 Speichern   F9 Laden"
 	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
 	help.offset_left = 20.0
 	help.offset_top = -36.0
@@ -922,10 +1040,13 @@ func _physics_process(delta: float) -> void:
 	if test_mode:
 		throttle = 1.0
 		test_time += delta
+	if dialog_open:
+		throttle = 0.0
+		steer_in = 0.0
 	var speed := car.linear_velocity.length()
 	# engine_force gilt pro Antriebsrad (4 Raeder); Hoechstgeschwindigkeit ca. 150 km/h
 	car.engine_force = throttle * 2000.0 if speed < 42.0 or throttle < 0.0 else 0.0
-	car.brake = 45.0 if Input.is_action_pressed("handbrake") else 0.0
+	car.brake = 60.0 if dialog_open else (45.0 if Input.is_action_pressed("handbrake") else 0.0)
 	var max_steer := 0.55 * (1.0 - clampf(speed / 60.0, 0.0, 0.7))
 	car.steering = lerpf(car.steering, steer_in * max_steer, 0.2)
 	if Input.is_action_just_pressed("reset"):
@@ -937,8 +1058,9 @@ func _physics_process(delta: float) -> void:
 		save_game()
 	if Input.is_action_just_pressed("load"):
 		load_game()
-	_update_agents(delta)
-	_update_game(delta)
+	if not dialog_open:
+		_update_agents(delta)
+		_update_game(delta)
 	if test_mode and test_time > 3.0:
 		var fwd := car.global_transform.basis.z
 		var m0 := money
@@ -950,6 +1072,24 @@ func _physics_process(delta: float) -> void:
 		var ok2 := load_game()
 		print("SAVETEST save=", ok1, " load=", ok2, " money=", money, " heat=", heat, " (erwartet 4242 / 2.5)")
 		money = m0
+		var steps := 0
+		var enter := InputEventKey.new()
+		enter.pressed = true
+		enter.keycode = KEY_ENTER
+		var one := InputEventKey.new()
+		one.pressed = true
+		one.keycode = KEY_1
+		while not current_mission.is_empty() and steps < 30:
+			steps += 1
+			_complete_story_mission()
+			_unhandled_input(enter)
+			var guard := 0
+			while dialog_open and dialog_stage == "choice" and guard < 10:
+				guard += 1
+				_unhandled_input(one)
+		if dialog_open:
+			_unhandled_input(enter)
+		print("STORYRUN steps=", steps, " completed=", story.state["completed"].size(), " ending=", story.state["flags"].get("ending"), " dialog_open=", dialog_open)
 		_spawn_police()
 		print("POLICE=", police.size(), " agents=", agents.size())
 		print("TEST pos=", car.global_position, " vel=", car.linear_velocity, " fwd=", fwd, " dot=", car.linear_velocity.normalized().dot(fwd))
@@ -995,7 +1135,10 @@ func _process(delta: float) -> void:
 	var mm := int((hour - hh) * 60.0)
 	var stars := int(ceil(heat - 0.001))
 	var dist_m := int(Vector2(mission_pos.x - car.global_position.x, mission_pos.z - car.global_position.z).length())
-	var time_txt := "%d s" % int(mission_time) if mission_time > 0.0 else "ohne Bonus"
-	hud.text = "%d km/h    %02d:%02d\n$ %d\nFahndung: %s%s\nZiel: %d m   %s" % [
+	var title := "Hauptstory: " + str(current_mission["title"]) if not current_mission.is_empty() else "Kurierfahrt"
+	var time_txt := "" if not current_mission.is_empty() else ("%d s" % int(mission_time) if mission_time > 0.0 else "ohne Bonus")
+	var st: Dictionary = story.state["standing"]
+	hud.text = "%d km/h    %02d:%02d\n$ %d\nFahndung: %s%s\nAuftrag: %s\nZiel: %d m   %s\nUnion %d  Aurelia %d  Collective %d  Wrenchers %d" % [
 		int(car.linear_velocity.length() * 3.6), hh, mm, money,
-		"*".repeat(stars), "-".repeat(5 - stars), dist_m, time_txt]
+		"*".repeat(stars), "-".repeat(5 - stars), title, dist_m, time_txt,
+		int(st["union"]), int(st["aurelia"]), int(st["collective"]), int(st["wrenchers"])]
