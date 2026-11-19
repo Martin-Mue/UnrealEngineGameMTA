@@ -1,4 +1,4 @@
-extends Node3D
+﻿extends Node3D
 ## MTA 6 (Godot) - Stadt, Auto, Verkehr, Tag/Nacht.
 ## Spieler-Auto (VehicleBody3D) faehrt in +Z, Verkehrsautos (Node3D) haben ihre Front bei -Z.
 
@@ -90,6 +90,11 @@ class Agent extends RefCounted:
 	var v := 0.0
 	var cruise := 12.0
 	var off := 0.0
+	var kind := "traffic"
+	var side := 1
+	var stun := 0.0
+	var wait := 0.0
+	var ghost := 0.0
 	var node: Node3D
 
 var car: VehicleBody3D
@@ -135,6 +140,7 @@ func _setup_input() -> void:
 		"accel": [KEY_W, KEY_UP], "brake": [KEY_S, KEY_DOWN],
 		"left": [KEY_A, KEY_LEFT], "right": [KEY_D, KEY_RIGHT],
 		"handbrake": [KEY_SPACE], "reset": [KEY_R],
+		"save": [KEY_F5], "load": [KEY_F9],
 	}
 	for action in map:
 		if not InputMap.has_action(action):
@@ -477,27 +483,111 @@ func _build_car() -> void:
 	add_child(cam)
 	cam.make_current()
 
+var money := 1000
+var heat := 0.0
+var last_crime := -99.0
+var gtime := 0.0
+var hit_cool := 0.0
+var bust_t := 0.0
+var police: Array[Agent] = []
+var mission_pos := Vector3.ZERO
+var mission_time := 0.0
+var marker: Node3D
+var msg_label: Label
+var msg_timer := 0.0
+
 func _build_traffic() -> void:
-	var cols := [Color(0.23, 0.43, 0.88), Color(0.94, 0.94, 0.94), Color(0.13, 0.13, 0.13), Color(0.88, 0.75, 0.19), Color(0.23, 0.66, 0.38), Color(0.53, 0.55, 0.58)]
 	for i in 28:
-		var a := Agent.new()
-		a.axis = rng.randi() % 2
-		a.line = rng.randi() % (N + 1)
-		a.sign = 1 if rng.randf() < 0.5 else -1
-		a.pos = rng.randf_range(-HALF + 5.0, HALF - 5.0)
+		_spawn_agent("traffic")
+	for i in 60:
+		_spawn_agent("ped")
+	_build_marker()
+	_new_mission()
+
+func _spawn_agent(kind: String) -> Agent:
+	var cols: Array = [Color(0.23, 0.43, 0.88), Color(0.94, 0.94, 0.94), Color(0.13, 0.13, 0.13), Color(0.88, 0.75, 0.19), Color(0.23, 0.66, 0.38), Color(0.53, 0.55, 0.58)]
+	var a := Agent.new()
+	a.kind = kind
+	a.axis = rng.randi() % 2
+	a.line = rng.randi() % (N + 1)
+	a.sign = 1 if rng.randf() < 0.5 else -1
+	a.pos = rng.randf_range(-HALF + 5.0, HALF - 5.0)
+	a.side = 1 if rng.randf() < 0.5 else -1
+	if kind == "ped":
+		a.cruise = rng.randf_range(1.6, 2.6)
+	elif kind == "police":
+		a.cruise = 26.0
+	else:
 		a.cruise = rng.randf_range(10.0, 17.0)
-		a.v = a.cruise
-		_set_off(a)
-		a.node = Node3D.new()
+	a.v = a.cruise
+	_set_off(a)
+	a.node = Node3D.new()
+	if kind == "ped":
+		_ped_visual(a.node)
+	elif kind == "police":
+		_car_visual(a.node, Color(0.06, 0.06, 0.09))
+		_police_lights(a.node)
+	else:
 		_car_visual(a.node, cols[rng.randi() % cols.size()])
-		add_child(a.node)
-		var t := _agent_target(a)
-		a.node.position = Vector3(t.x, 0.0, t.y)
-		a.node.rotation.y = _agent_heading(a)
-		agents.append(a)
+	add_child(a.node)
+	var t := _agent_target(a)
+	a.node.position = Vector3(t.x, 0.0, t.y)
+	a.node.rotation.y = _agent_heading(a)
+	agents.append(a)
+	return a
+
+func _remove_agent(a: Agent) -> void:
+	agents.erase(a)
+	police.erase(a)
+	a.node.queue_free()
+
+func _ped_visual(parent: Node3D) -> void:
+	var shirts: Array = [Color(0.8, 0.25, 0.25), Color(0.25, 0.45, 0.8), Color(0.25, 0.7, 0.45), Color(0.8, 0.75, 0.25), Color(0.6, 0.3, 0.75), Color(0.9, 0.9, 0.9), Color(0.2, 0.2, 0.2)]
+	var mi := MeshInstance3D.new()
+	var cm := CapsuleMesh.new()
+	cm.radius = 0.26
+	cm.height = 1.75
+	mi.mesh = cm
+	var m := StandardMaterial3D.new()
+	m.albedo_color = shirts[rng.randi() % shirts.size()]
+	m.roughness = 0.9
+	mi.material_override = m
+	mi.position.y = 0.88
+	parent.add_child(mi)
+
+func _police_lights(parent: Node3D) -> void:
+	var stripe := MeshInstance3D.new()
+	var sm := BoxMesh.new()
+	sm.size = Vector3(2.02, 0.25, 2.6)
+	stripe.mesh = sm
+	stripe.material_override = _paint(Color(0.92, 0.92, 0.92), 0.2)
+	stripe.position.y = 0.65
+	parent.add_child(stripe)
+	var mats: Array = []
+	var colors := [Color(1.0, 0.1, 0.1), Color(0.15, 0.3, 1.0)]
+	for i in 2:
+		var bar := MeshInstance3D.new()
+		var bm := BoxMesh.new()
+		bm.size = Vector3(0.7, 0.18, 0.4)
+		bar.mesh = bm
+		var m := StandardMaterial3D.new()
+		m.albedo_color = colors[i]
+		m.emission_enabled = true
+		m.emission = colors[i]
+		m.emission_energy_multiplier = 0.2
+		bar.material_override = m
+		bar.position = Vector3(-0.45 + 0.9 * i, 1.65, 0.2)
+		parent.add_child(bar)
+		mats.append(m)
+	parent.set_meta("lights", mats)
 
 func _set_off(a: Agent) -> void:
-	a.off = 4.0 * a.sign if a.axis == 0 else -4.0 * a.sign
+	if a.kind == "ped":
+		a.off = a.side * 9.5
+	elif a.kind == "police":
+		a.off = 0.0
+	else:
+		a.off = 4.0 * a.sign if a.axis == 0 else -4.0 * a.sign
 
 func _agent_target(a: Agent) -> Vector2:
 	var c := rr(a.line)
@@ -512,34 +602,91 @@ func _agent_heading(a: Agent) -> float:
 
 func _agent_intersection(a: Agent, m: int) -> void:
 	var k := a.line
+	var ix := rr(m) if a.axis == 0 else rr(k)
+	var iz := rr(k) if a.axis == 0 else rr(m)
 	var opts: Array = []
 	var straight_ok := not (m == N and a.sign > 0) and not (m == 0 and a.sign < 0)
 	if straight_ok:
-		opts.append([0, 0.6])
+		var sd := Vector2(a.sign, 0) if a.axis == 0 else Vector2(0, a.sign)
+		opts.append([0, 0.6, Vector2(ix, iz) + sd * P * 0.7])
 	for s in [1, -1]:
 		if (k == 0 and s < 0) or (k == N and s > 0):
 			continue
-		opts.append([s, 0.2])
-	var total := 0.0
-	for o in opts:
-		total += o[1]
-	var r := rng.randf() * total
+		var td := Vector2(0, s) if a.axis == 0 else Vector2(s, 0)
+		opts.append([s, 0.2, Vector2(ix, iz) + td * P * 0.7])
 	var ch: int = opts[opts.size() - 1][0]
-	for o in opts:
-		r -= o[1]
-		if r <= 0.0:
-			ch = o[0]
-			break
+	if a.kind == "police" and rng.randf() > 0.1:
+		var target := Vector2(car.global_position.x, car.global_position.z)
+		var best := INF
+		for o in opts:
+			var dd: float = (o[2] as Vector2).distance_to(target)
+			if dd < best:
+				best = dd
+				ch = o[0]
+	else:
+		var total := 0.0
+		for o in opts:
+			total += o[1]
+		var r := rng.randf() * total
+		for o in opts:
+			r -= o[1]
+			if r <= 0.0:
+				ch = o[0]
+				break
 	if ch == 0:
 		return
 	a.axis = 1 - a.axis
 	a.line = m
 	a.sign = ch
 	a.pos = rr(k) + ch * 1.0
+	if a.kind == "ped":
+		a.side = 1 if rng.randf() < 0.5 else -1
 	_set_off(a)
 
+func _ahead(p: Vector3, fwd: Vector3, q: Vector3) -> bool:
+	var d := q - p
+	d.y = 0.0
+	var f := d.dot(fwd)
+	if f <= 0.0 or f > 11.0:
+		return false
+	return absf(d.x * fwd.z - d.z * fwd.x) < 2.6
+
+func _blocked(a: Agent) -> bool:
+	var fwd := -a.node.global_transform.basis.z
+	var p := a.node.global_position
+	for o in agents:
+		if o != a and o.kind != "ped" and _ahead(p, fwd, o.node.global_position):
+			return true
+	return a.kind == "traffic" and _ahead(p, fwd, car.global_position)
+
 func _update_agents(dt: float) -> void:
-	for a in agents:
+	var cp := car.global_position
+	var speed := car.linear_velocity.length()
+	for a: Agent in agents.duplicate():
+		if a.stun > 0.0:
+			a.stun -= dt
+			a.v = move_toward(a.v, 0.0, 40.0 * dt)
+			if a.kind == "ped":
+				if a.stun <= 0.0:
+					a.node.rotation.x = 0.0
+					a.node.position.y = 0.0
+				continue
+		else:
+			var target := a.cruise
+			if a.kind == "police":
+				target = 24.0 + heat * 2.5
+			if a.kind != "ped":
+				if a.ghost > 0.0:
+					a.ghost -= dt
+				elif _blocked(a):
+					target = 0.0
+					a.wait += dt
+					if a.wait > 4.0:
+						a.ghost = 3.0
+						a.wait = 0.0
+				else:
+					a.wait = 0.0
+			a.v = move_toward(a.v, target, (14.0 if target > a.v else 30.0) * dt)
 		var prev := a.pos
 		a.pos += a.sign * a.v * dt
 		var k1 := int(floor((prev + HALF) / P))
@@ -551,16 +698,221 @@ func _update_agents(dt: float) -> void:
 		a.node.position.x += (t.x - a.node.position.x) * f
 		a.node.position.z += (t.y - a.node.position.z) * f
 		a.node.rotation.y = lerp_angle(a.node.rotation.y, _agent_heading(a), f)
+		if a.kind == "police":
+			var lm: Array = a.node.get_meta("lights")
+			var on := int(gtime * 8.0) % 2 == 0
+			lm[0].emission_energy_multiplier = 4.0 if on else 0.2
+			lm[1].emission_energy_multiplier = 0.2 if on else 4.0
+		var d := a.node.global_position - cp
+		d.y = 0.0
+		var dist := d.length()
+		if a.kind == "ped":
+			if dist < 2.2 and speed > 4.0 and a.stun <= 0.0:
+				a.stun = 5.0
+				a.v = 0.0
+				a.node.rotation.x = -PI / 2.0
+				a.node.position.y = 0.3
+				_add_heat(0.7)
+		elif dist < 3.5:
+			_on_car_hit(a)
+
+func _add_heat(v: float) -> void:
+	heat = minf(5.0, heat + v)
+	last_crime = gtime
+
+func _on_car_hit(a: Agent) -> void:
+	if hit_cool > 0.0:
+		return
+	hit_cool = 0.5
+	var speed := car.linear_velocity.length()
+	var dir := car.global_position - a.node.global_position
+	dir.y = 0.0
+	car.apply_central_impulse(dir.normalized() * 1500.0)
+	car.linear_velocity *= 0.75
+	a.stun = 0.6 if a.kind == "police" else 1.5
+	if a.kind != "police" and speed > 6.0:
+		_add_heat(0.35)
+
+func _spawn_police() -> void:
+	for t in 30:
+		var a := _spawn_agent("police")
+		var d := Vector2(a.node.global_position.x - car.global_position.x, a.node.global_position.z - car.global_position.z).length()
+		if d > 90.0 and d < 200.0:
+			a.v = 15.0
+			police.append(a)
+			return
+		_remove_agent(a)
+
+func _bust() -> void:
+	var fine := mini(money, 300)
+	money -= fine
+	heat = 0.0
+	bust_t = 0.0
+	for p: Agent in police.duplicate():
+		_remove_agent(p)
+	car.global_position = Vector3(-4, 1.2, -40)
+	car.rotation = Vector3.ZERO
+	car.linear_velocity = Vector3.ZERO
+	car.angular_velocity = Vector3.ZERO
+	toast("FESTGENOMMEN  -$%d" % fine)
+
+func _update_game(dt: float) -> void:
+	gtime += dt
+	hit_cool -= dt
+	msg_timer -= dt
+	msg_label.modulate.a = clampf(msg_timer, 0.0, 1.0)
+	var stars := int(ceil(heat - 0.001))
+	var desired := 0 if heat <= 0.0 else mini(8, 1 + stars)
+	if police.size() < desired and rng.randf() < dt * 0.8:
+		_spawn_police()
+	var cp := car.global_position
+	var near_police := false
+	var close_police := false
+	for p in police:
+		var dd := p.node.global_position.distance_to(cp)
+		if dd < 60.0:
+			near_police = true
+		if dd < 7.0:
+			close_police = true
+	if heat > 0.0 and gtime - last_crime > 8.0 and not near_police:
+		heat = maxf(0.0, heat - 0.12 * dt)
+	if heat <= 0.0:
+		for p: Agent in police.duplicate():
+			if p.node.global_position.distance_to(cp) > 150.0:
+				_remove_agent(p)
+	if heat > 0.0 and close_police and car.linear_velocity.length() < 3.0:
+		bust_t += dt
+		if bust_t > 2.5:
+			_bust()
+	else:
+		bust_t = 0.0
+	mission_time -= dt
+	marker.rotation.y += dt
+	if Vector2(mission_pos.x - cp.x, mission_pos.z - cp.z).length() < 9.0:
+		var gain := 300 + int(maxf(0.0, mission_time) * 8.0)
+		money += gain
+		toast("Ziel erreicht!  +$%d" % gain)
+		_new_mission()
+		save_game()
+
+func _build_marker() -> void:
+	marker = Node3D.new()
+	var mi := MeshInstance3D.new()
+	var cyl := CylinderMesh.new()
+	cyl.top_radius = 5.0
+	cyl.bottom_radius = 5.0
+	cyl.height = 70.0
+	cyl.cap_top = false
+	cyl.cap_bottom = false
+	mi.mesh = cyl
+	var m := StandardMaterial3D.new()
+	m.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	m.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	m.albedo_color = Color(1.0, 0.82, 0.2, 0.28)
+	m.cull_mode = BaseMaterial3D.CULL_DISABLED
+	mi.material_override = m
+	mi.position.y = 35.0
+	marker.add_child(mi)
+	add_child(marker)
+
+func _new_mission() -> void:
+	for t in 30:
+		var x := rr(rng.randi() % (N + 1))
+		var z := rr(rng.randi() % (N + 1))
+		var dist := Vector2(x - car.global_position.x, z - car.global_position.z).length()
+		if dist > 150.0:
+			mission_pos = Vector3(x, 0.0, z)
+			mission_time = dist / 14.0 + 20.0
+			marker.global_position = mission_pos
+			return
+
+const SAVE_PATH := "user://savegame.json"
+const SAVE_VERSION := 1
+
+func save_game() -> bool:
+	var data := {
+		"version": SAVE_VERSION,
+		"money": money,
+		"heat": heat,
+		"hour": hour,
+		"car": {
+			"pos": [car.global_position.x, car.global_position.y, car.global_position.z],
+			"yaw": car.global_rotation.y,
+		},
+		"mission": {"pos": [mission_pos.x, mission_pos.z], "time": mission_time},
+	}
+	var f := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
+	if f == null:
+		toast("Speichern fehlgeschlagen")
+		return false
+	f.store_string(JSON.stringify(data, "\t"))
+	f.close()
+	toast("Gespeichert (F5)")
+	return true
+
+func load_game() -> bool:
+	if not FileAccess.file_exists(SAVE_PATH):
+		toast("Kein Spielstand vorhanden")
+		return false
+	var f := FileAccess.open(SAVE_PATH, FileAccess.READ)
+	var parsed: Variant = JSON.parse_string(f.get_as_text())
+	f.close()
+	if typeof(parsed) != TYPE_DICTIONARY or int(parsed.get("version", 0)) != SAVE_VERSION:
+		toast("Spielstand unbrauchbar")
+		return false
+	money = int(parsed["money"])
+	heat = float(parsed["heat"])
+	hour = float(parsed["hour"])
+	var c: Dictionary = parsed["car"]
+	car.global_position = Vector3(c["pos"][0], c["pos"][1] + 0.3, c["pos"][2])
+	car.global_rotation = Vector3(0.0, float(c["yaw"]), 0.0)
+	car.linear_velocity = Vector3.ZERO
+	car.angular_velocity = Vector3.ZERO
+	var m: Dictionary = parsed["mission"]
+	mission_pos = Vector3(m["pos"][0], 0.0, m["pos"][1])
+	mission_time = float(m["time"])
+	marker.global_position = mission_pos
+	for p: Agent in police.duplicate():
+		_remove_agent(p)
+	toast("Geladen (F9)")
+	return true
+
+func toast(txt: String) -> void:
+	msg_label.text = txt
+	msg_timer = 3.0
 
 func _build_hud() -> void:
 	var layer := CanvasLayer.new()
 	hud = Label.new()
 	hud.position = Vector2(20, 14)
-	hud.add_theme_font_size_override("font_size", 28)
+	hud.add_theme_font_size_override("font_size", 26)
+	hud.add_theme_color_override("font_outline_color", Color.BLACK)
+	hud.add_theme_constant_override("outline_size", 6)
 	layer.add_child(hud)
+	msg_label = Label.new()
+	msg_label.anchor_right = 1.0
+	msg_label.position.y = 130.0
+	msg_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	msg_label.add_theme_font_size_override("font_size", 38)
+	msg_label.add_theme_color_override("font_outline_color", Color.BLACK)
+	msg_label.add_theme_constant_override("outline_size", 8)
+	msg_label.modulate.a = 0.0
+	layer.add_child(msg_label)
+	var mm := Control.new()
+	mm.set_script(load("res://minimap.gd"))
+	mm.set("main", self)
+	mm.anchor_left = 1.0
+	mm.anchor_right = 1.0
+	mm.offset_left = -230.0
+	mm.offset_right = -20.0
+	mm.offset_top = 20.0
+	mm.offset_bottom = 230.0
+	layer.add_child(mm)
 	var help := Label.new()
 	help.text = "W/S Gas/Bremse   A/D Lenken   Leertaste Handbremse   R Zuruecksetzen"
-	help.position = Vector2(20, 860)
+	help.set_anchors_preset(Control.PRESET_BOTTOM_LEFT)
+	help.offset_left = 20.0
+	help.offset_top = -36.0
 	layer.add_child(help)
 	add_child(layer)
 
@@ -581,9 +933,25 @@ func _physics_process(delta: float) -> void:
 		car.rotation = Vector3(0, car.rotation.y, 0)
 		car.linear_velocity = Vector3.ZERO
 		car.angular_velocity = Vector3.ZERO
+	if Input.is_action_just_pressed("save"):
+		save_game()
+	if Input.is_action_just_pressed("load"):
+		load_game()
 	_update_agents(delta)
+	_update_game(delta)
 	if test_mode and test_time > 3.0:
 		var fwd := car.global_transform.basis.z
+		var m0 := money
+		money = 4242
+		heat = 2.5
+		var ok1 := save_game()
+		money = 1
+		heat = 0.0
+		var ok2 := load_game()
+		print("SAVETEST save=", ok1, " load=", ok2, " money=", money, " heat=", heat, " (erwartet 4242 / 2.5)")
+		money = m0
+		_spawn_police()
+		print("POLICE=", police.size(), " agents=", agents.size())
 		print("TEST pos=", car.global_position, " vel=", car.linear_velocity, " fwd=", fwd, " dot=", car.linear_velocity.normalized().dot(fwd))
 		get_tree().quit()
 
@@ -625,4 +993,9 @@ func _process(delta: float) -> void:
 	cam.look_at(car.global_position + fwd * 5.0 + Vector3.UP * 1.5, Vector3.UP)
 	var hh := int(hour)
 	var mm := int((hour - hh) * 60.0)
-	hud.text = "%d km/h    %02d:%02d" % [int(car.linear_velocity.length() * 3.6), hh, mm]
+	var stars := int(ceil(heat - 0.001))
+	var dist_m := int(Vector2(mission_pos.x - car.global_position.x, mission_pos.z - car.global_position.z).length())
+	var time_txt := "%d s" % int(mission_time) if mission_time > 0.0 else "ohne Bonus"
+	hud.text = "%d km/h    %02d:%02d\n$ %d\nFahndung: %s%s\nZiel: %d m   %s" % [
+		int(car.linear_velocity.length() * 3.6), hh, mm, money,
+		"*".repeat(stars), "-".repeat(5 - stars), dist_m, time_txt]

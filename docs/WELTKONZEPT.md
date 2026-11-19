@@ -1,48 +1,49 @@
-# MTA 6 – Weltkonzept
+# MTA 6 – Weltkonzept (Godot 4.7)
 
 > Modulares Konzept für eine außergewöhnlich gute Spielwelt von **MTA 6**, einem **eigenständigen**, dystopisch-realistischen Open-World-Fahrspiel (Einzelspieler-Kern, später gemischt mit MMO-Elementen) mit eigener Stadt, eigenen Figuren und eigener Story.
-> Version 2 (ergänzt um Realismus/Detailtiefe, Story-Engine mit Entscheidungen, Server/Mehrspieler und dystopische Stadtidentität). Zusammenhang mit der Iterationsplanung: [`ITERATIONSPLAN.md`](ITERATIONSPLAN.md) (Zuordnung in Kapitel 9).
-> Stand: 19.11.2026 · Sprache: Deutsch · Ausgangsbasis: Prototyp `index.html` + `game.js` (Three.js, Browser).
+> **Version 3 – Engine: Godot 4.7.2** (GDScript, Forward+/Vulkan, Windows-PC; Zielhardware AMD RX 5700 XT 8 GB, Ryzen 5 3600, 64 GB RAM). Frühere Versionen waren auf Browser/Three.js ausgelegt; der Inhalt (Module, Welt, Story, Meilensteine) ist erhalten und technisch auf Godot übersetzt.
+> Stand: 19.11.2026 · Sprache: Deutsch · Ausgangsbasis: Godot-Prototyp in `godot/` (`main.gd`, `main.tscn`, `project.godot`), Iterationsplanung: [`ITERATIONSPLAN.md`](ITERATIONSPLAN.md) (Zuordnung in Kapitel 9).
 >
 > **Abgrenzung:** Dieses Dokument verwendet ausschließlich allgemeine Genre-Prinzipien (Open-World-Design, lebendige Städte, Systemik). Karte, Namen, Figuren, Marken und Story-Elemente sind vollständig eigen – nichts davon ist von GTA oder anderen Rockstar-Titeln abgeleitet.
+>
+> **Hinweis zur Recherche:** Die Godot-Dokumentation wurde in den Versionen 4.0–4.6 geprüft; für **4.7.2** sind Verhalten und Einstellungen am Prototyp zu verifizieren (jeweils markiert). Zahlen zu Frame-Zeiten sind **Planwerte**, keine Messungen – sie sind mit dem Profiler auf der Zielhardware zu bestätigen.
 
 ---
 
 ## Inhalt
 
-1. [Ist-Zustand des Prototyps](#1-ist-zustand-des-prototyps)
+1. [Ist-Zustand des Godot-Prototyps](#1-ist-zustand-des-godot-prototyps)
 2. [Vision und Designsäulen](#2-vision-und-designsäulen)
 3. [Modulübersicht und Schnittstellen](#3-modulübersicht-und-schnittstellen)
 4. [Module im Detail (M1–M12)](#4-module-im-detail)
 5. [Realismus und Detailtiefe (M13)](#5-realismus-und-detailtiefe-m13)
 6. [Story-Engine, Entscheidungen und Fraktionen (M14)](#6-story-engine-entscheidungen-und-fraktionen-m14)
 7. [Open World trifft MMO: Server und Mehrspieler (M15)](#7-open-world-trifft-mmo-server-und-mehrspieler-m15)
-8. [Die Welt: Kestrel Bay (dystopisch)](#8-die-welt-kestrel-bay)
+8. [Die Welt: Kestrel Bay (dystopisch)](#8-die-welt-kestrel-bay-dystopisch)
 9. [Roadmap mit Meilensteinen](#9-roadmap-mit-meilensteinen)
-10. [Empfohlene Dateistruktur (ES-Module)](#10-empfohlene-dateistruktur-es-module)
+10. [Empfohlene Projektstruktur (Godot)](#10-empfohlene-projektstruktur-godot)
 11. [Quellen](#11-quellen)
 12. [Zusammenfassung und die 5 nächsten Schritte](#12-zusammenfassung-und-die-5-nächsten-schritte)
 
 ---
 
-## 1. Ist-Zustand des Prototyps
+## 1. Ist-Zustand des Godot-Prototyps
 
-Gelesen wurde `game.js` (689 Zeilen, eine Datei, globale Variablen). Was vorhanden ist und was es für die Planung bedeutet:
+Gelesen wurden `godot/main.gd` (460 Zeilen, ein Skript auf der Wurzel von `main.tscn`), `godot/project.godot` und `godot/README.md`. Der frühere Three.js-Prototyp (`index.html`, `game.js`) bleibt als eingefrorene Referenz erhalten; er enthielt zusätzlich Polizei, Fußgänger, Missionsmarker, Minimap und Audio, die im Godot-Prototyp **noch nicht portiert** sind.
 
-| Bereich | Ist-Zustand | Konsequenz |
+| Bereich | Ist-Zustand (Godot) | Konsequenz |
 |---|---|---|
-| Stadt | Raster 8×8 Blöcke, `P = 80 m`, Straßenbreite 16 m → ca. 640 × 640 m. Zufällige Gebäude (Box + Canvas-Fenstertextur), Parks mit Kegel-Bäumen, Berge als Kegel am Horizont | Zu klein und zu gleichförmig; keine Bezirke, kein Terrain, keine Höhen |
-| Zufall | `Math.random()` ohne Seed | Welt nicht reproduzierbar → kein Seed, keine Tests, kein Speichern von Weltzustand |
-| Rendering | Ein `Mesh` pro Gebäude/Gehweg/Baum, pro Gebäude eigenes Material; `PCFSoftShadowMap`, 2048er Sonnenschatten | Draw Calls wachsen linear mit der Stadt – bei größerer Welt nicht tragbar → Instancing/Merging nötig |
-| Fahrzeuge | Arcade-Kinematik (Geschwindigkeit + Lenkwinkel), Box-Modell, Kollision nur gegen Block-AABBs (alle 64 Blöcke je Frame) und Kreisabstand zu NPC-Autos | Spielbar, aber kein Federweg/Gewicht/Drift; Kollision braucht räumlichen Index |
-| Agenten | Verkehr (36), Fußgänger (70), Polizei als „Linien-Agenten“: Position entlang einer Achse, an Kreuzungen gewichtete Zufallsabbiegung; Polizei wählt die zum Spieler nächste Option | Gute Basis, aber ohne Spurlogik, Ampeln, Vorfahrt, Wegenetz-Graph, Sim-LOD |
-| Polizei/Gesetz | `heat` 0–5, Polizei spawnt 90–200 m entfernt, Festnahme bei Stillstand <3 m/s in 7 m Nähe über 2,5 s | Gutes Spielgefühl-Skelett; es fehlt Sichtlinie/Suchzustand, Straßensperren, Verbrechenstypen |
-| Missionen | Ein Marker, zufälliges Ziel >150 m, Zeitbonus | Reine Lieferfahrt; keine Mission-Typen, keine Story, kein Fortschritt außer Geld |
-| Tag/Nacht | 1 Spielstunde = 20 s (Tag = 8 min), Himmel/Nebel/Sonne/Fensterlicht, Scheinwerfer | Funktioniert; fehlen Wetter, Straßenlaternen, Himmelskörper |
-| Audio | Zwei Oszillatoren als Motor, Mute-Taste | Platzhalter |
-| UI | HUD (Geld, Sterne, Tempo, HP, Uhr), runde Minimap per Canvas | Gut als Ausgangspunkt; keine große Karte, Wegpunkte, Menüs |
+| Projekt | Godot 4.7.2, **Forward+**, MSAA 2×, Direktionalschatten-Atlas 4096; Fenster 1600×900; `main.gd` baut fast alles im Code (`_build_*`) | Gute Basis, aber ein Skript für alles → in Szenen, Autoloads und Ressourcen zerlegen (Kapitel 10) |
+| Stadt | Raster 8×8 Blöcke, `P = 80 m`, Straße 16 m → ca. 640 × 640 m. **Boden = eine 4000×4000-PlaneMesh mit Spatial-Shader**, der Straßen, Mittellinien, Randlinien und Zebrastreifen prozedural aus der Weltposition zeichnet (kein Mesh pro Straße) | Sehr effizient; Shader-Konstanten (`P`, `HALF`) sind aber doppelt hartkodiert (GDScript und Shader) → **Global Shader Uniforms** verwenden |
+| Gebäude | Je Lot ein `StaticBody3D` + `MeshInstance3D` (BoxMesh) + `CollisionShape3D`, ein gemeinsames `ShaderMaterial` mit `instance uniform tint`; Fenster und Nachtlicht rein im Fragment-Shader aus Weltposition (`night`-Uniform) | Keine Fenstertexturen nötig (gut); Nodes-Zahl wächst mit der Stadt → für größere Welt **MultiMeshInstance3D** und gebündelte Kollision je Chunk |
+| Zufall | `RandomNumberGenerator` mit `seed = 6` | Welt ist **reproduzierbar** (Vorteil gegenüber dem alten Prototyp) |
+| Fahrzeug | `VehicleBody3D` (1200 kg, Schwerpunkt abgesenkt), 4 × `VehicleWheel3D` (Federhärte 45, Reibung 3,2), Motorkraft 2000 je Antriebsrad bis 42 m/s, geschwindigkeitsabhängige Lenkung, Verfolgerkamera, `SpotLight3D` als Scheinwerfer; Optik aus Boxen | Spielbar; Godot-Doku warnt, dass `VehicleBody3D` nicht für realistische Fahrphysik gedacht ist [Q22] → Tuning im MVP, eigenes Raycast-Fahrzeug im Ausbau |
+| Verkehr | 28 `Agent`-Objekte (RefCounted) als **Linien-Agenten** (Achse, Linie, Richtung, Position) mit gewichteter Zufallsabbiegung; Knoten ohne Physik, weiche Annäherung an die Zielposition | Übernommen aus dem Browser-Prototyp; kein Abstandhalten, keine Ampeln, keine Kollision mit dem Spieler |
+| Umwelt | `WorldEnvironment` mit `ProceduralSkyMaterial`, ACES-Tonemapping, **SSAO, SSR, Glow**, Nebel (Dichte 0,0006), 1 `DirectionalLight3D` (Schatten bis 260 m); Tag/Nacht: 1 Stunde = 20 s | Sieht schon gut aus; SSR/SSAO sind dauerhaft an → Kosten messen (Kapitel 5) |
+| UI/Eingabe | Ein `Label` (km/h, Uhrzeit); `InputMap` im Code; `--test`-Modus für Headless-Test | Minimal; HUD, Karte, Menüs fehlen |
+| Nicht vorhanden | Polizei, Fußgänger, Missionen, Audio, Karte, Speichern, Chunk-Streaming, LOD | Alles Weitere in den Modulen M1–M15 |
 
-**Schwächen, die jede Erweiterung blockieren:** globaler Zustand, kein Seed, ein Draw Call je Objekt, Allokationen pro Frame (`concat`, `map` im Update), keine Trennung zwischen Simulation und Darstellung.
+**Schwächen, die Erweiterungen blockieren:** alles in einer Datei, Zufall nicht zentralisiert, Gebäude als Einzel-Nodes, NPC-Autos ohne Kollisionskörper, Kamera/Fahrzeug/Welt vermischt, kein Profiler-Overlay.
 
 ---
 
@@ -50,7 +51,7 @@ Gelesen wurde `game.js` (689 Zeilen, eine Datei, globale Variablen). Was vorhand
 
 **Pitch:** *Kestrel Bay* ist eine sonnenverbrannte Küstenmetropole, die von einem Konzern „optimiert“ wird: glänzende Türme voller Kameras, rostige Docks, neonbunte Nächte, ein Highway, der in die Berge schneidet. Der Konzern *Aurelia Holdings* betreibt das Überwachungsnetz **Aegis**, das Kennzeichen, Gesichter und Zahlungen verknüpft und Zugang zu Straßen, Krediten und Wohnungen steuert. Man fährt, entkommt, handelt – und entscheidet, wem die Stadt am Ende gehört. Sie funktioniert auch ohne den Spieler.
 
-**Zielplattform:** PC, Desktop-Browser (Chrome/Edge als Referenz, Firefox/Safari als „soll laufen“). Keine Installation, Start in unter 10 s. Mittelklasse-Notebook (integrierte GPU) als Mindestziel: 60 fps bei 1080p im „Mittel“-Preset, 30 fps im „Niedrig“-Preset.
+**Zielplattform:** Windows-PC, Godot 4.7.2 (Forward+/Vulkan), ausgelegt auf **AMD RX 5700 XT (8 GB, ohne Hardware-Raytracing) + Ryzen 5 3600 + 64 GB RAM**. Läuft ohne Konto-Zwang und ohne Launcher; Start in unter 15 s von SSD. Ziel: 60 fps bei 1080p im Preset „Mittel“, 1440p über FSR 2.2 im Preset „Hoch“ nach Messung. Mehrspieler optional über einen eigenen Dedicated Server.
 
 ### Die sieben Designsäulen
 
@@ -58,8 +59,8 @@ Gelesen wurde `game.js` (689 Zeilen, eine Datei, globale Variablen). Was vorhand
 2. **Jeder Bezirk ist auf einen Blick erkennbar.** Silhouette, Farbpalette, Straßenmuster, Licht, Musik und Verkehr unterscheiden sich so stark, dass man ohne Karte weiß, wo man ist (Orientierung über Landmarken, siehe Quellen [Q7]).
 3. **Die Stadt lebt ohne dich.** Verkehr, Passanten, Polizei und Wetter folgen eigenen Regeln. Der Spieler stört ein System, das bereits läuft (Systemik statt Skript, [Q5][Q6]).
 4. **Systeme erzeugen Geschichten.** Wenige, saubere Regeln (Verfolgung, Ruf, Geld, Tageszeit, Wetter) kombinieren sich zu unvorhersehbaren Momenten; geschriebene Missionen setzen nur Anker.
-5. **Browser-ehrlich gebaut.** Alles wird gegen feste Performance-Budgets entworfen (Instancing, Streaming, Sim-LOD). Eine schöne Welt, die nur auf einer Highend-GPU läuft, ist keine.
-6. **Glaubwürdigkeit durch Detail.** Realismus entsteht aus vielen kleinen, konsistenten Dingen (Materialien, Verschleiß, Straßendetails, plausible Stadtstruktur), nicht aus maximaler Polygonzahl. Ziel ist der bestmögliche Look *innerhalb* der Browsergrenzen (Kapitel 5).
+5. **Hardware-ehrlich gebaut.** Alles wird gegen feste Performance-Budgets der Zielhardware entworfen (MultiMesh, Streaming, Visibility Ranges, Sim-LOD). Eine schöne Welt, die nur auf einer Highend-GPU läuft, ist keine.
+6. **Glaubwürdigkeit durch Detail.** Realismus entsteht aus vielen kleinen, konsistenten Dingen (Materialien, Verschleiß, Straßendetails, plausible Stadtstruktur), nicht aus maximaler Polygonzahl. Ziel ist der bestmögliche Look *innerhalb* der Hardwaregrenzen (Kapitel 5).
 7. **Entscheidungen haben Folgen, und die Welt hat eine Haltung.** Dystopie ist kein Anstrich, sondern Spielmechanik: Überwachung (Aegis), Konzernmacht und soziale Gegensätze verändern, wie man fährt, flieht und handelt. Spielerentscheidungen verschieben Fraktionen, Bezirke und Enden (Kapitel 6).
 
 ### Alleinstellungsmerkmal (Unique Selling Point)
@@ -80,7 +81,7 @@ flowchart TB
     CITY["CityData: Straßengraph, Parzellen, Zonen"]
   end
 
-  subgraph SIM["Simulation (Fixed-Step 60 Hz, ohne Three.js)"]
+  subgraph SIM["Simulation (_physics_process 60 Hz, ohne Render-Abhängigkeit)"]
     GEN["M1 Weltgenerierung"]
     VEH["M4 Fahrzeuge & Physik"]
     AI["M5 Verkehr/Fußgänger-KI"]
@@ -91,9 +92,9 @@ flowchart TB
     STO["M14 Story-Engine: Entscheidungen, Fraktionen, Weltzustand"]
   end
 
-  subgraph VIEW["Darstellung (Three.js, pro Frame)"]
+  subgraph VIEW["Darstellung (Godot-Renderer, _process)"]
     STR["M2 Streaming/LOD"]
-    REND["Renderer: Instancing, Material-Pools, Licht"]
+    REND["Rendering: MultiMesh, Shader, Environment"]
     AUD["M10 Audio"]
     UI["M11 UI/Karte"]
     REAL["M13 Realismus-Pipeline: PBR, Decals, Verschleiß"]
@@ -138,20 +139,25 @@ flowchart TB
   NET <-.Story-Zustand.-> STO
 ```
 
-### 3.2 Leitprinzipien der Architektur
+### 3.2 Leitprinzipien der Architektur (Godot)
 
-- **Simulation und Darstellung strikt getrennt.** Die Simulation kennt nur Zahlen (Positionen, Zustände) und läuft mit festem Zeitschritt. Der Renderer liest diese Zustände. Dadurch ist Sim-LOD (ferne Agenten billig simulieren), Worker-Auslagerung und Testen ohne Browser möglich.
-- **Ein Datenmodell für die Stadt (`CityData`)**: Straßengraph (Knoten, Kanten mit Spuren), Parzellen, Zonen/Bezirke. Weltgenerierung schreibt es, Streaming, KI, Karte und Missionen lesen es. So gibt es *eine* Wahrheit.
-- **Events statt direkter Aufrufe** zwischen Modulen (`bus.emit('crime', {...})`). Polizei, Missionen, Audio und UI abonnieren, ohne sich zu kennen.
-- **Alles seedbar:** ein `Rng(seed)` statt `Math.random()`; gleicher Seed = gleiche Stadt.
-- **Server-fähig von Anfang an:** Da `sim/` und `world/` ohne Three.js und ohne DOM laufen, kann dieselbe Simulation später im Node-Server laufen. Im Einzelspielermodus läuft sie als **LocalServer** im selben Browser (Web Worker). So gibt es *einen* Code-Pfad für Einzel- und Mehrspieler (Kapitel 7).
+- **Szenen als Bausteine, Autoloads als Dienste.** Jede wiederverwendbare Einheit ist eine **Szene** (`scenes/vehicles/car.tscn`, `scenes/world/chunk.tscn`, `scenes/ui/hud.tscn`). Systeme, die es genau einmal gibt (Zeit/Wetter, Ereignisse, Spielzustand, Audio-Manager, Chunk-Manager), sind **Autoloads** (Singletons). Alles andere wird instanziert, nicht global gehalten.
+- **Daten als Ressourcen.** Statische Inhalte (Bezirke, Fahrzeugdatenblätter, Fraktionen, Materialien) sind eigene `Resource`-Klassen (`class_name DistrictDef extends Resource`, `.tres`) oder JSON; Story-Inhalte in JSON (diffbar, prüfbar). **Gespeichert wird ausschließlich als JSON**, nie als `.tres/.res`, weil Godot-Ressourcen eingebetteten Skriptcode enthalten können (Sicherheitsrisiko bei fremden Dateien, vgl. Mehrspieler-Kapitel).
+- **Simulation und Darstellung trennen – soweit sinnvoll.** Simulationslogik (Verkehr, Polizei, Story, Wirtschaft) läuft in `_physics_process` (fester Takt, 60 Hz) und kennt **keine** Meshes/Materialien; die Darstellung liest den Zustand. Das ermöglicht Sim-LOD, Auslagerung in Threads und – wichtig – den **Dedicated Server im Headless-Modus**, der dieselbe Simulation ohne Rendering ausführt.
+- **Signale statt direkter Aufrufe.** Ein Autoload `EventBus` bündelt Signale (`crime_committed`, `mission_completed`, `district_entered`); Polizei, Missionen, Audio und UI abonnieren, ohne sich zu kennen.
+- **Ein Datenmodell für die Stadt (`CityData`):** Straßengraph (Knoten, Kanten, Spuren), Parzellen, Zonen/Bezirke als Ressourcen/Objekte, geschrieben von der Weltgenerierung, gelesen von Streaming, KI, Karte und Missionen.
+- **Alles seedbar:** ein zentraler `Rng`-Dienst (`RandomNumberGenerator` mit Seed je Aufgabe/Chunk: `seed = hash(world_seed, chunk_x, chunk_z)`); gleicher Seed = gleiche Stadt, **unabhängig von der Ladereihenfolge**.
+- **Globale Shader-Parameter statt Doppelpflege:** Welt-Konstanten, Tageszeit (`night`), Nässe (`wetness`), Wetter, Verschmutzung als **Global Shader Uniforms** (`RenderingServer.global_shader_parameter_set`), die alle Materialien lesen – ersetzt die doppelt hartkodierten Konstanten des Prototyps.
+- **GDScript zuerst, C#/GDExtension nur nach Messung.** Rechenintensive Schleifen (Verkehrs-Update für Hunderte Agenten, Generator-Mathematik, A*) werden zuerst in GDScript (typisiert!) gebaut und mit dem Profiler gemessen; erst bei nachgewiesenem Engpass auf **C#** (erfordert die .NET-Variante von Godot) oder **GDExtension** (C++/Rust) umstellen – dann nur dieses Modul.
+- **Server-fähig von Anfang an:** Dieselbe Simulation läuft im Einzelspieler lokal und im Mehrspielerbetrieb auf dem Server. Der Einzelspieler nutzt die Godot-Multiplayer-API im **Offline-Modus** (`OfflineMultiplayerPeer`), sodass RPC-Code in beiden Modi identisch ist (Kapitel 7).
 
 ### 3.3 Schnittstellentabelle
+
 
 | Modul | Liefert (Output) | Braucht (Input) |
 |---|---|---|
 | M1 Weltgenerierung | `CityData` (Straßengraph, Parzellen, Zonen, Landmarken-Slots) | Seed, Bezirksdefinitionen, Heightmap |
-| M2 Streaming/LOD | Sichtbare Chunks, Instanz-Buffer, Kollisions-Proxies | `CityData`, Kameraposition |
+| M2 Streaming/LOD | Geladene Chunk-Szenen (MultiMesh, Kollisionsformen), Sichtbarkeitsbereiche | `CityData`, Kameraposition |
 | M3 Bezirke | `DistrictDef` (Palette, Regeln, Dichte, Musik, Verkehrsprofil) | – (Designdaten) |
 | M4 Fahrzeuge | `VehicleState` (Pose, Geschwindigkeit, Schaden), Kollisionsevents | Eingabe/KI-Steuerung, Bodenhöhe, Fahrzeugdaten |
 | M5 Verkehrs-/Fußgänger-KI | Agentenzustände, Wahrnehmungsevents („Unfall gesehen“) | Straßengraph, Zeit, Wetter, Spielerposition |
@@ -170,7 +176,7 @@ flowchart TB
 
 ## 4. Module im Detail
 
-Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI-Unterstützung, jeweils pro Stufe; Werte sind grobe Schätzungen mit ±50 % Unsicherheit. Stufen: **MVP** (spielbar, trägt den Meilenstein), **Ausbau** (Qualitätssprung), **Wunschziel** (Politur/Luxus).
+Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI-Unterstützung, pro Stufe; grobe Schätzung, ±50 %. Stufen: **MVP** (spielbar, trägt den Meilenstein), **Ausbau** (Qualitätssprung), **Wunschziel** (Politur/Luxus). Godot liefert vieles fertig (Physik, Navigation, Multiplayer-API, Audio-Busse, UI, Profiler); der Aufwand ist deshalb gegenüber der Browser-Version bei einigen Modulen kleiner.
 
 ### M1 – Weltgenerierung
 
@@ -178,53 +184,55 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Seed-RNG; Raster wird zu **Straßengraph** (Knoten/Kanten) mit Hierarchie (Hauptstraße, Nebenstraße, Gasse); Blöcke werden rekursiv in Parzellen unterteilt; Gebäudehöhe nach Bezirk statt nur nach Abstand zur Mitte |
-| Ausbau | **Tensor-Feld-Straßen**: Raster in der Innenstadt, Radialmuster am Hang, Küstenparallelen an der Promenade, zu einem Feld verblendet; Heightmap-Terrain mit Straßen, die sich dem Gelände anpassen; Brücken/Tunnel; Wasserflächen |
-| Wunschziel | Grammatik-basierte Fassaden (Shape Grammar) mit Bezirksstil; Einwohner-/Landnutzungssimulation, aus der Zonen entstehen; handgesetzte „Hero“-Gebiete werden in die generierte Stadt eingefügt |
+| MVP | Zentraler Seed; Raster wird zu **Straßengraph** (Knoten/Kanten) mit Hierarchie (Hauptstraße, Nebenstraße, Gasse); Blöcke werden rekursiv in Parzellen unterteilt; Gebäudehöhe nach Bezirk statt nur nach Abstand zur Mitte (im Prototyp: `lerpf(80, 16, dist)`) |
+| Ausbau | **Tensor-Feld-Straßen**: Raster in der Innenstadt, Radialmuster am Hang, Küstenparallelen an der Promenade, zu einem Feld verblendet; Heightmap-Terrain; Straßen passen sich dem Gelände an; Brücken/Tunnel; Wasserflächen |
+| Wunschziel | Grammatik-basierte Fassaden mit Bezirksstil; Einwohner-/Landnutzungssimulation; handgesetzte „Hero“-Gebiete (eigene Szenen) werden in die generierte Stadt eingefügt |
 
-**Technische Umsetzung:**
-- Verfahren in der Reihenfolge der Literatur: Straßennetz → Blöcke → Parzellen → Gebäude ([Q1] Parish & Müller mit L-Systemen; [Q2] Chen et al. mit Tensor-Feldern für Raster/Radial/Küstenmuster; Parzellierung per rekursiver Teilung orientierter Rechtecke, vgl. [Q3]).
-- **Hybridansatz empfohlen:** Hauptachsen, Highway, Brücken und Landmarken **handgesetzt** (Designkontrolle, Wiedererkennbarkeit), Füllstraßen und Parzellen **prozedural** (Umfang, Vielfalt). Reine Prozedur erzeugt Beliebigkeit; reine Handarbeit ist nicht zu leisten.
-- Terrain als Heightmap-Gitter in Chunks; Straßen als Meshes entlang der Graph-Kanten, die an das Terrain „geschmiegt“ werden.
-- Ausgabe ist reine Daten-Struktur (JSON-fähig) → in Worker erzeugbar, cachebar, testbar.
+**Technische Umsetzung (Godot):**
+- Verfahren nach der Literatur: Straßennetz → Blöcke → Parzellen → Gebäude ([Q1] Parish & Müller, L-Systeme; [Q2] Chen et al., Tensor-Felder; Parzellierung durch rekursive Teilung orientierter Rechtecke [Q3]).
+- **Hybridansatz:** Hauptachsen, Highway, Brücken und Landmarken **handgesetzt** (als `.tscn`-Szenen im Editor), Füllstraßen und Parzellen **prozedural**. Reine Prozedur erzeugt Beliebigkeit, reine Handarbeit ist nicht zu leisten.
+- Ausgabe ist eine reine Datenstruktur `CityData` (`RefCounted`/`Resource`, JSON-serialisierbar) → in einem **Worker-Thread** (`WorkerThreadPool`) erzeugbar, cachebar und per Skript headless testbar.
+- Terrain: Heightmap-Gitter je Chunk (`ArrayMesh` bzw. `HeightMapShape3D` für Kollision); Straßen als Mesh-Bänder entlang der Graph-Kanten **oder** – wie im Prototyp – im Boden-Shader (für gerade, ebene Raster am billigsten); gemischt: Shader im Raster-Kern, Mesh-Bänder für Kurven/Hang. Für fertige Terrain-Werkzeuge existieren Community-Add-ons (z. B. Terrain3D); Eignung und Lizenz vor Einsatz prüfen *(nicht recherchiert)*.
+- Rechenintensive Generatorteile (Tensor-Feld, Straßenintegration) sind Kandidaten für **C#/GDExtension**, falls GDScript zu langsam ist (messen).
 
-**Abhängigkeiten:** M3 (Bezirksparameter), M12 (Seed-Tests). **Risiken:** Tensor-Felder erzeugen unschöne Kreuzungswinkel/Sackgassen → nachbearbeiten (Segmente verschmelzen, Mindestwinkel); Generator wird zum Zeitgrab → Zeitbox je Stufe, Handarbeit als Fallback. **Aufwand:** MVP 6 PT · Ausbau 14 PT · Wunsch 15 PT+.
+**Abhängigkeiten:** M3 (Bezirksparameter), M12 (Seed-Tests). **Risiken:** Tensor-Felder erzeugen unschöne Kreuzungswinkel/Sackgassen → nachbearbeiten (Segmente verschmelzen, Mindestwinkel); Generator wird zum Zeitgrab → Zeitbox je Stufe, Handarbeit als Fallback; GDScript-Laufzeit. **Aufwand:** MVP 6 PT · Ausbau 14 PT · Wunsch 15+ PT.
 
 ---
 
 ### M2 – Streaming und LOD
 
-**Ziel:** Eine Welt, die um ein Vielfaches größer ist als das, was gleichzeitig im Speicher/Renderer ist, bei stabilen 60 fps.
+**Ziel:** Eine Welt, die um ein Vielfaches größer ist als das, was gleichzeitig geladen/gerendert wird, bei stabilen 60 fps auf der RX 5700 XT.
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Welt in **Chunks** (z. B. 160 × 160 m); nur Chunks im Radius laden; **Instancing** für Gebäude/Bäume/Laternen/Fahrzeuge; geteilte Materialien; Frustum-Culling; Nebel als Weitsicht-Kaschierung |
-| Ausbau | Chunk-Erzeugung im **Web Worker** (Geometrie in Typed Arrays, per Transfer übergeben); 3 LOD-Stufen für Gebäude (Detail → Kasten mit Textur → Silhouette/Impostor); Kollisions-Proxies getrennt von Render-Meshes; Warteschlange mit Zeitbudget pro Frame (z. B. max. 2 ms Chunk-Upload) |
-| Wunschziel | **BatchedMesh** bzw. BVH-basiertes Instanz-Culling; Hierarchical-LOD für Fernstadt; WebGPU-Renderer mit Compute-Culling; Texturatlas/Virtual Texturing |
+| MVP | Welt in **Chunks** (z. B. 160 × 160 m); nur Chunks im Radius geladen; Gebäude/Bäume/Laternen je Chunk als **`MultiMeshInstance3D`**; geteilte Materialien; **Visibility Ranges** (`visibility_range_begin/end`, Fade) für Detailobjekte; Kollision je Chunk gebündelt; Nebel/Environment kaschiert Weitsicht |
+| Ausbau | Chunk-Erzeugung im **Worker-Thread** (`WorkerThreadPool`), Instanziierung auf dem Hauptthread mit Zeitbudget pro Frame; **HLOD** (Visibility-Parent: viele Häuser → ein Fernmesh); automatische **Mesh-LODs** für importierte Modelle; **Occlusion Culling** mit zur Laufzeit erzeugten `OccluderInstance3D`/`BoxOccluder3D` je Gebäude; Chunk-Vorlauf in Fahrtrichtung |
+| Wunschziel | Impostor-Billboards für Ferngebäude; Streaming per `ResourceLoader.load_threaded_request` für handgebaute Hero-Szenen; Texture-Streaming je Bezirk; **Floating-Origin** nur falls die Welt die Einzel-Präzisionsgrenze sprengt (siehe unten) |
 
-**Technische Umsetzung:**
-- `InstancedMesh` reduziert Draw Calls auf „Anzahl Geometrie×Material-Typen“, verliert aber Culling pro Objekt; deshalb **je Chunk eigene Instanzgruppen**, damit das Frustum-Culling auf Chunk-Ebene greift. `BatchedMesh` erlaubt mehrere Geometrien in einem Draw Call mit Culling je Instanz, ist aber nicht automatisch schneller – immer mit `renderer.info.render` messen [Q8][Q9].
-- Richtwert (Heuristik, keine harte Vorgabe): unter ca. 100–200 Draw Calls im Frame anpeilen [Q8].
-- Worker-Muster: Metadaten/Heightmap hin, fertige Geometrie-Buffer plus räumlicher Index zurück; Chunk-Noise auf dem Hauptthread kostet schon bei 64×64 grob 10 ms [Q10].
-- Fenster-Nachtlicht: statt eigener Emissive-Textur je Gebäude ein **Shader mit Fenstermuster aus Instanzattribut** (ein Material für alle).
-- Optional später: `WebGPURenderer` (in aktuellen Three.js-Versionen empfohlen; Browser-Abdeckung bei Firefox/Linux/Android noch lückenhaft) – daher **Renderer-Abstraktion** so bauen, dass WebGL2 Standard bleibt und WebGPU ein Schalter ist [Q11].
+**Technische Umsetzung (Godot):**
+- `MultiMesh` zeichnet tausende Instanzen in einem Draw Call; Nachteil: **einzelne Instanzen werden nicht gecullt** – das gesamte MultiMesh ist sichtbar oder nicht. Deshalb **ein MultiMesh je Chunk (und je Geometrie)**, sodass das Culling auf Chunk-Ebene greift. Per-Instanz-Daten (Farbe, `wear`, Fensterlicht-Variante) über `INSTANCE_CUSTOM`/Instanzfarbe im Shader [Q23].
+- **Visibility Ranges (HLOD)** sind der eingebaute LOD-Mechanismus: nahe Detail-Nodes blenden aus, wenn der Fern-Stellvertreter (`visibility_parent`) sichtbar ist. Godot unterstützt für Visibility Ranges nur alphabasiertes Fading; Dithering bleibt Workaround über getrennte Materialien [Q24].
+- **Occlusion Culling** (CPU-Software-Rasterizer) braucht eingeschaltetes Projektsetting und `OccluderInstance3D`; für prozedurale Chunks müssen Occluder zur Laufzeit gebaut werden (Box-Occluder je Hochhaus sind billig). Nutzen hängt von der Kameraperspektive ab (hohe Verfolgerkamera = geringerer Gewinn) [Q25].
+- **Größe der Welt:** Godot rechnet standardmäßig mit **Einzelpräzision**. Die Dokumentation nennt „Large World Coordinates“ nur für Raumschiff-/Planetensimulationen; moderne Open-World-Spiele kommen mit Einzelpräzision aus, mit einer Orientierungsgröße von etwa 8 × 8 km um den Ursprung [Q26]. **Kestrel Bay (Stadt ≈ 3 × 3 km, Umland ≈ 6 × 6 km)** liegt darunter → **keine Large-World-Coordinates** (sie kosten Performance und Speicher). Falls später doch nötig: Origin-Shifting, das aber Mehrspielerlogik verkompliziert.
+- Chunk-Lebenszyklus: `UNLOADED → GENERATING (Thread) → READY (Daten) → INSTANTIATING (Hauptthread, ≤ 2 ms/Frame) → ACTIVE → UNLOADING`; `queue_free` verteilt über Frames (Hitches vermeiden).
+- **Kollision:** Gebäude eines Chunks teilen sich eine `StaticBody3D` mit mehreren `CollisionShape3D` (oder einer `ConcavePolygonShape3D` für Terrain); Boden im Raster-Kern bleibt eine Ebene.
 
-**Abhängigkeiten:** M1 (Daten), M12 (Messung). **Risiken:** Pop-in sichtbar → Nebel, Überblendung, Chunk-Vorlauf in Fahrtrichtung; Speicherlecks beim Entladen (Geometrien/Texturen `dispose()`); Worker-Overhead/Transfer. **Aufwand:** MVP 5 PT · Ausbau 12 PT · Wunsch 15 PT+.
+**Abhängigkeiten:** M1 (Daten), M12 (Messung). **Risiken:** Pop-in sichtbar → Nebel, Visibility-Fade, Chunk-Vorlauf; Speicherlecks/Hitches beim Entladen; Thread-Sicherheit (Szenenbaum nur auf dem Hauptthread ändern → `call_deferred`); Verhalten von Occlusion Culling und HLOD in 4.7.2 am Prototyp prüfen. **Aufwand:** MVP 4 PT · Ausbau 10 PT · Wunsch 12+ PT.
 
 ---
 
 ### M3 – Stadtbezirke und Identität
 
-**Ziel:** Sechs Bezirke, die man an Optik, Licht, Verkehr und Klang erkennt (Details in [Kapitel 8](#8-die-welt-kestrel-bay)).
+**Ziel:** Sechs Bezirke, die man an Optik, Licht, Verkehr und Klang erkennt (Details in [Kapitel 8](#8-die-welt-kestrel-bay-dystopisch)).
 
 | Stufe | Umfang |
 |---|---|
-| MVP | `DistrictDef`-Datenobjekte: Farbpalette der Fassaden, Gebäudehöhen, Straßenbreiten, Baumdichte, Passanten-/Verkehrsdichte, Himmelstönung; je Bezirk 1 Landmarke |
-| Ausbau | Eigene Prop-Sets (Container, Palmen, Reklametafeln, Poller …) als Instanzen; Boden-/Asphalttexturen je Bezirk; bezirksspezifische Nachtbeleuchtung (Neon, Natrium, LED); Bezirksname beim Einfahren (UI) |
+| MVP | `DistrictDef`-Ressourcen: Farbpalette der Fassaden, Gebäudehöhen, Straßenbreiten, Baumdichte, Passanten-/Verkehrsdichte, Himmelstönung, Aegis-Dichte; je Bezirk 1 Landmarke (Szene) |
+| Ausbau | Eigene Prop-Sets (Container, Palmen, Reklametafeln, Poller …) als MultiMesh-Gruppen; Boden-/Asphaltvarianten je Bezirk (Shader-Parameter); bezirksspezifische Nachtbeleuchtung (Neon, Natrium, LED); Bezirksname beim Einfahren (UI, `Area3D`-Zonen) |
 | Wunschziel | Bezirkstypische NPC-Kleidung/Fahrzeugmix; Zeitrhythmen (Schichtwechsel, Rush Hour); dynamische Details (Baustellen, Märkte, Veranstaltungen) |
 
-**Technische Umsetzung:** Reine Daten (`districts/*.js`), konsumiert von M1 (Generierung), M2 (Props), M5 (Verkehrsprofil), M9 (Licht), M10 (Musik). Orientierung folgt bewährten Prinzipien: **Landmarken-Hierarchie** (1 Hauptlandmarke je Bezirk, kleinere als Wegmarken), Wiedererkennung über Farbe und Silhouette, Leitlinien (Straßen führen auf Landmarken zu) [Q7].
-**Abhängigkeiten:** M1, M2. **Risiken:** Bezirke wirken bloß „umgefärbt“ → Unterschiede in *Struktur* (Straßenmuster, Höhenprofil, Prop-Rhythmus) statt nur Farbe. **Aufwand:** MVP 3 PT · Ausbau 10 PT · Wunsch 10 PT+.
+**Technische Umsetzung (Godot):** Reine Daten (`data/districts/*.tres`), konsumiert von M1 (Generierung), M2 (Props), M5 (Verkehrsprofil), M9 (Licht), M10 (Musik). Bezirkszugehörigkeit je Position über eine **Bezirkskarte** (niedrig aufgelöste Textur/Voronoi-Gitter, O(1)-Abfrage) statt Geometrietests. Orientierung folgt bewährten Prinzipien: **Landmarken-Hierarchie**, Wiedererkennung über Farbe und Silhouette, Leitlinien [Q7].
+**Abhängigkeiten:** M1, M2. **Risiken:** Bezirke wirken bloß „umgefärbt“ → Unterschiede in *Struktur* (Straßenmuster, Höhenprofil, Prop-Rhythmus) statt nur Farbe. **Aufwand:** MVP 3 PT · Ausbau 10 PT · Wunsch 10+ PT.
 
 ---
 
@@ -234,37 +242,39 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Bestehendes Arcade-Modell sauber in Fixed-Step-Modul auslagern; **Fahrzeugdatenblätter** (Masse, Beschleunigung, Höchsttempo, Grip, Lenkrate); Handbremsendrift (Quer-Schlupf mit Haftgrenze); Kollision über räumliches Gitter statt Schleife über alle Blöcke; Höhenanpassung ans Terrain |
-| Ausbau | **Raycast-Fahrzeug**: Feder/Dämpfer je Rad, vereinfachtes Reifenmodell (linear/Bürsten statt vollem Pacejka, der bei niedrigem Tempo numerisch schwierig ist) [Q12]; Nick/Wank sichtbar; 4–6 Fahrzeugklassen (Kompakt, Limousine, Sportler, SUV, Transporter, Motorrad); Schadensmodell (Zonen, Beulen per Vertex-Offset, Rauch, Reifenschaden); Ein-/Aussteigen |
-| Wunschziel | Rapier (Rust/WASM) für Rigid-Body-Kollisionen und Kettenreaktionen [Q13]; Anhänger, Boote, Hubschrauber; Fahrzeug-Tuning |
+| MVP | Bestehendes `VehicleBody3D` in eine **Fahrzeugszene** mit Datenblatt-Ressource (`VehicleDef`: Masse, Motorkraft, Grip, Lenkung, Federung) auslagern; Drift über Reibungs-/Handbremsen-Tuning; Verfolgerkamera als eigene Szene; Ein-/Aussteigen vorbereiten; Boden-Höhenanpassung durch Terrainkollision |
+| Ausbau | **Eigenes Raycast-Fahrzeug** auf `RigidBody3D` (Feder/Dämpfer je Rad, vereinfachtes Reifenmodell – linear/Bürste statt vollem Pacejka [Q12]); 4–6 Fahrzeugklassen (Kompakt, Limousine, Sportler, SUV, Transporter, Motorrad); Schadensmodell (Zonen, Beulen per Vertex-Offset/Shader, Rauch, Reifenschaden); NPC-Autos wechseln bei Kollision von **Kinematik zu Physik** (RigidBody) |
+| Wunschziel | Anhänger, Boote, Hubschrauber; Tuning; Gelenkte Hinterachse, Differenzial/Traktionskontrolle; Force-Feedback für Lenkräder |
 
-**Technische Umsetzung:**
-- Fixed Timestep (z. B. 120 Hz Sub-Steps) mit Interpolation zur Darstellung; deterministisch genug für Replays/Tests.
-- Raycast-Fahrzeug nach klassischem Muster („Car Physics for Games“, M. Monster) – eigener Code für Arcade-Gefühl, **Physik-Engine nur für Kollision/Objekte**, nicht für das Fahrverhalten [Q12].
-- Kollision: uniformes Gitter (Spatial Hash) über Gebäude-/Props-Proxies und Fahrzeuge; Straßenbegrenzer/Poller zerstörbar später.
-- Gefühl vor Realismus: Tuning-Parameter in einer Datei, Live-Slider im Debug-Overlay.
+**Technische Umsetzung (Godot):**
+- **`VehicleBody3D`** ist ein Raycast-Fahrzeug, laut Dokumentation aber **nicht** für realistische 3D-Fahrphysik gedacht; für fortgeschrittenes Verhalten empfiehlt die Doku eine eigene Umsetzung auf `RigidBody3D` [Q22]. Der Prototyp zeigt, dass es als Start trägt.
+- **Physik-Engine:** Seit Godot **4.6** ist **Jolt** für neue 3D-Projekte der Standard (in 4.4 als Alternative eingeführt, in 4.6 ohne „experimentell“-Label); bestehende Projekte behalten ihre Einstellung, die Simulationsergebnisse unterscheiden sich [Q27]. Das Projekt (`config/features` „4.7“) prüft in `Project Settings → Physics → 3D`, welche Engine aktiv ist; **früh beide testen**, weil Fahrverhalten und Kollisionsstabilität unterschiedlich ausfallen können. Ob `VehicleBody3D` unter Jolt in 4.7.2 gleich robust ist wie unter Godot Physics, ließ sich nicht belegen → am Prototyp messen.
+- Physik läuft mit festem Takt (`physics_ticks_per_second`, Standard 60; für schnelle Fahrzeuge 120 erwägen); Kollisionsformen vereinfachen (Box/Konvex), Karosserie getrennt von Kollision.
+- Fahrzeuge als **`CollisionLayer`/`Mask`-Schema** (Welt, Fahrzeug, Fußgänger, Trigger) von Beginn an.
+- Gefühl vor Realismus: Tuning-Parameter in `VehicleDef`, Live-Tuning über Debug-Panel (Slider via `Control`-Nodes).
 
-**Abhängigkeiten:** M1/M2 (Boden, Kollision), M12. **Risiken:** Tunneling bei hohem Tempo (→ Sub-Steps, Sweep-Tests); WASM-Physik erhöht Ladezeit/Komplexität → erst wenn Kollision am Gitter nicht mehr reicht; „realistisch“ ≠ „spaßig“ → Playtests. **Aufwand:** MVP 5 PT · Ausbau 15 PT · Wunsch 20 PT+.
+**Abhängigkeiten:** M1/M2 (Boden, Kollision), M12. **Risiken:** Tunneling bei hohem Tempo (→ höherer Physiktakt, CCD-Option am RigidBody); Instabilitäten von `VehicleBody3D` beim Überschlag; „realistisch“ ≠ „spaßig“ → Playtests; Jolt/Godot-Physics-Unterschiede. **Aufwand:** MVP 4 PT · Ausbau 12 PT · Wunsch 18+ PT.
 
 ---
 
 ### M5 – Fußgänger- und Verkehrs-KI
 
-**Ziel:** Eine Stadt, die glaubwürdig wimmelt, ohne die CPU zu fressen – **Simulation-LOD** als Kernidee.
+**Ziel:** Eine Stadt, die glaubwürdig wimmelt, ohne die CPU zu fressen – **Simulation-LOD** als Kernidee (Ryzen 5 3600: 6 Kerne/12 Threads, gute Single-Thread-Leistung, aber begrenzt).
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Agenten auf dem **Straßengraph** (Kanten mit Spuren, Einbahn, Tempolimit); Ampel-/Vorfahrtlogik an Kreuzungen; Abstandhalten per Vorderfahrzeug-Abfrage über Spurlisten (statt Allpaarvergleich); Fußgänger auf Gehwegen, Überqueren an Zebrastreifen; **Spawn/Despawn am Rand des Aktivradius** |
-| Ausbau | **Drei Sim-Stufen**: (A) nah: volle Kollision, Animation, Wahrnehmung; (B) mittel: nur Spur-Bewegung ohne Kollision, niedrige Updaterate; (C) fern: statistische Dichte pro Kante, keine Einzelagenten. Reaktionen: Ausweichen, Hupen, Flucht bei Unfall/Schüssen/Raserei; Tageszeitprofile pro Bezirk; Wetter-Einfluss (weniger Fußgänger bei Regen, langsamerer Verkehr) |
-| Wunschziel | Agenten mit Zielen (Zuhause → Arbeit → Café) und Tagesplan; Busse/Bahn mit Haltestellen; Menschenmengen-Verhalten (Gruppen, Warteschlangen); Skinned/Instanz-Animationen per Vertex-Textur |
+| MVP | Agenten auf dem **Straßengraph** (Kanten mit Spuren, Einbahn, Tempolimit) statt Linien-Agenten; Ampel-/Vorfahrtlogik; Abstandhalten per Vorderfahrzeug-Abfrage je Spur (statt Allpaarvergleich); Fußgänger auf Gehweg-Graph, Überqueren an Zebrastreifen; **Spawn/Despawn am Rand des Aktivradius** |
+| Ausbau | **Drei Sim-Stufen**: (A) nah: volle Kollision (Physikkörper), Animation, Wahrnehmung, ggf. `NavigationAgent3D`-Avoidance; (B) mittel: nur Spur-Bewegung ohne Kollision, niedrige Updaterate; (C) fern: statistische Dichte je Kante, keine Einzelagenten. Reaktionen: Ausweichen, Hupen, Flucht bei Unfall/Schüssen/Raserei; Tageszeit-/Wetterprofile je Bezirk |
+| Wunschziel | Agenten mit Zielen und Tagesplan; Busse/Bahn mit Haltestellen; Gruppen, Warteschlangen; Skelett-Animation per Vertex-Textur/`AnimationTree`-LOD; Crowd-Rendering per `MultiMesh` |
 
-**Technische Umsetzung:**
-- Das Prinzip „**Simulationsblase**“ (Verkehr und Passanten laufen je in einer Blase um den Spieler; am Rand wird gespawnt/entfernt) und das Einhalten von Verkehrsregeln trotz unvorhersehbarer Kollisionen ist aus Open-City-Spielen belegt [Q4]. Gestufte Detailtiefe nach Entfernung (volle KI nah, vereinfachte mittel, statistisch fern) ist ebenfalls etablierte Praxis [Q14].
-- Datenorientiert: Agenten als Struct-of-Arrays (Typed Arrays), Rendering über Instanzmatrizen. Hunderte Fahrzeuge/Tausende Fußgänger sind so im Browser realistisch; Einzelobjekte mit je eigener Logik sind es nicht.
-- Optional Auslagerung der Sim-Stufen B/C in einen Worker (SharedArrayBuffer nur mit COOP/COEP-Headern; sonst Transfer-Snapshots).
-- Systemische Ereignisse (Unfall, Panne, Straßenfest), die auch **ohne** Spielerbeteiligung stattfinden, schaffen die Lebendigkeit [Q5][Q6].
+**Technische Umsetzung (Godot):**
+- Das Prinzip der **Simulationsblase** (Verkehr und Passanten laufen in einer Blase um den Spieler, am Rand wird gespawnt/entfernt) und das Einhalten von Verkehrsregeln trotz unvorhersehbarer Kollisionen ist aus Open-City-Spielen belegt [Q4]; Detailtiefe gestuft nach Entfernung ist etablierte Praxis [Q14].
+- **Straßenwege:** eigener Graph (`AStar3D` ist unabhängig vom NavigationServer und eignet sich für Straßengraphen, GPS und Polizei-Routing). **`NavigationServer3D`/NavMesh** für freie Fußgängerbewegung auf Plätzen; Avoidance und Pfadabfragen sind teuer → nur für nahe Agenten (Stufe A), Pfade nicht pro Frame neu berechnen, unerreichbare Ziele vermeiden (bekannter Performance-Einbruch) [Q28].
+- **Daten statt Nodes:** Agenten als Struktur-Arrays (`PackedFloat32Array`/`PackedVector3Array`) in einem `TrafficSystem`-Autoload; Darstellung über **ein `MultiMeshInstance3D` je Fahrzeugtyp** (Transform pro Frame setzen), echte `VehicleBody3D`/`RigidBody3D`-Körper nur für Stufe A und bei Kollisionen. Hunderte Fahrzeuge sind so realistisch, 28 einzelne Node-Autos mit eigener Logik skalieren nicht.
+- Rechenschleifen für Hunderte Agenten zuerst typisiertes GDScript, bei Engpass **C#** oder GDExtension; Updates über `WorkerThreadPool` auf mehrere Kerne verteilen (Ergebnisse auf dem Hauptthread übernehmen).
+- Systemische Ereignisse (Unfall, Panne, Straßenfest), die **ohne** Spielerbeteiligung stattfinden, erzeugen Lebendigkeit [Q5][Q6].
 
-**Abhängigkeiten:** M1 (Straßengraph), M9 (Zeit/Wetter), M6 (Polizei reagiert/teilt Graph). **Risiken:** Staus/Deadlocks an Kreuzungen (→ Timeout + Ghosting, wie der Prototyp es schon macht, aber kontrolliert); Mengenzahl vs. CPU; unnatürliches Pop-in (→ Spawn nur außerhalb der Sicht). **Aufwand:** MVP 8 PT · Ausbau 15 PT · Wunsch 20 PT+.
+**Abhängigkeiten:** M1 (Straßengraph), M9 (Zeit/Wetter), M6 (Polizei teilt den Graphen). **Risiken:** Staus/Deadlocks (→ Timeout und Ghosting wie im Prototyp, aber kontrolliert); Mengenzahl vs. CPU (Ryzen 5 3600); unnatürliches Pop-in (→ Spawn nur außerhalb der Sicht). **Aufwand:** MVP 7 PT · Ausbau 14 PT · Wunsch 18+ PT.
 
 ---
 
@@ -274,29 +284,27 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Verbrechens-**Events** mit Gewichtung (Raserei, Unfall mit Zivilfahrzeug, Fußgänger verletzt, Polizeikontakt); Fahndungsstufe 1–5 mit Abklingen; Polizei fährt über Straßengraph (Zielwahl: Spieler/letzte bekannte Position); Festnahme/Flucht wie im Prototyp, aber mit **Sichtlinie** |
-| Ausbau | Zustände **Verdacht → Verfolgung → Suche → Verloren** mit Suchradius um die zuletzt gesehene Position; Zeugenmeldung (nur gemeldet, wenn ein NPC das Verbrechen sah); **Bezirks-Ruf**: Fahndungsdruck gilt primär im Bezirk und strahlt abgeschwächt aus; Taktiken je Stufe (PIT-Manöver, Straßensperre, Nagelband, Hubschrauber); Unterschlupf (Garage, Tunnel, Wasser) zum Abschütteln |
-| Wunschziel | Polizei als Fraktion mit Revieren, Schichtwechsel, Korruption/Bestechung; Gerichts-/Kautionssystem; Nicht-tödliche Optionen für den Spieler |
+| MVP | Verbrechens-**Signale** mit Gewichtung (Raserei, Unfall mit Zivilfahrzeug, Fußgänger verletzt, Polizeikontakt); Fahndungsstufe 1–5 mit Abklingen; Polizei fährt über Straßengraph (Ziel: Spieler/letzte bekannte Position); Festnahme/Flucht, aber mit **Sichtlinie** (Raycast) |
+| Ausbau | Zustände **Verdacht → Verfolgung → Suche → Verloren** mit Suchradius um die zuletzt gesehene Position; Zeugenmeldung; **Bezirks-Ruf**: Fahndungsdruck primär im Bezirk; Taktiken je Stufe (PIT-Manöver, Straßensperre, Nagelband, Hubschrauber); Unterschlupf (Garage, Tunnel, Wasser) zum Abschütteln; **Aegis-Kennzeichenerfassung** (Kameras) |
+| Wunschziel | Polizei als Fraktion mit Revieren, Schichtwechsel, Korruption/Bestechung; Gerichts-/Kautionssystem; nicht-tödliche Optionen |
 
-**Technische Umsetzung:** Endlicher Automat pro Polizeieinheit + zentraler „Dispatcher“ (verteilt Einheiten, hält Ziel-Wissen). Wahrnehmung über Sichtkegel mit Raycast gegen Gebäude-Proxies, dazu Hörradius. Das Fahndungssystem als „Spielzeug“ mit klaren, ablesbaren Regeln zu gestalten (Spieler versteht, *warum* er gesucht wird) ist wichtiger als Realismus [Q5].
-**Abhängigkeiten:** M5 (Graph, Zeugen), M4 (Fahrzeuge), M3 (Bezirke), M1. **Risiken:** Gummiband-KI, die „betrügt“ (Teleport-Spawns) → Spawn nur außerhalb der Sicht, Dichte begrenzen; Frust durch unausweichliche Festnahme → immer einen erkennbaren Fluchtweg. **Aufwand:** MVP 4 PT · Ausbau 12 PT · Wunsch 15 PT+.
+**Technische Umsetzung (Godot):** Zustandsautomat je Einheit (`Node`-basiert oder Enum-Klasse) + zentraler Dispatcher-Autoload (verteilt Einheiten, hält Ziel-Wissen). Wahrnehmung über Sichtkegel mit `PhysicsRayQueryParameters3D` gegen Gebäude-Kollisionen (Strahlen budgetiert: wenige pro Frame, reihum), dazu Hörradius via `Area3D`. Das Fahndungssystem als „Spielzeug“ mit klaren, ablesbaren Regeln zu gestalten ist wichtiger als Realismus [Q5].
+**Abhängigkeiten:** M5 (Graph, Zeugen), M4 (Fahrzeuge), M3 (Bezirke), M1. **Risiken:** Gummiband-KI, die „betrügt“ (Teleport-Spawns) → Spawn nur außerhalb der Sicht; Frust durch unausweichliche Festnahme → immer ein erkennbarer Fluchtweg; Raycast-Kosten. **Aufwand:** MVP 4 PT · Ausbau 12 PT · Wunsch 15+ PT.
 
 ---
 
-### M7 – Missionen und Story
+### M7 – Missionen und Story-Runner
 
-**Ziel:** Aufträge, die die Welt zeigen und systemische Zufälle zulassen, getragen von einer eigenen, kleinen, konsistenten Story.
+**Ziel:** Aufträge, die die Welt zeigen und systemische Zufälle zulassen. Die Haupthandlung selbst steht in [Kapitel 6 (M14)](#6-story-engine-entscheidungen-und-fraktionen-m14); M7 liefert den Runner, den M14 mit Inhalten füttert.
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Missions-**Framework** als Daten (Schritte: *Gehe zu / Fahre zu / Hole ab / Liefere / Entkomme / Zerstöre / Warte*); Missionstypen: Kurier mit Zeitlimit, Taxi-Passagier, Verfolgung (Ziel fährt ein Ziel an), Flucht; Marker/Wegpunkt-UI; Checkpoints, Fehlschlag-/Erfolgsmeldung |
-| Ausbau | **Story-Kampagne** (ca. 12–15 Hauptmissionen) an Bezirke gekoppelt; Nebenaufträge je Bezirk („Bezirksjobs“); Dialoge/Funk als Textboxen mit Sprecherportrait; mehrere Lösungswege (z. B. Flucht über Dach/Tunnel/Wasser); Speicherpunkte |
-| Wunschziel | Verzweigende Entscheidungen, Charakterbeziehungen, dynamische Zufallsbegegnungen, Mission-Editor im Browser |
+| MVP | Missions-**Framework** als Daten (Schritte: *Gehe zu / Fahre zu / Hole ab / Liefere / Entkomme / Zerstöre / Warte*); Typen: Kurier mit Zeitlimit, Taxi-Passagier, Verfolgung, Flucht; Marker (der Prototyp hat Marker aus Zylinder-Mesh) und Wegpunkt-UI; Checkpoints, Erfolg/Fehlschlag |
+| Ausbau | Kampagne an Bezirke gekoppelt; Nebenaufträge je Bezirk; Dialoge/Funk als UI-Boxen mit Sprecherportrait; mehrere Lösungswege; Speicherpunkte |
+| Wunschziel | Verzweigende Entscheidungen, Beziehungen, dynamische Zufallsbegegnungen, Mission-Editor als Godot-Editor-Plugin (`EditorPlugin`) |
 
-**Technische Umsetzung:** Zustandsautomat/Skript-DSL in JSON (`missions/*.json`), ausgeführt von `MissionRunner`; Missionen **abonnieren Events** (z. B. `vehicle.enteredZone`), statt die Hauptschleife zu kennen. Gestaltungsregel: je Mission Zielbedingung, KI-Rollen, Checkpoint-Abstände und Fehlschlagtext explizit festlegen; einfache KI mit starker Reaktion wirkt besser als komplexe KI [Q15]. Missionen so „öffnen“, dass systemisches Chaos (Verkehr, Polizei) mitspielen darf, statt es auszuschalten [Q5][Q6].
-**Abhängigkeiten:** M1 (Orte), M5/M6 (Welt reagiert), M8 (Belohnung), M11 (Marker). **Risiken:** Content-Menge (jede Mission ist Handarbeit) → starke Wiederverwendung von Typen, Story kurz und prägnant; Skript-Brüche bei systemischen Zufällen → Fail-Safes (Neuaufsetzen, Checkpoint). **Aufwand:** MVP 6 PT · Ausbau 20 PT · Wunsch 25 PT+.
-
-**Story:** Die Haupthandlung „Nullstunde“ samt Fraktionen, Entscheidungs-/Ruf-System, Wendepunkten, Enden und Datenmodell steht in [Kapitel 6 (M14)](#6-story-engine-entscheidungen-und-fraktionen-m14). M7 liefert nur den Missions-Runner, den M14 mit Inhalten und Bedingungen füttert.
+**Technische Umsetzung (Godot):** Zustandsautomat/Skript-DSL in JSON (`data/missions/*.json`), ausgeführt vom `MissionRunner` (Autoload). Missionen **abonnieren Signale** des `EventBus` (z. B. `vehicle_entered_zone`) statt die Hauptschleife zu kennen; Zielzonen sind `Area3D`. Gestaltungsregel: je Mission Zielbedingung, KI-Rollen, Checkpoint-Abstände und Fehlschlagtext explizit festlegen; einfache KI mit starker Reaktion wirkt besser als komplexe KI [Q15]; Missionen „öffnen“, damit systemisches Chaos mitspielen darf [Q5][Q6].
+**Abhängigkeiten:** M1 (Orte), M5/M6 (Welt reagiert), M8 (Belohnung), M11 (Marker). **Risiken:** Content-Menge → Wiederverwendung der Typen; Skript-Brüche bei systemischen Zufällen → Fail-Safes (Neuaufsetzen, Checkpoint). **Aufwand:** MVP 5 PT · Ausbau 18 PT · Wunsch 22+ PT.
 
 ---
 
@@ -306,12 +314,12 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Geld (vorhanden) mit klaren Einnahmen/Ausgaben; Speichern/Laden (`localStorage`/IndexedDB); Fahrzeugreparatur und -ersatz; Strafen/Verlust bei Festnahme (vorhanden) |
-| Ausbau | Garagen/Safehouses je Bezirk (Speichern, Fahrzeuglager); Fahrzeugkauf und Tuning; **Bezirks-Ruf** (Fraktionen schalten Aufträge und Rabatte frei); Immobilien als Einnahmequelle |
-| Wunschziel | Dynamische Preise (Tageszeit, Nachfrage), Handel/Schmuggelrouten mit Risiko, Erfolge/Herausforderungen |
+| MVP | Geld mit klaren Einnahmen/Ausgaben; Speichern/Laden; Fahrzeugreparatur/-ersatz; Strafen bei Festnahme |
+| Ausbau | Garagen/Safehouses je Bezirk; Fahrzeugkauf und Tuning; **Fraktions-/Bezirks-Ruf**; Immobilien als Einnahmequelle |
+| Wunschziel | Dynamische Preise (Tageszeit, Nachfrage), Handel/Schmuggelrouten mit Risiko, Erfolge |
 
-**Technische Umsetzung:** Ein zentrales, serialisierbares `GameState` (reine Daten) – Grundlage für Speichern, Tests und Debug. Wirtschaft als kleine Tabellen (Preise, Belohnungen) in Daten-Dateien, nicht im Code.
-**Abhängigkeiten:** M7, M6. **Risiken:** Inflation/Balancing → Kennzahlen in einer Tabelle, Playtest-Telemetrie lokal; Speicherstand-Versionierung (Schema-Version von Anfang an). **Aufwand:** MVP 3 PT · Ausbau 8 PT · Wunsch 10 PT+.
+**Technische Umsetzung (Godot):** Ein zentraler, serialisierbarer `GameState`-Autoload (reine Daten als `Dictionary`/Klassen mit `to_dict()`/`from_dict()`); **Speichern als JSON** (`user://saves/…`, mit Schema-Version, Atomic-Write über temporäre Datei); **keine** `.tres/.res`-Speicherstände (Skript-Einbettung, Sicherheit). Preise und Belohnungen als Daten.
+**Abhängigkeiten:** M7, M6. **Risiken:** Inflation/Balancing → Kennzahlen in Tabelle; Speicherstand-Migration (Schema-Version von Anfang an). **Aufwand:** MVP 3 PT · Ausbau 7 PT · Wunsch 10+ PT.
 
 ---
 
@@ -321,12 +329,12 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Tageszyklus aus dem Prototyp in Modul auslagern; Sonne/Mond mit Elevation, Dämmerungsfarben; Straßenlaternen und Fensterlicht über Instanzattribut; Spielzeit-API (`env.hour`) |
-| Ausbau | **Wetter-Zustandsautomat** (klar, bewölkt, Regen, Nebel, Gewitter) mit weichen Übergängen; nasse Straßen (Roughness/Reflexion, Pfützen-Noise), Regenpartikel, Scheibenwischer; Himmelsshader (Sonne, Wolken, Sterne); Bezirks-Tönung; Wetter wirkt auf Grip (M4), Verkehr (M5), Audio (M10) |
-| Wunschziel | Volumetrische Wolken/Nebel, Screen-Space-Reflexionen, Jahreszeiten, Windsimulation für Vegetation |
+| MVP | Tageszyklus aus dem Prototyp (`_process` mit `ProceduralSkyMaterial`, Sonnenwinkel, Dämmerung) in Autoload `Clock`/`WeatherSystem` auslagern; globale Shader-Parameter (`night`); Straßenlaternen als Emissive-Props + wenige echte Lichter; Spielzeit-API |
+| Ausbau | **Wetter-Zustandsautomat** (klar, bewölkt, Regen, Nebel, Gewitter) mit weichen Übergängen; nasse Straßen (`wetness` global), Regen via `GPUParticles3D`, Nebel via `FogVolume`/Environment; physikalischer Himmel (`PhysicalSkyMaterial` oder eigener Sky-Shader mit Wolken/Sternen); Bezirks-Tönung; Wetter wirkt auf Grip (M4), Verkehr (M5), Audio (M10) |
+| Wunschziel | Volumetrische Wolken, Jahreszeiten, Windsimulation für Vegetation, Blitz-Beleuchtung |
 
-**Technische Umsetzung:** Ein `Environment`-Objekt hält alle Parameter; Übergänge per Interpolation; Himmel als großer Shader-Dom statt Szenenhintergrundfarbe. Schatten: **Cascaded Shadow Maps** statt einer 200-m-Box, sonst werden Schatten in der größeren Welt unscharf oder zu teuer. Straßenlaternen nicht als echte Lichter (zu teuer), sondern als Emissive-Sprites + wenige echte Lichter um den Spieler.
-**Abhängigkeiten:** M2 (Instanzen), M12. **Risiken:** Nachtbeleuchtung kostet viele Lichter → Fake-Licht (Glow-Sprites, Decals), echte Lichter strikt begrenzen; Regen-Shader auf Low-End. **Aufwand:** MVP 3 PT · Ausbau 12 PT · Wunsch 15 PT+.
+**Technische Umsetzung (Godot):** `WorldEnvironment` + `Environment`-Ressource (alle Parameter animiert per Code/`Tween`); **Cascaded Shadow Maps** der `DirectionalLight3D` (`directional_shadow_mode` PSSM 4 Splits; Schattenweite pro Qualitätsstufe) statt einer festen Box; Nachtbeleuchtung: Forward+ nutzt einen **Cluster-Renderer** für viele Lichter, die Kosten steigen aber mit Schattenwerfern → nur wenige schattenwerfende Lichter (Kapitel 5.1).
+**Abhängigkeiten:** M2, M12. **Risiken:** Nachtbeleuchtung (viele Lichter) → Fake-Licht (Emissive, Glow, Decals), Schattenwerfer strikt begrenzen; Regen-Shader. **Aufwand:** MVP 2 PT · Ausbau 8 PT · Wunsch 12+ PT.
 
 ---
 
@@ -336,12 +344,12 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Audio-Manager mit Bussen (Motor, Umwelt, Musik, UI) und Master-Lautstärke; Motor aus **geloopten Samples** (Leerlauf, Last, Schub) mit Pitch nach Drehzahl statt Oszillatoren; Kollision, Hupe, Sirene; Doppler/Dämpfung für NPC-Fahrzeuge |
-| Ausbau | Mehrschicht-Motor mit **Equal-Power-Crossfade** (kein Lautstärkeloch) [Q16]; Reifenquietschen, Wind nach Tempo, Regen; Umgebungs-Layer je Bezirk (Hafenhorn, Möwen, Neonsummen, Brandung); Straßenzug-Hall (Tunnel/Häuserschluchten); Radiosender mit prozeduraler Musik |
-| Wunschziel | Dynamische Musik (Intensität folgt Verfolgung/Tageszeit), Sprachausgabe, Mix-Snapshots (z. B. „unter Wasser“, „in der Garage“) |
+| MVP | `AudioManager`-Autoload mit **Audio-Bussen** (Motor, Umwelt, Musik, UI, Master) im `AudioBusLayout`; Motor aus **geloopten Samples** (Leerlauf, Last, Schub) mit Pitch nach Drehzahl; Kollision, Hupe, Sirene; Doppler/Dämpfung für NPC-Fahrzeuge (`AudioStreamPlayer3D`) |
+| Ausbau | Mehrschicht-Motor mit **Equal-Power-Crossfade** (kein Lautstärkeloch) [Q16]; Reifenquietschen, Wind nach Tempo, Regen; Umgebungs-Layer je Bezirk; Hall in Tunneln/Häuserschluchten (Reverb-Bus-Effekt, per Bezirk/`Area3D` umgeschaltet); Radiosender mit prozeduraler Musik |
+| Wunschziel | Dynamische Musik (Intensität folgt Verfolgung/Tageszeit), Sprachausgabe, Mix-Snapshots (z. B. „in der Garage“) |
 
-**Technische Umsetzung:** Web Audio API; `AudioBuffer`-Loops mit sample-genauem Looping; Gain-/Filter-Automation über `AudioParam`; **PannerNode nur für wichtige Quellen** (Kostenpunkt je Panner – mehrere Quellen am selben Emitter teilen sich einen) [Q16][Q17]. Audio-Kontext erst nach Nutzergeste starten (Browserregel; Prototyp macht das schon). Die Racer-Fallstudie von Google zeigt, wie ein Motorklang mit nur wenigen Dateien (Beschleunigung, Verzögerung, Leerlauf) überzeugend wird [Q16].
-**Abhängigkeiten:** M4, M5, M9. **Risiken:** Asset-Beschaffung/Lizenzen (→ CC0-Quellen oder selbst synthetisiert, Lizenzliste führen); Dateigröße/Ladezeit (→ Opus/OGG, Streaming nach Bezirk). **Aufwand:** MVP 3 PT · Ausbau 8 PT · Wunsch 10 PT+.
+**Technische Umsetzung (Godot):** `AudioStreamPlayer3D` mit Dämpfung/Doppler; Pitch über `pitch_scale`; Equal-Power-Crossfade über zwei Player und `Tween` (Gains in dB ableiten); Effekte (Reverb, Lowpass, Kompressor) auf **Bussen**. Anzahl gleichzeitiger 3D-Player begrenzen (Pool). Die Racer-Fallstudie von Google zeigt, wie Motorklang mit wenigen Dateien überzeugend wird [Q16].
+**Abhängigkeiten:** M4, M5, M9. **Risiken:** Asset-Beschaffung/Lizenzen (→ CC0 oder selbst synthetisiert, Lizenzliste); Dateigröße; Loop-Klicks bei Samples (Loop-Punkte sauber setzen). **Aufwand:** MVP 2 PT · Ausbau 7 PT · Wunsch 10+ PT.
 
 ---
 
@@ -351,12 +359,12 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | HUD modularisiert (DOM); Minimap aus **`CityData`** gezeichnet (Straßengraph statt Blockrechtecke); Zielpfeil und Entfernungsanzeige; Pause-/Optionsmenü (Grafik-Preset, Lautstärke, Tastenbelegung) |
-| Ausbau | **Vollkarte** (Zoom/Pan, Bezirksnamen, Landmarken, eigene Wegpunkte); **GPS-Routenlinie** auf Straßengraph (A*), im Spiel als Linie/Pfeile auf der Straße; Bezirksname-Einblendung; Gamepad-Unterstützung; Missions-Tagebuch |
-| Wunschziel | Fotomodus, Telefon-UI, Anpassbare HUD, Barrierefreiheit (Farbenblind-Modi, Untertitelgröße) |
+| MVP | HUD als Szene (`CanvasLayer` + `Control`-Nodes mit Theme); Minimap (aus `CityData` gezeichnet oder `SubViewport` mit Top-Down-Kamera); Zielpfeil und Entfernung; Pause-/Optionsmenü (Grafik-Preset, Lautstärke, Tastenbelegung via `InputMap`) |
+| Ausbau | **Vollkarte** (Zoom/Pan, Bezirksnamen, Landmarken, Wegpunkte); **GPS-Route** per A* auf Straßengraph, im Spiel als Linienmesh/Pfeile; Bezirksname-Einblendung; Gamepad (Godot-Eingabe nativ); Missions-Tagebuch |
+| Wunschziel | Fotomodus, Telefon-UI, anpassbares HUD, Barrierefreiheit (Farbenblind-Modi, Untertitelgröße) |
 
-**Technische Umsetzung:** Karte als vorab gerenderte **Canvas-Textur** aus `CityData` (einmal gebacken, dann nur Marker darüber); Pfadsuche A* auf dem Straßengraph (derselbe wie KI). Alle UI-Elemente lesen den Zustand, schreiben nie in die Simulation.
-**Abhängigkeiten:** M1, M7, M8. **Risiken:** DOM-Updates pro Frame (→ nur bei Änderung schreiben); Eingabegeräte-Matrix. **Aufwand:** MVP 3 PT · Ausbau 10 PT · Wunsch 8 PT+.
+**Technische Umsetzung (Godot):** `Control`-Nodes, `Theme`-Ressource, `CanvasLayer`; Karte als **einmal gebackene Textur** aus `CityData` (SubViewport-Render oder `Image`), darüber nur Marker; Pfadsuche A* auf dem Straßengraph (derselbe wie KI). UI liest nur Zustand (Signale), schreibt nie in die Simulation.
+**Abhängigkeiten:** M1, M7, M8. **Risiken:** Textupdates pro Frame (→ nur bei Änderung), Eingabegeräte-Matrix, Auflösungs-/Skalierungsverhalten (Stretch-Modus `canvas_items`). **Aufwand:** MVP 3 PT · Ausbau 8 PT · Wunsch 8+ PT.
 
 ---
 
@@ -366,26 +374,26 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 | Stufe | Umfang |
 |---|---|
-| MVP | **Debug-Overlay** (fps, Frame-ms, `renderer.info` Draw Calls/Dreiecke/Texturen, Agentenzahlen, Chunk-Zahl); `Rng(seed)` + Seed in URL; feste **Budgets** (siehe unten); Qualitäts-Presets (Niedrig/Mittel/Hoch) |
-| Ausbau | Automatischer **Benchmark-Flug** (fester Seed, fester Kameraweg, Ergebnis als JSON); Seed-Tests für Generator (z. B. „alle Blöcke erreichbar“, „kein Gebäude auf Straße“) per Node-Skript; Frame-Zeit-Aufschlüsselung je Modul; Speicher-Watch (Geometrien/Texturen) |
-| Wunschziel | CI-Lauf mit Headless-Browser, Performance-Regressionsgrenzen; In-Game-Editor für Bezirksparameter und Missionen |
+| MVP | **Debug-Overlay** (F3): fps, Frame-ms, `Performance`-Monitore (Draw Calls, Objekte, Primitive, Video-Speicher, Physik-Objekte), Agentenzahlen, Chunk-Zahl; zentraler Seed (URL-Ersatz: Kommandozeilenargument `-- --seed=…`); Budgets (siehe Tabelle); Qualitäts-Presets (Niedrig/Mittel/Hoch) |
+| Ausbau | Automatischer **Benchmark-Flug** (fester Seed, fester Kameraweg, Ergebnis als JSON); Seed-Tests für Generator (z. B. „alle Blöcke erreichbar“) als Headless-Skript; Frame-Zeit je System; Speicher-Watch |
+| Wunschziel | CI-Lauf (Headless-Tests, Import/Export), Performance-Regressionsgrenzen; In-Game-Editor für Bezirksparameter |
 
-**Performance-Budgets (Zielwerte für „Mittel“-Preset, 1080p, Integrierte GPU der Mittelklasse; bei Abweichung neu kalibrieren):**
+**Performance-Budgets (Zielwerte „Mittel“, 1080p nativ bzw. 1440p mit FSR, RX 5700 XT + Ryzen 5 3600; Planwerte):**
 
 | Größe | Budget |
 |---|---|
-| Frame-Zeit gesamt | ≤ 16,6 ms (60 fps), ≤ 33 ms im Preset „Niedrig“ |
-| Draw Calls | ≤ 200 (Richtwert aus Community-Praxis, siehe [Q8]) |
-| Dreiecke sichtbar | ≤ 1,5 Mio. |
-| Simulation (JS) | ≤ 4 ms pro Frame |
-| Chunk-Aufbau (Hauptthread) | ≤ 2 ms pro Frame |
-| Aktive Fahrzeuge / Fußgänger | ≤ 120 / ≤ 250 voll simuliert (Stufe A+B), weitere nur statistisch |
-| Echte dynamische Lichter | ≤ 4 in „Niedrig/Mittel“, ≤ 8 in „Hoch“ (gepoolt: Spieler-Scheinwerfer, Sonne, nächste Einsatzfahrzeuge/Neonquellen); alles Weitere als Emissive-Sprites/Fake-Licht |
-| Texturspeicher | ≤ 512 MB; Atlanten statt Einzeltexturen |
-| Erstladezeit bis Spielstart | ≤ 10 s auf 50 Mbit/s |
+| Frame-Zeit gesamt | ≤ 16,6 ms (60 fps), Niedrig: ≤ 33 ms |
+| GPU-Zeit je Frame | ≤ 14 ms (Reserve für Spitzen) |
+| Main-Thread CPU (Skripte + Physik) | ≤ 6 ms |
+| Draw Calls | ≤ 2500 (CPU-seitig; per Profiler am Ryzen 5 3600 zu bestätigen) |
+| Dreiecke sichtbar | ≤ 5 Mio. |
+| Aktive Fahrzeuge / Fußgänger | ≤ 150 / ≤ 300 simuliert (Stufe A+B); davon ≤ 30 Fahrzeuge mit echtem Physikkörper |
+| Echte Lichter | ≤ 128 sichtbar im Cluster (Mittel), davon **≤ 6 mit Schatten** |
+| Videospeicher | ≤ 6 GB von 8 GB (Reserve für Treiber/Fenster); Texturen ≤ 4 GB |
+| Ladezeit bis Spielstart | ≤ 15 s (SSD) |
 
-**Technische Umsetzung:** Eigenes kleines Profiler-Modul (`performance.now()` je Systemblock), Overlay per Taste. Allokationen im Frame vermeiden (Objekt-Pools, wiederverwendete Arrays – der Prototyp erzeugt z. B. pro Frame `concat`-Arrays).
-**Abhängigkeiten:** alle. **Risiken:** Messung wird vergessen → Overlay standardmäßig per `F3` und im Benchmark-Skript verankern. **Aufwand:** MVP 2 PT · Ausbau 6 PT · Wunsch 8 PT+.
+**Technische Umsetzung (Godot):** `Performance.get_monitor(...)` für Overlay, eingebauter Profiler/Monitore und **Visual Profiler** (GPU-Zeit je Render-Pass) im Editor; eigener Benchmark-Modus als Szene + Kommandozeilenflag; Tests mit **GUT/gdUnit4**-Add-ons oder eigenen `--headless --script`-Läufen *(Auswahl zu prüfen)*; Objekt-Pools (`Node` wiederverwenden statt `instantiate`/`queue_free`); typisierte Arrays/`Packed*Array` in heißen Pfaden.
+**Abhängigkeiten:** alle. **Risiken:** Messung wird vergessen → Overlay standardmäßig per F3, Benchmark im Plan verankert. **Aufwand:** MVP 1 PT · Ausbau 4 PT · Wunsch 6+ PT.
 
 ---
 
@@ -394,74 +402,93 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 | Modul | MVP | Ausbau | Wunsch |
 |---|---|---|---|
 | M1 Weltgenerierung | 6 | 14 | 15+ |
-| M2 Streaming/LOD | 5 | 12 | 15+ |
+| M2 Streaming/LOD | 4 | 10 | 12+ |
 | M3 Bezirke | 3 | 10 | 10+ |
-| M4 Fahrzeuge/Physik | 5 | 15 | 20+ |
-| M5 Verkehrs-/Fußgänger-KI | 8 | 15 | 20+ |
+| M4 Fahrzeuge/Physik | 4 | 12 | 18+ |
+| M5 Verkehrs-/Fußgänger-KI | 7 | 14 | 18+ |
 | M6 Polizei/Gesetz | 4 | 12 | 15+ |
-| M7 Missionen (Framework) | 6 | 20 | 25+ |
-| M8 Wirtschaft | 3 | 8 | 10+ |
-| M9 Tag/Nacht/Wetter | 3 | 12 | 15+ |
-| M10 Audio | 3 | 8 | 10+ |
-| M11 UI/Karte | 3 | 10 | 8+ |
-| M12 Performance/Tooling | 2 | 6 | 8+ |
-| M13 Realismus/Detailtiefe | 6 | 20 | 25+ |
+| M7 Missionen (Runner) | 5 | 18 | 22+ |
+| M8 Wirtschaft | 3 | 7 | 10+ |
+| M9 Tag/Nacht/Wetter | 2 | 8 | 12+ |
+| M10 Audio | 2 | 7 | 10+ |
+| M11 UI/Karte | 3 | 8 | 8+ |
+| M12 Performance/Tooling | 1 | 4 | 6+ |
+| M13 Realismus/Detailtiefe | 6 | 18 | 22+ |
 | M14 Story-Engine | 8 | 20 | 25+ |
-| M15 Server/Mehrspieler | 15 | 30 | 40+ |
-| **Summe (PT)** | **80** | **212** | **261+** |
+| M15 Server/Mehrspieler | 10 | 22 | 35+ |
+| **Summe (PT)** | **68** | **184** | **238+** |
 
-Alle MVPs zusammen: grob **16–18 Arbeitswochen** (eine Person mit KI-Unterstützung, ca. 5 PT/Woche). Davon entfallen rund 65 PT auf den **Einzelspieler-Kern** (M1–M14), 15 PT auf den Server. Alle Ausbaustufen kosten weitere ca. 8–10 Monate. Die Schätzungen sind Planwerte mit ±50 % Unsicherheit, keine Zusagen; Inhalte (Missionen, Assets, Audio) sind darin nur teilweise enthalten.
+Alle MVPs zusammen: grob **13–15 Arbeitswochen** (eine Person mit KI-Unterstützung, ca. 5 PT/Woche); davon ca. 58 PT für den **Einzelspieler-Kern** (M1–M14), 10 PT für den Server. Alle Ausbaustufen kosten weitere ca. 7–9 Monate. Gegenüber der Browser-Version (80/212/261+) sinkt der Aufwand vor allem bei Streaming, Physik, Navigation, Audio, UI, Profiling und Netzwerk, weil Godot diese Bausteine mitbringt. **Nicht enthalten:** Einarbeitung in Godot/GDScript, Content (Missionen, Assets, Audio, Vertonung) nur teilweise. Die Schätzungen sind Planwerte mit ±50 % Unsicherheit, keine Zusagen.
 
 ---
 
 ## 5. Realismus und Detailtiefe (M13)
 
-**Ziel:** Eine Stadt, die glaubwürdig *benutzt* aussieht – Asphalt mit Flicken, Gullideckel mit Dampf, abgenutzte Fassaden, nasse Straßen, die Neon spiegeln. Maßstab ist der **bestmögliche Look innerhalb der Browser-Grenzen**, nicht Konsolen-Fotorealismus.
+**Ziel:** Eine Stadt, die glaubwürdig *benutzt* aussieht – Asphalt mit Flicken, Gullideckel mit Dampf, abgenutzte Fassaden, nasse Straßen, die Neon spiegeln. Maßstab ist der **bestmögliche Look auf der Zielhardware** (RX 5700 XT, ohne Hardware-Raytracing), nicht Konsolen-Fotorealismus.
 
-### 5.1 Ehrliche Grenzen im Browser – und wie man sie ausreizt
+### 5.1 Die Zielhardware und ihre Grenzen
 
-| Bereich | Reale Grenze (Richtwerte, am Zielgerät messen) | Wie man sie ausreizt |
-|---|---|---|
-| Draw Calls | Etwa 100–200 pro Frame für 60 fps auf integrierter GPU [Q8] | Instancing je Chunk, Material-Pools (≈ 30 gemeinsame Materialien), Texturatlanten/Trim-Sheets statt Einzelmaterialien |
-| Texturspeicher | Rund 512 MB VRAM-Budget; unkomprimierte 2K-Maps sprengen es schnell | **KTX2/Basis-Universal** (GPU-komprimiert, ca. 4–8× kleiner), ORM-Packing (Occlusion/Roughness/Metalness in einer Textur), Mipmaps, Texturgröße je Preset |
-| Schatten | Eine große Shadow Map wird weit weg unscharf, mehrere kosten Fill-Rate | **Cascaded Shadow Maps** (3 Kaskaden), nur große Objekte werfen Schatten, Fernbereich: gebackener Blob-/AO-Schatten |
-| Dynamische Lichter | Jedes echte Licht verteuert jedes Fragment (Forward-Rendering) | ≤ 4/8 gepoolte Lichter (Budget M12); Straßenlaternen als Emissive-Sprites + **Lichtkegel-Decals** auf dem Boden; Fenster/Neon nur emissiv + Bloom |
-| Globale Beleuchtung | Echtzeit-GI nicht machbar | **Gebackene Umgebungslichtprobe** (4 vorberechnete Himmels-Environment-Maps für Morgen/Mittag/Abend/Nacht, per PMREM, zur Laufzeit überblendet), Vertex-AO in Gebäudegeometrie |
-| Reflexionen | Planare/SSR-Reflexionen für ganze Stadt zu teuer | Environment-Map-Reflexionen + billiger „Nässe-Boost“ (siehe 5.4); SSR/Planar nur im Preset „Hoch“ bzw. WebGPU-Pfad |
-| Geometrie | Etwa 1–1,5 Mio. sichtbare Dreiecke (Budget M12) | LOD-Stufen, Detail über **Normal-Maps und Decals statt Polygonen**, Impostor für Ferngebäude |
-| Transparenz/Overdraw | Viel Glas/Partikel/Nebel = Fill-Rate-Problem | Alpha-Test statt Blending, Partikelzahl begrenzen, Auflösungsskalierung bei Frame-Einbruch (**dynamische Auflösung**) |
-| Nachbearbeitung | Jeder Fullscreen-Pass kostet 0,5–2 ms | Tonemapping + dezenter Bloom in „Mittel“; SSAO, Kantenglättung per TAA/FXAA, Tiefenunschärfe nur „Hoch“ |
-| WebGPU | Empfohlener Renderer in aktuellen Three.js-Versionen, aber Browser-Abdeckung (Firefox/Linux/Android) lückenhaft [Q11] | WebGL2 bleibt Standard; WebGPU-Pfad als optionale Stufe „Ultra“ (Compute-Culling, GTAO) |
+**AMD RX 5700 XT** (RDNA 1, 8 GB GDDR6, Vulkan-fähig, **kein Hardware-Raytracing**, keine Mesh Shader) + **Ryzen 5 3600** (6 Kerne/12 Threads). Godot-Forward+ läuft laut Nutzer nachweislich per Vulkan darauf. Konsequenz: Alles, was Raytracing braucht, entfällt; Godots Screen-Space- und Voxel/SDF-Verfahren sind die Mittel der Wahl.
 
-**Grundsatz:** *Fake it, aber konsistent.* Der Spieler bemerkt falsche Beleuchtung nur, wenn sie inkonsistent ist. Eine einheitliche Tonemapping-/Farbpipeline und ein glaubwürdiger Himmel tragen mehr als einzelne teure Effekte.
+**Frame-Budget bei 60 fps (16,6 ms), 1080p – Planwerte (Schätzung, per Visual Profiler zu bestätigen):**
+
+| Posten | Mittel | Hoch | Bemerkung |
+|---|---|---|---|
+| Opake Geometrie + Depth-Prepass | 3,5 ms | 4,5 ms | MultiMesh, Visibility Ranges, Occlusion Culling halten es klein |
+| Direktionalschatten (4 Kaskaden) | 2,0 ms | 3,0 ms | Schattenweite 150/250 m; Atlas 4096 (Prototyp) |
+| Weitere Schatten (Spot/Omni) | 0,5 ms (≤ 4) | 1,0 ms (≤ 6) | Jeder Schattenwerfer kostet extra Durchgänge |
+| **SDFGI** | **aus** | 3,0 ms (Cascades 3–4, halbe Auflösung) | Teuerstes Einzelfeature; siehe unten |
+| SSAO | 1,0 ms | 1,5 ms | Halbe Auflösung in „Mittel“ |
+| SSR | 0,8 ms | 1,2 ms | Nur für nasse Flächen sinnvoll (nur bei Regen aktiv) |
+| Volumetrischer Nebel | aus | 1,0 ms | Kleines Volumen, grobe Froxel |
+| Transparenz/Partikel/Glow/Tonemapping | 1,2 ms | 1,5 ms | Regen, Rauch, Neon-Glow |
+| Skripte/Physik (Main-Thread CPU, parallel zur GPU) | ≤ 6 ms | ≤ 6 ms | Muss unter dem GPU-Budget bleiben, sonst CPU-limitiert |
+| **Summe GPU (Richtwert)** | **≈ 9–11 ms** | **≈ 14–16 ms** | Reserve für Spitzen |
+
+**Was sich lohnt (Reihenfolge nach Nutzen pro Kosten):**
+1. **Tonemapping/Farbpipeline, Himmel, Nebel, Glow** – fast kostenlos, größter Stimmungsgewinn.
+2. **MultiMesh + Visibility Ranges + Occlusion Culling** – senkt die Kosten *aller* Passes, ist Voraussetzung für alles andere.
+3. **Materialqualität** (PBR, Detail-Normal, ORM, Decals) – kostet Speicher statt Rechenzeit.
+4. **SSAO** (Boden-/Fassaden-Kontakt) und **SSR nur bei Nässe** – Realismus für Neon-Nächte im Regen.
+5. **Reflection Probes** (je Bezirk/Straßenzug, statisch gebacken) für Metall-/Glasreflexe.
+6. **SDFGI** nur im Preset „Hoch“ und nach Messung: Es liefert Raumlicht/Bounce, ist aber das anspruchsvollste GI-Verfahren; die Doku empfiehlt weniger Cascades bei schneller Kamera (≤ 4), Halbauflösungs-GI, höheren „Frames to converge“ bei statischem Licht und deaktivierte „Use Occlusion“-Option, wenn nicht nötig; SDFGI gilt nur für Forward+ [Q29]. **Zu klären am Prototyp:** Wie verhält sich SDFGI bei zur Laufzeit gestreamten Chunk-Meshes (Neuberechnung, Flackern)? Fallback: kein GI, dafür Himmels-Ambient + Reflection Probes + SSAO.
+7. **Volumetrischer Nebel** nur für Hero-Momente (Nachtregen, Industrienebel) – kleine Volumen.
+
+**Was sich nicht lohnt / zu vermeiden ist:** Echtzeit-Raytracing (nicht verfügbar), SDFGI in „Mittel“, mehr als ~6 schattenwerfende Lichter, SSR dauerhaft auf der ganzen Stadt, hochauflösende Schatten für alle Props (nur große Objekte werfen Schatten), tausende individuelle `MeshInstance3D` statt MultiMesh, Transparenz-Overdraw (Glas, Partikel) ohne Begrenzung, 4K-Texturen für Kleinteile.
+
+**Auflösung und Skalierung:** Zielvorgabe **1080p nativ** (MSAA 2× wie im Prototyp, oder TAA) bzw. **1440p über Upscaling**: `Viewport.scaling_3d_mode = FSR 2.2` mit `scaling_3d_scale` ≈ 0,67 („Quality“) bis 0,59. FSR 2.2 gibt es seit Godot 4.2, ist die qualitativ beste, aber langsamste Skalierungsoption; bei FSR 2 wird TAA ignoriert; der Skalierungsfaktor wirkt **pro Achse** (0,5 = ein Viertel der Pixel) [Q30]. Dazu eine **dynamische Skalierung**, die `scaling_3d_scale` bei Frame-Einbruch absenkt (Qualität adaptiv).
+
+**Compositor/Post-Processing:** Godot 4.3+ bietet `Compositor`/`CompositorEffect` für eigene Compute-Post-Effekte (z. B. Schärfung, Film-Grain, Aegis-Scan-Overlay). Das ist ein **Wunschziel** und in dieser Recherche nicht verifiziert; für den MVP genügen `Environment`-Effekte (Tonemapping, Glow, Adjustment/Color-Correction).
+
+**Threads/CPU:** Der Ryzen 5 3600 hat 6 Kerne. Godot trennt Render- und Hauptthread (Threading-Modell in den Projekteinstellungen prüfen); Generierung/KI-Rechnung wandert in den **`WorkerThreadPool`**. Der Main-Thread (Skripte + Physik) ist der typische Engpass – deshalb GDScript typisieren, Batch-Verarbeitung, C#/GDExtension nur für gemessene Hotspots.
 
 ### 5.2 Materialien (PBR)
 
-- **Physikalisch plausibel:** `MeshStandardMaterial` für die Masse, `MeshPhysicalMaterial` (Clearcoat) nur für Fahrzeuglack und Glas. Albedo in sRGB, Daten-Maps (Normal, ORM) in Linear.
-- **Material-Bibliothek** in `data/materials.js`: Asphalt (neu/alt/nass), Beton, Backstein, Blech/Rost, Glas/Stahl-Fassade, Putz, Holz, Kopfsteinpflaster, Kunstrasen, Gummi, Lack. Jedes Material: Albedo, Normal, ORM, Skalierung in Metern (**Texel-Dichte**-Ziel nah ca. 256–512 px/m für Boden, 128–256 px/m für Fassaden – Richtwerte).
-- **Texturformat:** PNG/JPG nur im Quellordner; ausgeliefert wird KTX2. Für ORM-Maps ist die beste Kompression umstritten (ETC1S vs. UASTC): beide an echten Daten testen, Normal-Maps eher UASTC [Q18].
-- **Quellen für Texturen:** CC0-Bibliotheken wie [ambientCG](https://ambientcg.com) und [Poly Haven](https://polyhaven.com); Lizenzliste in `assets/LICENSES.md` führen.
-- **Detail-Maps/Triplanar:** Zweite, hochfrequente Normal-Map (Asphaltkorn) im Nahbereich überblendet, damit große Flächen nicht „plastisch“ wirken.
+- **Standard:** `StandardMaterial3D` (PBR, Metallic/Roughness) für die Masse, eigene **Spatial-Shader** für Boden, Fassade, Nässe; Godots `BaseMaterial3D` kann Albedo, Normal, ORM (Occlusion/Roughness/Metallic gepackt), Clearcoat und Detail-Texturen.
+- **Material-Bibliothek** in `data/materials/` (`.tres`): Asphalt (neu/alt/nass), Beton, Backstein, Blech/Rost, Glas/Stahl-Fassade, Putz, Holz, Kopfsteinpflaster, Gummi, Lack. Jedes Material: Albedo, Normal, ORM, UV-Skalierung in Metern, Wear-Parameter. **Texel-Dichte** nah ca. 256–512 px/m für Boden, 128–256 px/m für Fassaden (Richtwerte).
+- **Texturformate:** Godot importiert Texturen als **VRAM-komprimiert (BPTC/S3TC auf dem Desktop)** mit Mipmaps (Import-Voreinstellung „VRAM Compressed“); Normal-Maps mit passendem Import-Typ; so sinkt der VRAM-Bedarf deutlich. Texturspeicher-Ziel ≤ 4 GB.
+- **Mixed Prozedural/Textur:** Wie im Prototyp zeichnet ein Shader Straßenmarkierungen und Fenster prozedural – ein Vorteil: keine Texturen, unendliche Auflösung. Für Realismus ergänzen: **Detail-Normal-Map** (Asphaltkorn), Triplanar-Mapping für Terrain/Fels, Werte-Rauschen für Verschmutzung.
+- **Quellen für Texturen:** CC0-Bibliotheken wie [ambientCG](https://ambientcg.com) und [Poly Haven](https://polyhaven.com); Lizenzliste in `assets/LICENSES.md`.
 
 ### 5.3 Straßendetails und Props
 
 Dichte-Budgets je Bezirk legen fest, *wie viel* Detail ein Chunk bekommt (Chunk-Generator streut Props regelbasiert, seed-stabil).
 
-| Detailklasse | Beispiele | Umsetzung |
+| Detailklasse | Beispiele | Umsetzung in Godot |
 |---|---|---|
-| Boden-Decals | Gullideckel, Risse, Flickstellen, Ölflecken, Reifenspuren, abgenutzte Markierungen, Zebrastreifen, Kaugummi-/Streusalzflecken, Laub | Instanzierte Quads mit `polygonOffset`, alles in **einer Decal-Atlastextur** |
-| Straßenmöblierung | Hydranten, Poller, Mülltonnen, Ampeln, Schilder, Laternen, Kabelmasten, Briefkästen, Parkuhren, Fahrradständer | Instanz-Pools; Varianten je Bezirk (Prop-Sets) |
-| Fassadendetails | Klimageräte, Feuerleitern, Wasserspeicher, Regenrohre, Sat-Schüsseln, Wäscheleinen, Reklame, Graffiti | Fassaden-Atlas + Dach-/Anbau-Instanzen |
-| Dystopie-Props | Aegis-Kameras (drehen sich, rote LED), Drohnenstationen, Checkpoint-Schranken, „Social-Zone“-Schilder, Konzern-Werbewände, Zäune um Gated Areas | Gleiche Instanzpipeline; Kameras sind gleichzeitig **Spielobjekte** (M6/M14) |
-| Lebendigkeit | Dampf aus Gullis, Müll im Wind, flackernde Neonröhren, Lüftungsgeräusche, Tauben, Pfützen-Ringe | Wenige Partikel-Emitter nahe der Kamera, Rest per Shader-Animation |
-| Beschilderung/Text | Straßennamen, Ladenschilder, Werbetexte (alles fiktiv, eigene Marken) | Text-Atlas (MSDF-Schrift), keine Realmarken |
+| Boden-Decals | Gullideckel, Risse, Flickstellen, Ölflecken, Reifenspuren, abgenutzte Markierungen, Laub | Godots **`Decal`-Node** (projiziert Albedo/Normal/ORM, geclusterte Decals begrenzt) für wenige, wichtige Stellen; **MultiMesh-Quads** mit Decal-Atlas und `depth_bias`/Offset für die Masse; Markierungen weiter im Boden-Shader |
+| Straßenmöblierung | Hydranten, Poller, Mülltonnen, Ampeln, Schilder, Laternen, Kabelmasten, Parkuhren | MultiMesh je Chunk und Typ; Varianten je Bezirk (Prop-Sets) |
+| Fassadendetails | Klimageräte, Feuerleitern, Wasserspeicher, Regenrohre, Sat-Schüsseln, Reklame, Graffiti | Fassaden-Shader (Gittermuster, wie bei den Fenstern im Prototyp) + Dach-/Anbau-MultiMesh |
+| Dystopie-Props | Aegis-Kameras (drehen sich, rote LED), Drohnenstationen, Checkpoint-Schranken, „Social-Zone“-Schilder, Konzern-Werbewände, Zäune um Gated Areas | Gleiche MultiMesh-Pipeline; Kameras sind zugleich **Spielobjekte** (M6/M14, eigene Szene mit `Area3D`-Sichtkegel) |
+| Lebendigkeit | Dampf aus Gullis, Müll im Wind, flackernde Neonröhren, Tauben, Pfützen-Ringe | Wenige `GPUParticles3D` nahe der Kamera (Visibility Range), Rest per Shader-Animation |
+| Beschilderung/Text | Straßennamen, Ladenschilder, Werbetexte (fiktiv, eigene Marken) | `Label3D`/Textur-Atlas; keine Realmarken |
 
 ### 5.4 Verschleiß und Wetter
 
-- **Wear-Attribut:** Jede Gebäude-/Straßeninstanz bekommt ein Attribut `wear` (0–1) aus Bezirk (Rustline hoch, Core niedrig), Alter und Zufall. Der Shader mischt damit Schmutz am Sockel, Regenstreifen unter Fensterbänken, Rost an Metall, abplatzenden Putz.
-- **Fahrzeuge:** Dreck-Level wächst mit Fahrstrecke/Regen, Waschanlage setzt zurück; Kratzer/Beulen aus dem Schadensmodell (M4).
-- **Nasse Oberflächen (Shader):** bei Regen sinkt `roughness`, `albedo` wird dunkler, ein World-Space-Rauschen erzeugt Pfützen-Masken (dort Roughness ≈ 0, glatte Normalen), Regenringe als animierte Normal-Map. Reflexion über Environment-Map; im Preset „Hoch“ zusätzlich SSR. *(Eigenes Design; zu Nässe-Shadern in Three.js fand die Recherche keine belastbare Quelle – früh als Prototyp prüfen.)*
-- **Wettereinfluss auf Welt:** Beleuchtung (Himmel-Probe wechselt), Sicht (Nebel), Verkehr/Passanten (M5), Grip (M4), Klang (M10).
+- **Wear-Attribut:** Jede Gebäude-/Straßeninstanz bekommt einen Verschleißwert `wear` (0–1) aus Bezirk (Rustline hoch, Core niedrig), Alter und Zufall (per MultiMesh-`INSTANCE_CUSTOM`). Der Shader mischt damit Schmutz am Sockel, Regenstreifen unter Fensterbänken, Rost an Metall, abplatzenden Putz.
+- **Fahrzeuge:** Dreck-Level wächst mit Fahrstrecke/Regen (Shader-Parameter am Material), Waschanlage setzt zurück; Kratzer/Beulen aus dem Schadensmodell (M4).
+- **Nasse Oberflächen (Shader):** `wetness` als **Global Shader Uniform**: Roughness sinkt, Albedo dunkler, ein World-Space-Rauschen erzeugt Pfützen-Masken (dort Roughness ≈ 0, glatte Normalen), Regenringe als animierte Normal-Map; Reflexion über **SSR (nur bei Regen aktivieren)** und Reflection Probes. *(Eigenes Design; zu Nässe-Shadern lieferte die Recherche keine belastbare Quelle – früh als Prototyp prüfen.)*
+- **Wettereinfluss auf Welt:** Beleuchtung, Sicht (Nebel), Verkehr/Passanten (M5), Grip (M4), Klang (M10).
 - **Tageszeit:** Straßenbeleuchtung natriumorange in Rustline, kaltweiß im Core, warm in Lantern Hill – Beleuchtung gehört zur Bezirksidentität (M3).
 
 ### 5.5 Glaubwürdige Stadtstruktur
@@ -471,19 +498,19 @@ Realismus ist auch *Plan*: Die Stadt muss aussehen, als wäre sie über Jahrzehn
 - **Blockgrößen nach Bezirk:** Core 100–140 m, Altstadt 30–60 m, Vorstadt gewunden mit Sackgassen, Industrie große Blöcke (nach Verfahren in [Q1][Q2][Q3]).
 - **Landnutzungslogik:** Gewerbe und Läden an Hauptstraßen, Wohnen in Nebenstraßen, Tankstellen/Supermärkte an Einfallstraßen, Lager/Industrie in Hafennähe; Gebäudefront und Eingänge zur Straße gerichtet, Hinterhöfe und Zufahrten.
 - **Gelände:** Straßen folgen Höhenlinien (Terrassierung, Serpentinen, Stützmauern, Treppen), Brücken/Tunnel an echten Hindernissen.
-- **Infrastruktur sichtbar:** Strommasten und Leitungen, Brunnen, U-Bahn-Zugänge, Bushaltestellen, Mülltonnen-Rhythmus, Baustellen.
+- **Infrastruktur sichtbar:** Strommasten und Leitungen, Brunnen, U-Bahn-Zugänge, Bushaltestellen, Baustellen.
 - **Soziale Gegensätze lesbar machen:** Gehwegzustand, Beleuchtung, Sauberkeit und Kameradichte unterscheiden reiche und arme Viertel (Kapitel 8).
 
 ### 5.6 Stufen, Technik, Risiken
 
 | Stufe | Umfang |
 |---|---|
-| MVP | Material-Bibliothek (12 Materialien, PBR, KTX2), ACES-/AgX-Tonemapping und einheitliche Farbpipeline, 4 Himmels-Environment-Maps, CSM (3 Kaskaden), Decal-Atlas mit 20 Decals, 30 Props, `wear`-Attribut, Qualitäts-Presets |
-| Ausbau | Nässe-Shader mit Pfützen, Gebäude-Verschleiß, Bezirks-Prop-Sets, Text-Atlas, Aegis-Kameras als Props, SSAO/GTAO, dynamische Auflösung, Fahrzeuglack mit Clearcoat |
-| Wunschziel | WebGPU-Pfad (SSR, Compute-Culling), volumetrischer Nebel, Fensterinterieurs per Parallax-Cubemap, Photogrammetrie-Hero-Assets, Jahreszeiten |
+| MVP | Material-Bibliothek (12 Materialien, PBR, VRAM-Kompression), einheitliche Farbpipeline (ACES oder Filmic, Glow), Himmelsanimation, Direktionalschatten mit 4 Kaskaden, Reflection Probes je Bezirk, Decal-Atlas (20 Decals), 30 Props, `wear`-Attribut, Qualitäts-Presets |
+| Ausbau | Nässe-Shader mit Pfützen, Gebäude-Verschleiß, Bezirks-Prop-Sets, Text-Atlas/`Label3D`, Aegis-Kameras als Props, SSAO-Feinschliff, dynamische Auflösung mit FSR 2.2, Fahrzeuglack mit Clearcoat, SDFGI-Test für „Hoch“ |
+| Wunschziel | `CompositorEffect`-Pipeline (Schärfung, Grain, Scan-Overlay), volumetrischer Nebel an Hero-Orten, Fensterinterieurs per Parallax-Cubemap-Shader, Photogrammetrie-Hero-Assets, Jahreszeiten |
 
-**Technische Umsetzung:** Asset-Pipeline `tools/assets/` (Skript: PNG → KTX2, glTF → Meshopt/Draco, Atlas-Packer); Chunk-Generator (M2) erzeugt Props/Decals regelbasiert; alle Qualitätsstufen laufen über **ein** Preset-Objekt (M12).
-**Abhängigkeiten:** M2, M3, M9, M12. **Risiken:** (1) Asset-Menge und Lizenzen → CC0 + Prozeduralmaterialien, Lizenzliste; (2) Ladezeit durch Texturen → Streaming nach Bezirk, KTX2, Platzhalter-Mip zuerst; (3) „Look-Drift“ zwischen Bezirken → eine Material- und Farbpipeline, zentrale Look-Dev-Szene; (4) Performance-Einbruch auf Low-End → Presets und dynamische Auflösung. **Aufwand:** MVP 6 PT · Ausbau 20 PT · Wunsch 25+ PT (ohne Kunstproduktion; Assets zusätzlich).
+**Technische Umsetzung:** Asset-Pipeline in Godot (Import-Presets; Texturen/Modelle `.glb` über den Importer, automatische Mesh-LODs); Chunk-Generator (M2) erzeugt Props/Decals regelbasiert; alle Qualitätsstufen über **eine** Preset-Ressource (M12), die Environment-, Viewport- und Projekteinstellungen setzt.
+**Abhängigkeiten:** M2, M3, M9, M12. **Risiken:** (1) Asset-Menge und Lizenzen → CC0 + Prozeduralmaterialien, Lizenzliste; (2) Videospeicher (8 GB) → Textur-Budget, Kompression, Streaming nach Bezirk; (3) „Look-Drift“ zwischen Bezirken → eine Material- und Farbpipeline, zentrale Look-Dev-Szene; (4) Performance-Einbruch → Presets, dynamische Auflösung; (5) SDFGI/Streaming-Wechselwirkung (siehe oben). **Aufwand:** MVP 6 PT · Ausbau 18 PT · Wunsch 22+ PT (ohne Kunstproduktion).
 
 ---
 
@@ -555,10 +582,10 @@ Konsequenzen laufen über **Effekte** (Datenmodell 6.5): Standard ändern, Flag 
 
 ### 6.5 Datenmodell
 
-Alle Story-Inhalte sind **Daten** (JSON/JS-Module in `data/story/`), kein Code. Die Engine (`sim/story.js`) wertet Bedingungen aus und wendet Effekte an.
+Alle Story-Inhalte sind **Daten** (JSON bzw. `Resource` in `data/story/`), kein Code. Die Engine (Autoload `story.gd`) wertet Bedingungen aus und wendet Effekte an.
 
-```js
-// data/story/schema (Beschreibung als JSDoc/TypeScript-ähnlich)
+```text
+// data/story/ – Schema als Pseudocode (Umsetzung: GDScript-Klassen mit to_dict()/from_dict(), Speicherung als JSON)
 
 /** Dauerhafter Story-Zustand, wird gespeichert (M8) und – online – serverseitig geführt (M15). */
 GameStory = {
@@ -617,7 +644,7 @@ Ending = { id: 'E2', title: 'Hafenrepublik', priority: 20,
 ### 6.6 Weltzustand, Konsequenzen und Test
 
 - **Weltzustand-Tags** (z. B. `strike`, `aegis_dense`, `blackout`, `free_port`, `gentrified`) wirken als Parameter-Überschreibungen auf `DistrictDef` (M3): andere Verkehrsprofile (M5), mehr/weniger Kameras und KCG (M6), geschlossene Docks, Lichter, Graffiti (M13), Ambient-Klang (M10).
-- **Story-Simulator** (`tests/storySim.mjs`, Node): erzeugt zufällig alle Entscheidungskombinationen (oder eine feste Stichprobe von mehreren Tausend), spielt den Graph durch und meldet: nicht erreichbare Missionen/Enden, Sackgassen (keine aktive/verfügbare Mission vor einem Hauptknoten), widersprüchliche Flags. Wird in CI/Skript ausgeführt.
+- **Story-Simulator** (`tests/story_sim.gd`, läuft headless: `godot --headless --script …`): erzeugt zufällig alle Entscheidungskombinationen (oder eine feste Stichprobe von mehreren Tausend), spielt den Graph durch und meldet: nicht erreichbare Missionen/Enden, Sackgassen (keine aktive/verfügbare Mission vor einem Hauptknoten), widersprüchliche Flags. Wird in CI/Skript ausgeführt.
 - **Rückblick:** Entscheidungsprotokoll (`decisions`) speist ein „Was wäre gewesen“-Menü nach dem Ende (Wiederspielwert).
 
 ### 6.7 Stufen, Technik, Risiken
@@ -628,7 +655,7 @@ Ending = { id: 'E2', title: 'Hafenrepublik', priority: 20,
 | Ausbau | Alle 5 Fraktionen, 4 NPC-Vertrauenswerte, W1–W5, E1–E4, Weltzustand-Tags mit sichtbaren Bezirksänderungen, Dialog-UI mit Entscheidungsoptionen, Rückblick-Menü |
 | Wunschziel | Geheimes Ende E5, Beziehungsszenen, dynamische Nebenaufträge je Weltzustand, Lokalisierung (DE/EN), Editor-Werkzeug für Story-Graphen |
 
-**Technische Umsetzung:** reine Daten + deterministische Engine; kein Zufall in Story-Entscheidungen; Ereignisse über den Event-Bus (`mission.completed`, `crime`, `district.entered`); Texte in `data/story/text.de.json`.
+**Technische Umsetzung:** reine Daten + deterministische Engine; kein Zufall in Story-Entscheidungen; Ereignisse über Signale des `EventBus`-Autoloads (`mission.completed`, `crime`, `district.entered`); Texte in `data/story/text.de.json` (später Godots Übersetzungssystem/`tr()`).
 **Abhängigkeiten:** M7 (Runner), M6 (Verbrechen/Heat), M3/M5/M9/M13 (Weltzustand-Wirkung), M8 (Speichern). **Risiken:** (1) Content-Umfang → Perlenkette und Variantentexte statt vollständiger Verzweigung; (2) Soft-Locks → Story-Simulator, Notfall-Reset „Mission neu starten“; (3) Konsistenzfehler in Dialogen → Bedingungen zentral prüfen, Review-Checkliste; (4) Mehrspieler: globale Story-Spoiler → Story bleibt **pro Spieler** (Kapitel 7.8). **Aufwand:** MVP 8 PT · Ausbau 20 PT · Wunsch 25+ PT (ohne Texte/Vertonung).
 
 ---
@@ -639,114 +666,108 @@ Ending = { id: 'E2', title: 'Hafenrepublik', priority: 20,
 
 ### 7.1 Ehrliche Einordnung
 
-- „MMO“ im Browser heißt realistisch: **ein Realm mit ca. 50–100 gleichzeitigen Spielern** (Richtwert, per Lasttest zu bestimmen), nicht Tausende in einer Szene. Mehrere Realms nebeneinander skalieren die Gesamtzahl.
-- Ein MMO braucht **Dauerbetrieb**: Server, Datenbank, Backups, Moderation, Datenschutz (DSGVO), Kosten. Das ist ein eigenes Projekt neben dem Spiel. Deshalb: Mehrspieler ist **optional** und das Spiel muss ohne Server voll funktionieren.
-- Der Browser-Client ist **nicht vertrauenswürdig** (JS ist les- und manipulierbar). Absolute Cheat-Freiheit gibt es nicht; es geht um *Schadensbegrenzung durch Serverautorität* (7.7).
+- „MMO“ heißt hier realistisch: **ein Realm mit ca. 50–100 gleichzeitigen Spielern** (Richtwert, per Lasttest zu bestimmen), nicht Tausende in einer Szene. Mehrere Realms skalieren die Gesamtzahl.
+- Ein MMO braucht **Dauerbetrieb**: Server, Datenbank, Backups, Moderation, Datenschutz (DSGVO), Kosten. Das ist ein eigenes Projekt neben dem Spiel. Mehrspieler bleibt **optional**; das Spiel muss ohne Server voll funktionieren.
+- Auch ein **nativer Godot-Client ist manipulierbar** (Speicher, Dateien, Netzwerkverkehr). Es gibt keine absolute Cheat-Freiheit; Ziel ist Schadensbegrenzung durch Serverautorität (7.7).
+- Godots eingebaute Multiplayer-API ist für kleinere Sessions gedacht; für ein persistentes MMO braucht es zusätzlich Backend-Dienste (Konten, Datenbank). Das Verhalten bei 50–100 Spielern mit Fahrzeugen ist **nicht belegt** → früh per Lasttest mit Bots prüfen.
 
-### 7.2 Architektur
+### 7.2 Architektur (Godot)
 
 ```mermaid
 flowchart LR
-  subgraph CL["Client (Browser)"]
+  subgraph CL["Client (Godot, Windows)"]
     C1["Rendering, UI, Audio (M2/M10/M11/M13)"]
     C2["Prädiktion + Interpolation"]
   end
-  subgraph LB["Gateway"]
-    GW["Node.js + WebSocket (wss)<br/>Auth, Rate-Limit, Routing"]
+  subgraph BE["Backend-Dienst (HTTP/JSON)"]
+    AU["Anmeldung, Token, Realm-Liste"]
+    PG[("PostgreSQL: Konten, Charaktere, Weltzustand")]
   end
   subgraph RL["Realm (Weltinstanz, ~50–100 Spieler)"]
-    Z1["Zone-Prozess: Kestrel Core"]
-    Z2["Zone-Prozess: Saltmarket"]
-    Z3["Zone-Prozess: Umland/Highway"]
-    ST["Story-Dienst (pro Spieler, M14)"]
-  end
-  subgraph DB["Persistenz"]
-    PG[("PostgreSQL: Konten, Charaktere, Weltzustand")]
-    RD[("Redis: Sessions, Pub/Sub, Warteschlangen")]
+    Z1["Zone-Server (Godot --headless): Kestrel Core"]
+    Z2["Zone-Server (Godot --headless): Saltmarket"]
+    Z3["Zone-Server (Godot --headless): Umland/Highway"]
   end
   C1 --> C2
-  C2 <-->|"Eingaben / Snapshots (binär)"| GW
-  GW --> Z1
-  GW --> Z2
-  GW --> Z3
+  C2 -->|"HTTPS: Login, Token"| AU
+  AU --> PG
+  C2 <-->|"ENet (UDP) bzw. WebSocket: Eingaben / Zustand"| Z1
   Z1 <-->|"Übergabe an Zonengrenze"| Z2
   Z2 <--> Z3
-  Z1 --> ST
-  Z2 --> ST
-  Z3 --> ST
-  ST --> PG
-  Z1 --> PG
-  GW --> RD
-  Z1 --> RD
+  Z1 -->|"Speichern (HTTPS/intern)"| AU
+  Z2 --> AU
+  Z3 --> AU
 ```
 
 **Grundentscheidungen**
-- **Node.js + `ws`** (einfach, ausreichend; `uWebSockets.js` als Option, falls Durchsatz zum Engpass wird – die Herstellerzahlen dazu sind nicht unabhängig belegt) [Q19]. Sicher nur über `wss://` (TLS) hinter einem Reverse-Proxy.
-- **Autoritativer Server:** Der Server führt die Simulation (dieselben Module `sim/*` wie im Client), der Client sendet nur **Eingaben**, nie Ergebnisse.
-- **Ein Prozess pro Zone**, weil eine laufende Spielschleife den Node-Event-Loop blockiert; schwere Teile gehören in Worker-Threads/Prozesse [Q19].
-- **Einzelspieler = derselbe Code:** Ein **LocalServer** (Web Worker im Browser) führt dieselbe Simulation für genau einen Spieler und speichert lokal (IndexedDB). Der Client kennt nur ein Interface `World.connect(transport)`: Transport = `LocalTransport` (Worker) oder `WebSocketTransport` (Server).
+- **Godot High-Level-Multiplayer-API** (`MultiplayerAPI`/`SceneMultiplayer`): Transport **`ENetMultiplayerPeer`** (UDP, Standard, geringe Latenz) für Windows-Clients; **`WebSocketMultiplayerPeer`** (TCP) als Alternative, falls UDP blockiert ist oder später eine Web-Version entsteht. Der Server hat immer die Peer-ID 1 [Q31][Q32].
+- **Autoritativer Dedicated Server:** Godot-Projekt läuft auf dem Server **headless** (`--headless` bzw. Export mit Feature-Tag `dedicated_server`, Abfrage `OS.has_feature("dedicated_server")`), ohne Fenster/Rendering, aber mit derselben Simulation (`sim/`-Skripte) wie der Client [Q32]. Dazu die Regel aus Kapitel 3.2: Simulationslogik kennt keine Meshes/Materialien.
+- **Clients senden nur Eingaben** (Gas, Lenkung, Bremse, Aktion), nie Positionen. `@rpc`-Funktionen mit `any_peer` validieren **immer** `multiplayer.get_remote_sender_id()` und die Parameter; Objekte werden **nie** aus Netzwerkdaten deserialisiert (kein `bytes_to_var_with_objects`/Objekt-Decoding).
+- **`MultiplayerSynchronizer`/`MultiplayerSpawner`** eignen sich für einfache Replikation (Spieler-Szenen spawnen, Zustände). Für Fahrzeuge und Massenobjekte besser **eigene Snapshots** (kompakt, quantisiert, gefiltert nach Interessenbereich) – ein reiner Synchronizer-Einsatz kann in großen Szenen die Bandbreite sprengen [Q32].
+- **Einzelspieler = derselbe Pfad:** Der Einzelspieler nutzt `OfflineMultiplayerPeer` (Spieler ist „Server“); RPC-/Autoritätscode ist in beiden Modi identisch.
+- **Persistenz über einen Backend-Dienst** (HTTP/JSON, beliebige Sprache), weil Godot keinen nativen Datenbanktreiber für PostgreSQL mitbringt; Server und Backend sprechen per `HTTPRequest`. Alternative für lokale Entwicklung: SQLite-Add-on *(Eignung prüfen)*.
 
 ### 7.3 Zonen und Sharding
 
 | Begriff | Bedeutung |
 |---|---|
-| **Realm** | Eine vollständige Weltinstanz mit eigener Spielerliste, Weltzustand und Wirtschaft; maximal ca. 50–100 Spieler (Richtwert). Weitere Spieler → weiterer Realm (Shard). Spieler wählen Realm oder werden zugewiesen. |
-| **Zone** | Räumlicher Teil des Realms, z. B. die 6 Bezirke plus Umland (≈ 8 Zonen). Jede Zone läuft als eigener Prozess/Thread mit eigener Tick-Schleife. |
-| **Interessenbereich (Area of Interest)** | Ein Spieler bekommt nur Entitäten innerhalb von ca. 300–400 m (Gitter = Chunks). Spart Bandbreite und CPU [Q19]. |
-| **Grenzübergang (Handoff)** | Nähert sich eine Entität der Zonengrenze, wird sie in der Nachbarzone als „Geist“ gespiegelt und beim Überschreiten übergeben (Zustand + Sequenznummer). Ein Überlappungsstreifen von ca. 100 m verhindert Flackern. |
-| **Phase** | Privater Story-Ausschnitt eines Spielers (7.8): Story-NPCs und Missionsobjekte existieren nur für ihn/seine Gruppe. |
+| **Realm** | Eine vollständige Weltinstanz mit eigener Spielerliste, Weltzustand und Wirtschaft; maximal ca. 50–100 Spieler (Richtwert). Weitere Spieler → weiterer Realm (Shard). |
+| **Zone** | Räumlicher Teil des Realms (6 Bezirke plus Umland ≈ 8 Zonen). **Ein Godot-Prozess pro Zone** (mehrere Welten parallel im selben SceneTree sind nicht vorgesehen); Prozesse sprechen untereinander über ENet/Backend. |
+| **Interessenbereich (Area of Interest)** | Ein Spieler bekommt nur Entitäten innerhalb von ca. 300–400 m (Gitter = Chunks); in Godot über eigene Snapshot-Filter (Synchronizer-Sichtbarkeit für wenige Objekte). |
+| **Grenzübergang (Handoff)** | Nähert sich eine Entität der Zonengrenze, wird sie in der Nachbarzone als „Geist“ gespiegelt und beim Überschreiten übergeben (Zustand + Sequenznummer); Überlappung ca. 100 m. Client verbindet sich dabei mit dem nächsten Zonenprozess. |
+| **Phase** | Privater Story-Ausschnitt eines Spielers (7.8): Story-NPCs und Missionsobjekte existieren nur für ihn/seine Gruppe (Sichtbarkeitsfilter). |
 
-*Hinweis:* Zu zonenbasiertem Sharding mit Grenz-Handoff fand die Recherche **keine belastbare Einzelquelle**; die Konzeption folgt allgemeinen Praktiken (Rooms/Instanzen, Interessenmanagement) und ist früh per Prototyp und Lasttest zu validieren.
+*Hinweis:* Zu zonenbasiertem Sharding mit Grenz-Handoff fand die Recherche **keine belastbare Quelle**; die Konzeption folgt allgemeinen Praktiken (Instanzen, Interessenmanagement). **Anfangs genau eine Zone pro Realm**, geteilt wird erst nach Lasttest.
 
 ### 7.4 Was synchronisiert wird
 
 | Objekt | Autorität | Rate | Methode |
 |---|---|---|---|
-| Spielerfigur / Eigenes Fahrzeug | Server validiert, Client sagt voraus | Eingaben 30–60 Hz, Snapshots 15–20 Hz | Client-Prädiktion + Server-Korrektur (Reconciliation) [Q20] |
-| Fremde Spieler und Fahrzeuge | Server | 15–20 Hz (verteilt nach Entfernung) | Entity Interpolation (ca. 100–150 ms zeitversetzt) [Q21] |
+| Spielerfigur / eigenes Fahrzeug | Server validiert, Client sagt voraus | Eingaben 30–60 Hz, Snapshots 15–20 Hz | Client-Prädiktion + Server-Korrektur (Reconciliation) [Q20] |
+| Fremde Spieler und Fahrzeuge | Server | 15–20 Hz (nach Entfernung gestaffelt) | Interpolation (ca. 100–150 ms Zeitversatz) [Q21] |
 | Kollisionen zwischen Spielern | Server | ereignisbasiert | Server entscheidet, Client zeigt Effekt |
-| Ambient-Verkehr/Passanten | **Nahe an Spielern: Server (Sim-Stufe A)**, fern: lokal deterministisch (Seed + Spielzeit) | 5–10 Hz nah | Wichtige Fahrzeuge (Polizei, Missionsziele) immer serverseitig; Hintergrundverkehr darf je Client leicht abweichen |
-| Polizei/Fahndung | Server | ereignisbasiert + 10 Hz Positionen | Server-Dispatcher; Sichtlinie serverseitig |
-| Geld, Inventar, Fahrzeugbesitz, Standing, Flags | **Nur Server** | bei Änderung | Transaktional in der Datenbank |
+| Ambient-Verkehr/Passanten | **Nahe an Spielern: Server (Sim-Stufe A)**; fern: lokal deterministisch (Seed + Spielzeit) | 5–10 Hz nah | Wichtige Fahrzeuge (Polizei, Missionsziele) immer serverseitig; Hintergrundverkehr darf je Client leicht abweichen |
+| Polizei/Fahndung | Server | ereignisbasiert + 10 Hz Positionen | Server-Dispatcher; Sichtlinie serverseitig (Raycast) |
+| Geld, Inventar, Fahrzeugbesitz, Standing, Flags | **Nur Server** | bei Änderung | Transaktional im Backend |
 | Missionsfortschritt | Server (pro Spieler) | bei Ereignis | Server prüft Bedingungen (Position, Zeit, Zustand) |
 | Weltzustand (Bezirks-Tags, Fraktionskontrolle) | Server (pro Realm) | langsam (Minuten) | Aggregation aus Spieleraktionen mit Dämpfung |
 | Tageszeit/Wetter | Server (pro Realm) | 1 Hz | Client interpoliert lokal |
 | Chat/Ping/Emotes | Server | Ereignis | Rate-Limit, Filter |
 
-**Bandbreitenbudget (Überschlag):** 20 sichtbare Fahrzeuge × ca. 24 Byte × 15 Hz ≈ 7 KB/s je Client abwärts, plus Weltereignisse. Mit Delta-Kompression und Quantisierung (Position in cm, Winkel in 1/256) deutlich darunter. Zielwert < 30 KB/s je Client.
+**Bandbreitenbudget (Überschlag):** 20 sichtbare Fahrzeuge × ca. 24 Byte × 15 Hz ≈ 7 KB/s je Client abwärts, plus Weltereignisse; mit Quantisierung (Position in cm, Winkel in 1/256) und Deltakompression darunter. Zielwert < 30 KB/s je Client.
 
 ### 7.5 Netzcode
 
-- **Binärprotokoll** (eigene `DataView`-Kodierung oder MessagePack), versionierte Nachrichten, `tick`- und `seq`-Nummern.
-- **Client-Prädiktion und Reconciliation:** Client wendet Eingaben sofort an, merkt sich unbestätigte Eingaben mit Sequenznummer; bei Server-Snapshot setzt er den Zustand zurück und wiederholt ausstehende Eingaben. Für andere Spieler **Interpolation** statt Prädiktion [Q20][Q21].
-- **Tick-Raten:** Simulation 60 Hz (deterministischer Fixed-Step, M4), Netzwerk-Snapshots 15–20 Hz (üblicher Kompromiss; höhere Raten nur wo nötig) [Q19].
-- **Lag-Kompensation** nur für Trefferprüfungen (später); Fahrzeuge bleiben bei Prädiktion/Interpolation.
+- **Kompakte Pakete:** `PackedByteArray` mit eigener Kodierung (`encode_*`/`decode_*`) für Snapshots; `@rpc("unreliable_ordered")` für Positionsdaten, `@rpc("reliable")` für Ereignisse/Transaktionen; versionierte Nachrichten, `tick`/`seq`-Nummern.
+- **Client-Prädiktion und Reconciliation:** Client wendet Eingaben sofort an, merkt sich unbestätigte Eingaben mit Sequenznummer; bei Server-Snapshot setzt er zurück und wiederholt ausstehende Eingaben. Für andere Spieler **Interpolation** [Q20][Q21]. Bei physikbasierten Fahrzeugen (`RigidBody3D`) ist exakte Wiederholung schwierig → Fahrzeug-Prädiktion wird am Prototyp erprobt; Fallback: Server-autoritatives Fahrzeug mit Glättung.
+- **Tick-Raten:** Physik 60 Hz (`physics_ticks_per_second`), Netzwerk-Snapshots 15–20 Hz [Q33].
+- **Lag-Kompensation** nur für Trefferprüfungen (später).
 - **Verbindungsabbruch:** Fahrzeug bleibt kurz „Geist“ (5 s), Wiederverbinden mit Sitzungstoken.
 
 ### 7.6 Persistenz
 
 | Daten | Speicher | Anmerkung |
 |---|---|---|
-| Konten, Anmeldung | PostgreSQL | E-Mail-Login mit Magic Link oder OAuth; keine Passwörter im Klartext, ggf. Passkeys |
-| Charaktere (Story-Zustand `GameStory`, Geld, Fahrzeuge, Standing, Flags) | PostgreSQL (JSONB + relationale Kerne) | Schema-Versionierung und Migrationen von Anfang an |
+| Konten, Anmeldung | Backend + PostgreSQL | E-Mail-Login mit Magic Link oder OAuth; keine Klartext-Passwörter, ggf. Passkeys |
+| Charaktere (`GameStory`, Geld, Fahrzeuge, Standing, Flags) | PostgreSQL (JSONB + relationale Kerne) | Schema-Versionierung und Migrationen von Anfang an |
 | Weltzustand je Realm | PostgreSQL | Periodisch (alle 1–5 min) und bei Ereignissen („write-behind“) |
-| Sitzungen, Warteschlangen, Realm-übergreifender Chat | Redis (Pub/Sub) | Flüchtig |
-| Einzelspieler-Speicher | IndexedDB (Browser) | Gleiches Schema wie online → ein Pfad im Code |
+| Sitzungen/Warteschlangen/Realm-übergreifender Chat | Backend (Redis optional) | Flüchtig |
+| Einzelspieler-Speicher | JSON-Dateien in `user://saves/` | **Gleiches Schema wie online** → ein Pfad im Code; **kein** `.tres/.res`-Speichern (Skripteinbettung) |
 
-**Regeln:** Wirtschaftliche Änderungen (Kauf, Belohnung) als **Transaktion**; Backups täglich; Löschkonzept für personenbezogene Daten (DSGVO: Auskunft, Löschung; Hosting in der EU bevorzugen).
+**Regeln:** Wirtschaftliche Änderungen (Kauf, Belohnung) als Transaktion; tägliche Backups; Löschkonzept für personenbezogene Daten (DSGVO: Auskunft, Löschung; Hosting in der EU bevorzugen).
 
 ### 7.7 Anti-Cheat – Grundlagen (realistisch)
 
-Ein Browser-Client lässt sich nicht „absichern“. Strategie ist **Serverautorität plus Plausibilitätsprüfung**:
+Ein nativer Client lässt sich ebenfalls nicht „absichern“. Strategie ist **Serverautorität plus Plausibilitätsprüfung**:
 
 1. **Never trust the client:** Geld, Fahrzeuge, Standing, Flags, Missionsabschluss und Schaden entscheidet nur der Server.
-2. **Eingaben statt Zustände:** Client sendet Lenkung/Gas/Bremse, nie Positionen. Der Server simuliert mit denselben Fahrzeugdaten; Abweichungen führen zu Korrektur (Rubber-Banding), nicht zum Vertrauen.
+2. **Eingaben statt Zustände:** Client sendet Lenkung/Gas/Bremse, nie Positionen. Der Server simuliert mit denselben `VehicleDef`-Daten; Abweichungen führen zu Korrektur (Rubber-Banding), nicht zum Vertrauen.
 3. **Plausibilitätsgrenzen:** maximale Beschleunigung/Geschwindigkeit je Fahrzeug, Teleport-Erkennung, Sprunghöhen, Schussrate; Verstöße zählen auf ein Konto-Risiko-Konto.
-4. **Rate-Limits und Größenlimits** je Nachricht und Verbindung; Validierung aller Felder (kein Vertrauen in Typ/Bereich).
-5. **Authentifizierung:** kurzlebige, signierte Tokens (z. B. JWT) über sichere Cookies; Sitzungsbindung; keine Geheimnisse im Client.
+4. **Rate-Limits und Größenlimits** je RPC und Verbindung; Validierung aller Parameter (Typ, Bereich); `any_peer`-RPCs nur dort, wo nötig.
+5. **Authentifizierung:** kurzlebige, signierte Tokens; Sitzungsbindung; keine Geheimnisse im Client/PCK (PCK-Verschlüsselung erschwert nur das Auslesen, bietet keine echte Sicherheit).
 6. **Deterministische Story-Prüfung:** Missions-Bedingungen (6.5) sind deklarativ → Server wertet sie selbst aus.
 7. **Protokolle und Replays:** Eingabeprotokolle in Ringpuffer; auffällige Sitzungen nachträglich analysierbar; Melde-Funktion und Moderationswerkzeuge.
-8. **Ehrlichkeit nach außen:** Kein Client-seitiger „Anti-Cheat“ als Sicherheitsversprechen; Schutz vor Automatisierung (Bots) über Verhaltensanalyse und Rate-Limits. Offline-Charaktere sind **nicht** in den Online-Modus übertragbar (Cheat-Risiko), Ausnahme: reine Story-Flags ohne Geld/Fahrzeuge, wenn das Spiel das erlauben soll.
+8. **Ehrlichkeit nach außen:** Kein Client-seitiger „Anti-Cheat“ als Sicherheitsversprechen; Schutz vor Bots über Verhaltensanalyse und Rate-Limits. Offline-Charaktere sind **nicht** in den Online-Modus übertragbar (Cheat-Risiko), Ausnahme: reine Story-Flags ohne Geld/Fahrzeuge.
 
 ### 7.8 Einzelspieler-Story und gemeinsame Welt zusammenbringen
 
@@ -754,32 +775,32 @@ Drei Modi, ein Spiel:
 
 | Modus | Welt | Story | Persistenz |
 |---|---|---|---|
-| **Offline** | LocalServer im Browser | Vollständig, einziger Spieler | IndexedDB, lokal |
+| **Offline** | Lokale Simulation (`OfflineMultiplayerPeer`) | Vollständig, einziger Spieler | JSON-Speicher lokal |
 | **Online – Story** | Geteilter Realm | **Pro Spieler privat (Phasen):** Story-NPCs, Missionsobjekte, Entscheidungen existieren nur für ihn/seine Gruppe; Mitspieler sehen nur die gemeinsame Welt | Server (Charakter) |
 | **Online – Freispiel** | Geteilter Realm | Keine Hauptstory; Nebenaufträge, Fraktionskonflikte, Rennen, Events | Server |
 
 **Verzahnung:**
 - **Persönliche Entscheidungen bleiben persönlich.** Ein Spieler, der E3 „Blackout“ erreicht, verändert nicht den Realm für alle (keine globalen Spoiler, keine „verbrannte“ Welt).
-- **Gemeinsame Welt reagiert langsam auf Gemeinschaftsverhalten:** Aggregierte Spieleraktionen (z. B. Kameras gehackt, Docks beschützt, Straßenrennen) verschieben **Fraktionskontrolle der Bezirke** im Realm (Zähler mit Zerfall, z. B. wöchentlich bilanziert). Das erzeugt eine dystopische Metaspiel-Ebene: Welche Gruppe kontrolliert den Bezirk?
-- **Weltzustand-Tags (6.6)** gibt es zweimal: *persönliche* (Phase) und *Realm-weite* (Gemeinschaft). Die Darstellung wählt: persönliche Tags überlagern für den Spieler.
-- **Gruppen:** Eine Gruppe (2–4) teilt eine Missionsphase; Entscheidungen werden per Abstimmung oder durch den Gruppenführer getroffen.
+- **Gemeinsame Welt reagiert langsam auf Gemeinschaftsverhalten:** Aggregierte Spieleraktionen (Kameras gehackt, Docks beschützt, Straßenrennen) verschieben die **Fraktionskontrolle der Bezirke** im Realm (Zähler mit Zerfall, z. B. wöchentlich bilanziert) – eine dystopische Metaspiel-Ebene.
+- **Weltzustand-Tags (6.6)** gibt es zweimal: *persönliche* (Phase) und *Realm-weite* (Gemeinschaft); persönliche überlagern für den Spieler.
+- **Gruppen:** Eine Gruppe (2–4) teilt eine Missionsphase; Entscheidungen per Abstimmung oder Gruppenführer.
 - **Aegis als Mehrspielermechanik:** Spieler können Kameras hacken (zeitlich begrenzt für alle im Umkreis sichtbar), KCG-Einsätze auslösen oder abfangen; Heat gilt je Bezirk **pro Spieler**.
 
 ### 7.9 Stufen, Technik, Risiken
 
 | Stufe | Umfang |
 |---|---|
-| MVP (MS9) | `World.connect(transport)`-Abstraktion; LocalServer im Worker (Einzelspieler läuft darüber); Node-Gateway, Anmeldung, 1 Realm, 1 Zone; Prädiktion/Interpolation für Fahrzeuge; Charakter-Persistenz; 2 Clients gleichzeitig fahren sichtbar |
+| MVP (MS9) | Lokaler/Online-Pfad über dieselbe API (`OfflineMultiplayerPeer` ↔ `ENetMultiplayerPeer`); Dedicated Server (`--headless`) mit 1 Realm, 1 Zone; einfache Anmeldung; Prädiktion/Interpolation für Fahrzeuge; Charakter-Persistenz über Backend; 2 Clients fahren gleichzeitig sichtbar |
 | Ausbau (MS10) | Mehrere Zonen mit Handoff; Interessenverwaltung; serverseitiger Ambient-Verkehr in Spielernähe; Polizei-Dispatcher serverseitig; Anti-Cheat-Plausibilitätsprüfung; Lasttest mit simulierten 50–100 Bots; Chat; Moderationswerkzeug |
 | Wunschziel (MS11) | Mehrere Realms, Matchmaking, Fraktionskontrolle der Bezirke, Events/Saisons, Gruppen mit gemeinsamer Story-Phase, Replays, Telemetrie-Dashboard |
 
-**Abhängigkeiten:** Setzt eine saubere Trennung von Sim und Render (M1–M12), ein serialisierbares `GameState` (M8) und die Story-Engine (M14) voraus. **Risiken:** (1) **Betrieb und Kosten** (Hosting, Backups, Updates) → klein starten, ein Realm, Kosten vorab kalkulieren; (2) **Latenz/Fahrzeugsynchronisation** (hohe Geschwindigkeiten) → Prädiktion und Interpolation früh prototypen; (3) **Zonenübergabe** komplex → anfangs *eine* Zone pro Realm, erst nach Lasttest teilen; (4) **Cheater** → Serverautorität von Beginn an, nicht nachrüsten; (5) **DSGVO/Jugendschutz/Moderation** → vor Öffnung rechtlich klären; (6) **Doppelter Content-Pfad** (Einzel/Online) → ein gemeinsamer Daten- und Codepfad (7.2). **Aufwand:** MVP 15 PT · Ausbau 30 PT · Wunsch 40+ PT (ohne Betrieb).
+**Abhängigkeiten:** Setzt eine saubere Trennung von Sim und Darstellung (M1–M12), ein serialisierbares `GameState` (M8) und die Story-Engine (M14) voraus. **Risiken:** (1) **Betrieb und Kosten** → klein starten, ein Realm, Kosten vorab kalkulieren; (2) **Latenz/Fahrzeugsynchronisation** bei hoher Geschwindigkeit und Physikfahrzeugen → früh prototypen; (3) **Zonenübergabe** komplex → anfangs eine Zone; (4) **Cheater** → Serverautorität von Beginn an; (5) **DSGVO/Jugendschutz/Moderation** → vor Öffnung klären; (6) **Doppelter Content-Pfad** → ein gemeinsamer Daten- und Codepfad; (7) **Deterministik:** Godot-Physik ist nicht garantiert deterministisch zwischen Clients/Server → Server-Autorität statt Lockstep. **Aufwand:** MVP 10 PT · Ausbau 22 PT · Wunsch 35+ PT (ohne Betrieb).
 
 ---
 
 ## 8. Die Welt: Kestrel Bay (dystopisch)
 
-**Kestrel Bay** ist eine fiktive, dystopische Hafenmetropole an einer halbmondförmigen Bucht: Der Konzern *Aurelia Holdings* hält die Innenstadt und das Überwachungsnetz **Aegis**, an den Rändern leben Hafenarbeiter, Schrotthändler und Aktivisten in „blinden“ Vierteln. Die Stadt ist komplett erfunden; Namen, Fraktionen und Orte stammen aus keinem bestehenden Spiel. Das Meer liegt im Westen, im Osten steigen die **Ashridge-Berge** auf; die Stadt zieht sich vom Strand über Industrie und Zentrum bis in die Hanglagen. Größe: **Stadtgebiet ca. 3 × 3 km**, Umland insgesamt ca. 6 × 6 km (Browser-realistisch mit Chunk-Streaming; der Prototyp hat 0,64 × 0,64 km). Fahrzeit durch die Stadt bei Höchsttempo ca. 2 Minuten, Rundfahrt über Umland ca. 8–10 Minuten.
+**Kestrel Bay** ist eine fiktive, dystopische Hafenmetropole an einer halbmondförmigen Bucht: Der Konzern *Aurelia Holdings* hält die Innenstadt und das Überwachungsnetz **Aegis**, an den Rändern leben Hafenarbeiter, Schrotthändler und Aktivisten in „blinden“ Vierteln. Die Stadt ist komplett erfunden; Namen, Fraktionen und Orte stammen aus keinem bestehenden Spiel. Das Meer liegt im Westen, im Osten steigen die **Ashridge-Berge** auf; die Stadt zieht sich vom Strand über Industrie und Zentrum bis in die Hanglagen. Größe: **Stadtgebiet ca. 3 × 3 km**, Umland insgesamt ca. 6 × 6 km (mit Chunk-Streaming in Godot machbar und unterhalb der Einzelpräzisions-Orientierungsgröße von ca. 8 km [Q26]; der Prototyp hat 0,64 × 0,64 km). Fahrzeit durch die Stadt bei Höchsttempo ca. 2 Minuten, Rundfahrt über Umland ca. 8–10 Minuten.
 
 ### 8.1 Karte (schematisch)
 
@@ -851,61 +872,71 @@ Wie in [Q7] beschrieben: Landmarken sind von vielen Punkten sichtbar und geben e
 
 ## 9. Roadmap mit Meilensteinen
 
-Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `renderer.info` (Draw Calls), Debug-Overlay (fps), Benchmark-Flug (fester Seed).
-**Reihenfolge-Regel:** Meilensteine 1–8 machen den **Einzelspieler stabil und vollständig**; erst danach folgen Server und Mehrspieler (MS9–MS11).
-**Stand des Prototyps:** läuft lokal ohne Konsolenfehler (Iteration 1 des Iterationsplans abgeschlossen); Meilenstein 1 baut direkt darauf auf. Solange eine andere Session `game.js` direkt weiterentwickelt, startet die Modularisierung erst nach deren Abschluss, damit keine widersprüchlichen Änderungen entstehen.
+Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `Performance`-Monitore im Debug-Overlay (fps, Frame-ms, Draw Calls, Videospeicher), Visual Profiler, Benchmark-Flug (fester Seed). Referenzgerät für alle Messungen: **RX 5700 XT + Ryzen 5 3600**, 1080p, Preset „Mittel“, sofern nicht anders angegeben.
+**Reihenfolge-Regel:** Meilensteine 1–8 machen den **Einzelspieler stabil und vollständig**; erst danach folgen Server und Mehrspieler (MS9–MS11). Die Reihenfolge entspricht der bisherigen Planung; geändert haben sich Technik und Aufwände.
 
 ### Teil A – Einzelspieler
 
-#### Meilenstein 1 – Fundament auf dem Prototyp *(≈ 1–1,5 Wochen)*
-- `game.js` in ES-Module zerlegen (Kapitel 10), Verhalten unverändert; Simulation/Render trennen.
-- `Rng(seed)` statt `Math.random()` für die Weltgenerierung; Seed per URL (`?seed=…`).
-- Gebäude/Bäume/Gehwege als **Instanzen** mit geteiltem Material (Fenster-Nachtlicht über Shader/Instanzattribut).
-- Debug-Overlay (`F3`): fps, Frame-ms, Draw Calls, Dreiecke.
-- **Done:** (1) Spielablauf wie vorher (Fahren, Verkehr, Polizei, Mission, Tag/Nacht). (2) Gleicher Seed → gleiche Stadt in zwei Läufen. (3) Draw Calls im Overlay **≤ 150**. (4) Kein einzelner Frame > 33 ms im 60-s-Benchmark-Flug.
+#### Meilenstein 1 – Fundament auf dem Godot-Prototyp *(≈ 1–1,5 Wochen Restarbeit)*
+
+**Bereits vorhanden (Stand Godot-Prototyp, nicht neu zu bauen):**
+- ✔ Projekt `godot/` (Godot 4.7.2, Forward+), Start per `godot --path …`
+- ✔ 8×8-Stadt mit Boden-Shader (Straßen/Markierungen) und Gebäuden mit Fenster-/Nachtlicht-Shader
+- ✔ Auto (`VehicleBody3D`, 4 Räder, Verfolgerkamera, Scheinwerfer), Steuerung W/S/A/D/Leertaste/R
+- ✔ 28 Verkehrsautos auf Linien-Agenten
+- ✔ Tag/Nacht (20 s/Stunde), SSAO, SSR, Glow, ACES-Tonemapping
+- ✔ Reproduzierbarer Seed (`rng.seed = 6`), Headless-Test (`-- --test`)
+
+**Zu tun in MS1:**
+- `main.gd` in **Szenen und Autoloads** zerlegen (Kapitel 10): `World`, `Vehicle`, `TrafficSystem`, `Clock`, `HUD`, `EventBus`; Verhalten unverändert.
+- Seed als Kommandozeilenargument (`-- --seed=…`); Weltkonstanten als **Global Shader Uniforms** statt doppelter Konstanten.
+- Gebäude je Chunk als **`MultiMeshInstance3D`** (Shader-Tint über Instanzdaten), Kollision je Chunk gebündelt.
+- **Debug-Overlay (F3)** mit `Performance`-Monitoren; Qualitäts-Presets (Niedrig/Mittel/Hoch) als Ressource.
+- Polizei, Fußgänger und Missionsmarker aus dem Browser-Prototyp als Referenz notieren (Portierung in MS2/MS5/MS6).
+- **Done:** (1) Spiel startet und läuft wie vorher (Fahren, Verkehr, Tag/Nacht, Reset-Taste). (2) Gleicher Seed → identische Stadt in zwei Läufen (Gebäudepositionen im Test verglichen). (3) Draw Calls im Overlay **≤ 600** (Basis: je Chunk ein MultiMesh) bei 64 Blöcken; **Frame-Zeit ≤ 8 ms** im Benchmark-Flug auf dem Referenzgerät. (4) `godot --headless -- --test` meldet Erfolg.
 
 #### Meilenstein 2 – Straßengraph und lebendiger Verkehr *(≈ 2 Wochen)*
-- `CityData` mit Straßengraph (Knoten/Kanten/Spuren); Verkehr/Fußgänger/Polizei fahren auf dem Graph.
-- Ampeln/Vorfahrt, Abstandhalten, Spawn am Aktivradius; Minimap aus `CityData`.
-- **Done:** 60-s-Messlauf mit 120 Fahrzeugen ohne Stillstands-Deadlock > 10 s; 0 geloggte Rotlichtverstöße; Sim-Zeit ≤ 4 ms/Frame.
+- `CityData` mit Straßengraph (Knoten/Kanten/Spuren); Verkehr, Fußgänger und Polizei fahren auf dem Graph (`AStar3D` für Routing).
+- Ampeln/Vorfahrt, Abstandhalten, Spawn am Aktivradius; Verkehr als MultiMesh, nahe Autos mit Physikkörper; Minimap aus `CityData`.
+- **Done:** 60-s-Messlauf mit 120 Fahrzeugen (Stufe A+B) ohne Stillstands-Deadlock > 10 s; 0 geloggte Rotlichtverstöße; Main-Thread-Zeit der Verkehrs-Simulation ≤ 3 ms/Frame.
 
 #### Meilenstein 3 – Bezirke, dystopische Identität, Look-Dev *(≈ 3 Wochen)*
 - Generator MVP (Parzellen, Bezirksparameter), **vier** Bezirke spielbar (Core, Saltmarket, Sunstrip, Greenmoor) mit Landmarken, Bezirksname beim Einfahren.
-- **Look-Dev-Szene** und Realismus-MVP (M13): 12 PBR-Materialien (KTX2), Tonemapping, 4 Himmelsproben, CSM, 20 Decals, 30 Props, `wear`-Attribut.
-- Aegis-Kameras als erste Props (nur Optik und Sichtkegel).
-- **Done:** (1) Blindtest: 5 Screenshots ohne HUD werden von 3 Testpersonen zu ≥ 80 % richtig dem Bezirk zugeordnet. (2) Generator-Test: 100 Seeds ohne Gebäude auf Straße und mit vollständig verbundenem Graph. (3) Mittleres Preset hält ≥ 60 fps im Benchmark-Flug durch alle vier Bezirke.
+- **Look-Dev-Szene** und Realismus-MVP (M13): 12 PBR-Materialien, Farbpipeline, Reflection Probes, 20 Decals, 30 Props, `wear`-Attribut.
+- Aegis-Kameras als erste Props (Optik und Sichtkegel).
+- **Done:** (1) Blindtest: 5 Screenshots ohne HUD werden von 3 Testpersonen zu ≥ 80 % richtig dem Bezirk zugeordnet. (2) Generator-Test: 100 Seeds ohne Gebäude auf Straße und mit vollständig verbundenem Graph. (3) Preset „Mittel“ hält ≥ 60 fps im Benchmark-Flug durch alle vier Bezirke.
 
 #### Meilenstein 4 – Streaming und große Welt *(≈ 2–3 Wochen)*
-- Chunk-Streaming mit Worker, LOD-Stufen, Terrain mit Höhen; Welt auf ca. 3 × 3 km Stadt + Umland erweitern.
-- **Done:** Fahrt von Küste zu Berggipfel (ca. 6 km) im Benchmark-Flug: durchschnittlich ≥ 60 fps im Preset „Mittel“, 1-%-Low ≥ 40 fps; Speicher nach 10 Minuten Fahrt ± 10 % konstant; kein sichtbares Pop-in näher als 300 m.
+- Chunk-Streaming mit Worker-Threads, Visibility Ranges/HLOD, Terrain mit Höhen; Welt auf ca. 3 × 3 km Stadt + Umland erweitern.
+- **Done:** Fahrt von Küste zu Berggipfel (ca. 6 km) im Benchmark-Flug: durchschnittlich ≥ 60 fps im Preset „Mittel“, 1-%-Low ≥ 40 fps; Videospeicher nach 10 Minuten Fahrt ± 10 % konstant (kein Leck); kein Hitch > 50 ms durch Chunk-Laden; kein sichtbares Pop-in näher als 300 m.
 
 #### Meilenstein 5 – Fahren und Polizei auf Spielniveau *(≈ 2–3 Wochen)*
-- Fahrzeugdatenblätter, Drift, Raycast-Räder, Schaden (M4); Polizei mit Sichtlinie, Suchzustand, Bezirks-Heat und Aegis-Kennzeichenerfassung (M6).
-- **Done:** (1) 5 Fahrzeugklassen mit deutlich unterschiedlichem Fahrverhalten (Messtabelle 0–100 km/h, Kurvenradius). (2) Verfolgung kann ohne Cheat beendet werden (Playtest: ≥ 3 von 5 Testpersonen schütteln die Polizei innerhalb von 3 Minuten ab, ≥ 1 wird festgenommen).
+- Fahrzeugdatenblätter, Drift, Raycast-Rad-Physik (eigener Controller, Vergleich Jolt/Godot Physics), Schaden (M4); Polizei mit Sichtlinie, Suchzustand, Bezirks-Heat und Aegis-Kennzeichenerfassung (M6).
+- **Done:** (1) 5 Fahrzeugklassen mit deutlich unterschiedlichem Fahrverhalten (Messtabelle 0–100 km/h, Kurvenradius). (2) Verfolgung kann ohne Cheat beendet werden (Playtest: ≥ 3 von 5 Testpersonen schütteln die Polizei innerhalb von 3 Minuten ab, ≥ 1 wird festgenommen). (3) Überschlag-/Kollisionstest: 100 Zufallskollisionen ohne Physik-Explosion (kein Objekt > 100 m/s).
 
 #### Meilenstein 6 – Missionen, Story-Engine, Speichern *(≈ 3–4 Wochen)*
 - Missions-Framework (M7), Story-Engine MVP (M14: Datenmodell, Fraktionsstand, Entscheidung, Flags), Prolog + Akt I (ca. 6 Missionen) mit Wendepunkt W1; Garage/Speichern (M8), Vollkarte mit GPS (M11).
-- **Done:** (1) Speichern/Laden reproduziert Geld, Position, Fahrzeug, Standing, Flags und Missionsstand exakt (automatischer Test). (2) Story-Simulator läuft grün: alle Entscheidungen von Prolog bis W1 durchspielbar, keine Sackgasse. (3) Zwei verschiedene Entscheidungen bei W1 führen nachweislich zu unterschiedlichen Folgemissionen und Weltzustand-Tags.
+- **Done:** (1) Speichern/Laden (JSON) reproduziert Geld, Position, Fahrzeug, Standing, Flags und Missionsstand exakt (automatischer Test). (2) Story-Simulator läuft grün: alle Entscheidungen von Prolog bis W1 durchspielbar, keine Sackgasse. (3) Zwei verschiedene Entscheidungen bei W1 führen nachweislich zu unterschiedlichen Folgemissionen und Weltzustand-Tags.
 
-#### Meilenstein 7 – Atmosphäre: Wetter, Audio, Nacht, Nässe *(≈ 3 Wochen)*
-- Wetter-Zustandsautomat, Nässe-Shader, Verschleiß-Look (M13 Ausbau), Sirenen/Motoren/Umgebungsklang je Bezirk, Straßenbeleuchtung nach Bezirk.
-- **Done:** Alle 5 Wetterzustände wechseln ohne fps-Einbruch > 15 %; jeder Bezirk hat eine eigene Audio-Umgebung (Hörtest: ≥ 80 % richtige Zuordnung ohne Bild); nachts nie mehr als 4 (Mittel) bzw. 8 (Hoch) echte Lichter laut `renderer.info`.
+#### Meilenstein 7 – Atmosphäre: Wetter, Audio, Nacht, Nässe *(≈ 2–3 Wochen)*
+- Wetter-Zustandsautomat, Nässe-Shader, Verschleiß-Look (M13 Ausbau), Motor-/Sirenen-/Umgebungsklang je Bezirk, Straßenbeleuchtung nach Bezirk; SDFGI-Test für „Hoch“.
+- **Done:** Alle 5 Wetterzustände wechseln ohne fps-Einbruch > 15 %; jeder Bezirk hat eine eigene Audio-Umgebung (Hörtest: ≥ 80 % richtige Zuordnung ohne Bild); nachts nie mehr als 6 schattenwerfende Lichter; Preset „Hoch“ (mit SDFGI, falls bestanden) hält ≥ 45 fps, sonst wird SDFGI aus „Hoch“ gestrichen.
 
-#### Meilenstein 8 – Einzelspieler-Vollversion (Release-Kandidat) *(≈ 6+ Wochen)*
-- Alle 6 Bezirke und Umland (Highway, Coast Road, Tunnel), Story komplett: Akt II–III, W2–W5, Enden E1–E4, Nebenaufträge, Weltzustand-Tags sichtbar, Aegis-Mechaniken (Kameras hacken, Kennzeichen), Tuning-Feinschliff.
-- **Done:** (1) Vollständiger Durchlauf der Kampagne durch 3 Testpersonen ohne Blocker; jedes der Enden E1–E4 wurde mindestens einmal erreicht. (2) Story-Simulator: 5000 zufällige Entscheidungsläufe, 0 Sackgassen, jedes Ende erreichbar. (3) Benchmark-Flug auf drei Referenzgeräten (Highend, Mittelklasse, integrierte GPU) erfüllt die Budgets aus M12. (4) Ladezeit bis Start ≤ 10 s. (5) **Einzelspieler-Stabilitätstest:** 2 Stunden Dauerlauf ohne Absturz, Speicher stabil.
+#### Meilenstein 8 – Einzelspieler-Vollversion (Release-Kandidat) *(≈ 5+ Wochen)*
+- Alle 6 Bezirke und Umland (Highway, Coast Road, Tunnel), Story komplett: Akt II–III, W2–W5, Enden E1–E4, Nebenaufträge, Weltzustand-Tags sichtbar, Aegis-Mechaniken (Kameras hacken, Kennzeichen), Tuning-Feinschliff; Windows-Export (Export-Templates, Installer/Zip).
+- **Done:** (1) Vollständiger Durchlauf der Kampagne durch 3 Testpersonen ohne Blocker; jedes Ende E1–E4 mindestens einmal erreicht. (2) Story-Simulator: 5000 zufällige Entscheidungsläufe, 0 Sackgassen, jedes Ende erreichbar. (3) Benchmark-Flug auf dem Referenzgerät erfüllt die Budgets aus M12 (Preset „Mittel“ 60 fps; „Niedrig“ ≥ 60 fps bei reduzierter Dichte). (4) Ladezeit bis Spielstart ≤ 15 s. (5) **Stabilitätstest:** 2 Stunden Dauerlauf ohne Absturz, Videospeicher/RAM stabil.
 
 ### Teil B – Mehrspieler (erst nach Meilenstein 8)
 
-#### Meilenstein 9 – Server-Fundament *(≈ 4 Wochen)*
-- `World.connect(transport)`-Abstraktion; **LocalServer** (Einzelspieler läuft über denselben Netzpfad); Node-Gateway mit `ws`, Anmeldung, 1 Realm, 1 Zone; Persistenz (PostgreSQL); Prädiktion/Interpolation für Fahrzeuge.
-- **Done:** (1) Einzelspieler-Regressionstest aus MS8 besteht unverändert über den LocalServer. (2) Zwei Browser-Clients fahren im selben Realm und sehen sich gegenseitig flüssig (≤ 150 ms Interpolationsverzug, keine Sprünge > 1 m bei 100 ms simulierter Latenz und 2 % Paketverlust). (3) Server-Neustart verliert keinen Charakterstand (Geld, Fahrzeuge, Standing, Flags).
+#### Meilenstein 9 – Server-Fundament *(≈ 3 Wochen)*
+- Einzelspieler läuft über `OfflineMultiplayerPeer`; **Dedicated Server** (`--headless`, Linux/Windows) mit 1 Realm und 1 Zone; ENet-Verbindung; Anmeldung und Charakter-Persistenz über Backend-Dienst; Prädiktion/Interpolation für Fahrzeuge.
+- **Done:** (1) Einzelspieler-Regressionstest aus MS8 besteht unverändert über den Offline-Peer. (2) Zwei Clients fahren im selben Realm und sehen sich gegenseitig flüssig (≤ 150 ms Interpolationsverzug, keine Sprünge > 1 m bei 100 ms simulierter Latenz und 2 % Paketverlust). (3) Server-Neustart verliert keinen Charakterstand (Geld, Fahrzeuge, Standing, Flags).
 
-#### Meilenstein 10 – Mehrspieler-Welt und Anti-Cheat *(≈ 6 Wochen)*
-- Mehrere Zonen mit Handoff, Interessenverwaltung, serverseitiger Ambient-Verkehr in Spielernähe, Polizei-Dispatcher serverseitig, Story-Phasen pro Spieler, Plausibilitätsprüfungen, Rate-Limits, Chat.
-- **Done:** (1) Lasttest mit 50 simulierten Spielern (Bots): Tick-Zeit ≤ 30 ms (95. Perzentil), Bandbreite < 30 KB/s je Client. (2) Cheat-Testsuite: manipulierte Clients, die Teleport, Geld-Zuwachs oder Missionsabschluss melden, werden zu 100 % abgelehnt (automatische Tests). (3) Zwei Spieler spielen **verschiedene** Story-Stände im selben Realm ohne gegenseitige Spoiler.
+#### Meilenstein 10 – Mehrspieler-Welt und Anti-Cheat *(≈ 5 Wochen)*
+- Mehrere Zonenprozesse mit Handoff, Interessenverwaltung, serverseitiger Ambient-Verkehr in Spielernähe, Polizei-Dispatcher serverseitig, Story-Phasen pro Spieler, Plausibilitätsprüfungen, Rate-Limits, Chat.
+- **Done:** (1) Lasttest mit 50 simulierten Spielern (headless Bots): Server-Tickzeit ≤ 30 ms (95. Perzentil), Bandbreite < 30 KB/s je Client. (2) Cheat-Testsuite: manipulierte Clients, die Teleport, Geld-Zuwachs oder Missionsabschluss melden, werden zu 100 % abgelehnt (automatische Tests). (3) Zwei Spieler spielen **verschiedene** Story-Stände im selben Realm ohne gegenseitige Spoiler.
 
-#### Meilenstein 11 – Live-Ausbau *(≈ 6+ Wochen, offen)*
+#### Meilenstein 11 – Live-Ausbau *(≈ 5+ Wochen, offen)*
 - Mehrere Realms, Fraktionskontrolle der Bezirke, Events/Saisons, Gruppen mit gemeinsamer Story-Phase, Telemetrie, Moderation, Datenschutz-/Betriebskonzept.
 - **Done:** 100 Spieler im Realm stabil (Lasttest 2 h), Backups und Wiederherstellung getestet, DSGVO-Auskunft und -Löschung funktionieren.
 
@@ -913,7 +944,7 @@ Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `r
 
 ```mermaid
 flowchart LR
-  M1["MS1 Fundament"] --> M2["MS2 Graph & Verkehr"]
+  M1["MS1 Fundament (Prototyp vorhanden)"] --> M2["MS2 Graph & Verkehr"]
   M2 --> M3["MS3 Bezirke & Look-Dev"]
   M3 --> M4["MS4 Streaming & große Welt"]
   M2 --> M5["MS5 Fahren & Polizei"]
@@ -926,175 +957,178 @@ flowchart LR
   M10 --> M11["MS11 Live-Ausbau"]
 ```
 
-MS4 und MS5 können parallel laufen (unterschiedliche Dateibereiche), sofern zwei Personen/Sessions arbeiten und nicht dieselben Dateien berühren. **Vorarbeit für den Server** (Trennung Sim/Render, serialisierbares `GameState`, deklarative Story-Bedingungen) fällt bereits in MS1–MS6 an und kostet dort kaum Mehraufwand.
+MS4 und MS5 können parallel laufen (unterschiedliche Dateibereiche/Szenen), sofern zwei Personen/Sessions arbeiten und nicht dieselben Dateien berühren. **Vorarbeit für den Server** (Trennung Sim/Darstellung, serialisierbarer `GameState`, deklarative Story-Bedingungen) fällt bereits in MS1–MS6 an und kostet dort kaum Mehraufwand.
 
 ### Zuordnung zum Iterationsplan
 
 | Iteration ([`ITERATIONSPLAN.md`](ITERATIONSPLAN.md)) | Entspricht Meilenstein |
 |---|---|
-| 1 – Prototyp lauffähig | Voraussetzung (erledigt) |
+| 1 – Prototyp lauffähig | Voraussetzung (erledigt) und Teil von MS1 |
 | 2 – Spielgefühl und Details | MS5 (Fahren), Teile von MS7 (Sound, Licht) |
 | 3 – Welt: Bezirke, Küste, Landmarken | MS3 und MS4 |
-| 4 – Zu Fuß, Polizei, Missionen | MS5 und MS6 (Zu-Fuß-Spiel ist im Konzept ein **Ausbau** von M4/M5 und noch nicht eingeplant → ergänzen) |
-| 5 – Modularisierung | MS1 (vorziehen empfohlen, weil alle weiteren Meilensteine davon abhängen) |
+| 4 – Zu Fuß, Polizei, Missionen | MS5 und MS6 (Zu-Fuß-Spielen ist im Konzept ein **Ausbau** von M4/M5 und noch nicht eingeplant → als eigener Posten ergänzen, ca. 8–10 PT) |
+| 5 – Modularisierung | MS1 (jetzt: Szenen/Autoloads statt Module; **vorziehen**, weil alle weiteren Meilensteine davon abhängen) |
 
-**Empfehlung:** Iteration 5 (Modularisierung) vor Iteration 2–4 ziehen, sonst wird jede neue Funktion in die Ein-Datei-Struktur gebaut und später doppelt angefasst.
+**Empfehlung:** Iteration 5 (Struktur) vor Iteration 2–4 ziehen, sonst wird jede neue Funktion in `main.gd` gebaut und später doppelt angefasst.
 
 ---
 
-## 10. Empfohlene Dateistruktur (ES-Module)
+## 10. Empfohlene Projektstruktur (Godot)
 
-Ziel: von der einen `game.js` auf **native ES-Module** (`<script type="module">`), ohne Pflicht zu einem Bundler; ab Meilenstein 4 (Worker) optional **Vite** für Dev-Server und Build. Three.js wird per Importmap oder Paket eingebunden (feste Version pinnen).
+Ziel: von der einen `main.gd` auf eine **Szenen-/Autoload-Struktur** mit klar getrennten Ordnern. Der Projektordner ist `godot/` (`res://`); der Rest des Repositories (`docs/`, alter Browser-Prototyp) bleibt außerhalb. Die Struktur ist ein Vorschlag; Namen nach GDScript-Konvention (`snake_case` für Dateien).
 
 ```
 E:\Projekte\GTA 6\
-├─ index.html                 # lädt nur src/main.js (type="module"), HUD-DOM
-├─ docs/
-│  └─ WELTKONZEPT.md          # dieses Dokument
-├─ assets/                    # Audio (OGG/Opus), Texturatlanten, Fahrzeugmodelle (glTF)
-├─ data/                      # reine Daten, keine Logik
-│  ├─ districts/              # core.js, saltmarket.js, lanternHill.js, greenmoor.js, rustline.js, sunstrip.js
-│  ├─ vehicles.js             # Datenblätter
-│  ├─ materials.js            # M13: PBR-Material-Bibliothek, Texel-Dichte, Presets
-│  ├─ missions/               # *.json (Schrittlisten)
-│  ├─ story/                  # M14: factions.js, npcs.js, missions/*.json, endings.js, text.de.json
-│  └─ economy.js              # Preise, Belohnungen
-├─ src/
-│  ├─ main.js                 # Bootstrap, Game-Loop (Fixed-Step + Render)
-│  ├─ core/
-│  │  ├─ rng.js               # Seed-RNG
-│  │  ├─ events.js            # Event-Bus
-│  │  ├─ time.js              # Fixed-Step, Spielzeit
-│  │  ├─ math.js              # clamp, lerp, angDiff …
-│  │  ├─ spatialHash.js       # Raumgitter für Kollision/Abfragen
-│  │  └─ state.js             # GameState (serialisierbar)
-│  ├─ world/
-│  │  ├─ generator.js         # M1: Straßengraph, Parzellen, Zonen
-│  │  ├─ cityData.js          # Datenmodell, Abfragen, A*
-│  │  ├─ terrain.js           # Heightmap-Chunks
-│  │  ├─ districts.js         # M3: Bezirksauswertung
-│  │  └─ landmarks.js
-│  ├─ render/
-│  │  ├─ renderer.js          # Renderer/Kamera/Presets (WebGL2, optional WebGPU)
-│  │  ├─ streaming.js         # M2: Chunk-Verwaltung, LOD
-│  │  ├─ instancing.js        # Instanz-Pools, Materialpools
-│  │  ├─ buildings.js, roads.js, props.js, vehicleMesh.js, pedMesh.js
-│  │  ├─ sky.js               # Himmel/Nachtlicht
-│  │  └─ camera.js
-│  ├─ sim/
-│  │  ├─ vehicles.js          # M4: Fahrmodell, Schaden
-│  │  ├─ traffic.js           # M5: Verkehrs-KI
-│  │  ├─ pedestrians.js
-│  │  ├─ police.js            # M6: Dispatcher, Zustände
-│  │  ├─ law.js               # Verbrechen, Ruf
-│  │  ├─ missions.js          # M7: Runner
-│  │  ├─ story.js             # M14: Bedingungen/Effekte, Fraktionsstand, Enden
-│  │  ├─ aegis.js             # Überwachung: Kameras, Kennzeichen, Aegis-Profil
-│  │  ├─ economy.js           # M8
-│  │  └─ environment.js       # M9: Zeit/Wetter
-│  ├─ audio/
-│  │  ├─ audioManager.js      # M10: Busse, Kontext
-│  │  ├─ engineSound.js
-│  │  └─ ambience.js
-│  ├─ ui/
-│  │  ├─ hud.js, minimap.js, fullmap.js, menu.js, toast.js   # M11
-│  │  └─ input.js             # Tastatur/Gamepad
-│  ├─ net/                    # M15: client-seitig
-│  │  ├─ transport.js         # Interface World.connect(transport)
-│  │  ├─ localTransport.js    # LocalServer im Web Worker (Einzelspieler)
-│  │  ├─ wsTransport.js       # WebSocket zum Server
-│  │  ├─ protocol.js          # Binärkodierung (geteilt mit Server)
-│  │  └─ prediction.js        # Prädiktion, Reconciliation, Interpolation
-│  ├─ workers/
-│  │  ├─ chunkWorker.js       # Chunk-Geometrie im Worker
-│  │  └─ localServerWorker.js # führt sim/* für den Einzelspieler aus
-│  └─ tools/
-│     ├─ debugOverlay.js      # M12: F3-Overlay
-│     ├─ profiler.js
-│     └─ benchmark.js         # Benchmark-Flug
-├─ server/                    # M15 (ab MS9): Node.js, nutzt dieselben src/sim und src/world
-│  ├─ gateway.js              # ws, Auth, Rate-Limits
-│  ├─ realm.js                # Weltinstanz, Spielerliste
-│  ├─ zone.js                 # Zonen-Prozess, Interessenverwaltung, Handoff
-│  ├─ persistence.js          # PostgreSQL/Redis, Migrationen
-│  └─ validation.js           # Plausibilitätsprüfungen (Anti-Cheat)
-├─ tools/
-│  └─ assets/                 # M13: PNG→KTX2, glTF→Meshopt, Atlas-Packer
-└─ tests/
-   ├─ generator.test.mjs      # Seed-Tests (Node)
-   ├─ mission.test.mjs
-   ├─ storySim.mjs            # M14: Story-Simulator (alle Enden erreichbar, keine Sackgassen)
-   └─ cheat.test.mjs          # M15: manipulierte Clients werden abgelehnt
+├─ docs/                          # WELTKONZEPT.md, ITERATIONSPLAN.md
+├─ index.html, game.js            # eingefrorener Browser-Prototyp (Referenz)
+└─ godot/                         # res://  (project.godot liegt hier)
+   ├─ project.godot               # Autoloads, Input-Map, Physik-/Render-Einstellungen, Global Shader Uniforms
+   ├─ main.tscn                   # Einstiegsszene: lädt World, HUD, Kamera (dünn!)
+   ├─ autoload/                   # Singletons (Project Settings → Autoload)
+   │  ├─ event_bus.gd             # Signale: crime_committed, mission_completed, district_entered …
+   │  ├─ game_state.gd            # GameState (serialisierbar), Speichern/Laden (JSON)
+   │  ├─ config.gd                # Qualitäts-Preset, Budgets, Seed (aus Kommandozeile)
+   │  ├─ rng.gd                   # Seed-Dienst (Seed je Chunk/Aufgabe)
+   │  ├─ clock.gd                 # Tageszeit, Wetter-Zustandsautomat, Global Shader Uniforms
+   │  ├─ audio_manager.gd         # Busse, Pools
+   │  ├─ chunk_manager.gd         # M2: Chunk-Lebenszyklus, Worker-Threads
+   │  ├─ traffic_system.gd        # M5: Agenten (Struktur-Arrays), MultiMesh-Anbindung
+   │  ├─ police_dispatcher.gd     # M6
+   │  ├─ aegis.gd                 # Kameras, Kennzeichen, Aegis-Profil
+   │  ├─ mission_runner.gd        # M7
+   │  ├─ story.gd                 # M14: Bedingungen/Effekte, Fraktionsstand, Enden
+   │  ├─ net.gd                   # M15: Peer-Auswahl (Offline/ENet), Sitzung
+   │  └─ debug_overlay.gd         # M12: F3-Overlay, Performance-Monitore
+   ├─ scenes/                     # .tscn (Instanzierbare Bausteine)
+   │  ├─ world/                   # world.tscn, chunk.tscn, district_zone.tscn, landmarks/*.tscn
+   │  ├─ vehicles/                # car_player.tscn, car_npc.tscn, police_car.tscn, camera_rig.tscn
+   │  ├─ characters/              # pedestrian.tscn, player_onfoot.tscn (später)
+   │  ├─ props/                   # camera_aegis.tscn, traffic_light.tscn, …
+   │  ├─ ui/                      # hud.tscn, minimap.tscn, fullmap.tscn, menu.tscn, dialog.tscn
+   │  └─ dev/                     # look_dev.tscn (Materialien/Beleuchtung), benchmark_flight.tscn
+   ├─ scripts/                    # .gd (nach Modul gruppiert; sim/ ohne Mesh-/Material-Abhängigkeit)
+   │  ├─ world/                   # generator.gd, city_data.gd, road_graph.gd, terrain.gd, districts.gd
+   │  ├─ sim/                     # traffic.gd, pedestrians.gd, police.gd, law.gd, economy.gd, validation.gd
+   │  ├─ vehicles/                # vehicle_body.gd, raycast_vehicle.gd, damage.gd
+   │  ├─ render/                  # multimesh_builder.gd, decal_scatter.gd, quality_presets.gd
+   │  ├─ ui/                      # hud.gd, minimap.gd, fullmap.gd
+   │  ├─ net/                     # protocol.gd, prediction.gd, snapshots.gd (geteilt mit dem Server)
+   │  └─ util/                    # math_utils.gd, spatial_hash.gd, pool.gd
+   ├─ shaders/                    # .gdshader + .gdshaderinc
+   │  ├─ ground.gdshader          # Straßen/Markierungen (aus dem Prototyp)
+   │  ├─ building.gdshader        # Fassade, Fenster, Nachtlicht, wear
+   │  ├─ wet_surface.gdshaderinc  # Nässe/Pfützen (include)
+   │  ├─ sky.gdshader, water.gdshader, vehicle_paint.gdshader
+   │  └─ common.gdshaderinc       # Konstanten über Global Shader Uniforms
+   ├─ data/                       # reine Daten (Resources/JSON), keine Logik
+   │  ├─ districts/               # core.tres, saltmarket.tres, lantern_hill.tres, greenmoor.tres, rustline.tres, sunstrip.tres
+   │  ├─ vehicles/                # vehicle_def_*.tres (Datenblätter)
+   │  ├─ materials/               # PBR-Materialbibliothek (.tres)
+   │  ├─ missions/                # *.json (Schrittlisten)
+   │  ├─ story/                   # factions.json, npcs.json, missions/*.json, endings.json, text.de.json
+   │  └─ economy.json             # Preise, Belohnungen
+   ├─ assets/                     # Importquellen (nicht im Code referenziert, nur über Szenen/Ressourcen)
+   │  ├─ audio/                   # OGG: Motorloops, Ambience, Musik
+   │  ├─ textures/                # PNG/ORM-Maps, Decal-Atlas, Text-Atlas
+   │  ├─ models/                  # .glb: Fahrzeuge, Props, Landmarken
+   │  └─ LICENSES.md
+   ├─ tests/                      # Headless-Tests (--headless --script oder GUT/gdUnit4)
+   │  ├─ test_generator.gd        # Seed-Tests: kein Gebäude auf Straße, Graph verbunden
+   │  ├─ test_savegame.gd
+   │  ├─ story_sim.gd             # M14: alle Enden erreichbar, keine Sackgassen
+   │  └─ test_cheat.gd            # M15: manipulierte Eingaben werden abgelehnt
+   ├─ server/                     # M15 (ab MS9): Einstieg und Konfiguration des Dedicated Servers
+   │  ├─ server_main.tscn / .gd   # läuft headless, lädt nur sim/, world/, net/ (keine Render-Szenen)
+   │  ├─ realm.gd, zone.gd        # Weltinstanz, Zonen, Handoff
+   │  └─ persistence_client.gd    # HTTPRequest zum Backend (Charakter, Weltzustand)
+   ├─ addons/                     # Drittanbieter-Add-ons (z. B. Test-Framework, Terrain3D – nach Prüfung)
+   └─ export_presets.cfg          # Windows Desktop, Dedicated Server (Linux)
 ```
 
+**Autoloads in `project.godot` (Reihenfolge = Ladereihenfolge):** `EventBus`, `Config`, `Rng`, `GameState`, `Clock`, `AudioManager`, `ChunkManager`, `TrafficSystem`, `PoliceDispatcher`, `Aegis`, `MissionRunner`, `Story`, `Net`, `DebugOverlay`. Autoloads, die Szenen/Rendering benötigen (Audio, Debug), werden im Server-Export weggelassen oder durch Stubs ersetzt (`OS.has_feature("dedicated_server")`).
+
+**Wichtige Projekteinstellungen (zu setzen/prüfen):**
+- `Rendering → Renderer`: **Forward+** (Voraussetzung für SDFGI, Cluster-Beleuchtung); `Rendering → Occlusion Culling`: an.
+- `Physics → 3D → Physics Engine`: **Jolt** (Standard in neuen 4.6+-Projekten) vs. Godot Physics – bewusst entscheiden und am Fahrzeug testen; `physics_ticks_per_second`: 60 (ggf. 120).
+- `Rendering → Global Shader Uniforms`: `world_half`, `block_pitch`, `night`, `wetness`, `time_of_day`, `wear_bias`.
+- `Display → Window → Stretch`: Modus `canvas_items` für UI-Skalierung; V-Sync an.
+- `Input Map`: nicht im Code anlegen, sondern im Projekt (der Prototyp legt sie in `_setup_input()` an; auslagern).
+- **Export:** Windows-Desktop-Export mit Export-Templates; für den Server ein Export mit Feature-Tag `dedicated_server` (Linux) [Q32].
+
 **Migrationsregeln:**
-1. `src/sim/*` und `src/world/*` importieren **nie** Three.js und **nie** DOM/`window` (nur `render/` und `ui/` tun das) – sonst ist Sim-LOD/Worker/Test **und der spätere Einsatz im Node-Server** nicht möglich.
-2. Kein globaler Zustand: Module bekommen `ctx` (World, State, Bus) übergeben.
-3. Jeder Schritt der Zerlegung muss lauffähig bleiben (Strangler-Muster): Funktionen blockweise aus `game.js` herauslösen, `game.js` wird schrittweise zur dünnen `main.js`.
-4. Der Prototyp-Code bleibt bis MS1 vollständig im Git/Backup; der Prototyp ist derzeit **nicht** unter Versionskontrolle → **`git init` als allererster Schritt** (Verzeichnis ist kein Repository).
+1. `scripts/sim/*`, `scripts/world/*` und `scripts/net/*` nutzen **keine** Mesh-/Material-/Kamera-/UI-Klassen, damit sie unverändert im headless Dedicated Server laufen.
+2. **Kein Gott-Skript:** Die Wurzel von `main.tscn` enthält nur Instanzen und Verdrahtung; neue Funktionen kommen als Szene + Skript, nicht in `main.gd`.
+3. **Strangler-Muster:** Funktionen blockweise aus `main.gd` herauslösen (zuerst Uhr/Umwelt → `clock.gd`, dann Fahrzeug → `car_player.tscn`, dann Verkehr, dann Stadt), jeder Schritt bleibt lauffähig; `main.gd` wird zur dünnen Verdrahtung.
+4. **Typisierung:** GDScript-Typen (`var x: float`, `Array[Agent]`, `-> void`) verwenden – schneller und fehlerärmer.
+5. **Der Prototypstand ist derzeit nicht unter Versionskontrolle → `git init` als erster Schritt** (mit `.gitignore` für `.godot/`, Exportordner und große Assets bzw. Git-LFS für `assets/`).
 
 ---
 
 ## 11. Quellen
 
-Die Recherche wurde per Websuche durchgeführt. Viele Treffer sind Blogs, Foren und Fachartikel unterschiedlicher Qualität; wo eine Quelle nur sekundär oder anekdotisch ist, ist das vermerkt. Konkrete Zahlen (Draw-Call-Budgets, Millisekunden) sind **Richtwerte** und müssen am eigenen Prototyp gemessen werden.
+Die Recherche wurde per Websuche durchgeführt. Viele Treffer sind Blogs, Foren und Fachartikel unterschiedlicher Qualität; wo eine Quelle nur sekundär oder anekdotisch ist, ist das vermerkt. Godot-Dokumentationsseiten wurden in den Versionen 4.0–4.6 gefunden; die verlinkten „stable“-Adressen zeigen die aktuelle Version, Inhalte sind für **4.7.2** am Prototyp zu verifizieren. Konkrete Zahlen (Frame-Zeiten, Draw-Call-Budgets) sind **Richtwerte** und müssen auf der Zielhardware gemessen werden.
 
 **Prozedurale Stadtgenerierung**
 - [Q1] Parish, Y. & Müller, P.: *Procedural Modeling of Cities* (SIGGRAPH 2001) – Grundlagenarbeit (L-Systeme für Straßen, Parzellen, Gebäude). Zusammenfassungen u. a. in der Übersichtsarbeit der Purdue-Gruppe: https://www.cs.purdue.edu/cgvlab/papers/aliaga/uacs18.pdf
 - [Q2] Chen, G., Esch, G., Wonka, P., Müller, P., Zhang, E.: *Interactive Procedural Street Modeling* (SIGGRAPH 2008) – Tensor-Felder für Raster-/Radial-/Küstenmuster: https://www.sci.utah.edu/~chengu/street_sig08/street_sig08.pdf
 - [Q3] Aliaga, D. et al.: *Procedural generation of … urban analytics and city science* (Parzellen durch rekursive Teilung orientierter Rechtecke): https://www.cs.purdue.edu/cgvlab/papers/aliaga/uacs18.pdf
-- [Q3b] *Procedural Urban Modeling of Population, Road Network and Land Use* (Landnutzungs-/Bevölkerungsmodell, Wunschziel M1): https://www.researchgate.net/publication/282283901_Procedural_Urban_Modeling_of_Population_Road_Network_and_Land_Use
-- [Q3c] *Procedural generation as an approach for digital representation of a city* (CityEngine-Studie, Grammatik-Kette Straße → Block → Gebäude): https://link.springer.com/article/10.1007/s43762-026-00263-8
+- [Q3b] *Procedural Urban Modeling of Population, Road Network and Land Use*: https://www.researchgate.net/publication/282283901_Procedural_Urban_Modeling_of_Population_Road_Network_and_Land_Use
+- [Q3c] *Procedural generation as an approach for digital representation of a city* (Grammatik-Kette Straße → Block → Gebäude): https://link.springer.com/article/10.1007/s43762-026-00263-8
 
 **KI-Ökosysteme (Verkehr, Fußgänger, Systemik)**
 - [Q4] Game Developer: *AI Madness: Using AI to Bring Open-City Racing to Life* (Simulationsblasen, Verkehrsregeln trotz Kollisionen): https://www.gamedeveloper.com/programming/ai-madness-using-ai-to-bring-open-city-racing-to-life
 - [Q5] Game Developer: *Bringing Washington D.C. to Life: The AI of The Division 2* (dynamische, systemische Open-World-KI): https://gamedeveloper.com/design/bringing-washington-d-c-to-life-the-ai-of-the-division-2
-- [Q6] Game Developer: *How Watch Dogs: Legion's „Play as Anyone“ simulation works* (Simulation mit Tagesabläufen und Verhaltensvariation): https://gamedeveloper.com/design/how-watch-dogs-legion-s-play-as-anyone-simulation-works · GDC Vault zu Assassin's Creed Unity (nicht spielerzentrierte Systemereignisse): https://www.gdcvault.com/play/1022211/contactUs *(nur Kurzbeschreibung gelesen)*
-- [Q14] DEV Community: *Open-World Crowds – tiered simulation* (gestufte Detailtiefe nach Entfernung). **Sekundär/Erklärartikel, keine Entwicklerquelle** – nur als Beleg für das gängige Prinzip verwendet: https://dev.to/saeedjt/gta-6-npc-technology-how-open-world-crowds-are-actually-simulated *(Hinweis: Titel nennt ein kommerzielles Spiel; das Prinzip ist generisch, von dem Spiel wird nichts übernommen.)*
+- [Q6] Game Developer: *How Watch Dogs: Legion's „Play as Anyone“ simulation works*: https://gamedeveloper.com/design/how-watch-dogs-legion-s-play-as-anyone-simulation-works · GDC Vault zu Assassin's Creed Unity (nicht spielerzentrierte Systemereignisse): https://www.gdcvault.com/play/1022211/contactUs *(nur Kurzbeschreibung gelesen)*
+- [Q14] DEV Community: *Open-World Crowds – tiered simulation* (gestufte Detailtiefe nach Entfernung). **Sekundär/Erklärartikel, keine Entwicklerquelle** – nur als Beleg für das gängige Prinzip: https://dev.to/saeedjt/gta-6-npc-technology-how-open-world-crowds-are-actually-simulated *(Titel nennt ein kommerzielles Spiel; das Prinzip ist generisch, von dem Spiel wird nichts übernommen.)*
 
 **Level-Design und Orientierung**
-- [Q7] Disney-Prinzip „Weenie“/Landmarken im Level-Design, Landmarken-Hierarchie und Leitlinien: Sammlung von Praxisartikeln, u. a. https://tancoque.design.blog/ und https://openskillindex.com/skills/vibeforge1111-vibeship-spawner-skills-level-design *(Blog-/Skill-Niveau, nicht peer-reviewed)*
+- [Q7] Disney-Prinzip „Weenie“/Landmarken im Level-Design, Landmarken-Hierarchie und Leitlinien: https://tancoque.design.blog/ und https://openskillindex.com/skills/vibeforge1111-vibeship-spawner-skills-level-design *(Blog-/Skill-Niveau, nicht peer-reviewed)*
 - [Q15] Mission-Design-Checkliste (Zielbedingung, KI-Rollen, Checkpoints, Fehlschlagtext; „einfache KI, starke Reaktion“): https://app.studyraid.com/en/read/99643/4470902/game-design-document-mechanics-and-systems-outline *(Lehrmaterial)*
 
-**Rendering, Streaming, Performance (Three.js)**
-- [Q8] Three.js-Forum: *How to choose between InstancedMesh and BatchedMesh?* https://discourse.threejs.org/t/how-to-choose-between-instancedmesh-and-batchedmesh/81221 · Offizielle Doku `BatchedMesh`: https://threejs.org/docs/pages/BatchedMesh.html
-- [Q9] Three.js-Forum: *Significant Performance Drop and High CPU Usage with BatchedMesh* (Warnung, dass BatchedMesh nicht automatisch schneller ist): https://discourse.threejs.org/t/significant-performance-drop-and-high-cpu-usage-with-batchedmesh/67324
-- [Q10] Three.js-Forum: *Web worker and texture transfer* und Tutorial *Procedural Worlds* (Chunk-Erzeugung im Worker, ca. 10 ms je 64×64-Chunk auf dem Hauptthread): https://discourse.threejs.org/t/web-worker-and-texture-transfer/44283 · https://masterallarts.pages.dev/learn/threejs-from-zero/s2-10-procedural-worlds/
-- [Q11] Three.js-Handbuch *WebGPURenderer*: https://threejs.org/manual/en/webgpurenderer · Übersicht 2026: https://www.utsubo.com/blog/threejs-2026-what-changed *(Sekundärquelle; Firefox/Linux/Android-Abdeckung vor Einsatz prüfen)*
-
 **Fahrphysik**
-- [Q12] Monster, M.: *Car Physics for Games* (klassische Grundlage für Fahrzeugphysik; Verfügbarkeit des Originals unsicher) sowie Diskussion zu Pacejka-Reifenmodell und Niedriggeschwindigkeits-Problem: https://www.gamedev.net/forums/topic/612987-pacejka-tire-model-question/ · https://en.wikipedia.org/wiki/Hans_B._Pacejka
-- [Q13] Rapier (Rust/WASM-Physik für JavaScript): https://www.npmjs.com/package/@dimforge/rapier3d · Three.js-Beispiel: https://discourse.threejs.org/t/physics-rapier3d-js-three-js/25610
+- [Q12] Monster, M.: *Car Physics for Games* (klassische Grundlage; Original-Verfügbarkeit unsicher) sowie Diskussion zu Pacejka-Reifenmodell und Niedriggeschwindigkeits-Problem: https://www.gamedev.net/forums/topic/612987-pacejka-tire-model-question/ · https://en.wikipedia.org/wiki/Hans_B._Pacejka
+- [Q22] Godot-Dokumentation: *VehicleBody3D* (Raycast-Fahrzeug; Hinweis, dass die Klasse nicht für realistische Fahrphysik gedacht ist, eigene Umsetzung auf RigidBody3D als Alternative): https://docs.godotengine.org/en/stable/classes/class_vehiclebody3d.html
+- [Q27] Godot-Dokumentation *Using Jolt Physics* (Jolt als Alternative seit 4.4) und Godot-Release 4.6 (Jolt als Standard für neue 3D-Projekte, Warnung vor abweichenden Simulationsergebnissen): https://docs.godotengine.org/en/stable/tutorials/physics/using_jolt_physics.html · https://godotengine.org/releases/4.6/ *(ob `VehicleBody3D` unter Jolt in 4.7.2 gleich robust ist, wurde nicht belegt)*
+
+**Rendering, Streaming, Performance (Godot)**
+- [Q23] Godot-Dokumentation *Optimization using MultiMeshes* (ein Draw Call für sehr viele Instanzen; einzelne Instanzen nicht cullbar; mehrere MultiMeshes je Weltbereich; Abschnitt als „in Arbeit“ markiert): https://docs.godotengine.org/en/stable/tutorials/performance/using_multimesh.html · Ergänzend (Drittquelle): https://www.strayspark.studio/blog/godot-3d-optimization-guide-2026
+- [Q24] Godot-Dokumentation *Visibility ranges (HLOD)* (Fern-Stellvertreter, Visibility Parent, Fade-Modi, nur Alpha-Fading): https://docs.godotengine.org/en/stable/tutorials/3d/visibility_ranges.html
+- [Q25] Godot-Dokumentation *Occlusion culling* (Projektsetting, `OccluderInstance3D`, Baking; Nutzen abhängig von der Kameraperspektive): https://docs.godotengine.org/en/stable/tutorials/3d/occlusion_culling.html
+- [Q26] Godot-Dokumentation *Large world coordinates* (nur für Raum-/Planetensimulationen; Einzelpräzision für Open Worlds ausreichend; Origin-Shifting als Alternative): https://docs.godotengine.org/en/stable/tutorials/physics/large_world_coordinates.html
+- [Q29] Godot-Dokumentation *Signed distance field global illumination (SDFGI)* (anspruchsvollstes GI-Verfahren, nur Forward+, Hinweise zu Cascades, Probe-Strahlen, Halbauflösung): https://docs.godotengine.org/en/stable/tutorials/3d/global_illumination/using_sdfgi.html
+- [Q30] Godot-Dokumentation *Resolution scaling* (FSR 2.2 seit 4.2, langsamste/beste Option, Skalierung pro Achse): https://docs.godotengine.org/en/stable/tutorials/3d/resolution_scaling.html
+- [Q28] Godot-Dokumentation *Optimizing navigation performance* (Kosten von Avoidance und Pfadabfragen, unerreichbare Ziele): https://docs.godotengine.org/en/stable/tutorials/navigation/navigation_optimizing_performance.html · Forum: https://forum.godotengine.org/t/godot-terrible-performance-on-navigationagent3d/64567 *(anekdotisch)*
 
 **Audio**
-- [Q16] Google web.dev: *Case Study – The Sounds of Racer* (Motorklang aus wenigen Loops, Crossfades, sample-genaues Looping): https://web.dev/case-studies/racer-sound
-- [Q17] MDN: *Web audio spatialization basics*: https://developer.mozilla.org/en-US/docs/Web/API/Web_Audio_API/Web_audio_spatialization_basics
+- [Q16] Google web.dev: *Case Study – The Sounds of Racer* (Motorklang aus wenigen Loops, Crossfades, sample-genaues Looping – als Gestaltungsprinzip, auf Godots Audio-Bus-System übertragen): https://web.dev/case-studies/racer-sound
 
-**Nicht belegt / ausdrücklich offen:** Detailzahlen zu Fußgängermengen im Browser, Compute-Shader-Reife in Three.js-WebGPU, Rapier-Fahrzeugcontroller-Verfügbarkeit – im Meilenstein 2/4/5 am eigenen Code zu prüfen.
-
-
-**Realismus und Materialien (Ergänzung)**
-- [Q18] Three.js-Forum: *ORM texture doesn't work properly* (Kanal-Zuordnung bei gepackten ORM-Maps) und Hinweise zu KTX2-Kompression (ETC1S vs. UASTC, widersprüchliche Empfehlungen – an eigenen Daten testen): https://discourse.threejs.org/t/orm-texture-doesnt-work-properly/51342 · https://www.soft8soft.com/docs/manual/en/introduction/Texture-Compression.html *(Foren/Handbuch, keine Nässe-Shader-Quelle gefunden)*
-
-**Server und Mehrspieler**
-- [Q19] Praxisleitfäden zu WebSocket-Spielservern in Node.js (Tickrate 20 Hz üblich, Interessenmanagement, Räume/Instanzen, Event-Loop-Blockade, `ws` vs. `uWebSockets.js`): https://abratabia.com/multiplayer-web-games/websockets.php · https://pkgpulse.com/guides/best-websocket-libraries-nodejs-2026 *(Blog-Niveau; Leistungszahlen unverifiziert; zu zonenbasiertem Sharding mit Grenz-Handoff wurde keine belastbare Quelle gefunden)*
+**Server und Mehrspieler (Godot)**
+- [Q31] Godot-Dokumentation *High-level multiplayer* (ENet, WebSocket, WebRTC; RPCs, Autorität): https://docs.godotengine.org/en/stable/tutorials/networking/high_level_multiplayer.html · Godot-Artikel *Multiplayer in Godot 4.0: Scene Replication*: https://godotengine.org/article/multiplayer-in-godot-4-0-scene-replication/
+- [Q32] Praxisleitfäden zu Dedicated Servern in Godot 4 (Headless-Export, Feature-Tag `dedicated_server`, Warnung vor ausschließlichem `MultiplayerSynchronizer`-Einsatz, Eingaben statt Positionen): https://gsb.supercraft.host/blog/godot-multiplayer-dedicated-server-backend/ *(Blog-Niveau; offizielle Exportdokumentation zusätzlich prüfen)*
+- [Q33] Allgemeine Netzcode-Praxis für Tickraten und Interessenmanagement (Snapshot-Rate 15–20 Hz üblich): https://abratabia.com/multiplayer-web-games/websockets.php *(Blog-Niveau, engine-unabhängig)*
 - [Q20] Gambetta, G.: *Fast-Paced Multiplayer (Part II): Client-Side Prediction and Server Reconciliation*: https://gabrielgambetta.com/client-side-prediction-server-reconciliation.html
 - [Q21] Gambetta, G.: *Fast-Paced Multiplayer (Part III): Entity Interpolation*: https://gabrielgambetta.com/entity-interpolation.html · Teil IV (Lag-Kompensation): https://gabrielgambetta.com/lag-compensation.html
 
-**Nicht belegt / ausdrücklich offen (Ergänzung):** Nässe-/Pfützen-Shader in Three.js, Zonen-Handoff im Browser-MMO, tatsächliche Realm-Obergrenzen (Spielerzahl) – jeweils am Prototyp bzw. per Lasttest zu validieren. Story-Struktur („Perlenkette“), Ruf-/Aegis-System und Anti-Cheat-Liste sind eigene Entwürfe auf Basis allgemeiner Praxis, keine übernommenen Fremdkonzepte.
+**Nicht belegt / ausdrücklich offen:**
+- Verhalten von **4.7.2** im Detail (Dokumentation recherchiert für 4.0–4.6).
+- **VehicleBody3D unter Jolt**, Fahrzeug-Prädiktion mit `RigidBody3D` im Netzwerk.
+- **SDFGI mit gestreamten Chunk-Meshes** (Neuberechnung/Flackern) und reale GPU-Kosten auf der RX 5700 XT – alle Frame-Zeiten in Kapitel 5.1 sind Schätzungen.
+- **Volumetrischer Nebel** (Kosten/Einstellungen), **`CompositorEffect`**, **Terrain3D**-Add-on und **godot-sqlite**: nicht recherchiert.
+- Nässe-/Pfützen-Shader in Godot, Zonen-Handoff bei Godot-Servern, tatsächliche Realm-Obergrenze (Spielerzahl), GDScript-Leistung bei Hunderten Agenten – jeweils am Prototyp bzw. per Lasttest zu validieren.
+- Story-Struktur („Perlenkette“), Ruf-/Aegis-System und Anti-Cheat-Liste sind eigene Entwürfe auf Basis allgemeiner Praxis, keine übernommenen Fremdkonzepte.
 
 ---
 
 ## 12. Zusammenfassung und die 5 nächsten Schritte
 
-**Kurzfassung:** MTA 6 wird zu einer eigenständigen, dystopisch-realistischen Küstenmetropole (**Kestrel Bay**, sechs Bezirke zwischen Konzernturm und Schrottgürtel, dazu Umland mit Küstenstraße, Bergen, Highway und Tunnel). Die Welt entsteht als **Hybrid aus handgesetzten Landmarken/Hauptachsen und prozeduraler Füllung** über einen gemeinsamen Straßengraph. Realismus kommt aus einer disziplinierten Pipeline (PBR, KTX2, Decals, Verschleiß, Nässe, Wetter) innerhalb fester Browser-Budgets. Die Story **„Nullstunde“** reagiert über Fraktionsstand, NPC-Vertrauen, Taten-Flags und Weltzustand mit fünf Wendepunkten und fünf Enden; sie ist als Daten modelliert und per Simulator testbar. Ein autoritativer Node-Server mit Zonen und Realms macht daraus später eine geteilte Welt, in der die Story pro Spieler privat bleibt. Differenzierung: **Tagesrhythmus pro Bezirk**, **Bezirks-Ruf** und das **Aegis-Überwachungsprofil** als spielbare Dystopie.
+**Kurzfassung:** MTA 6 wird in **Godot 4.7.2** (GDScript, Forward+/Vulkan) zu einer eigenständigen, dystopisch-realistischen Küstenmetropole (**Kestrel Bay**, sechs Bezirke zwischen Konzernturm und Schrottgürtel, dazu Umland mit Küstenstraße, Bergen, Highway und Tunnel). Die Welt entsteht als **Hybrid aus handgesetzten Landmarken/Hauptachsen und prozeduraler Füllung** über einen gemeinsamen Straßengraph; technisch tragen **Chunk-Streaming mit `MultiMeshInstance3D`, Visibility Ranges/HLOD, Occlusion Culling und Sim-LOD** für Verkehr und Passanten. Realismus kommt aus einer disziplinierten Pipeline (PBR, Decals, Verschleiß, Nässe, Wetter) innerhalb eines **Frame-Budgets für die RX 5700 XT** (SDFGI nur optional im Preset „Hoch“, FSR 2.2 zur Skalierung). Die Story **„Nullstunde“** reagiert über Fraktionsstand, NPC-Vertrauen, Taten-Flags und Weltzustand mit fünf Wendepunkten und fünf Enden; sie ist als Daten modelliert und per Simulator testbar. Ein **autoritativer Dedicated Server (Godot headless, ENet)** mit Zonen und Realms macht daraus später eine geteilte Welt, in der die Story pro Spieler privat bleibt. Differenzierung: **Tagesrhythmus pro Bezirk**, **Bezirks-Ruf** und das **Aegis-Überwachungsprofil** als spielbare Dystopie.
 
-Das Ganze besteht aus 15 Modulen und 11 überprüfbaren Meilensteinen; **Einzelspieler wird in MS1–MS8 zuerst stabil**, Mehrspieler folgt in MS9–MS11.
+Das Ganze besteht aus 15 Modulen und 11 überprüfbaren Meilensteinen; **Meilenstein 1 ist größtenteils bereits durch den Godot-Prototyp abgedeckt**, der Einzelspieler wird in MS1–MS8 zuerst stabil, Mehrspieler folgt in MS9–MS11. Aufwand der MVPs insgesamt ca. 68 Personentage (±50 %).
 
 ### Die 5 wichtigsten nächsten Schritte
 
-1. **Versionskontrolle einrichten** (`git init`, erster Commit mit Prototyp) und abwarten, bis die laufende Prototyp-Session `game.js` abgeschlossen hat – danach Meilenstein 1 starten.
-2. **Modularisieren (Iteration 5 vorziehen):** `game.js` in ES-Module zerlegen, `Rng(seed)` einführen, `sim/` und `world/` ohne Three.js halten – Voraussetzung für Streaming, Story-Engine und späteren Server.
-3. **Instancing + Debug-Overlay (F3):** Gebäude, Bäume, Gehwege als Instanzen; Ziel ≤ 150 Draw Calls; Benchmark-Flug als Ausgangsmessung.
-4. **Straßengraph (`CityData`) einführen** und Verkehr/Fußgänger/Polizei darauf umstellen (MS2) – Grundlage für KI, Karte, GPS, Missionen und später die Zonen.
+1. **Versionskontrolle einrichten** (`git init`, `.gitignore` für `.godot/` und Exporte, erster Commit mit Godot-Prototyp) – danach MS1 starten.
+2. **`main.gd` in Szenen und Autoloads zerlegen** (Kapitel 10): `EventBus`, `Config`/`Rng`, `Clock`, Fahrzeug-Szene, `TrafficSystem`; Global Shader Uniforms statt doppelter Konstanten; Verhalten unverändert.
+3. **Messgrundlage schaffen:** Debug-Overlay (F3) mit `Performance`-Monitoren, Benchmark-Flug und Qualitäts-Presets; erste echte Frame-Zeiten auf der RX 5700 XT festhalten (ersetzen die Planwerte aus Kapitel 5.1), inklusive Test **Jolt vs. Godot Physics** für `VehicleBody3D`.
+4. **Gebäude auf `MultiMeshInstance3D` je Chunk umstellen** und den **Straßengraph (`CityData`)** einführen; Verkehr darauf umstellen (MS2) – Grundlage für KI, Karte, GPS, Missionen und später die Zonen.
 5. **Story-Datenmodell und Bezirks-Definitionen festschreiben** (`data/story/`, `data/districts/`) und eine **Look-Dev-Szene** mit 12 PBR-Materialien aufbauen – damit Stimmung, Dystopie und Realismus früh am Bild geprüft werden, bevor Inhalte in Masse entstehen.
