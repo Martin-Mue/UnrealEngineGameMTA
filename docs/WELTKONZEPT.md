@@ -1,8 +1,8 @@
 # MTA 6 – Weltkonzept (Godot 4.7)
 
 > Modulares Konzept für eine außergewöhnlich gute Spielwelt von **MTA 6**, einem **eigenständigen**, dystopisch-realistischen Open-World-Fahrspiel (Einzelspieler-Kern, später gemischt mit MMO-Elementen) mit eigener Stadt, eigenen Figuren und eigener Story.
-> **Version 3 – Engine: Godot 4.7.2** (GDScript, Forward+/Vulkan, Windows-PC; Zielhardware AMD RX 5700 XT 8 GB, Ryzen 5 3600, 64 GB RAM). Frühere Versionen waren auf Browser/Three.js ausgelegt; der Inhalt (Module, Welt, Story, Meilensteine) ist erhalten und technisch auf Godot übersetzt.
-> Stand: 19.11.2026 · Sprache: Deutsch · Ausgangsbasis: Godot-Prototyp in `godot/` (`main.gd`, `main.tscn`, `project.godot`), Iterationsplanung: [`ITERATIONSPLAN.md`](ITERATIONSPLAN.md) (Zuordnung in Kapitel 9).
+> **Version 3 – Engine: Godot 4.7.2** (GDScript, Forward+/Vulkan, Windows-PC; Zielhardware AMD RX 5700 XT 8 GB, Ryzen 5 3600, 64 GB RAM). Frühere Versionen waren auf Browser/Three.js ausgelegt; der Inhalt (Module, Welt, Story, Meilensteine) ist erhalten und technisch auf Godot übersetzt. Ergänzt wurden Design-Vorbilder (Kapitel 9), Missionstypen und Aktivitäten (10), Speichern/Laden (11), Spielsysteme und Produktion (12) sowie Erkenntnisse und Aufwandsfortschreibung (13).
+> Stand: 19.11.2026 · Sprache: Deutsch · Ausgangsbasis: Godot-Prototyp in `godot/` (`main.gd`, `main.tscn`, `project.godot`), Iterationsplanung: [`ITERATIONSPLAN.md`](ITERATIONSPLAN.md) (Zuordnung in Kapitel 14).
 >
 > **Abgrenzung:** Dieses Dokument verwendet ausschließlich allgemeine Genre-Prinzipien (Open-World-Design, lebendige Städte, Systemik). Karte, Namen, Figuren, Marken und Story-Elemente sind vollständig eigen – nichts davon ist von GTA oder anderen Rockstar-Titeln abgeleitet.
 >
@@ -20,10 +20,15 @@
 6. [Story-Engine, Entscheidungen und Fraktionen (M14)](#6-story-engine-entscheidungen-und-fraktionen-m14)
 7. [Open World trifft MMO: Server und Mehrspieler (M15)](#7-open-world-trifft-mmo-server-und-mehrspieler-m15)
 8. [Die Welt: Kestrel Bay (dystopisch)](#8-die-welt-kestrel-bay-dystopisch)
-9. [Roadmap mit Meilensteinen](#9-roadmap-mit-meilensteinen)
-10. [Empfohlene Projektstruktur (Godot)](#10-empfohlene-projektstruktur-godot)
-11. [Quellen](#11-quellen)
-12. [Zusammenfassung und die 5 nächsten Schritte](#12-zusammenfassung-und-die-5-nächsten-schritte)
+9. [Design-Vorbilder: was wir übernehmen und wie wir es eigenständig umsetzen](#9-design-vorbilder-was-wir-übernehmen-und-wie-wir-es-eigenständig-umsetzen)
+10. [Missionstypen und Aktivitäten](#10-missionstypen-und-aktivitäten)
+11. [Speichern und Laden (SaveManager)](#11-speichern-und-laden-savemanager)
+12. [Spielsysteme und Produktion](#12-spielsysteme-und-produktion-alles-was-zu-einem-spiel-dieses-umfangs-gehört)
+13. [Neue Erkenntnisse, Pläne und Aufwandsfortschreibung](#13-neue-erkenntnisse-pläne-und-aufwandsfortschreibung)
+14. [Roadmap mit Meilensteinen](#14-roadmap-mit-meilensteinen)
+15. [Empfohlene Projektstruktur (Godot)](#15-empfohlene-projektstruktur-godot)
+16. [Quellen](#16-quellen)
+17. [Zusammenfassung und die 5 nächsten Schritte](#17-zusammenfassung-und-die-5-nächsten-schritte)
 
 ---
 
@@ -33,7 +38,7 @@ Gelesen wurden `godot/main.gd`, `godot/project.godot` und `godot/README.md`. Der
 
 | Bereich | Ist-Zustand (Godot) | Konsequenz |
 |---|---|---|
-| Projekt | Godot 4.7.2, **Forward+**, MSAA 2×, Direktionalschatten-Atlas 4096; Fenster 1600×900; `main.gd` baut fast alles im Code (`_build_*`) | Gute Basis, aber ein Skript für alles → in Szenen, Autoloads und Ressourcen zerlegen (Kapitel 10) |
+| Projekt | Godot 4.7.2, **Forward+**, MSAA 2×, Direktionalschatten-Atlas 4096; Fenster 1600×900; `main.gd` baut fast alles im Code (`_build_*`) | Gute Basis, aber ein Skript für alles → in Szenen, Autoloads und Ressourcen zerlegen (Kapitel 15) |
 | Stadt | Raster 8×8 Blöcke, `P = 80 m`, Straße 16 m → ca. 640 × 640 m. **Boden = eine 4000×4000-PlaneMesh mit Spatial-Shader**, der Straßen, Mittellinien, Randlinien und Zebrastreifen prozedural aus der Weltposition zeichnet (kein Mesh pro Straße) | Sehr effizient; Shader-Konstanten (`P`, `HALF`) sind aber doppelt hartkodiert (GDScript und Shader) → **Global Shader Uniforms** verwenden |
 | Gebäude | Je Lot ein `StaticBody3D` + `MeshInstance3D` (BoxMesh) + `CollisionShape3D`, ein gemeinsames `ShaderMaterial` mit `instance uniform tint`; Fenster und Nachtlicht rein im Fragment-Shader aus Weltposition (`night`-Uniform) | Keine Fenstertexturen nötig (gut); Nodes-Zahl wächst mit der Stadt → für größere Welt **MultiMeshInstance3D** und gebündelte Kollision je Chunk |
 | Zufall | `RandomNumberGenerator` mit `seed = 6` | Welt ist **reproduzierbar** (Vorteil gegenüber dem alten Prototyp) |
@@ -196,6 +201,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 - Terrain: Heightmap-Gitter je Chunk (`ArrayMesh` bzw. `HeightMapShape3D` für Kollision); Straßen als Mesh-Bänder entlang der Graph-Kanten **oder** – wie im Prototyp – im Boden-Shader (für gerade, ebene Raster am billigsten); gemischt: Shader im Raster-Kern, Mesh-Bänder für Kurven/Hang. Für fertige Terrain-Werkzeuge existieren Community-Add-ons (z. B. Terrain3D); Eignung und Lizenz vor Einsatz prüfen *(nicht recherchiert)*.
 - Rechenintensive Generatorteile (Tensor-Feld, Straßenintegration) sind Kandidaten für **C#/GDExtension**, falls GDScript zu langsam ist (messen).
 
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Straßengraph mit **Ebenenattribut** für Hochstraßen/Skybridges (MVP: eine zusätzliche Ebene im Core); Dichte und Vertikalität statt reiner Fläche (9.7).
 **Abhängigkeiten:** M3 (Bezirksparameter), M12 (Seed-Tests). **Risiken:** Tensor-Felder erzeugen unschöne Kreuzungswinkel/Sackgassen → nachbearbeiten (Segmente verschmelzen, Mindestwinkel); Generator wird zum Zeitgrab → Zeitbox je Stufe, Handarbeit als Fallback; GDScript-Laufzeit. **Aufwand:** MVP 6 PT · Ausbau 14 PT · Wunsch 15+ PT.
 
 ---
@@ -233,6 +239,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Bezirkstypische NPC-Kleidung/Fahrzeugmix; Zeitrhythmen (Schichtwechsel, Rush Hour); dynamische Details (Baustellen, Märkte, Veranstaltungen) |
 
 **Technische Umsetzung (Godot):** Reine Daten (`data/districts/*.tres`), konsumiert von M1 (Generierung), M2 (Props), M5 (Verkehrsprofil), M9 (Licht), M10 (Musik). Bezirkszugehörigkeit je Position über eine **Bezirkskarte** (niedrig aufgelöste Textur/Voronoi-Gitter, O(1)-Abfrage) statt Geometrietests. Orientierung folgt bewährten Prinzipien: **Landmarken-Hierarchie**, Wiedererkennung über Farbe und Silhouette, Leitlinien [Q7].
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Nachtleben-Orte (Clubs, Nachtmärkte), Bezirks-Events (10.4), bezirkstypische Aktivitäten (10.2), Neon-/Reklame-Vokabular je Bezirk (9.7).
 **Abhängigkeiten:** M1, M2. **Risiken:** Bezirke wirken bloß „umgefärbt“ → Unterschiede in *Struktur* (Straßenmuster, Höhenprofil, Prop-Rhythmus) statt nur Farbe. **Aufwand:** MVP 3 PT · Ausbau 10 PT · Wunsch 10+ PT.
 
 ---
@@ -254,6 +261,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 - Fahrzeuge als **`CollisionLayer`/`Mask`-Schema** (Welt, Fahrzeug, Fußgänger, Trigger) von Beginn an.
 - Gefühl vor Realismus: Tuning-Parameter in `VehicleDef`, Live-Tuning über Debug-Panel (Slider via `Control`-Nodes).
 
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Garage und Fahrzeug-Tuning (12.3), Chaos-Spielzeug (zerstörbare Props, Verkehrsreaktionen), Verfolgungsfahrten als Kernspaß (9.7).
 **Abhängigkeiten:** M1/M2 (Boden, Kollision), M12. **Risiken:** Tunneling bei hohem Tempo (→ höherer Physiktakt, CCD-Option am RigidBody); Instabilitäten von `VehicleBody3D` beim Überschlag; „realistisch“ ≠ „spaßig“ → Playtests; Jolt/Godot-Physics-Unterschiede. **Aufwand:** MVP 4 PT · Ausbau 12 PT · Wunsch 18+ PT.
 
 ---
@@ -275,6 +283,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 - Rechenschleifen für Hunderte Agenten zuerst typisiertes GDScript, bei Engpass **C#** oder GDExtension; Updates über `WorkerThreadPool` auf mehrere Kerne verteilen (Ergebnisse auf dem Hauptthread übernehmen).
 - Systemische Ereignisse (Unfall, Panne, Straßenfest), die **ohne** Spielerbeteiligung stattfinden, erzeugen Lebendigkeit [Q5][Q6].
 
+**Ideen aus den Design-Vorbildern (Kapitel 9):** **Zielprofile mit Tagesplan** für Verträge (9.5), lebendige Nachtmärkte und Bezirksereignisse (9.7, 10.4).
 **Abhängigkeiten:** M1 (Straßengraph), M9 (Zeit/Wetter), M6 (Polizei teilt den Graphen). **Risiken:** Staus/Deadlocks (→ Timeout und Ghosting wie im Prototyp, aber kontrolliert); Mengenzahl vs. CPU (Ryzen 5 3600); unnatürliches Pop-in (→ Spawn nur außerhalb der Sicht). **Aufwand:** MVP 7 PT · Ausbau 14 PT · Wunsch 18+ PT.
 
 ---
@@ -290,6 +299,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Polizei als Fraktion mit Revieren, Schichtwechsel, Korruption/Bestechung; Gerichts-/Kautionssystem; nicht-tödliche Optionen |
 
 **Technische Umsetzung (Godot):** Zustandsautomat je Einheit (`Node`-basiert oder Enum-Klasse) + zentraler Dispatcher-Autoload (verteilt Einheiten, hält Ziel-Wissen). Wahrnehmung über Sichtkegel mit `PhysicsRayQueryParameters3D` gegen Gebäude-Kollisionen (Strahlen budgetiert: wenige pro Frame, reihum), dazu Hörradius via `Area3D`. Das Fahndungssystem als „Spielzeug“ mit klaren, ablesbaren Regeln zu gestalten ist wichtiger als Realismus [Q5].
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Eskalationsleiter mit Medien-Hubschrauber und Radio-Meldungen (9.6/9.7), Kamera-Slalom durch Aegis-Blindzonen (10.2).
 **Abhängigkeiten:** M5 (Graph, Zeugen), M4 (Fahrzeuge), M3 (Bezirke), M1. **Risiken:** Gummiband-KI, die „betrügt“ (Teleport-Spawns) → Spawn nur außerhalb der Sicht; Frust durch unausweichliche Festnahme → immer ein erkennbarer Fluchtweg; Raycast-Kosten. **Aufwand:** MVP 4 PT · Ausbau 12 PT · Wunsch 15+ PT.
 
 ---
@@ -305,6 +315,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Verzweigende Entscheidungen, Beziehungen, dynamische Zufallsbegegnungen, Mission-Editor als Godot-Editor-Plugin (`EditorPlugin`) |
 
 **Technische Umsetzung (Godot):** Zustandsautomat/Skript-DSL in JSON (`data/missions/*.json`), ausgeführt vom `MissionRunner` (Autoload). Missionen **abonnieren Signale** des `EventBus` (z. B. `vehicle_entered_zone`) statt die Hauptschleife zu kennen; Zielzonen sind `Area3D`. Gestaltungsregel: je Mission Zielbedingung, KI-Rollen, Checkpoint-Abstände und Fehlschlagtext explizit festlegen; einfache KI mit starker Reaktion wirkt besser als komplexe KI [Q15]; Missionen „öffnen“, damit systemisches Chaos mitspielen darf [Q5][Q6].
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Vier Auftragsklassen (Hauptquest, Nebenquest, Gig, Vertrag; 9.1), zehn Missionstypen mit Parametern (Kapitel 10), Gig-Generator (9.4), Dialog-/Quest-/Flag-Graph (6.9).
 **Abhängigkeiten:** M1 (Orte), M5/M6 (Welt reagiert), M8 (Belohnung), M11 (Marker). **Risiken:** Content-Menge → Wiederverwendung der Typen; Skript-Brüche bei systemischen Zufällen → Fail-Safes (Neuaufsetzen, Checkpoint). **Aufwand:** MVP 5 PT · Ausbau 18 PT · Wunsch 22+ PT.
 
 ---
@@ -320,6 +331,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Dynamische Preise (Tageszeit, Nachfrage), Handel/Schmuggelrouten mit Risiko, Erfolge |
 
 **Technische Umsetzung (Godot):** Ein zentraler, serialisierbarer `GameState`-Autoload (reine Daten als `Dictionary`/Klassen mit `to_dict()`/`from_dict()`); **Speichern als JSON** (`user://saves/…`, mit Schema-Version, Atomic-Write über temporäre Datei); **keine** `.tres/.res`-Speicherstände (Skript-Einbettung, Sicherheit). Preise und Belohnungen als Daten.
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Herkunft, Skills und Module (9.3), Inventar/Garage/Tuning (12.3), Wirtschaft (12.4), **SaveManager** (Kapitel 11).
 **Abhängigkeiten:** M7, M6. **Risiken:** Inflation/Balancing → Kennzahlen in Tabelle; Speicherstand-Migration (Schema-Version von Anfang an). **Aufwand:** MVP 3 PT · Ausbau 7 PT · Wunsch 10+ PT.
 
 ---
@@ -335,6 +347,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Volumetrische Wolken, Jahreszeiten, Windsimulation für Vegetation, Blitz-Beleuchtung |
 
 **Technische Umsetzung (Godot):** `WorldEnvironment` + `Environment`-Ressource (alle Parameter animiert per Code/`Tween`); **Cascaded Shadow Maps** der `DirectionalLight3D` (`directional_shadow_mode` PSSM 4 Splits; Schattenweite pro Qualitätsstufe) statt einer festen Box; Nachtbeleuchtung: Forward+ nutzt einen **Cluster-Renderer** für viele Lichter, die Kosten steigen aber mit Schattenwerfern → nur wenige schattenwerfende Lichter (Kapitel 5.1).
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Neon-Nacht und nasse Straßen als Stimmungskern, Stromausfall/Blackout als Bezirks-Event (10.4).
 **Abhängigkeiten:** M2, M12. **Risiken:** Nachtbeleuchtung (viele Lichter) → Fake-Licht (Emissive, Glow, Decals), Schattenwerfer strikt begrenzen; Regen-Shader. **Aufwand:** MVP 2 PT · Ausbau 8 PT · Wunsch 12+ PT.
 
 ---
@@ -350,6 +363,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Dynamische Musik (Intensität folgt Verfolgung/Tageszeit), Sprachausgabe, Mix-Snapshots (z. B. „in der Garage“) |
 
 **Technische Umsetzung (Godot):** `AudioStreamPlayer3D` mit Dämpfung/Doppler; Pitch über `pitch_scale`; Equal-Power-Crossfade über zwei Player und `Tween` (Gains in dB ableiten); Effekte (Reverb, Lowpass, Kompressor) auf **Bussen**. Anzahl gleichzeitiger 3D-Player begrenzen (Pool). Die Racer-Fallstudie von Google zeigt, wie Motorklang mit wenigen Dateien überzeugend wird [Q16].
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Reaktives Radio mit fünf fiktiven Sendern und Satire-Werbung (9.6, 12.8).
 **Abhängigkeiten:** M4, M5, M9. **Risiken:** Asset-Beschaffung/Lizenzen (→ CC0 oder selbst synthetisiert, Lizenzliste); Dateigröße; Loop-Klicks bei Samples (Loop-Punkte sauber setzen). **Aufwand:** MVP 2 PT · Ausbau 7 PT · Wunsch 10+ PT.
 
 ---
@@ -365,6 +379,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | Wunschziel | Fotomodus, Telefon-UI, anpassbares HUD, Barrierefreiheit (Farbenblind-Modi, Untertitelgröße) |
 
 **Technische Umsetzung (Godot):** `Control`-Nodes, `Theme`-Ressource, `CanvasLayer`; Karte als **einmal gebackene Textur** aus `CityData` (SubViewport-Render oder `Image`), darüber nur Marker; Pfadsuche A* auf dem Straßengraph (derselbe wie KI). UI liest nur Zustand (Signale), schreibt nie in die Simulation.
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Journal, Charaktermenü, Optionen und Barrierefreiheit (12.5/12.6), Fotomodus (12.9).
 **Abhängigkeiten:** M1, M7, M8. **Risiken:** Textupdates pro Frame (→ nur bei Änderung), Eingabegeräte-Matrix, Auflösungs-/Skalierungsverhalten (Stretch-Modus `canvas_items`). **Aufwand:** MVP 3 PT · Ausbau 8 PT · Wunsch 8+ PT.
 
 ---
@@ -419,7 +434,7 @@ Aufwand in **Personentagen (PT)** für eine Entwicklerin/einen Entwickler mit KI
 | M15 Server/Mehrspieler | 10 | 22 | 35+ |
 | **Summe (PT)** | **68** | **184** | **238+** |
 
-Alle MVPs zusammen: grob **13–15 Arbeitswochen** (eine Person mit KI-Unterstützung, ca. 5 PT/Woche); davon ca. 58 PT für den **Einzelspieler-Kern** (M1–M14), 10 PT für den Server. Alle Ausbaustufen kosten weitere ca. 7–9 Monate. Gegenüber der Browser-Version (80/212/261+) sinkt der Aufwand vor allem bei Streaming, Physik, Navigation, Audio, UI, Profiling und Netzwerk, weil Godot diese Bausteine mitbringt. **Nicht enthalten:** Einarbeitung in Godot/GDScript, Content (Missionen, Assets, Audio, Vertonung) nur teilweise. Die Schätzungen sind Planwerte mit ±50 % Unsicherheit, keine Zusagen.
+Alle MVPs zusammen: grob **13–15 Arbeitswochen** (eine Person mit KI-Unterstützung, ca. 5 PT/Woche); davon ca. 58 PT für den **Einzelspieler-Kern** (M1–M14), 10 PT für den Server. Alle Ausbaustufen kosten weitere ca. 7–9 Monate. Gegenüber der Browser-Version (80/212/261+) sinkt der Aufwand vor allem bei Streaming, Physik, Navigation, Audio, UI, Profiling und Netzwerk, weil Godot diese Bausteine mitbringt. **Nicht enthalten:** Einarbeitung in Godot/GDScript, Content (Missionen, Assets, Audio, Vertonung) nur teilweise. Die Schätzungen sind Planwerte mit ±50 % Unsicherheit, keine Zusagen. **Fortschreibung (Prototypfortschritt, Design-Vorbilder, Zusatzsysteme): Kapitel 13.**
 
 ---
 
@@ -511,6 +526,7 @@ Realismus ist auch *Plan*: Die Stadt muss aussehen, als wäre sie über Jahrzehn
 | Wunschziel | `CompositorEffect`-Pipeline (Schärfung, Grain, Scan-Overlay), volumetrischer Nebel an Hero-Orten, Fensterinterieurs per Parallax-Cubemap-Shader, Photogrammetrie-Hero-Assets, Jahreszeiten |
 
 **Technische Umsetzung:** Asset-Pipeline in Godot (Import-Presets; Texturen/Modelle `.glb` über den Importer, automatische Mesh-LODs); Chunk-Generator (M2) erzeugt Props/Decals regelbasiert; alle Qualitätsstufen über **eine** Preset-Ressource (M12), die Environment-, Viewport- und Projekteinstellungen setzt.
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Neon-/Reklame-Look der Nacht, Dystopie-Props und satirische Plakate (9.7, 9.8).
 **Abhängigkeiten:** M2, M3, M9, M12. **Risiken:** (1) Asset-Menge und Lizenzen → CC0 + Prozeduralmaterialien, Lizenzliste; (2) Videospeicher (8 GB) → Textur-Budget, Kompression, Streaming nach Bezirk; (3) „Look-Drift“ zwischen Bezirken → eine Material- und Farbpipeline, zentrale Look-Dev-Szene; (4) Performance-Einbruch → Presets, dynamische Auflösung; (5) SDFGI/Streaming-Wechselwirkung (siehe oben). **Aufwand:** MVP 6 PT · Ausbau 18 PT · Wunsch 22+ PT (ohne Kunstproduktion).
 
 ---
@@ -657,7 +673,89 @@ Ending = { id: 'E2', title: 'Hafenrepublik', priority: 20,
 | Wunschziel | Geheimes Ende E5, Beziehungsszenen, dynamische Nebenaufträge je Weltzustand, Lokalisierung (DE/EN), Editor-Werkzeug für Story-Graphen |
 
 **Technische Umsetzung:** reine Daten + deterministische Engine; kein Zufall in Story-Entscheidungen; Ereignisse über Signale des `EventBus`-Autoloads (`mission.completed`, `crime`, `district.entered`); Texte in `data/story/text.de.json` (später Godots Übersetzungssystem/`tr()`).
+**Ideen aus den Design-Vorbildern (Kapitel 9):** Entscheidungsgewicht und verzögerte Folgen (9.2), Hauptfiguren, Dialog-/Flag-Graph und drei Missionsketten (6.8–6.10).
 **Abhängigkeiten:** M7 (Runner), M6 (Verbrechen/Heat), M3/M5/M9/M13 (Weltzustand-Wirkung), M8 (Speichern). **Risiken:** (1) Content-Umfang → Perlenkette und Variantentexte statt vollständiger Verzweigung; (2) Soft-Locks → Story-Simulator, Notfall-Reset „Mission neu starten“; (3) Konsistenzfehler in Dialogen → Bedingungen zentral prüfen, Review-Checkliste; (4) Mehrspieler: globale Story-Spoiler → Story bleibt **pro Spieler** (Kapitel 7.8). **Aufwand:** MVP 8 PT · Ausbau 20 PT · Wunsch 25+ PT (ohne Texte/Vertonung).
+
+### 6.8 Hauptfiguren
+
+Alle Figuren sind frei erfunden. `trust` ist der NPC-Vertrauenswert (−3…+3, Kapitel 6.3).
+
+| Figur | Rolle | Motiv | Geheimnis | Funktion in der Handlung | Wandel nach Vertrauen |
+|---|---|---|---|---|---|
+| **Mira Voss** (Protagonistin) | Ex-Rennfahrerin, je nach Herkunft (9.3) Fahrerin, Hafenkind oder Konzern-Aussteigerin | Bruder finden, Schuld begleichen | Sie hat vor sieben Jahren ein Rennen verkauft, das den Bruder in Schulden stürzte | Spielerfigur; Herkunft färbt Dialoge | – |
+| **Jonas Voss** | Bruder, Datenanalyst bei Aurelia, untergetaucht | Beweise zu Aegis sichern | Er hat Daten verkauft, bevor er floh (Teilschuld) | Auslöser (W1), Schicksal in W4 | `savedJonas` bestimmt E5 |
+| **Dr. Idris Kandel** | Vorstand Aurelia Holdings, Architekt von Aegis „Phase Zwei“ | „Ordnung durch Sichtbarkeit“ – glaubt, Aegis rettet die Stadt | Aegis-Unfälle (Fehlfestnahmen) werden vertuscht | Gegenspieler; macht in W3 das Angebot | Bei Vertrauen +2 zeigt er echte Beweggründe (Tragödie in der Familie) |
+| **Cmdr. Ravn Okoye** | Leiter der Kestrel Civil Guard | Pflichtgefühl, Karriere | Zweifelt an Aegis, folgt Befehlen | Jäger in Akt I–II; kann in Akt III die Seite wechseln | Vertrauen ≥ +2 → warnt Mira vor Razzien, schützt in E5 |
+| **Tomasz „Brann“ Brandt** | Anführer der Dockers' Union | Arbeitsplätze, Würde | Hat einen Deal mit dem Konzern erwogen | Verbündeter, mögliche Verrat-Figur (W2) | Hoch: tiefer Verrat; niedrig: bleibt Zweckpartner |
+| **„Nox“** | Hackerin/Hacker des Lantern Collective (Pronomen offen halten) | Aegis stoppen | Kennt Jonas besser als angegeben | Quelle für Hacks; Verrat-Variante (W2) | Hoch: gibt den „Ledger-Schlüssel“ |
+| **Yara Quill** | Sprecherin des Lantern Collective, Predigerin am Glockenturm | Altstadt retten | Hat Abrissdaten zurückgehalten | Moralische Gegenstimme in W3 | – |
+| **Odalys „Dutch“ Halloran** | Chefin der Rustline Wrenchers | Respekt, Unabhängigkeit | Wettet auf alle Seiten | Fluchtwege, Fahrzeuge, Rennen | Hoch: bietet Fluchtroute (E4) |
+| **Pia Sorensen** | Moderatorin von *Open Line* (Radio) | Wahrheit, Quote | Quelle ist ein Konzern-Insider | Verbindet Welt und Spieler; kündigt Folgen an (Kap. 9.6) | Zeugin in E5 |
+
+### 6.9 Quest-, Dialog- und Flag-Graph (Datenmodell)
+
+**Drei Graphen, ein Zustand:**
+1. **Quest-Graph:** Knoten = Beats/Missionen, Kanten = Bedingungen (`requires`), siehe 6.5/9.1.
+2. **Dialog-Graph:** Knoten = Textzeilen und Wahlmöglichkeiten, eingebettet in Beats.
+3. **Flag-Registry:** zentrale Liste aller erlaubten Flags/Werte mit Namensraum (verhindert Tippfehler und Geister-Flags).
+
+```text
+DialogGraph = { id: 'a2_brann_confront', speaker_map: { brann: 'npc_brann' }, start: 'n1', nodes: {
+  n1: { type: 'line',   who: 'brann', text: 'tr:a2.brann.n1', next: 'n2' },
+  n2: { type: 'choice', options: [
+        { text: 'tr:a2.brann.ask_deal',  when: [{ skill: ['street', '>=', 2] }], effects: [{ npcTrust: ['brann', -1] }], next: 'n3a' },
+        { text: 'tr:a2.brann.stay_calm', when: [],                              effects: [],                            next: 'n3b' } ] },
+  n3a: { type: 'check', cond: { flag: ['story.a1.cargo_destroyed', '==', true] }, yes: 'n4a', no: 'n4b' },
+  n3b: { type: 'line',  who: 'brann', text: 'tr:a2.brann.n3b', next: 'end' },
+  n4a: { type: 'effect', effects: [{ flag: ['story.w2.brann_exposed', true] }], next: 'end' },
+  n4b: { type: 'line',  who: 'brann', text: 'tr:a2.brann.n4b', next: 'end' },
+  end: { type: 'end' } } }
+
+FlagRegistry = {
+  'story.w1.shown_to':      { type: 'enum', values: ['none','union','collective','aurelia'], default: 'none' },
+  'story.w2.betrayer':      { type: 'enum', values: ['none','brann','nox','ravn'],            default: 'none' },
+  'story.savedJonas':       { type: 'bool', default: false },
+  'npc.brann.trust':        { type: 'int',  min: -3, max: 3, default: 0 },
+  'world.saltmarket.tags':  { type: 'set',  values: ['strike','free_port','blockade'] },
+  'stat.civilians_killed':  { type: 'int',  min: 0, default: 0 } }
+```
+
+**Regeln:** (1) Jedes Flag muss in der Registry stehen; unbekannte Flags sind Fehler (Lint). (2) Namensräume `story.*`, `npc.*`, `world.*`, `stat.*`, `quest.*`. (3) Texte ausschließlich als Schlüssel (`tr:…`) → Lokalisierung und Untertitel. (4) Der **Graph-Lint** (`tests/graph_lint.gd`) prüft: Erreichbarkeit aller Knoten, keine Sackgassen, jede Auswahloption hat Ziel, jeder Effekt nennt ein registriertes Flag, jede Bedingung ist auswertbar. (5) Debug-Konsole: `flag set story.savedJonas true`, `quest start a2_blockade`, `jump w3`, `dump_state` – für schnelles Testen. (6) Alle Graphen sind rein deklarativ → serverprüfbar (Kapitel 7.7) und speicherbar (Kapitel 11).
+
+### 6.10 Drei vollständig skizzierte Missionsketten
+
+Jede Kette läuft in der Hauptstory parallel; welche Kette dominiert, hängt von W1 und dem Fraktionsstand ab. Typen sind in Kapitel 10 definiert.
+
+#### Kette A – „Der Hafenpakt“ (Dockers' Union, Akt I–II)
+
+| # | Mission | Typ / Ort | Ablauf | Entscheidung | Folge (Flags/Welt) | Belohnung |
+|---|---|---|---|---|---|---|
+| A1 | **Frühschicht** | Lieferung · Saltmarket → Core | Fracht vor 6:00 Uhr in den Core fahren; Aegis-Checkpoint umgehen oder Pass vorzeigen | Pass (sauber, kostet Standing bei Union) oder Hintertür (riskant) | `a1.route = pass/back`, Aegis-Profil ±5 | $400, Union +10 |
+| A2 | **Der Streikbrecher** | Verfolgung · Hafen/Route 9 | Konzern-Truck mit Ersatzarbeitern jagen, abdrängen | Fahrer verschonen oder Ladung zerstören | `a1.cargo_destroyed`; Tag `strike` bei Zerstörung | $600, Union +15 / KCG −10 |
+| A3 | **Docks bei Nacht** | Flucht · Saltmarket | Schmuggelware zum Versteck bringen, KCG-Streifen abschütteln (Bezirks-Heat 3) | Ware abgeben oder Teil für Jonas-Spur behalten | `a3.kept_sample` (öffnet Hinweis auf Jonas) | $500, Hinweis |
+| A4 | **Der Preis des Lohns** | Dialog/Entscheidung · Brann | Brann gesteht Gespräche mit dem Konzern; Mira stellt ihn zur Rede (Dialog 6.9) | Brann decken / enttarnen / erpressen | `npc.brann.trust` ±2; Variante für W2 | Standing, Info |
+| A5 | **Blockade** | Bezirks-Event · Saltmarket | Straßensperren gegen KCG organisieren (Fahrten, Barrikaden), zeitlich begrenzt | Gewalt (Heat ↑) oder Aussitzen (Zeitdruck) | Tag `blockade`, Hafen autonom bei Erfolg | $1000, Union +25, Zugang E2 |
+
+#### Kette B – „Blackout-Protokoll“ (Lantern Collective, Akt I–III)
+
+| # | Mission | Typ / Ort | Ablauf | Entscheidung | Folge | Belohnung |
+|---|---|---|---|---|---|---|
+| B1 | **Blinde Flecken** | Rennen/Aktivität · Lantern Hill | Kamera-Slalom durch Aegis-Blindzonen lernen (Tutorial für Hack-Modul) | – | Skill Technik +1, Kamera-Hack freigeschaltet | $250, Modul |
+| B2 | **Das Archiv** | Einbruch/Verfolgung · Core | Datenträger aus einem Konzernarchiv holen: Hochstraße anfahren, Kameras hacken, mit Beute fliehen | Datenträger kopieren (schnell) oder Original (riskant, mehr Inhalt) | `b2.original` → mehr Beweise für E5 | $800, Collective +20 |
+| B3 | **Der Verräter** | Dialog/Verfolgung · Lantern Hill | Nox wird (oder nicht) als Verräter enttarnt; Verfolgung durch Gassen | Nox stellen / entkommen lassen / Konzern melden | `story.w2.betrayer` (nur wenn nox-Vertrauen ≥ 2), Collective ±30 | Info, Standing |
+| B4 | **Uplink-Probe** | Lieferung + Hack · Ashridge | Störsender zum Sendemast fahren, kurzen Blackout in Core testen | Test durchführen oder abbrechen | Tag `blackout` temporär; Aegis-Dichte ↓ | $700, Collective +15 |
+| B5 | **Nullstunde: Blackout** | Finale/Flucht · Route 9 → Ashridge | Uplink zerstören, Konzern- und KCG-Jagd über Highway | Uplink zerstören oder kapern (nur bei Konzern-Allianz) | E3 „Blackout“ oder Variante E5 (Voraussetzungen siehe 6.4) | Ende |
+
+#### Kette C – „Schrottkönige“ (Rustline Wrenchers, Akt I–III)
+
+| # | Mission | Typ / Ort | Ablauf | Entscheidung | Folge | Belohnung |
+|---|---|---|---|---|---|---|
+| C1 | **Probefahrt** | Rennen · Rustline | Qualifikationsrennen gegen drei Fahrer; Vorgeschichte der Wrenchers | Fair fahren oder rammen | `c1.dirty` → Dutch Respekt ↓ aber Gegner meiden Mira | $300, Wrenchers +10 |
+| C2 | **Ersatzteile** | Lieferung/Verfolgung · Hafen → Rustline | Teile aus dem Hafen vor KCG-Zugriff retten | Teile teilen (Union +) oder behalten (Wrenchers +) | Verbündete-Konflikt Union/Wrenchers | $500, Standing |
+| C3 | **Die Revanche** | Rennen · Sunstrip/Küstenstraße | Rennen gegen den Konzern-Sponsorfahrer; Wetter wechselt (Regen) | Gewinnen oder absichtlich verlieren, um Wetten/Infos zu bekommen | `c3.lost_on_purpose` → Info über Kandel | $1200 / Info |
+| C4 | **Fluchtroute Route 9** | Flucht · Route 9 | Jonas oder Dokumente aus dem Stadtgebiet schaffen; Straßensperren, Hubschrauber | Mit Jonas fliehen (E4) oder zurückfahren | `savedJonas` ↔ E4-Pfad, Wrenchers ≥ Vertraut | $1500, E4 öffnen |
+
+**Anforderungen an jede Kette (Qualitätskriterien):** (1) mindestens zwei echte Entscheidungen, (2) mindestens eine **verzögerte Folge** (9.2), (3) mindestens ein systemischer Eingriff (Verkehr/Polizei/Wetter) ohne Skript-Bruch, (4) jede Mission hat Fail-Zustand und Checkpoint, (5) jede Mission nennt Fraktions-Standing-Änderung. Die drei Ketten ergeben zusammen 14 der ca. 28–32 Hauptstory-Missionen; die restlichen Missionen (Prolog, Konzernroute, Finale) folgen demselben Schema.
 
 ---
 
@@ -871,14 +969,509 @@ Wie in [Q7] beschrieben: Landmarken sind von vielen Punkten sichtbar und geben e
 
 ---
 
-## 9. Roadmap mit Meilensteinen
+## 9. Design-Vorbilder: was wir übernehmen und wie wir es eigenständig umsetzen
+
+Drei Spielgenres liefern bewährte **Designprinzipien**, an denen sich MTA 6 orientiert:
+
+| Vorbild-Genre | Stärken, die wir als Prinzip übernehmen |
+|---|---|
+| **Story-getriebenes Rollenspiel (düstere Fantasy)** | Quest-Writing mit moralisch grauen Entscheidungen und echten, verzögerten Konsequenzen; Nebenquests als eigene kleine Geschichten; Auftragsjagd mit Vorbereitung (Informationen sammeln, ausrüsten, stellen) |
+| **Dystopisches Cyberpunk-Rollenspiel** | Dichte, vertikale, neonbeleuchtete Stadt; Konzernmacht; Implantate/Fähigkeiten; Herkunft/Lebensphase der Spielfigur; Nachtleben; kurze Aufträge („Gigs“) |
+| **Systemisches Open-World-Fahrspiel** | Lebendige Systemik, Fahren und Verfolgungen, Humor/Satire, Radio, Aktivitäten, freies Chaos |
+
+**Abgrenzung (verbindlich):** Übernommen werden **nur allgemeine Gestaltungsprinzipien**. Es werden **keine** Inhalte, Namen, Figuren, Orte, Story-Elemente, Marken, Musik oder Regelwerke aus diesen oder anderen Spielen verwendet. Jede Mechanik unten ist als eigenes Design für Kestrel Bay formuliert; Namen (Sender, Marken, Fraktionen) sind frei erfunden. Vor Release ist jede Mechanik einmal gegen den Satz zu prüfen: *„Ließe sich das ohne Kenntnis des Vorbilds so aus unserer Welt herleiten?“*
+
+### 9.1 Quest-Struktur (Modul M7/M14)
+
+Vier Auftragsklassen mit unterschiedlicher Größe und Qualitätsregel:
+
+| Klasse | Umfang | Eigenschaften | Beispiel (eigen) |
+|---|---|---|---|
+| **Hauptquest** | 25–32 Missionen (Kapitel 6.4) | Perlenkette, Wendepunkte W1–W5, Fraktions- und Enden-Relevanz | „Nullstunde“ |
+| **Nebenquest („Geschichte“)** | 3–5 Beats, 15–25 min, ca. 12 zum Release | Eigene Figuren und Bogen, **unabhängig** von der Hauptquest lesbar, mindestens eine Entscheidung ohne „richtige“ Antwort, eine **verzögerte Folge** in der Welt | Eine Hafenarbeiterin bittet um Fahrten zu einer unbekannten Adresse; am Ziel entscheidet der Spieler, wessen Geheimnis wichtiger ist |
+| **Gig** | 3–8 min, systemisch erzeugt, wiederholbar | Template + Parameter (9.4) | Kurierfahrt mit Zeitfenster und Kameraroute |
+| **Vertrag („Jagd“)** | 20–40 min, ca. 6 zum Release | Vorbereitung → Jagd → Entscheidung (9.5) | Eine Schmugglerin aufspüren, die ihre Routen täglich wechselt |
+
+**Quest-Anatomie (Writing-Regeln):** *Hook* (eine Frage, kein Marker-Spam) → *Ermittlung* (Spuren in der Welt: Zeugen, Kamera-Archive, Radiomeldungen) → *Entscheidung* (beide Seiten haben Kosten) → *Folge* (sofort kleine, verzögert große Wirkung). Jede Nebenquest enthält Thema, Gegenspiel, Überraschung und eine Folge, die der Spieler **später ungefragt in der Welt sieht** (verändertes Schaufenster, neue Figur im Café, Meldung im Radio).
+**Keine Fragezeichen-Karte:** Aufträge werden über Gespräche, Telefon, Aushänge und das Radio gefunden; die Karte zeigt nur angenommene Aufträge und bekannte Kontaktpunkte.
+
+**Datenmodell-Erweiterung (zu 6.5):**
+```text
+Quest = { id, class: 'main'|'side'|'gig'|'contract', beats: [Beat], tone: ['grim','satire'],
+          district: 'saltmarket', giver: 'npc_id', requires: [Cond] }
+Beat  = { id, steps: [Step], choices: [Choice], onEnter: [Effect] }
+Effect += { delay: { days: 3 }, effect: Effect, announce: 'radio'|'npc'|'none' }   // verzögerte Folge
+Choice += { weight: 'light'|'medium'|'heavy', costs: [Effect], witnesses: ['npc_id'] }
+```
+
+### 9.2 Entscheidungsgewicht (M14)
+
+- **Gewichtsklassen:** *leicht* (Dialogton, kleine Standing-Änderung ±2–5), *mittel* (Standing ±10–20, Tag im Bezirk, Folgeauftrag gesperrt/geöffnet), *schwer* (Figur stirbt oder geht, Bezirk verändert sich sichtbar, Hauptquest-Variante). **Höchstens ca. 8 schwere Entscheidungen** in der Kampagne, damit jede zählt.
+- **Beide Optionen kosten etwas.** Kein „guter“ Ausgang ohne Preis; Entscheidungen werden **nicht** als „gut/böse“ markiert (nur Taten-Flags, Kapitel 6.3).
+- **Verzögerte Folgen:** Wirkung erst nach Spielzeit-Tagen (Effekt mit `delay`), angekündigt über Radio, Gespräche oder Veränderungen im Bezirk – nie über einen Pop-up „Entscheidung gespeichert“.
+- **Zeugen:** Wer die Tat gesehen hat (`witnesses`), erzählt davon; Ruf verbreitet sich über Figuren und Radio, nicht über einen globalen Zähler.
+- **Selten Zeitdruck:** Entscheidungs-Timer nur bei 1–2 Schlüsselszenen.
+- **Rückblick:** Entscheidungsprotokoll im Menü („Was wäre gewesen“ erst nach dem Ende, um Spoiler zu vermeiden).
+- **Test:** Der Story-Simulator (6.6) prüft zusätzlich: jede schwere Entscheidung führt in eine **spielbare** Folge; verzögerte Effekte feuern auch nach Laden/Speichern.
+
+### 9.3 Charakterfortschritt: Herkunft, Skills, Module (M8/M14)
+
+**Herkunft („Lebensphase“) – drei Startwege, im Prolog gewählt:**
+
+| Herkunft | Vergangenheit | Startvorteil | Eigene Dialogoptionen/Prolog |
+|---|---|---|---|
+| **Rennfahrerin** | Streckenfahrerin aus dem Umland | Fahrzeugbeherrschung, Garage in Rustline | Kontakte bei den Wrenchers, Ruf als „schnell“ |
+| **Hafenkind** | Aufgewachsen in Saltmarket | Union-Standing +20, Zugang zu Schmuggelrouten | Hafen-Slang, Vertrauen der Arbeiter |
+| **Konzern-Aussteigerin** | Ex-Angestellte von Aurelia | Aegis-Kenntnis (Kamera-Hack leichter), Konzern-Standing +10, aber Aegis-Profil +20 | Konzern-Jargon, KCG kennt sie |
+
+Die Herkunft setzt Startwerte, Dialogvarianten und eine eigene Prolog-Szene (Variante derselben Perlenketten-Mission, kein Parallel-Content). Sie ist im `GameStory` als `origin` gespeichert.
+
+**Fähigkeiten (nutzungsbasiert, kein XP-Grind):** *Fahren, Technik/Hacking, Straße (Überzeugen/Einschüchtern), Tarnung.* Jede steigt durch Anwenden (Drift-Distanz, gehackte Kameras, gelungene Dialoge). Fähigkeiten öffnen **Lösungswege** in Quests (Skill-Checks mit Alternativen, nie Sackgassen).
+
+**Module (Implantate/Upgrades, eigenes Konzept):** Spieler- und Fahrzeug-Upgrades mit **Preis und Nebenwirkung**:
+- *Kennzeichen-Störer* (Fahrzeug): senkt Aegis-Erkennung, kostet Wartung, im Core illegal.
+- *Kamera-Hack-Modul* (Körper): erlaubt Hacks aus der Distanz; Konzern-Lizenz → Aegis kann **orten**, wenn Spieler es zu oft nutzt.
+- *Fokus* (Körper): kurze Zeitlupe beim Fahren; belastet „Systemrisiko“ (Konsequenzen: Zittern/Blur-Effekt im HUD).
+- Einbau nur bei Fraktions-Händlern (Rustline: billig und riskant, Core: teuer und lizenziert) – Fraktionsstand beeinflusst Auswahl und Preis.
+
+**Technik:** Skills/Module als Daten (`data/skills/*.tres`, `data/modules/*.tres`) und Teil von `GameState`; Wirkungen als Modifikatoren auf M4/M6/M5-Parameter (Server prüft, Kapitel 7.7).
+
+### 9.4 Gigs – systemische Kleinaufträge (M7/M8)
+
+- **Vermittler pro Bezirk** (Telefon, Terminals, Stammkunden, Radio-Aushang); jeder Bezirk bietet andere Gig-Typen (Saltmarket: Lieferfahrten; Sunstrip: Taxi/Fotojobs; Rustline: Rennen/Abschleppen; Core: Kurier mit Kameraroute; Lantern Hill: Kamera-Sabotage).
+- **Generator aus Templates:** `GigTemplate` = Typ, Orte (aus `CityData`), Zeitfenster (Tageszeit), Risiko, Belohnung, Fraktion. Parameter ziehen Seed + Weltzustand (z. B. nach Streik mehr Hafenlieferungen).
+- **Fraktions-Standing schaltet Stufen frei** (Stufe 1 Standard → Stufe 3 gefährlich, hohe Belohnung); **Abkühlzeit** gegen Wiederholung; **Gig-Ketten** („Stammkunde“) können zu einer Nebenquest werden.
+- **Ziel:** Es gibt immer etwas Sinnvolles in der Nähe, ohne Content-Fließband: maximal 3 gleichzeitig angebotene Gigs je Bezirk.
+
+### 9.5 Verträge: Jagd mit Vorbereitung (M5/M6/M7)
+
+Eine eigene Auftragsklasse in vier Phasen:
+1. **Ermittlung:** Das Ziel (Person/Fahrzeug) hat ein **Profil** (Tagesplan, bevorzugte Route, Schwäche). Spieler sammelt Hinweise: Zeugen befragen, Kamera-Archiv hacken (Technik), Gigs bei Informanten.
+2. **Vorbereitung:** Fahrzeug anpassen (schneller/robuster/leiser), Route blockieren lassen (Fraktions-Gefallen), Kameras manipulieren, Ausrüstung/Module wählen. Gute Vorbereitung verändert die Jagd (z. B. weniger Polizei im Zielbezirk).
+3. **Jagd:** Verfolgung im systemischen Verkehr; das Ziel nutzt Routinen (M5-Tagesplan) und reagiert auf Eskalation (flieht, ruft Verstärkung).
+4. **Entscheidung:** stellen und übergeben / laufen lassen / gegen Bezahlung verkaufen; Konsequenzen in Standing und Bezirk (9.2).
+
+**Technik:** Zielprofil als Daten (`ContractTarget`), Tagesplan wiederverwendet die Agentenlogik aus M5; Jagd-Phase ist ein Zustandsautomat im `MissionRunner`.
+
+### 9.6 Radio und Sound (M10)
+
+- **Sendernetz (fiktiv):** 5 Sender mit eigener Identität: *Clearwave FM* (glatter Konzern-Pop), *Lantern Pirate Radio* (Untergrund, Talk und Elektronik), *Dockline* (Hafen, Arbeiter-Talk und Folk), *Neon Tide FM* (Synth/Nacht, Sunstrip), *Open Line* (Nachrichten und Hörerrufe). Namen frei erfunden und änderbar.
+- **Reaktives Radio:** Nachrichten und Moderatoren **reagieren auf Spielerhandlungen und Weltzustand** (Weltzustand-Tags, Heat-Ereignisse, Entscheidungsfolgen: „Streik im Hafen geht in die dritte Woche“). Das ist das wichtigste Werkzeug für verzögerte Folgen (9.2) und Satire (9.8).
+- **Werbung und Jingles:** Satirische Werbespots für Konzernprodukte (9.8) zwischen den Songs; Verkehrsfunk mit realen Ereignissen aus M5.
+- **Musik:** eigene, prozedurale oder **lizenzfreie/CC0-Musik**; keine fremden Lizenzmusiktitel ohne Rechteklärung; Lizenzliste `assets/LICENSES.md`.
+- **Technik in Godot:** `AudioStreamPlayer` mit **Playlist-Ressource** (`RadioStation`: Tracks, Jingles, Nachrichtenpool, Zeitplan); eigener **Radio-Bus** mit Tiefpass außerhalb des Fahrzeugs (Lautsprecher im Café/Club als 3D-Quelle); Nachrichtenpool als Daten mit Bedingungen (`when: [Cond]`, wie 6.5); Streaming-Dateien (OGG), nicht alles im Speicher.
+
+### 9.7 Bezirksleben, Nachtleben, Aktivitäten und vertikale Stadt (M1/M3/M13)
+
+- **Dichte statt Fläche:** Kestrel Bay wirkt durch **Verdichtung und Vertikalität**: Hochstraßen auf zwei Ebenen im Core, Skybridges, Dachwege, Parkhäuser, Hanggassen in Lantern Hill. Technisch: Straßengraph mit **Ebenenattribut** (Boden/Hochstraße), Rampen als Kanten; MVP nur **eine** zusätzliche Ebene im Core.
+- **Neonbeleuchtete Nacht:** Reklame als Leuchtkörper (Emissive + Glow, wenige echte Lichter), holografische Werbetafeln als Shader, nasse Straßen (M13). Konzern-Werbung dominiert Core/Sunstrip, Graffiti und Plakate Lantern Hill/Rustline.
+- **Nachtleben:** Clubs und Bars (Lantern Hill, Sunstrip) als Orte mit Gigs, Informanten und Radio-Quellen; Nachtmärkte und Straßenküchen mit Ambient-Dialogen; Ausgehzeiten sind Teil des Bezirksrhythmus (M3).
+- **Aktivitäten (ohne Pflicht):** Straßenrennen (Rustline), Drift-Zonen, **Kamera-Slalom** (durch Aegis-Blindzonen fahren), Hafen-Stunts, **Foto-Jobs** (Fotomodus), Sammelaufgaben („Kameras überkleben“ als Graffiti-Tags), Lieferketten. Jede Aktivität belohnt Standing/Geld und ist in der Weltzustand-Logik verankert.
+- **Systemisches „freies Chaos“:** zerstörbare Straßenprops, Verkehrsreaktionen (Ausweichen, Hupen, Flucht), Eskalationsleiter der Polizei (M6), Medien-Hubschrauber/Live-Berichte im Radio, Verkehrssperren; Chaos wird nicht bestraft, sondern erzeugt **Folgen** (Bezirks-Heat, Radio-Meldungen, Preise).
+
+### 9.8 Satire-Ton (Writing, UI, Radio)
+
+- **Ton-Regel:** Die Welt ist **ernst**, die Medien sind **satirisch**. Humor kommt aus Konzernsprache, Werbung und Überwachungs-Bürokratie – nicht auf Kosten realer Gruppen oder Personen.
+- **Humorkanäle:** Radiowerbung, Plakate, Lautsprecherdurchsagen im Core, Zeitungs-/Nachrichtenmeldungen, NPC-Ambient-Dialoge (Pool aus 200+ Sätzen je Bezirk), Gerätenamen und Menütexte.
+- **Beispiele (eigene Fiktion):** „Aegis – Wir sehen, was Sie brauchen.“ · „Aurelia Calm™: Ihre Stadt, optimiert.“ · Durchsage im Core: „Ihr Verhalten wurde freundlich bewertet.“
+- **Leitplanken:** Keine echten Marken/Personen; Altersfreigabe und Inhaltshinweis festlegen; Satire im Ton einheitlich halten (Textleitfaden `docs/TONFALL.md` anlegen, sobald geschrieben wird).
+
+### 9.9 Zuordnung zu Modulen und Meilensteinen
+
+| Idee | Modul | Meilenstein | Umfang (MVP / Ausbau) |
+|---|---|---|---|
+| Quest-Klassen, Beat-Modell, verzögerte Folgen, Entscheidungsgewicht | M7, M14 | MS6 / MS8 | Daten + Engine / 12 Nebenquests |
+| Herkunft (3 Startwege), Skills (4), Module | M8, M14 | MS6 / MS8 | 3 Herkünfte, 3 Skills / 4 Skills, 6 Module |
+| Gig-System (Templates, Vermittler, Stufen) | M7, M8 | MS6 / MS8 | 3 Gig-Typen / 8 Typen, Ketten |
+| Verträge (Jagd mit Vorbereitung) | M5, M6, M7 | MS8 | 1 Prototyp-Vertrag (MS6) / 6 Verträge |
+| Reaktives Radio, Werbung, Sendernetz | M10, M14 | MS7 / MS8 | 3 Sender / 5 Sender |
+| Vertikalität (Hochstraße Core), Neon-Look | M1, M13 | MS3 / MS8 | 1 Ebene im Core / mehrere Ebenen, Skybridges |
+| Nachtleben-Orte, Aktivitäten | M3, M7 | MS7 / MS8 | 2 Aktivitäten / 6 Aktivitäten |
+| Chaos-Systemik (zerstörbare Props, Eskalation) | M4, M5, M6 | MS5 | Props + 3 Eskalationsstufen |
+| Satire-Content (Werbung, Durchsagen, Ambient-Dialoge) | M10, M11, M13 | MS7 / MS8 | 20 Spots, 60 Sätze / 60 Spots, 200 Sätze je Bezirk |
+
+**Zusatzaufwand durch diese Ideen (PT, Planwerte, ohne Texte/Vertonung):**
+
+| Posten | MVP | Ausbau | Wunsch |
+|---|---|---|---|
+| Quest-Klassen, verzögerte Folgen, Entscheidungsgewicht | 3 | 8 | 10+ |
+| Herkunft, Skills, Module | 4 | 10 | 15+ |
+| Gig-System | 4 | 8 | 10+ |
+| Verträge/Jagd | 3 | 8 | 10+ |
+| Radio und Sendernetz | 3 | 8 | 10+ |
+| Vertikalität (Hochstraße) | 3 | 8 | 10+ |
+| Aktivitäten, Satire-Systeme | 2 | 8 | 10+ |
+| **Summe** | **22** | **58** | **75+** |
+
+Die konsolidierte Gesamtschätzung steht in Kapitel 13.4. Die Ideen sind **entkoppelt** planbar: Jede lässt sich streichen, ohne dass Grundmodule brechen; empfohlene Streichreihenfolge bei Zeitnot: Aktivitäten → Verträge → zweite Ebene → Satire-Ausbau → Module.
+
+**Risiken:** (1) Umfangsexplosion → harte Obergrenzen je Klasse (12 Nebenquests, 6 Verträge, 8 Gig-Typen), Content-Wiederverwendung; (2) Ton kippt (Satire untergräbt die Dystopie) → Textleitfaden und Lektorat; (3) Rechte → keine fremden Marken/Musik, Lizenzliste; (4) Vertikalität erschwert Navigation, Kamera und Streaming → klein starten (eine Ebene); (5) Systemisches Chaos kollidiert mit Skript-Missionen → Fail-Safes (6.7).
+
+---
+
+## 10. Missionstypen und Aktivitäten
+
+Alle Aufträge sind **Vorlagen (Templates) + Parameter**, ausgeführt vom `MissionRunner` (M7). Dadurch lassen sich Missionen, Gigs und Aktivitäten aus Daten bauen, statt Code zu schreiben. Belohnungen folgen einer gemeinsamen Formel (10.3), damit Balancing zentral möglich ist.
+
+### 10.1 Missionstypen
+
+| Typ | Kurzbeschreibung | Pflichtparameter | Optionale Parameter | Fehlschlag | Module |
+|---|---|---|---|---|---|
+| **Lieferung** | Fracht/Person von A nach B | `from`, `to`, `cargo`, `time_limit` | `fragile` (Schaden zählt), `route_hint`, `checkpoints`, `heat_start` | Zeit abgelaufen, Fracht zerstört | M5, M6, M11 |
+| **Taxi/Passagier** | Passagier mit Wünschen (schnell/ruhig/leise) | `pickup`, `dropoff`, `mood` | `detours`, `tip_rules` | Passagier verlässt Fahrzeug, Beschwerde | M5, M8 |
+| **Verfolgung** | Ziel jagen (Fahrzeug/Person) | `target`, `route_profile`, `escape_skill` | `aggression`, `reinforcements`, `capture_mode` (rammen/blockieren/stoppen) | Ziel entkommt, Zeit | M4, M5 |
+| **Flucht** | Verfolger abschütteln | `heat_level`, `pursuers`, `safe_zone` | `time_limit`, `hide_spots`, `weather` | Festnahme, Totalschaden | M6 |
+| **Rennen** | Strecke mit Gegnern | `route`, `opponents`, `laps`, `stake` | `weather`, `time_of_day`, `traffic_density`, `rules` (Rammen erlaubt) | Letzter Platz, Disqualifikation | M4, M9 |
+| **Auftragsjagd (Vertrag)** | Vier Phasen Ermittlung–Vorbereitung–Jagd–Entscheidung (9.5) | `target_profile`, `investigation_nodes`, `prep_slots` | `heat_cap`, `bonus_objectives` | Ziel entkommt, Zeugen verlieren | M5, M6, M7 |
+| **Gig** | Kurzer, systemisch generierter Auftrag (9.4) | `template`, `district`, `faction`, `tier` | `cooldown`, `chain_id` | Abbruch, Zeitablauf | M7, M8 |
+| **Nebenquest** | Erzählte Kurzgeschichte mit Entscheidungen (9.1) | `beats`, `giver`, `district` | `requires`, `delayed_effects` | Beat-spezifisch | M14 |
+| **Bezirks-Event** | Weltereignis mit zeitlichem Fenster | `district`, `trigger`, `duration` | `participation_rewards`, `world_tags` | Event läuft aus (Folgen trotzdem) | M3, M9, M14 |
+| **Hauptmission** | Kapitel 6.4/6.10 | wie Nebenquest + `main: true`, `act` | Cutscene/Dialog-IDs | Checkpoint-Neustart | M14 |
+
+**Beispiel-Parameter (Lieferung):**
+```text
+{ type: 'delivery', id: 'a1_frueschicht', from: 'saltmarket_dock3', to: 'core_tower_plaza',
+  cargo: { kind: 'crate', fragile: false, mass: 400 }, time_limit: 360,
+  checkpoints: ['core_checkpoint_n'], heat_start: 0,
+  reward: { money: 400, standing: { union: 10 } },
+  fail: { standing: { union: -5 }, money: 0 } }
+```
+**Beispiel-Parameter (Rennen):**
+```text
+{ type: 'race', id: 'c1_probefahrt', route: 'rustline_loop_a', laps: 2, opponents: 3,
+  weather: 'overcast', time_of_day: 'dusk', traffic_density: 0.3, rules: { ramming: true },
+  stake: 100, reward: { money: 300, standing: { wrenchers: 10 }, rank_bonus: [1.0, 0.5, 0.25] } }
+```
+
+### 10.2 Aktivitäten (optional, ohne Story)
+
+| Aktivität | Bezirk | Ablauf | Belohnung | Besonderheit |
+|---|---|---|---|---|
+| **Straßenrennen** | Rustline | Nachts, Einsatz mit Gegnern, Streckenwahl | Geld, Standing Wrenchers, Fahrzeugteile | Polizeirisiko je Stufe |
+| **Drift-Zonen** | Rustline, Salzebene | Punkte für Driftlänge/Winkel | Geld, Ranglisten (lokal) | Fahrmodell-Prüfstein (M4) |
+| **Kamera-Slalom** | Core, Lantern Hill | Strecke durch Aegis-Blindzonen, ohne erfasst zu werden | Aegis-Profil ↓, Modul-Teile | Verbindet Dystopie und Fahren |
+| **Foto-Jobs** | Sunstrip, Core | Foto von Motiv/Ereignis machen | Geld, Ruf in Medien | nutzt Fotomodus (12.9) |
+| **Hafen-Stunts** | Saltmarket | Rampen, Container-Sprünge | Geld, Respekt | Physik-Spielplatz |
+| **Aussichtspunkte** | Umland | Panorama anfahren, Foto | Karten-Reveal, kleiner Bonus | Weltentdeckung ohne Fragezeichen-Spam |
+| **Graffiti/Kamera überkleben** | Lantern Hill, Rustline | Sammelaufgaben mit Fahrstrecke | Aegis-Dichte lokal ↓ | Weltzustand-Wirkung |
+| **Lieferketten** | alle | Fortlaufende Gigs für einen Kunden | Stammkunde-Bonus | Brücke zu Nebenquests |
+
+### 10.3 Belohnungs- und Schwierigkeitsformel
+
+`Geld = Basis(Klasse, Tier) × Bezirksfaktor × (1 + Zeitbonus + Zielbonus) − Schadenskosten`; `Standing = Basis_Standing(Klasse) × Entscheidungsgewicht`; Fehlschlag: ein Teil der Basis als Strafe, nie Totalverlust (Frustkontrolle).
+
+| Klasse | Dauer | Basis-Geld (Richtwert, $) | Standing | Risiko |
+|---|---|---|---|---|
+| Gig Stufe 1–3 | 3–8 min | 150 / 350 / 700 | ±3 / ±6 / ±10 | gering → hoch |
+| Rennen | 4–10 min | 200–1500 (Einsatz-abhängig) | ±10 | mittel |
+| Verfolgung / Flucht | 5–12 min | 400–1000 | ±10–15 | hoch |
+| Auftragsjagd | 20–40 min | 1500–4000 | ±15–25 | hoch |
+| Nebenquest | 15–25 min | 600–1500 + Folge | ±10–20 | mittel |
+| Hauptmission | 15–30 min | 500–2000 | ±20–25 | variabel |
+| Bezirks-Event | 10–20 min | 500–1200 + Weltwirkung | ±15–30 | mittel |
+
+*Planwerte; Feintuning im Balancing (12.10). Bezirksfaktor: Core 1,3 · Sunstrip 1,1 · Greenmoor 1,2 · Lantern Hill 0,9 · Saltmarket 0,8 · Rustline 0,7 (riskantere Gebiete zahlen weniger Geld, aber mehr Standing/Material).*
+
+### 10.4 Bezirks-Events
+
+| Event | Bezirk | Auslöser | Dauer | Wirkung | Spieler-Optionen |
+|---|---|---|---|---|---|
+| **Hafenstreik** | Saltmarket | Weltzustand `strike` oder Zeitplan | 2–4 Spieltage | LKW-Verkehr stockt, Straßensperren, mehr Lieferungs-Gigs | Streikbrecher jagen, Union unterstützen |
+| **Razzia** | Lantern Hill | Aegis-Dichte hoch | 1 Tag | KCG-Sperren, Heat-Anstieg | Flucht, Verstecken, Informanten warnen |
+| **Aegis-Wartung** | Core | Zeitplan | 1 Nacht | Kameras kurz offline → Kamera-Slalom ohne Risiko | Einbruchsgig, Archivmission |
+| **Nachtmarkt/Straßenfest** | Sunstrip, Lantern Hill | Wochenende | 1 Abend | Fußgängerdichte hoch, Gigs, Musik | Fotojobs, Taxi, Chaos |
+| **Straßenrennen-Nacht** | Rustline | Zufall (Standing Wrenchers) | 1 Nacht | Strecke gesperrt, Polizei dünn | Teilnahme |
+| **Stromausfall** | beliebig | nach Blackout-Quest | variabel | Dunkelheit, Ampeln aus, Chaos | Plündergigs, Schutzjobs |
+
+### 10.5 Datenhaltung und Umsetzung (Godot)
+
+- **Ordner:** `data/missions/` (Templates), `data/gigs/` (Gig-Templates), `data/events/` (Bezirks-Events), `data/activities/`; alles JSON mit Schema-Prüfung.
+- **`MissionRunner`:** Zustandsautomat je Mission (`LOCKED → OFFERED → ACTIVE → COMPLETED/FAILED`), Schritte als Plugin-Klassen (`DeliveryStep`, `ChaseStep`, `RaceStep`), jeder Schritt hat `enter()`, `update(dt)`, `exit()`, `serialize()`.
+- **Marker und GPS:** Zielmarker (der Prototyp nutzt Zylinder-Mesh) plus GPS-Linie (M11); keine Fragezeichen-Karte (9.1).
+- **Checkpoints:** Jede Mission definiert Checkpoints; Laden/Autosave nutzt sie (Kapitel 11).
+- **Events:** Ein `WorldEventScheduler`-Autoload plant Events anhand von Weltzustand, Tageszeit und Seed.
+
+**Aufwand:** Der Runner und die Schrittbibliothek sind in M7 enthalten; **zusätzlich** (Kapitel 13): 6 PT MVP (4 Typen: Lieferung, Verfolgung, Flucht, Rennen) · 18 PT Ausbau (alle 10 Typen, Events) · 22+ PT Wunschziel (Editor, Variationen).
+
+---
+
+## 11. Speichern und Laden (SaveManager)
+
+**Ziel:** Ein robustes, versioniertes Speichersystem, das Einzelspieler und (später) Online-Charaktere mit demselben Schema abdeckt; Spielstände überleben Updates und Abstürze.
+
+### 11.1 Format und Entscheidungen
+
+| Entscheidung | Wahl | Begründung |
+|---|---|---|
+| Format | **JSON** (UTF-8, `JSON.stringify`/`JSON.parse_string`), optional komprimiert (`FileAccess.open_compressed`) | Les-/diffbar, versionierbar, kein Skript-/Objektcode (vgl. Sicherheitsregel in Kapitel 3.2); Binärformat erst bei Größenproblemen |
+| Ort | `user://saves/` (plattformabhängiger Benutzerordner, im Editor über „Open User Data Folder“ erreichbar) | Standard in Godot [Q34] |
+| Slots | 3 manuelle Slots + 1 Autosave + 1 Quicksave | Übersichtlich; Online: serverseitig |
+| Versionierung | `schema` (Ganzzahl) + `game_version` (SemVer) + `seed` | Migrationen und Fehlersuche |
+| Integrität | Prüfsumme (SHA-256 über den Nutzdaten-Block via `HashingContext`) | Erkennt Beschädigung, **kein** Manipulationsschutz |
+| Nur Daten | Kein `var_to_str`/`str_to_var` mit Objekten, kein `.tres/.res` für Spielstände | Schutz vor Code-Einbettung |
+| Welt | **Seed + Deltas** statt voller Weltabbildung | Kleine Dateien; Welt ist reproduzierbar (Kapitel 3.2) |
+
+*Hinweis zur Recherche:* Die Godot-Dokumentation *Saving games* beschreibt das Speichern per `FileAccess`, `JSON` und `ConfigFile` (letzteres für Einstellungen) [Q34]. Zur Frage, ob Ressourcen-Laden fremder Dateien Code ausführen kann, fand die Recherche nur Sekundärquellen (die den Objekt-Ausschluss als Grund für Sicherheit nennen) → Regel „nur JSON für Spielstände“ bleibt.
+
+### 11.2 Was gespeichert wird
+
+```text
+Savegame = {
+  schema: 3, game_version: '0.4.1', saved_at: '2026-11-19T21:04:00', play_time_s: 18432,
+  meta: { slot: 1, label: 'Saltmarket – Frühschicht', district: 'saltmarket', thumbnail: 'slot1.png', origin: 'harbor_kid' },
+  world: { seed: 6, day: 4, hour: 17.5, weather: { state: 'rain', t: 12.0 },
+           deltas: { destroyed_props: [[chunk, id]…], district_tags: { saltmarket: ['strike'] }, camera_states: { cam_031: 'hacked' } },
+           world_flags: { 'world.saltmarket.tags': ['strike'] } },
+  player: { pos: [x,y,z], yaw: 1.2, hp: 82, money: 3400, skills: { driving: 3, tech: 2, street: 1, stealth: 0 },
+            modules: ['plate_jammer'], inventory: [{ id, count }], vehicle_in_use: 'veh_001' },
+  vehicles: [ { id: 'veh_001', def: 'sedan_a', paint: '#d02030', tuning: { engine: 2, tires: 1 }, damage: { body: 0.2 },
+                parked: { pos, yaw, district } , plate: 'KB-4471' } ],
+  reputation: { standing: { aurelia: -10, union: 35, … }, district_heat: { saltmarket: 1.5 }, aegis: 42, npc_trust: { brann: 1 } },
+  story: { flags: { … }, completed: ['p1','a1'], active: [{ id, beat, step_state }], decisions: [ … ], delayed_effects: [{ at_day: 7, effect: … }] },
+  economy: { stats: { earned: 5200, spent: 1800 }, safehouses: ['sh_saltmarket'], garage: ['veh_001','veh_002'] },
+  settings_ref: null, // Einstellungen liegen separat in user://settings.cfg
+  checksum: 'sha256:…'
+}
+```
+
+**Nicht gespeichert:** Verkehrs-/Passantenpositionen (werden neu gespawnt), Chunk-Geometrie (aus Seed erzeugt), Partikel, Kamerastand. **Gespeichert wird beim Checkpoint-Zustand** laufender Missionen (Schritt + Parameter), damit Laden nach Fehlschlag/Absturz konsistent bleibt.
+
+### 11.3 Autosave, Slots, Sicherheit der Dateien
+
+- **Autosave-Auslöser:** Mission-Checkpoint, Betreten/Verlassen eines Safehouses, Abschluss einer Entscheidung (Beat-Ende), alle 5 Spielminuten außerhalb von Verfolgungen, beim Beenden. **Nie** mitten in einer Verfolgung/Eskalation (Heat ≥ 3) oder im Kampf.
+- **Manuelles Speichern:** nur sicher (nicht in Mission/Flucht); Quicksave (F5) mit gleichem Schutz.
+- **Atomares Schreiben:** erst `slot1.json.tmp` schreiben und prüfen, alte Datei als `slot1.json.bak` behalten, dann umbenennen (`DirAccess.rename`). Beim Laden: bei Fehler automatisch `.bak`.
+- **Mehrere Slots:** Slot-Liste mit Metadaten (Label, Ort, Spielzeit, Datum, Vorschaubild, Herkunft, Fortschritt in %). Löschen mit Bestätigung; Kopieren/Exportieren.
+- **Spielzeit-Konsistenz:** Verzögerte Effekte (9.2) speichern absolute Spielzeit (`at_day`), nicht relative Zähler.
+
+### 11.4 Versionierung und Migration
+
+- Jede Strukturänderung erhöht `schema`. Eine **Migrationskette** `migrate_v1_to_v2(d)`, `migrate_v2_to_v3(d)` … läuft beim Laden in Reihenfolge; jede Migration ist rein funktional (Dictionary rein → Dictionary raus) und hat eine **Fixture-Datei** in `tests/fixtures/` (alter Spielstand) + Test.
+- **Neuere Version als Spiel:** Laden verweigern mit klarer Meldung („Spielstand stammt aus einer neueren Version“), nie stillschweigend kürzen.
+- **Defaults statt Fehler:** Fehlende Felder bekommen Standardwerte (Flag-Registry-Defaults aus 6.9); unbekannte Felder werden erhalten (Vorwärtskompatibilität).
+- **Content-Updates:** Wird eine Mission/ein Flag entfernt, mappt eine Migration auf `quest.*`-Alias.
+
+### 11.5 Godot-Umsetzung (Autoload `SaveManager`)
+
+```text
+SaveManager (Autoload, scripts/save/save_manager.gd)
+  signal saved(slot), loaded(slot), save_failed(reason), migrated(from, to)
+  func save(slot: int, reason := 'manual') -> Error
+  func load_slot(slot: int) -> Error          # Szene laden → Seed → Chunks → Deltas → Spieler/Quests setzen
+  func list_slots() -> Array[SlotInfo]
+  func delete(slot: int) -> void
+  func autosave(trigger: String) -> void
+  func register(node: Node)                   # Knoten in Gruppe 'persist' mit serialize()/deserialize()
+```
+- **Serialisierer-Muster:** Jedes persistente System (`GameState`, `Story`, `TrafficSystem` (nur Seed), Garage, Economy) implementiert `serialize() -> Dictionary` und `deserialize(d: Dictionary)` und ist in der Gruppe `persist`. Der `SaveManager` sammelt, schreibt, prüft, migriert.
+- **Lade-Ablauf:** (1) Datei lesen, Prüfsumme prüfen, migrieren; (2) Ladebildschirm; (3) Szene `World` mit Seed erzeugen; (4) Chunks um Spielerposition laden, Deltas anwenden; (5) Fahrzeuge/Spieler setzen; (6) Quest-/Story-Zustand wiederherstellen (inkl. aktiver Schritt); (7) Uhrzeit/Wetter; (8) `loaded`-Signal.
+- **API für Mehrspieler:** Dasselbe Schema (JSON-Teil `player`, `story`, `reputation`) wird auf dem Server gespeichert (Kapitel 7.6); lokaler und serverseitiger Speicher teilen die Migrationskette.
+- **Einstellungen getrennt:** `user://settings.cfg` über `ConfigFile` (Auflösung, Audio, Steuerung, Barrierefreiheit), unabhängig von Spielständen.
+- **Tests:** Round-Trip-Test (speichern → laden → vergleichen), Migrationstest je Schema-Version, Korruptionstest (abgeschnittene Datei → `.bak`), Soft-Lock-Test (Laden mitten in Mission), Performance (Speichern ≤ 100 ms ohne Frame-Hitch durch Schreiben im Thread).
+- **Risiken:** Hitch beim Schreiben (→ Thread), Schemaänderungen vergessen (→ CI-Test „Schema erhöht?“), Spielstand-Manipulation (→ bei Online: Server speichert; offline akzeptiert).
+
+**Aufwand:** MVP 3 PT (Slots, Autosave, JSON, Round-Trip) · Ausbau 7 PT (Migration, Thumbnails, Backup, Checkpoint-Integration) · Wunsch 9+ PT (Cloud-Speicher, Export/Import, Replay-Daten).
+
+---
+
+## 12. Spielsysteme und Produktion: alles, was zu einem Spiel dieses Umfangs gehört
+
+Dieses Kapitel sammelt die Querschnittsthemen, die in Modulen leicht untergehen. Jeder Abschnitt nennt Umfang (MVP/Ausbau/Wunsch), Godot-Umsetzung und Verknüpfung.
+
+### 12.1 Charaktererstellung und Herkunft
+
+- **Umfang MVP:** Name, 3 Herkünfte (9.3), 6 vorgefertigte Aussehen (Auswahl statt freiem Editor), Stimme (2 Varianten). Die Herkunft setzt Startwerte, Prolog-Variante und Dialogoptionen.
+- **Ausbau:** Aussehen-Anpassung (Frisur, Kleidung, Farben als Parameter), Hintergrundtext, Startfahrzeug wählbar.
+- **Wunsch:** Voller Charakter-Editor, Kleiderschrank, Tattoos/Implantat-Optik.
+- **Godot:** `CharacterProfile`-Ressource (JSON-gespeichert), `Control`-Szene `character_creation.tscn`; Spielerfigur zunächst Fahrzeug-zentriert, **Zu-Fuß-Spiel** (Aussteigen, Laufen) wird als eigenes Paket geführt (Kapitel 13). Mesh-Varianten per `MultiMesh`/Blendshapes.
+
+### 12.2 Skills und Fortschritt
+
+Siehe 9.3 (vier Skills, nutzungsbasiert; Module mit Nebenwirkung). Ergänzung: **Fortschrittsanzeige** (Skills, Fraktionsstände, Bezirks-Ruf, Aegis-Profil) im Charakter-Menü; **keine Stufen-Obergrenze-Schleife**, sondern Meilenstein-Belohnungen (neue Gig-Stufen, Händler, Fahrzeuge).
+
+### 12.3 Inventar, Garage und Fahrzeug-Tuning
+
+- **Inventar (klein halten):** Gegenstände ohne Gewichtssystem; Kategorien: *Schlüssel/Zugang*, *Beweise* (z. B. der Ledger-Kern), *Gadgets* (Kamera-Störer, Kennzeichen-Set, Abschleppseil), *Verbrauchsgüter* (Reparatur, Treibstoffzusatz). Begrenzung über Slots (12/20/30 je Fortschritt).
+- **Garage:** Safehouses mit 2/4/8/16 Stellplätzen; Fahrzeuge gespeichert mit Lack, Tuning, Schaden, Kennzeichen; **Parken** außerhalb der Garage speichert Position (Bezirk). Fahrzeuge „heiß“ (gesucht) gelten als Risiko in überwachten Bezirken (Aegis).
+- **Tuning (Daten, M4):** Motor, Getriebe, Reifen, Federung, Bremsen, Gewicht, Aerodynamik, Lack/Aufkleber, Kennzeichen. Jede Stufe verändert `VehicleDef`-Parameter (Beschleunigung, Grip, Bremsweg, Masse) und kostet Geld + ggf. Fraktionsstand (Rustline-Teile gegen Standing). **Tuning-Slots** pro Klasse; Auswirkungen im Menü als Balken (Vergleich vorher/nachher).
+- **Godot:** `ItemDef`/`TuningPart`-Ressourcen (`.tres`); Garage-Szene mit Fahrzeugvorschau im `SubViewport`; Tuning schreibt Modifikatoren (Multiplikatoren) auf den Fahrzeugkontroller; Server prüft (Kapitel 7.7).
+
+### 12.4 Wirtschaft
+
+- **Einnahmen:** Missionen/Gigs/Aktivitäten (Kapitel 10), Verkäufe, Wetten, Schwarzmarkt; **Ausgaben:** Reparatur, Treibstoff (optional), Tuning, Fahrzeuge, Safehouse-Miete, Bestechung, Kennzeichen.
+- **Preisgefälle nach Bezirk:** Core teuer und legal, Rustline billig und riskant; Schwarzmarkt-Aufschläge (Aegis-Risiko).
+- **Preisrahmen (Planwerte):** Reparatur $50–400, Reifen-/Brems-Upgrade $300–2000, Fahrzeug $6.000–60.000, Safehouse $8.000–40.000. Zielwert: Ein „guter“ Spielstunden-Einkommen ca. $4.000–6.000; ein neues Mittelklassefahrzeug nach 3–4 Spielstunden.
+- **Steuerung:** Alle Zahlen in `data/economy.json`; ein **Economy-Simulator** (Skript, Monte-Carlo über typische Spielverläufe) prüft Inflation/Engpässe (12.10).
+
+### 12.5 Menüs und Einstellungen
+
+- **Menüs:** Hauptmenü (Fortsetzen, Neues Spiel, Laden, Optionen, Extras, Beenden), Pause-Menü, Karte, Journal (Aufträge, Entscheidungen, Kontakte), Charakter, Garage, Handy-/Terminal-Menü, Foto, Credits.
+- **Optionen:** *Grafik* (Preset Niedrig/Mittel/Hoch/Benutzerdefiniert; Auflösung, Fenstermodus, V-Sync, FPS-Limit, **Skalierung FSR 2.2/Native**, Schatten, SDFGI, Volumennebel, SSAO/SSR, Sichtweite), *Audio* (Master, Musik, Radio, Effekte, Sprache, Umgebung, UI), *Steuerung* (**Tastaturbelegung ändern, Gamepad**, Empfindlichkeit, Invertierung, Totzone), *Spiel* (Sprache, Untertitel, Schwierigkeit, Hilfen), *Barrierefreiheit* (12.6).
+- **Godot:** `Control`-Szenen mit einem `Theme`; `InputMap` + Neubelegung (`InputEvent` serialisiert in `ConfigFile`); Einstellungen in `user://settings.cfg`; **Grafik-Presets als Ressource** (Kapitel 5/M12); Menüs sind Szenen, steuerbar per Tastatur/Gamepad (Fokus-Navigation).
+
+### 12.6 Barrierefreiheit
+
+Orientierung an den **Game Accessibility Guidelines** (nach Aufwand in Basis/Fortgeschritten/Erweitert gestuft) [Q35]. Umsetzungsplan:
+
+| Stufe | Maßnahme |
+|---|---|
+| MVP (Basis) | **Untertitel** für alle gesprochenen Dialoge und wichtige Geräusche, Größe/Hintergrund einstellbar; **freie Tastenbelegung**; getrennte Lautstärkeregler (Musik/Effekte/Sprache); gut lesbarer Text mit Kontrast; mehrere **Schwierigkeitsgrade**; Hilfen wählbar (Lenkhilfe, Bremshilfe) |
+| Ausbau | **Farbenblind-Modi** (Filter und Symbole zusätzlich zu Farben: Polizei-/Marker-Icons), Kamera-Schütteln/Blur/Bewegungsunschärfe abschaltbar, Schwierigkeit **während des Spiels** änderbar, Halten statt Drücken (Toggle), Zeitlimit-Entschärfung bei Missionen, UI-Skalierung, Warnton/Visual-Cues für Sirenen (Untertitel „[Sirene links]“) |
+| Wunsch | Text-to-Speech für Menüs, einhändige Steuerschemata, visuelle Entsprechungen zu Audiosignalen (Radar), Assistenz-Autopilot für Fahrstrecken (Gigs) |
+
+**Godot:** `Accessibility`-Autoload liest Einstellungen und wirkt auf UI-Theme, Kamera-Effekte, Untertitel-Overlay (`CanvasLayer`), Eingabe-Modi und Missions-Zeitlimits. Farbenblind-Filter als Shader im **Environment/Compositor**-Pfad oder Fullscreen-Material.
+
+### 12.7 Tutorial und Onboarding
+
+- **Prolog als Tutorial:** Die ersten 20 min lehren Gas/Lenken/Handbremse, Minimap/GPS, Fahndung/Aegis, Gig annehmen und abschließen, Speichern – eingebettet in die Handlung, keine Texttafeln-Wand.
+- **Kontextuelle Hinweise:** Einmalige Einblendungen bei Erstkontakt (Kamera, Heat, Garage); abschaltbar; im Journal nachlesbar.
+- **Fahrschule (Aktivität):** Optionale Fahrübungen (Drift, Notbremsung, Verfolgung) für Wiedereinsteiger; Ranglisten lokal.
+- **Test:** Drei Neulinge ohne Anleitung spielen den Prolog; Kennzahl: ≥ 80 % schließen ohne externe Hilfe ab (Telemetrie 12.11).
+
+### 12.8 Radio und Musik
+
+Konzept in 9.6 (fünf fiktive Sender, reaktive Nachrichten, Satire-Werbung). Ergänzend: **Mix-Regeln** (Radio unter Dialogen absenken, Ducking via Bus-Effekt), **Lizenz-Pipeline** (nur eigene/CC0/prozedurale Musik, Lizenzliste, keine Fremdtitel), **Content-Ziel** MVP 3 Sender × 30 min, Ausbau 5 Sender × 60 min, Wunsch dynamische Remixe je Wetter/Heat.
+
+### 12.9 Fotomodus
+
+- **Umfang MVP:** Pause + freie Kamera (Bewegung, Neigung, FOV), Aufnahme als PNG in `user://photos/`, Tiefenschärfe-Regler, Filter (Kontrast/Sättigung/Kornung), HUD ausblenden.
+- **Ausbau:** Zeit und Wetter für das Foto einstellen (nur Anzeige), Rahmen/Titel, Fahrzeug-Posen, **Foto-Jobs** (Aufgabenliste, Bewertung nach Motiv/Qualität).
+- **Wunsch:** Ranglisten, Bildergalerie im Spiel, Export.
+- **Godot:** `Camera3D` getrennt von Spielerkamera; `Viewport.get_texture().get_image()` → `save_png`; Environment-Anpassung per `CameraAttributesPractical` (DoF) bzw. Overrides.
+
+### 12.10 Balancing
+
+- **Daten-getrieben:** Alle Kennzahlen (Belohnungen, Preise, Heat-Parameter, KI-Werte, Fahrzeugdaten) in `data/*.json|tres`, nicht im Code.
+- **Werkzeuge:** Economy-Simulator, Heat-Simulator (wie lange bis Verlust), Fahrzeugvergleichstabelle (Benchmark-Tests 0–100, Kurvenradius), **Schwierigkeitsprofile** (Heat-Zerfall, Polizei-Aggressivität, Zeitlimits).
+- **Prozess:** Wöchentlicher Playtest-Zyklus, Telemetrie-Auswertung (12.11), Änderungsprotokoll (`docs/BALANCING.md`), keine Änderung ohne Messwert.
+
+### 12.11 Telemetrie
+
+- **Grundsatz:** Zuerst **lokal** (JSON-Lines-Logdatei in `user://telemetry/`), **opt-in** mit klarer Einwilligung; Upload nur nach Zustimmung; keine personenbezogenen Daten, keine Eingabetexte; DSGVO-konform (Zweck, Speicherdauer, Löschung).
+- **Ereignisse:** Missionsstart/-ende/-abbruch, Tod/Festnahme (Ort, Ursache), Entscheidungswahl, FPS-Einbrüche (> 50 ms) mit Szene/Bezirk, Ladezeiten, Abstürze (Stack-Info), Menü-Nutzung, Tutorial-Abbrüche.
+- **Auswertung:** Skript erzeugt Heatmaps (Todesorte), Abbruchraten je Mission, Entscheidungsverteilungen, Performance-Karte. Wird zur Datengrundlage für Balancing und Optimierung.
+- **Godot:** Autoload `Telemetry` mit Puffer, Hintergrund-Thread für Schreiben; `OS`-Informationen (GPU, Treiber) nur für Fehlersuche.
+
+### 12.12 Tests und Qualitätssicherung
+
+| Ebene | Inhalt | Werkzeug |
+|---|---|---|
+| Unit | Generator, Straßengraph, Story-Bedingungen, Wirtschaft, Spielstand-Migration | Headless-GDScript, **GUT oder gdUnit4** *(Auswahl prüfen)* |
+| Graph/Daten | Graph-Lint (Dialog/Quest/Flags), JSON-Schemata, Referenzprüfung | `tests/graph_lint.gd` |
+| Simulation | Story-Simulator (alle Enden), Economy-Simulator, Verkehrs-Stresstest | Headless |
+| Integration | Speichern/Laden-Round-Trip, Mission Start–Ende per Bot-Fahrer, Dedicated-Server-Verbindung | Szenentests |
+| Performance | Benchmark-Flug mit Grenzwerten (fps, Frame-ms, VRAM) | `--fps`/Benchmark-Szene |
+| Playtest | Strukturierte Tests (Tutorial, Missionen, Balancing) | Protokollbogen, Telemetrie |
+| Regression | Vor jedem Release: Smoke-Test der Kernschleife (Fahren → Gig → Speichern → Laden) | Checkliste + Skript |
+
+Optionale **CI** (z. B. GitHub Actions mit Godot headless) führt Unit-/Lint-/Simulationstests bei jedem Commit aus.
+
+### 12.13 Release-Prozess
+
+1. **Versionierung:** SemVer (`0.x` bis Beta), Changelog (`CHANGELOG.md`), Git-Tags je Build.
+2. **Branching:** `main` stabil, Feature-Branches, Release-Branch für Release-Kandidaten.
+3. **Build:** Windows-Export mit Export-Templates; Ordner/ZIP, später Installer; Server-Export (Linux, Feature-Tag `dedicated_server`) [Q32].
+4. **Qualitätstor:** Tests grün, Benchmark im Budget (M12), Smoke-Test, **Lizenz-Check** aller Assets (`assets/LICENSES.md`), Inhaltsprüfung (keine Fremdmarken).
+5. **Absturz-/Fehlerprotokolle:** Logs in `user://logs/`, Meldeformular, optional Upload mit Einwilligung.
+6. **Updates/Patches:** Versions-Check beim Start, Patch-Notes im Spiel; Spielstände bleiben durch Migration lesbar (Kapitel 11).
+7. **Verteilung:** Direkt-Download zuerst; Plattform-Stores (Konten/Gebühren nötig) erst später entscheiden.
+8. **Beta-Phase:** Geschlossener Test mit Fragebogen, Telemetrie-Auswertung, 2 Wochen „Bugfix-only“ vor Release.
+
+**Aufwand (Kapitel 13):** Charaktererstellung 2/5/6 · Inventar/Garage/Tuning 4/10/14 · Menüs/Optionen/Barrierefreiheit 4/8/10 · Tutorial 3/6/8 · Fotomodus 1/3/4 · Balancing/Telemetrie 2/6/8 · Tests/QA 3/8/10 · Release-Prozess 2/5/8 · Wirtschafts-Ausbau 0/3/5 · Dialogsystem 4/10/12 (PT MVP/Ausbau/Wunsch).
+
+---
+
+## 13. Neue Erkenntnisse, Pläne und Aufwandsfortschreibung
+
+### 13.1 Stand des Godot-Prototyps (19.11.2026, Abend)
+
+- **Messwert:** Laut Prototyp-Session läuft der Prototyp mit **ca. 160 FPS auf der RX 5700 XT** (mit SDFGI, Volumennebel, SSAO, SSR, Glow, Laternen mit Licht-Pool, MultiMesh-Bäumen). Die Zahl stammt aus der Rückmeldung der Prototyp-Session und wurde in diesem Dokument **nicht nachgemessen**; Auflösung/Preset sind nicht angegeben (→ MS1 hält die Messung samt Einstellungen fest).
+- **Gerade ergänzt (Arbeitskopie):** Fußgänger (60), Polizei-Fahndung (`heat`, Festnahme), Missionsmarker mit Zeitbonus, Minimap (`minimap.gd`).
+- **Bereits vorhanden:** Boden-/Fassaden-Shader, Auto (`VehicleBody3D`), 28 Verkehrsautos, Tag/Nacht, Seed, `--test`/`--fps`-Modi, Parks/Bäume, Laternen-MultiMesh mit Lichtpool.
+
+### 13.2 Erkenntnisse aus der bisherigen Arbeit
+
+1. **Shader statt Texturen trägt:** Straßen, Markierungen und Fenster werden im Fragment-Shader aus der Weltposition erzeugt (keine Texturen, keine Mesh-Menge). Das bleibt Standard für Raster und Fassaden; für Hang/Kurven kommen Mesh-Bänder dazu (M1).
+2. **MultiMesh ist das richtige Werkzeug:** Bäume und Laternen laufen bereits als MultiMesh. Regel: **Jede wiederholte Prop-Art ist ein MultiMesh je Chunk** (Kapitel 4/M2).
+3. **Licht-Pool funktioniert:** 8 `OmniLight3D`, die den nächsten Laternen zugewiesen werden, genügen für die Nachtbeleuchtung. Verbesserungen: **Spatial Hash** statt Sortieren aller Laternenpositionen alle 0,25 s, **Hysterese** (keine springenden Lichter) und weiches Ein-/Ausblenden.
+4. **Das Budget ist (in der kleinen Szene) großzügig:** Bei ca. 160 FPS (≈ 6 ms) bleibt viel Reserve. **Aber** die Stadt ist 640 × 640 m; die Zielwelt ist grob 25-mal größer. Folge: SDFGI und Volumennebel zunächst **in „Mittel“ lassen**, Entscheidung erst nach einem Benchmark mit der gewachsenen Welt (Kriterium: ≥ 90 fps im Benchmark-Flug über alle Bezirke, sonst raus aus „Mittel“).
+5. **Portierung Three.js → GDScript ist unproblematisch:** Linien-Agenten, Fahndungs- und Missionslogik liefen ohne Umbau (Typisierung beachten). **Konvention festhalten:** `VehicleBody3D` fährt in +Z, Verkehrsfahrzeuge haben ihre Front bei −Z (Prototyp-Kommentar) → Fahrzeugszene mit einheitlicher Vorwärtsrichtung bauen (Visual drehen), bevor weitere Fahrzeugtypen entstehen.
+6. **Test-Modi als Muster:** `--test` und `--fps` zeigen den Weg für CI und Benchmark-Flug (Kommandozeilen-Flags, Ausgabe, `quit()`); in MS1 zu einem Test-/Benchmark-Runner verallgemeinern.
+7. **Prozess:** Der Prototyp wächst schneller als seine Dokumentation (veraltetes `README.md`, nicht eingecheckter Stand). → Commit-Disziplin je Teilschritt, README mit Stand und Befehlen mitpflegen, Konzept-Dokument bei Meilenstein-Abschluss aktualisieren.
+8. **Offen/ungeprüft:** SDFGI mit Streaming, `VehicleBody3D` unter Jolt vs. Godot Physics (Kapitel 4/M4), tatsächliche GPU-Kosten der einzelnen Effekte (Visual Profiler), GDScript-Leistung bei Hunderten Agenten.
+
+### 13.3 Pläne und Entscheidungen
+
+| Thema | Entscheidung / Plan | Status |
+|---|---|---|
+| Struktur | `main.gd` in Szenen/Autoloads zerlegen (Kapitel 15), danach erst neue Systeme | **Zuerst** (MS1) |
+| Messung | Overlay + Benchmark-Flug + Dokumentation der Einstellungen (Auflösung, Preset, Treiber) | MS1 |
+| Physik | Jolt vs. Godot Physics am Prototyp-Auto messen, danach festlegen | MS1/MS5 |
+| Sprache | **GDScript (typisiert)**; C#/GDExtension nur bei nachgewiesenem Engpass | Entscheidung bei MS2-Messung |
+| Welt | Straßengraph (`CityData`) vor Ausbau von KI und Polizei | MS2 |
+| Spielsysteme | Speichern/Dialog/Missionstypen in MS6 (Kapitel 10–11) | MS6 |
+| Zu-Fuß-Spiel | Eigenes Paket (Aussteigen, Laufen, Animationen, Kamera), 4/8/12 PT | vor MS6 einplanen |
+| Test-Framework | GUT oder gdUnit4 vergleichen (1 Tag), dann festlegen | MS1 |
+| Terrain | Eigene Heightmap-Chunks vs. Add-on (z. B. Terrain3D) prüfen | MS4 |
+| Server | Erst nach Einzelspieler-Release-Kandidat (MS8) | MS9 |
+
+### 13.4 Aufwandsfortschreibung (Personentage, Planwerte ±50 %)
+
+**Anpassung durch den Prototypfortschritt** (bereits gebaut, spart MVP-Aufwand): Fußgänger/Polizei/Mission/Minimap portiert (M5 −2, M6 −1,5, M7 −1, M11 −1), Laternen/Lichtpool (M9 −0,5), Props/MultiMesh (M13 −1, M2 −0,5), `--fps`-Modus (M12 −0,5): **MVP −8 PT, Ausbau −3 PT**.
+
+| Block | MVP | Ausbau | Wunsch |
+|---|---|---|---|
+| Kapitel 4: M1–M12 (Basis laut Gesamtschätzung, ohne M13–M15) | 44 | 124 | 156+ |
+| M13 Realismus/Detailtiefe | 6 | 18 | 22+ |
+| M14 Story-Engine | 8 | 20 | 25+ |
+| M15 Server/Mehrspieler | 10 | 22 | 35+ |
+| Prototypfortschritt (Abzug) | −8 | −3 | 0 |
+| **Zwischensumme Basis** | **60** | **181** | **238+** |
+| Kapitel 9: Design-Vorbilder | 22 | 58 | 75+ |
+| Kapitel 10: Missionstypen und Aktivitäten | 6 | 18 | 22+ |
+| Kapitel 11: Speichern/Laden (SaveManager) | 3 | 7 | 9+ |
+| Kapitel 12: Charaktererstellung | 2 | 5 | 6+ |
+| Kapitel 12: Inventar/Garage/Tuning | 4 | 10 | 14+ |
+| Kapitel 12: Menüs/Optionen/Barrierefreiheit | 4 | 8 | 10+ |
+| Kapitel 12: Tutorial/Onboarding | 3 | 6 | 8+ |
+| Kapitel 12: Fotomodus | 1 | 3 | 4+ |
+| Kapitel 12: Balancing/Telemetrie | 2 | 6 | 8+ |
+| Kapitel 12: Tests/QA | 3 | 8 | 10+ |
+| Kapitel 12: Release-Prozess | 2 | 5 | 8+ |
+| Kapitel 12: Wirtschafts-Ausbau | 0 | 3 | 5+ |
+| Dialogsystem (Graph-Runner, UI, Untertitel) | 4 | 10 | 12+ |
+| Story-Content (Dialoge/Ketten schreiben und skripten, Kapitel 6.8–6.10) | 6 | 25 | 35+ |
+| Zu-Fuß-Spiel (Paket) | 4 | 8 | 12+ |
+| **Gesamtsumme** | **126** | **361** | **476+** |
+
+(Die Basiszeile ergibt sich aus der Gesamtschätzung in Kapitel 4 abzüglich der Module M13–M15, die separat stehen. Überlappungen zwischen den Missionstypen (Kapitel 10) und M7 sind konservativ **nicht** abgezogen; erwartbar ist ein Korridor von −10 %.)
+
+**Einordnung:** Gesamtsumme MVP ≈ 126 PT ≈ **25 Arbeitswochen** (eine Person mit KI-Unterstützung, 5 PT/Woche), davon ca. 116 PT Einzelspieler und 10 PT Server. Der **Einzelspieler-Release-Kandidat (MS8)** entspricht etwa MVP + Teile des Ausbaus (grob 200–250 PT ≈ 10–12 Monate). Der Umfang ist für eine Einzelperson sehr groß; empfohlene Priorisierung bei Engpass: (1) Fahren, Welt, Verkehr, Polizei (Kern), (2) eine vollständige Kette + Entscheidungen, (3) Speichern/Menüs/Tutorial, (4) Radio/Wetter/Realismus, (5) Rest. Alle Zahlen sind Planwerte, keine Zusagen.
+
+### 13.5 Aktualisierte Meilenstein-Dauern
+
+| Meilenstein | Bisher | Neu | Grund |
+|---|---|---|---|
+| MS1 Fundament | 1–1,5 Wochen | **1 Woche** | Ports (Fußgänger, Polizei, Mission, Minimap) sind im Prototyp, Struktur-Umbau bleibt |
+| MS2 Graph & Verkehr | 2 | 2 | – |
+| MS3 Bezirke & Look-Dev | 3 | 3–4 | + Vertikalität Core (1 Ebene), Neon-Look |
+| MS4 Streaming | 2–3 | 2–3 | – |
+| MS5 Fahren & Polizei | 2–3 | 3 | + Chaos-Systemik, Zu-Fuß-Paket |
+| MS6 Missionen & Story | 3–4 | **5–6** | + Dialogsystem, SaveManager, Missionstypen, Herkunft, Menüs-MVP |
+| MS7 Atmosphäre | 2–3 | 3–4 | + Radio, Fotomodus, Barrierefreiheit-MVP |
+| MS8 Vollversion | 5+ | **10+** | + 3 Ketten, Nebenquests, Verträge, Tuning/Garage, Balancing, Tests, Release-Prozess |
+| MS9–MS11 | 3 / 5 / 5+ | 3 / 5 / 5+ | unverändert |
+
+---
+
+## 14. Roadmap mit Meilensteinen
 
 Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `Performance`-Monitore im Debug-Overlay (fps, Frame-ms, Draw Calls, Videospeicher), Visual Profiler, Benchmark-Flug (fester Seed). Referenzgerät für alle Messungen: **RX 5700 XT + Ryzen 5 3600**, 1080p, Preset „Mittel“, sofern nicht anders angegeben.
 **Reihenfolge-Regel:** Meilensteine 1–8 machen den **Einzelspieler stabil und vollständig**; erst danach folgen Server und Mehrspieler (MS9–MS11). Die Reihenfolge entspricht der bisherigen Planung; geändert haben sich Technik und Aufwände.
 
 ### Teil A – Einzelspieler
 
-#### Meilenstein 1 – Fundament auf dem Godot-Prototyp *(≈ 1–1,5 Wochen Restarbeit)*
+#### Meilenstein 1 – Fundament auf dem Godot-Prototyp *(≈ 1 Woche Restarbeit)*
 
 **Bereits vorhanden (Stand Godot-Prototyp, nicht neu zu bauen):**
 - ✔ Projekt `godot/` (Godot 4.7.2, Forward+), Start per `godot --path …`
@@ -891,7 +1484,7 @@ Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `P
 - ✔ Reproduzierbarer Seed (`rng.seed = 6`), Headless-Test (`-- --test`)
 
 **Zu tun in MS1:**
-- `main.gd` in **Szenen und Autoloads** zerlegen (Kapitel 10): `World`, `Vehicle`, `TrafficSystem`, `Clock`, `HUD`, `EventBus`; Verhalten unverändert.
+- `main.gd` in **Szenen und Autoloads** zerlegen (Kapitel 15): `World`, `Vehicle`, `TrafficSystem`, `Clock`, `HUD`, `EventBus`; Verhalten unverändert.
 - Seed als Kommandozeilenargument (`-- --seed=…`); Weltkonstanten als **Global Shader Uniforms** statt doppelter Konstanten.
 - Gebäude je Chunk als **`MultiMeshInstance3D`** (Shader-Tint über Instanzdaten), Kollision je Chunk gebündelt.
 - **Debug-Overlay (F3)** mit `Performance`-Monitoren; Qualitäts-Presets (Niedrig/Mittel/Hoch) als Ressource.
@@ -904,31 +1497,36 @@ Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `P
 - Ampeln/Vorfahrt, Abstandhalten, Spawn am Aktivradius; Verkehr als MultiMesh, nahe Autos mit Physikkörper; Minimap aus `CityData`.
 - **Done:** 60-s-Messlauf mit 120 Fahrzeugen (Stufe A+B) ohne Stillstands-Deadlock > 10 s; 0 geloggte Rotlichtverstöße; Main-Thread-Zeit der Verkehrs-Simulation ≤ 3 ms/Frame.
 
-#### Meilenstein 3 – Bezirke, dystopische Identität, Look-Dev *(≈ 3 Wochen)*
+#### Meilenstein 3 – Bezirke, dystopische Identität, Look-Dev *(≈ 3–4 Wochen)*
 - Generator MVP (Parzellen, Bezirksparameter), **vier** Bezirke spielbar (Core, Saltmarket, Sunstrip, Greenmoor) mit Landmarken, Bezirksname beim Einfahren.
 - **Look-Dev-Szene** und Realismus-MVP (M13): 12 PBR-Materialien, Farbpipeline, Reflection Probes, 20 Decals, 30 Props, `wear`-Attribut.
 - Aegis-Kameras als erste Props (Optik und Sichtkegel).
-- **Done:** (1) Blindtest: 5 Screenshots ohne HUD werden von 3 Testpersonen zu ≥ 80 % richtig dem Bezirk zugeordnet. (2) Generator-Test: 100 Seeds ohne Gebäude auf Straße und mit vollständig verbundenem Graph. (3) Preset „Mittel“ hält ≥ 60 fps im Benchmark-Flug durch alle vier Bezirke.
+- **Ergänzt (Kapitel 9):** eine zusätzliche Straßenebene (Hochstraße) im Core als Prototyp; Neon-/Reklame-Look; erste satirische Plakate/Props.
+- **Done:** (1) Blindtest: 5 Screenshots ohne HUD werden von 3 Testpersonen zu ≥ 80 % richtig dem Bezirk zugeordnet. (2) Generator-Test: 100 Seeds ohne Gebäude auf Straße und mit vollständig verbundenem Graph. (3) Preset „Mittel“ hält ≥ 60 fps im Benchmark-Flug durch alle vier Bezirke. (4) Hochstraße im Core befahrbar (Auf-/Abfahrt, KI-Verkehr auf beiden Ebenen) ohne Stau-Deadlock.
 
 #### Meilenstein 4 – Streaming und große Welt *(≈ 2–3 Wochen)*
 - Chunk-Streaming mit Worker-Threads, Visibility Ranges/HLOD, Terrain mit Höhen; Welt auf ca. 3 × 3 km Stadt + Umland erweitern.
 - **Done:** Fahrt von Küste zu Berggipfel (ca. 6 km) im Benchmark-Flug: durchschnittlich ≥ 60 fps im Preset „Mittel“, 1-%-Low ≥ 40 fps; Videospeicher nach 10 Minuten Fahrt ± 10 % konstant (kein Leck); kein Hitch > 50 ms durch Chunk-Laden; kein sichtbares Pop-in näher als 300 m.
 
-#### Meilenstein 5 – Fahren und Polizei auf Spielniveau *(≈ 2–3 Wochen)*
+#### Meilenstein 5 – Fahren und Polizei auf Spielniveau *(≈ 3 Wochen)*
 - Fahrzeugdatenblätter, Drift, Raycast-Rad-Physik (eigener Controller, Vergleich Jolt/Godot Physics), Schaden (M4); Polizei mit Sichtlinie, Suchzustand, Bezirks-Heat und Aegis-Kennzeichenerfassung (M6).
-- **Done:** (1) 5 Fahrzeugklassen mit deutlich unterschiedlichem Fahrverhalten (Messtabelle 0–100 km/h, Kurvenradius). (2) Verfolgung kann ohne Cheat beendet werden (Playtest: ≥ 3 von 5 Testpersonen schütteln die Polizei innerhalb von 3 Minuten ab, ≥ 1 wird festgenommen). (3) Überschlag-/Kollisionstest: 100 Zufallskollisionen ohne Physik-Explosion (kein Objekt > 100 m/s).
+- **Ergänzt (Kapitel 9/12/13):** Chaos-Systemik (zerstörbare Props, Verkehrsreaktionen, 3 Polizei-Eskalationsstufen); **Zu-Fuß-Paket** (Aussteigen, Laufen, Einsteigen); Garage-Grundlage.
+- **Done:** (1) 5 Fahrzeugklassen mit deutlich unterschiedlichem Fahrverhalten (Messtabelle 0–100 km/h, Kurvenradius). (2) Verfolgung kann ohne Cheat beendet werden (Playtest: ≥ 3 von 5 Testpersonen schütteln die Polizei innerhalb von 3 Minuten ab, ≥ 1 wird festgenommen). (3) Überschlag-/Kollisionstest: 100 Zufallskollisionen ohne Physik-Explosion (kein Objekt > 100 m/s). (4) Aussteigen/Einsteigen funktioniert in 100 Versuchen ohne Hänger.
 
-#### Meilenstein 6 – Missionen, Story-Engine, Speichern *(≈ 3–4 Wochen)*
+#### Meilenstein 6 – Missionen, Story-Engine, Speichern *(≈ 5–6 Wochen)*
 - Missions-Framework (M7), Story-Engine MVP (M14: Datenmodell, Fraktionsstand, Entscheidung, Flags), Prolog + Akt I (ca. 6 Missionen) mit Wendepunkt W1; Garage/Speichern (M8), Vollkarte mit GPS (M11).
-- **Done:** (1) Speichern/Laden (JSON) reproduziert Geld, Position, Fahrzeug, Standing, Flags und Missionsstand exakt (automatischer Test). (2) Story-Simulator läuft grün: alle Entscheidungen von Prolog bis W1 durchspielbar, keine Sackgasse. (3) Zwei verschiedene Entscheidungen bei W1 führen nachweislich zu unterschiedlichen Folgemissionen und Weltzustand-Tags.
+- **Ergänzt (Kapitel 6.8–6.10, 9–12):** Dialogsystem (Graph-Runner, Untertitel), Quest-Klassen und verzögerte Folgen, Flag-Registry mit Graph-Lint; **SaveManager** (3 Slots, Autosave, Migration); Missionstypen Lieferung/Verfolgung/Flucht/Rennen; Herkunft (3 Startwege) und 3 Skills; Gig-Generator (3 Typen); Menüs/Optionen-MVP; Prolog als Tutorial; **Kette A „Hafenpakt“** (Prolog–Akt I).
+- **Done:** (1) Speichern/Laden (JSON) reproduziert Geld, Position, Fahrzeug, Standing, Flags und Missionsstand exakt (automatischer Test). (2) Story-Simulator läuft grün: alle Entscheidungen von Prolog bis W1 durchspielbar, keine Sackgasse. (3) Zwei verschiedene Entscheidungen bei W1 führen nachweislich zu unterschiedlichen Folgemissionen und Weltzustand-Tags. (4) Graph-Lint grün. (5) Savegame-Migrationstest für 2 Schemas besteht. (6) 3 Neulinge schließen den Prolog ohne externe Hilfe ab (≥ 80 %). (7) Kette A (A1–A3) ist mit zwei verschiedenen Entscheidungspfaden spielbar.
 
-#### Meilenstein 7 – Atmosphäre: Wetter, Audio, Nacht, Nässe *(≈ 2–3 Wochen)*
+#### Meilenstein 7 – Atmosphäre: Wetter, Audio, Nacht, Nässe *(≈ 3–4 Wochen)*
 - Wetter-Zustandsautomat, Nässe-Shader, Verschleiß-Look (M13 Ausbau), Motor-/Sirenen-/Umgebungsklang je Bezirk, Straßenbeleuchtung nach Bezirk; SDFGI-Test für „Hoch“.
-- **Done:** Alle 5 Wetterzustände wechseln ohne fps-Einbruch > 15 %; jeder Bezirk hat eine eigene Audio-Umgebung (Hörtest: ≥ 80 % richtige Zuordnung ohne Bild); nachts nie mehr als 6 schattenwerfende Lichter; Preset „Hoch“ (mit SDFGI, falls bestanden) hält ≥ 45 fps, sonst wird SDFGI aus „Hoch“ gestrichen.
+- **Ergänzt (Kapitel 9/12):** reaktives Radio (3 Sender) mit Satire-Werbung; Fotomodus-MVP; Barrierefreiheit-MVP (Untertitel, Neubelegung, Farbenblind-Filter); lokale Telemetrie (opt-in); Nachtleben-Orte, 2 Aktivitäten, 2 Bezirks-Events.
+- **Done:** Alle 5 Wetterzustände wechseln ohne fps-Einbruch > 15 %; jeder Bezirk hat eine eigene Audio-Umgebung (Hörtest: ≥ 80 % richtige Zuordnung ohne Bild); nachts nie mehr als 6 schattenwerfende Lichter; Preset „Hoch“ (mit SDFGI, falls bestanden) hält ≥ 45 fps, sonst wird SDFGI aus „Hoch“ gestrichen. (4) Radio-Nachrichten reagieren nachweislich auf mindestens 3 Weltzustand-Tags. (5) Untertitel und Tastenneubelegung sind vollständig nutzbar (Basis-Checkliste der Game Accessibility Guidelines).
 
-#### Meilenstein 8 – Einzelspieler-Vollversion (Release-Kandidat) *(≈ 5+ Wochen)*
+#### Meilenstein 8 – Einzelspieler-Vollversion (Release-Kandidat) *(≈ 10+ Wochen)*
 - Alle 6 Bezirke und Umland (Highway, Coast Road, Tunnel), Story komplett: Akt II–III, W2–W5, Enden E1–E4, Nebenaufträge, Weltzustand-Tags sichtbar, Aegis-Mechaniken (Kameras hacken, Kennzeichen), Tuning-Feinschliff; Windows-Export (Export-Templates, Installer/Zip).
-- **Done:** (1) Vollständiger Durchlauf der Kampagne durch 3 Testpersonen ohne Blocker; jedes Ende E1–E4 mindestens einmal erreicht. (2) Story-Simulator: 5000 zufällige Entscheidungsläufe, 0 Sackgassen, jedes Ende erreichbar. (3) Benchmark-Flug auf dem Referenzgerät erfüllt die Budgets aus M12 (Preset „Mittel“ 60 fps; „Niedrig“ ≥ 60 fps bei reduzierter Dichte). (4) Ladezeit bis Spielstart ≤ 15 s. (5) **Stabilitätstest:** 2 Stunden Dauerlauf ohne Absturz, Videospeicher/RAM stabil.
+- **Ergänzt (Kapitel 6, 9–12):** alle drei Ketten (A–C) und Konzernroute; 12 Nebenquests; 6 Verträge; Gig-Ausbau (8 Typen, Ketten); Inventar/Garage/Tuning; Module und Skills; 5 Sender; Balancing-Durchgang mit Telemetrie; Tests/CI; Release-Prozess (Export, Changelog, Lizenz-Check).
+- **Done:** (1) Vollständiger Durchlauf der Kampagne durch 3 Testpersonen ohne Blocker; jedes Ende E1–E4 mindestens einmal erreicht. (2) Story-Simulator: 5000 zufällige Entscheidungsläufe, 0 Sackgassen, jedes Ende erreichbar. (3) Benchmark-Flug auf dem Referenzgerät erfüllt die Budgets aus M12 (Preset „Mittel“ 60 fps; „Niedrig“ ≥ 60 fps bei reduzierter Dichte). (4) Ladezeit bis Spielstart ≤ 15 s. (5) **Stabilitätstest:** 2 Stunden Dauerlauf ohne Absturz, Videospeicher/RAM stabil. (6) Alle drei Missionsketten ohne Blocker durchgespielt. (7) Economy-Simulator zeigt keine Engpässe (Fahrzeugkauf nach 3–4 Spielstunden). (8) Release-Checkliste (Kapitel 12.13) vollständig abgehakt.
 
 ### Teil B – Mehrspieler (erst nach Meilenstein 8)
 
@@ -977,20 +1575,21 @@ MS4 und MS5 können parallel laufen (unterschiedliche Dateibereiche/Szenen), sof
 
 ---
 
-## 10. Empfohlene Projektstruktur (Godot)
+## 15. Empfohlene Projektstruktur (Godot)
 
 Ziel: von der einen `main.gd` auf eine **Szenen-/Autoload-Struktur** mit klar getrennten Ordnern. Der Projektordner ist `godot/` (`res://`); der Rest des Repositories (`docs/`, alter Browser-Prototyp) bleibt außerhalb. Die Struktur ist ein Vorschlag; Namen nach GDScript-Konvention (`snake_case` für Dateien).
 
 ```
 E:\Projekte\GTA 6\
-├─ docs/                          # WELTKONZEPT.md, ITERATIONSPLAN.md
+├─ docs/                          # WELTKONZEPT.md, ITERATIONSPLAN.md, TONFALL.md (Textleitfaden), BALANCING.md (Änderungsprotokoll), CHANGELOG.md
 ├─ index.html, game.js            # eingefrorener Browser-Prototyp (Referenz)
 └─ godot/                         # res://  (project.godot liegt hier)
    ├─ project.godot               # Autoloads, Input-Map, Physik-/Render-Einstellungen, Global Shader Uniforms
    ├─ main.tscn                   # Einstiegsszene: lädt World, HUD, Kamera (dünn!)
    ├─ autoload/                   # Singletons (Project Settings → Autoload)
    │  ├─ event_bus.gd             # Signale: crime_committed, mission_completed, district_entered …
-   │  ├─ game_state.gd            # GameState (serialisierbar), Speichern/Laden (JSON)
+   │  ├─ game_state.gd            # GameState (serialisierbar)
+   │  ├─ save_manager.gd          # Kapitel 11: Slots, Autosave, Migration, Prüfsumme
    │  ├─ config.gd                # Qualitäts-Preset, Budgets, Seed (aus Kommandozeile)
    │  ├─ rng.gd                   # Seed-Dienst (Seed je Chunk/Aufgabe)
    │  ├─ clock.gd                 # Tageszeit, Wetter-Zustandsautomat, Global Shader Uniforms
@@ -1001,6 +1600,11 @@ E:\Projekte\GTA 6\
    │  ├─ aegis.gd                 # Kameras, Kennzeichen, Aegis-Profil
    │  ├─ mission_runner.gd        # M7
    │  ├─ story.gd                 # M14: Bedingungen/Effekte, Fraktionsstand, Enden
+   │  ├─ dialog_runner.gd         # Dialog-Graph, Untertitel
+   │  ├─ world_events.gd          # Bezirks-Events (Scheduler)
+   │  ├─ radio_manager.gd         # Sender, Playlists, reaktive Nachrichten
+   │  ├─ accessibility.gd         # Untertitel, Farbenblind, Hilfen
+   │  ├─ telemetry.gd             # lokale Telemetrie (opt-in)
    │  ├─ net.gd                   # M15: Peer-Auswahl (Offline/ENet), Sitzung
    │  └─ debug_overlay.gd         # M12: F3-Overlay, Performance-Monitore
    ├─ scenes/                     # .tscn (Instanzierbare Bausteine)
@@ -1008,7 +1612,7 @@ E:\Projekte\GTA 6\
    │  ├─ vehicles/                # car_player.tscn, car_npc.tscn, police_car.tscn, camera_rig.tscn
    │  ├─ characters/              # pedestrian.tscn, player_onfoot.tscn (später)
    │  ├─ props/                   # camera_aegis.tscn, traffic_light.tscn, …
-   │  ├─ ui/                      # hud.tscn, minimap.tscn, fullmap.tscn, menu.tscn, dialog.tscn
+   │  ├─ ui/                      # hud.tscn, minimap.tscn, fullmap.tscn, menu.tscn, dialog.tscn, options.tscn, journal.tscn, garage.tscn, photo_mode.tscn, character_creation.tscn
    │  └─ dev/                     # look_dev.tscn (Materialien/Beleuchtung), benchmark_flight.tscn
    ├─ scripts/                    # .gd (nach Modul gruppiert; sim/ ohne Mesh-/Material-Abhängigkeit)
    │  ├─ world/                   # generator.gd, city_data.gd, road_graph.gd, terrain.gd, districts.gd
@@ -1029,6 +1633,10 @@ E:\Projekte\GTA 6\
    │  ├─ vehicles/                # vehicle_def_*.tres (Datenblätter)
    │  ├─ materials/               # PBR-Materialbibliothek (.tres)
    │  ├─ missions/                # *.json (Schrittlisten)
+   │  ├─ gigs/, events/, activities/   # Templates (Kapitel 10)
+   │  ├─ dialogs/                 # Dialog-Graphen (6.9)
+   │  ├─ skills/, modules/, items/     # Fortschritt, Implantate, Inventar (9.3, 12.3)
+   │  ├─ radio/                   # Sender, Jingles, Nachrichtenpool, Werbung (9.6)
    │  ├─ story/                   # factions.json, npcs.json, missions/*.json, endings.json, text.de.json
    │  └─ economy.json             # Preise, Belohnungen
    ├─ assets/                     # Importquellen (nicht im Code referenziert, nur über Szenen/Ressourcen)
@@ -1040,7 +1648,10 @@ E:\Projekte\GTA 6\
    │  ├─ test_generator.gd        # Seed-Tests: kein Gebäude auf Straße, Graph verbunden
    │  ├─ test_savegame.gd
    │  ├─ story_sim.gd             # M14: alle Enden erreichbar, keine Sackgassen
-   │  └─ test_cheat.gd            # M15: manipulierte Eingaben werden abgelehnt
+   │  ├─ test_cheat.gd            # M15: manipulierte Eingaben werden abgelehnt
+   │  ├─ test_graph_lint.gd       # Dialog-/Quest-/Flag-Graph-Prüfung (6.9)
+   │  ├─ test_economy.gd          # Economy-Simulator
+   │  └─ fixtures/                # alte Spielstände für Migrationstests
    ├─ server/                     # M15 (ab MS9): Einstieg und Konfiguration des Dedicated Servers
    │  ├─ server_main.tscn / .gd   # läuft headless, lädt nur sim/, world/, net/ (keine Render-Szenen)
    │  ├─ realm.gd, zone.gd        # Weltinstanz, Zonen, Handoff
@@ -1049,7 +1660,7 @@ E:\Projekte\GTA 6\
    └─ export_presets.cfg          # Windows Desktop, Dedicated Server (Linux)
 ```
 
-**Autoloads in `project.godot` (Reihenfolge = Ladereihenfolge):** `EventBus`, `Config`, `Rng`, `GameState`, `Clock`, `AudioManager`, `ChunkManager`, `TrafficSystem`, `PoliceDispatcher`, `Aegis`, `MissionRunner`, `Story`, `Net`, `DebugOverlay`. Autoloads, die Szenen/Rendering benötigen (Audio, Debug), werden im Server-Export weggelassen oder durch Stubs ersetzt (`OS.has_feature("dedicated_server")`).
+**Autoloads in `project.godot` (Reihenfolge = Ladereihenfolge):** `EventBus`, `Config`, `Rng`, `GameState`, `SaveManager`, `Clock`, `AudioManager`, `ChunkManager`, `TrafficSystem`, `PoliceDispatcher`, `Aegis`, `MissionRunner`, `Story`, `DialogRunner`, `WorldEvents`, `RadioManager`, `Accessibility`, `Telemetry`, `Net`, `DebugOverlay`. Autoloads, die Szenen/Rendering benötigen (Audio, Debug), werden im Server-Export weggelassen oder durch Stubs ersetzt (`OS.has_feature("dedicated_server")`).
 
 **Wichtige Projekteinstellungen (zu setzen/prüfen):**
 - `Rendering → Renderer`: **Forward+** (Voraussetzung für SDFGI, Cluster-Beleuchtung); `Rendering → Occlusion Culling`: an.
@@ -1068,7 +1679,7 @@ E:\Projekte\GTA 6\
 
 ---
 
-## 11. Quellen
+## 16. Quellen
 
 Die Recherche wurde per Websuche durchgeführt. Viele Treffer sind Blogs, Foren und Fachartikel unterschiedlicher Qualität; wo eine Quelle nur sekundär oder anekdotisch ist, ist das vermerkt. Godot-Dokumentationsseiten wurden in den Versionen 4.0–4.6 gefunden; die verlinkten „stable“-Adressen zeigen die aktuelle Version, Inhalte sind für **4.7.2** am Prototyp zu verifizieren. Konkrete Zahlen (Frame-Zeiten, Draw-Call-Budgets) sind **Richtwerte** und müssen auf der Zielhardware gemessen werden.
 
@@ -1113,26 +1724,32 @@ Die Recherche wurde per Websuche durchgeführt. Viele Treffer sind Blogs, Foren 
 - [Q20] Gambetta, G.: *Fast-Paced Multiplayer (Part II): Client-Side Prediction and Server Reconciliation*: https://gabrielgambetta.com/client-side-prediction-server-reconciliation.html
 - [Q21] Gambetta, G.: *Fast-Paced Multiplayer (Part III): Entity Interpolation*: https://gabrielgambetta.com/entity-interpolation.html · Teil IV (Lag-Kompensation): https://gabrielgambetta.com/lag-compensation.html
 
+**Speichern, Barrierefreiheit, Design**
+- [Q34] Godot-Dokumentation *Saving games* (Speichern per `FileAccess`/JSON, `ConfigFile` für Einstellungen): https://docs.godotengine.org/en/stable/tutorials/io/saving_games.html · Praxisleitfaden: https://gdquest.com/library/save_game_godot4 *(Sekundärquelle; Code-Details der Doku-Seite nicht im Wortlaut geprüft)*
+- [Q35] Game Accessibility Guidelines (Maßnahmen nach Aufwand gestuft; Untertitel, Neubelegung, Schwierigkeitsgrade, getrennte Lautstärken): https://gameaccessibilityguidelines.com/basic/ *(Zuordnung einzelner Punkte, z. B. Farbenblind-Modus, zur Stufe nicht verifiziert)*
+- Kapitel 9 (Design-Vorbilder) beruht auf **allgemeinem Genre-Wissen**; es werden keine Inhalte der Vorbilder verwendet und keine Quellen dazu zitiert.
+
 **Nicht belegt / ausdrücklich offen:**
 - Verhalten von **4.7.2** im Detail (Dokumentation recherchiert für 4.0–4.6).
 - **VehicleBody3D unter Jolt**, Fahrzeug-Prädiktion mit `RigidBody3D` im Netzwerk.
 - **SDFGI mit gestreamten Chunk-Meshes** (Neuberechnung/Flackern) und reale GPU-Kosten auf der RX 5700 XT – alle Frame-Zeiten in Kapitel 5.1 sind Schätzungen.
 - **Volumetrischer Nebel** (Kosten/Einstellungen), **`CompositorEffect`**, **Terrain3D**-Add-on und **godot-sqlite**: nicht recherchiert.
 - Nässe-/Pfützen-Shader in Godot, Zonen-Handoff bei Godot-Servern, tatsächliche Realm-Obergrenze (Spielerzahl), GDScript-Leistung bei Hunderten Agenten – jeweils am Prototyp bzw. per Lasttest zu validieren.
+- Sicherheit beim Laden fremder Godot-Ressourcen (`.tres/.res`): nur Sekundärquelle; deshalb Spielstände ausschließlich als JSON.
 - Story-Struktur („Perlenkette“), Ruf-/Aegis-System und Anti-Cheat-Liste sind eigene Entwürfe auf Basis allgemeiner Praxis, keine übernommenen Fremdkonzepte.
 
 ---
 
-## 12. Zusammenfassung und die 5 nächsten Schritte
+## 17. Zusammenfassung und die 5 nächsten Schritte
 
 **Kurzfassung:** MTA 6 wird in **Godot 4.7.2** (GDScript, Forward+/Vulkan) zu einer eigenständigen, dystopisch-realistischen Küstenmetropole (**Kestrel Bay**, sechs Bezirke zwischen Konzernturm und Schrottgürtel, dazu Umland mit Küstenstraße, Bergen, Highway und Tunnel). Die Welt entsteht als **Hybrid aus handgesetzten Landmarken/Hauptachsen und prozeduraler Füllung** über einen gemeinsamen Straßengraph; technisch tragen **Chunk-Streaming mit `MultiMeshInstance3D`, Visibility Ranges/HLOD, Occlusion Culling und Sim-LOD** für Verkehr und Passanten. Realismus kommt aus einer disziplinierten Pipeline (PBR, Decals, Verschleiß, Nässe, Wetter) innerhalb eines **Frame-Budgets für die RX 5700 XT** (SDFGI nur optional im Preset „Hoch“, FSR 2.2 zur Skalierung). Die Story **„Nullstunde“** reagiert über Fraktionsstand, NPC-Vertrauen, Taten-Flags und Weltzustand mit fünf Wendepunkten und fünf Enden; sie ist als Daten modelliert und per Simulator testbar. Ein **autoritativer Dedicated Server (Godot headless, ENet)** mit Zonen und Realms macht daraus später eine geteilte Welt, in der die Story pro Spieler privat bleibt. Differenzierung: **Tagesrhythmus pro Bezirk**, **Bezirks-Ruf** und das **Aegis-Überwachungsprofil** als spielbare Dystopie.
 
-Das Ganze besteht aus 15 Modulen und 11 überprüfbaren Meilensteinen; **Meilenstein 1 ist größtenteils bereits durch den Godot-Prototyp abgedeckt**, der Einzelspieler wird in MS1–MS8 zuerst stabil, Mehrspieler folgt in MS9–MS11. Aufwand der MVPs insgesamt ca. 68 Personentage (±50 %).
+Das Ganze besteht aus 15 Modulen, den Zusatzkapiteln zu Design-Vorbildern, Missionstypen, Speichern und Produktion sowie 11 überprüfbaren Meilensteinen; **Meilenstein 1 ist größtenteils bereits durch den Godot-Prototyp abgedeckt**, der Einzelspieler wird in MS1–MS8 zuerst stabil, Mehrspieler folgt in MS9–MS11. Aufwand der MVPs insgesamt ca. **126 Personentage** (±50 %) inklusive Spielsysteme, Design-Vorbilder und Prototypfortschritt (Kapitel 13); der Prototyp läuft laut Prototyp-Session mit ca. 160 FPS auf der RX 5700 XT.
 
 ### Die 5 wichtigsten nächsten Schritte
 
 1. **Prototypstand sichern:** Die nicht eingecheckten Änderungen (Polizei, Fußgänger, Mission, Minimap) committen, `godot/README.md` aktualisieren – danach MS1 starten.
-2. **`main.gd` in Szenen und Autoloads zerlegen** (Kapitel 10): `EventBus`, `Config`/`Rng`, `Clock`, Fahrzeug-Szene, `TrafficSystem`; Global Shader Uniforms statt doppelter Konstanten; Verhalten unverändert.
+2. **`main.gd` in Szenen und Autoloads zerlegen** (Kapitel 15): `EventBus`, `Config`/`Rng`, `Clock`, Fahrzeug-Szene, `TrafficSystem`; Global Shader Uniforms statt doppelter Konstanten; Verhalten unverändert.
 3. **Messgrundlage schaffen:** Debug-Overlay (F3) mit `Performance`-Monitoren, Benchmark-Flug und Qualitäts-Presets; erste echte Frame-Zeiten auf der RX 5700 XT festhalten (ersetzen die Planwerte aus Kapitel 5.1), inklusive Test **Jolt vs. Godot Physics** für `VehicleBody3D`.
 4. **Gebäude auf `MultiMeshInstance3D` je Chunk umstellen** und den **Straßengraph (`CityData`)** einführen; Verkehr darauf umstellen (MS2) – Grundlage für KI, Karte, GPS, Missionen und später die Zonen.
 5. **Story-Datenmodell und Bezirks-Definitionen festschreiben** (`data/story/`, `data/districts/`) und eine **Look-Dev-Szene** mit 12 PBR-Materialien aufbauen – damit Stimmung, Dystopie und Realismus früh am Bild geprüft werden, bevor Inhalte in Masse entstehen.
