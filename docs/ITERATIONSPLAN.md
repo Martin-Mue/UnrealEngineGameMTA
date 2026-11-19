@@ -9,6 +9,9 @@ Details zur Welt: `docs/WELTKONZEPT.md` (wird von der Session „mta6-weltkonzep
 - Open World und MMO gemischt, in einer realistischen, gern dystopischen Welt
 - Ehrlicher Hinweis: Der MMO-Teil braucht einen Server (Node/WebSocket) und kommt erst nach stabiler Einzelspieler-Basis; Realismus ist im Browser durch Performance begrenzt, Ziel ist der bestmögliche Look innerhalb dieser Grenzen.
 
+## Update 19.11.2026: Godot statt Unreal
+Der Nutzer hat kein Epic-Konto und wollte eine Lösung ohne Konto. Deshalb wird MTA 6 jetzt in **Godot 4.7.2** gebaut (Ordner `godot/`, läuft nachweislich auf der RX 5700 XT per Vulkan). Das Unreal-Gerüst bleibt als Option liegen. Aktueller Stand: Stadt, Auto mit Fahrphysik, Verkehr, Tag/Nacht (siehe `godot/README.md`). Die Iterationen unten gelten nun für Godot.
+
 ## Plattformwechsel (19.11.2026)
 Auf Wunsch des Nutzers wird MTA 6 als **Unreal-Engine-5-Projekt** gebaut (siehe `docs/UNREAL_SETUP.md`). Der Browser-Prototyp bleibt als Testfeld. Projektgerüst steht (`MTA6.uproject`, `Source/`, `Config/`), UE ist noch nicht installiert, nichts ist kompiliert. Die folgenden Iterationen gelten jetzt für Unreal (Iteration 5 „ES-Module“ entfällt, stattdessen C++-Module und World Partition).
 

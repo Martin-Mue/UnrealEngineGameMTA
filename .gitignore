@@ -9,3 +9,5 @@ DerivedDataCache/
 *.opensdf
 *.sdf
 node_modules/
+.godot/
+*.import

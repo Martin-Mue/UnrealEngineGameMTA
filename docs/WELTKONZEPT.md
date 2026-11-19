@@ -296,7 +296,7 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 **Technische Umsetzung:** Zustandsautomat/Skript-DSL in JSON (`missions/*.json`), ausgeführt von `MissionRunner`; Missionen **abonnieren Events** (z. B. `vehicle.enteredZone`), statt die Hauptschleife zu kennen. Gestaltungsregel: je Mission Zielbedingung, KI-Rollen, Checkpoint-Abstände und Fehlschlagtext explizit festlegen; einfache KI mit starker Reaktion wirkt besser als komplexe KI [Q15]. Missionen so „öffnen“, dass systemisches Chaos (Verkehr, Polizei) mitspielen darf, statt es auszuschalten [Q5][Q6].
 **Abhängigkeiten:** M1 (Orte), M5/M6 (Welt reagiert), M8 (Belohnung), M11 (Marker). **Risiken:** Content-Menge (jede Mission ist Handarbeit) → starke Wiederverwendung von Typen, Story kurz und prägnant; Skript-Brüche bei systemischen Zufällen → Fail-Safes (Neuaufsetzen, Checkpoint). **Aufwand:** MVP 6 PT · Ausbau 20 PT · Wunsch 25 PT+.
 
-**Story-Kern (eigene Erfindung, ca. 5 Sätze):** Mira Voss, ehemalige Rennfahrerin, kehrt nach Kestrel Bay zurück, um die Schulden ihres Bruders bei der Hafenspedition *Calder & Sons* zu begleichen. Aus Kurierfahrten werden Aufträge für drei Fraktionen (Hafen, Finanzviertel, Nachtleben), die jeweils die Stadt anders „besitzen“. Sie entdeckt, dass ein Sanierungsprojekt der *Aurelia Holdings* die Altstadt abreißen und die Docks verkaufen soll. Es folgt ein Balanceakt zwischen Loyalität und Aufstieg. Das Finale spielt auf dem Highway und der Küstenstraße. (Alle Namen und Figuren sind frei erfunden und können beliebig umbenannt werden.)
+**Story:** Die Haupthandlung „Nullstunde“ samt Fraktionen, Entscheidungs-/Ruf-System, Wendepunkten, Enden und Datenmodell steht in [Kapitel 6 (M14)](#6-story-engine-entscheidungen-und-fraktionen-m14). M7 liefert nur den Missions-Runner, den M14 mit Inhalten und Bedingungen füttert.
 
 ---
 
@@ -389,7 +389,7 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 
 ---
 
-### Gesamtschätzung
+### Gesamtschätzung (M1–M15)
 
 | Modul | MVP | Ausbau | Wunsch |
 |---|---|---|---|
@@ -399,23 +399,389 @@ Aufwandsschätzung in **Personentagen (PT)** für eine Entwicklerin/einen Entwic
 | M4 Fahrzeuge/Physik | 5 | 15 | 20+ |
 | M5 Verkehrs-/Fußgänger-KI | 8 | 15 | 20+ |
 | M6 Polizei/Gesetz | 4 | 12 | 15+ |
-| M7 Missionen/Story | 6 | 20 | 25+ |
+| M7 Missionen (Framework) | 6 | 20 | 25+ |
 | M8 Wirtschaft | 3 | 8 | 10+ |
 | M9 Tag/Nacht/Wetter | 3 | 12 | 15+ |
 | M10 Audio | 3 | 8 | 10+ |
 | M11 UI/Karte | 3 | 10 | 8+ |
 | M12 Performance/Tooling | 2 | 6 | 8+ |
-| **Summe (PT)** | **51** | **142** | **171+** |
+| M13 Realismus/Detailtiefe | 6 | 20 | 25+ |
+| M14 Story-Engine | 8 | 20 | 25+ |
+| M15 Server/Mehrspieler | 15 | 30 | 40+ |
+| **Summe (PT)** | **80** | **212** | **261+** |
 
-Alle MVPs zusammen: grob **10–12 Arbeitswochen** (eine Person mit KI-Unterstützung). Alle Ausbaustufen weitere ca. 6 Monate. Die Schätzungen sind Planwerte, keine Zusagen.
+Alle MVPs zusammen: grob **16–18 Arbeitswochen** (eine Person mit KI-Unterstützung, ca. 5 PT/Woche). Davon entfallen rund 65 PT auf den **Einzelspieler-Kern** (M1–M14), 15 PT auf den Server. Alle Ausbaustufen kosten weitere ca. 8–10 Monate. Die Schätzungen sind Planwerte mit ±50 % Unsicherheit, keine Zusagen; Inhalte (Missionen, Assets, Audio) sind darin nur teilweise enthalten.
 
 ---
 
-## 5. Die Welt: Kestrel Bay
+## 5. Realismus und Detailtiefe (M13)
 
-**Kestrel Bay** ist eine fiktive Hafenmetropole an einer halbmondförmigen Bucht. Das Meer liegt im Westen, im Osten steigen die **Ashridge-Berge** auf; die Stadt zieht sich vom Strand über Industrie und Zentrum bis in die Hanglagen. Größe: **Stadtgebiet ca. 3 × 3 km**, Umland insgesamt ca. 6 × 6 km (Browser-realistisch mit Chunk-Streaming; der Prototyp hat 0,64 × 0,64 km). Fahrzeit durch die Stadt bei Höchsttempo ca. 2 Minuten, Rundfahrt über Umland ca. 8–10 Minuten.
+**Ziel:** Eine Stadt, die glaubwürdig *benutzt* aussieht – Asphalt mit Flicken, Gullideckel mit Dampf, abgenutzte Fassaden, nasse Straßen, die Neon spiegeln. Maßstab ist der **bestmögliche Look innerhalb der Browser-Grenzen**, nicht Konsolen-Fotorealismus.
 
-### 5.1 Karte (schematisch)
+### 5.1 Ehrliche Grenzen im Browser – und wie man sie ausreizt
+
+| Bereich | Reale Grenze (Richtwerte, am Zielgerät messen) | Wie man sie ausreizt |
+|---|---|---|
+| Draw Calls | Etwa 100–200 pro Frame für 60 fps auf integrierter GPU [Q8] | Instancing je Chunk, Material-Pools (≈ 30 gemeinsame Materialien), Texturatlanten/Trim-Sheets statt Einzelmaterialien |
+| Texturspeicher | Rund 512 MB VRAM-Budget; unkomprimierte 2K-Maps sprengen es schnell | **KTX2/Basis-Universal** (GPU-komprimiert, ca. 4–8× kleiner), ORM-Packing (Occlusion/Roughness/Metalness in einer Textur), Mipmaps, Texturgröße je Preset |
+| Schatten | Eine große Shadow Map wird weit weg unscharf, mehrere kosten Fill-Rate | **Cascaded Shadow Maps** (3 Kaskaden), nur große Objekte werfen Schatten, Fernbereich: gebackener Blob-/AO-Schatten |
+| Dynamische Lichter | Jedes echte Licht verteuert jedes Fragment (Forward-Rendering) | ≤ 4/8 gepoolte Lichter (Budget M12); Straßenlaternen als Emissive-Sprites + **Lichtkegel-Decals** auf dem Boden; Fenster/Neon nur emissiv + Bloom |
+| Globale Beleuchtung | Echtzeit-GI nicht machbar | **Gebackene Umgebungslichtprobe** (4 vorberechnete Himmels-Environment-Maps für Morgen/Mittag/Abend/Nacht, per PMREM, zur Laufzeit überblendet), Vertex-AO in Gebäudegeometrie |
+| Reflexionen | Planare/SSR-Reflexionen für ganze Stadt zu teuer | Environment-Map-Reflexionen + billiger „Nässe-Boost“ (siehe 5.4); SSR/Planar nur im Preset „Hoch“ bzw. WebGPU-Pfad |
+| Geometrie | Etwa 1–1,5 Mio. sichtbare Dreiecke (Budget M12) | LOD-Stufen, Detail über **Normal-Maps und Decals statt Polygonen**, Impostor für Ferngebäude |
+| Transparenz/Overdraw | Viel Glas/Partikel/Nebel = Fill-Rate-Problem | Alpha-Test statt Blending, Partikelzahl begrenzen, Auflösungsskalierung bei Frame-Einbruch (**dynamische Auflösung**) |
+| Nachbearbeitung | Jeder Fullscreen-Pass kostet 0,5–2 ms | Tonemapping + dezenter Bloom in „Mittel“; SSAO, Kantenglättung per TAA/FXAA, Tiefenunschärfe nur „Hoch“ |
+| WebGPU | Empfohlener Renderer in aktuellen Three.js-Versionen, aber Browser-Abdeckung (Firefox/Linux/Android) lückenhaft [Q11] | WebGL2 bleibt Standard; WebGPU-Pfad als optionale Stufe „Ultra“ (Compute-Culling, GTAO) |
+
+**Grundsatz:** *Fake it, aber konsistent.* Der Spieler bemerkt falsche Beleuchtung nur, wenn sie inkonsistent ist. Eine einheitliche Tonemapping-/Farbpipeline und ein glaubwürdiger Himmel tragen mehr als einzelne teure Effekte.
+
+### 5.2 Materialien (PBR)
+
+- **Physikalisch plausibel:** `MeshStandardMaterial` für die Masse, `MeshPhysicalMaterial` (Clearcoat) nur für Fahrzeuglack und Glas. Albedo in sRGB, Daten-Maps (Normal, ORM) in Linear.
+- **Material-Bibliothek** in `data/materials.js`: Asphalt (neu/alt/nass), Beton, Backstein, Blech/Rost, Glas/Stahl-Fassade, Putz, Holz, Kopfsteinpflaster, Kunstrasen, Gummi, Lack. Jedes Material: Albedo, Normal, ORM, Skalierung in Metern (**Texel-Dichte**-Ziel nah ca. 256–512 px/m für Boden, 128–256 px/m für Fassaden – Richtwerte).
+- **Texturformat:** PNG/JPG nur im Quellordner; ausgeliefert wird KTX2. Für ORM-Maps ist die beste Kompression umstritten (ETC1S vs. UASTC): beide an echten Daten testen, Normal-Maps eher UASTC [Q18].
+- **Quellen für Texturen:** CC0-Bibliotheken wie [ambientCG](https://ambientcg.com) und [Poly Haven](https://polyhaven.com); Lizenzliste in `assets/LICENSES.md` führen.
+- **Detail-Maps/Triplanar:** Zweite, hochfrequente Normal-Map (Asphaltkorn) im Nahbereich überblendet, damit große Flächen nicht „plastisch“ wirken.
+
+### 5.3 Straßendetails und Props
+
+Dichte-Budgets je Bezirk legen fest, *wie viel* Detail ein Chunk bekommt (Chunk-Generator streut Props regelbasiert, seed-stabil).
+
+| Detailklasse | Beispiele | Umsetzung |
+|---|---|---|
+| Boden-Decals | Gullideckel, Risse, Flickstellen, Ölflecken, Reifenspuren, abgenutzte Markierungen, Zebrastreifen, Kaugummi-/Streusalzflecken, Laub | Instanzierte Quads mit `polygonOffset`, alles in **einer Decal-Atlastextur** |
+| Straßenmöblierung | Hydranten, Poller, Mülltonnen, Ampeln, Schilder, Laternen, Kabelmasten, Briefkästen, Parkuhren, Fahrradständer | Instanz-Pools; Varianten je Bezirk (Prop-Sets) |
+| Fassadendetails | Klimageräte, Feuerleitern, Wasserspeicher, Regenrohre, Sat-Schüsseln, Wäscheleinen, Reklame, Graffiti | Fassaden-Atlas + Dach-/Anbau-Instanzen |
+| Dystopie-Props | Aegis-Kameras (drehen sich, rote LED), Drohnenstationen, Checkpoint-Schranken, „Social-Zone“-Schilder, Konzern-Werbewände, Zäune um Gated Areas | Gleiche Instanzpipeline; Kameras sind gleichzeitig **Spielobjekte** (M6/M14) |
+| Lebendigkeit | Dampf aus Gullis, Müll im Wind, flackernde Neonröhren, Lüftungsgeräusche, Tauben, Pfützen-Ringe | Wenige Partikel-Emitter nahe der Kamera, Rest per Shader-Animation |
+| Beschilderung/Text | Straßennamen, Ladenschilder, Werbetexte (alles fiktiv, eigene Marken) | Text-Atlas (MSDF-Schrift), keine Realmarken |
+
+### 5.4 Verschleiß und Wetter
+
+- **Wear-Attribut:** Jede Gebäude-/Straßeninstanz bekommt ein Attribut `wear` (0–1) aus Bezirk (Rustline hoch, Core niedrig), Alter und Zufall. Der Shader mischt damit Schmutz am Sockel, Regenstreifen unter Fensterbänken, Rost an Metall, abplatzenden Putz.
+- **Fahrzeuge:** Dreck-Level wächst mit Fahrstrecke/Regen, Waschanlage setzt zurück; Kratzer/Beulen aus dem Schadensmodell (M4).
+- **Nasse Oberflächen (Shader):** bei Regen sinkt `roughness`, `albedo` wird dunkler, ein World-Space-Rauschen erzeugt Pfützen-Masken (dort Roughness ≈ 0, glatte Normalen), Regenringe als animierte Normal-Map. Reflexion über Environment-Map; im Preset „Hoch“ zusätzlich SSR. *(Eigenes Design; zu Nässe-Shadern in Three.js fand die Recherche keine belastbare Quelle – früh als Prototyp prüfen.)*
+- **Wettereinfluss auf Welt:** Beleuchtung (Himmel-Probe wechselt), Sicht (Nebel), Verkehr/Passanten (M5), Grip (M4), Klang (M10).
+- **Tageszeit:** Straßenbeleuchtung natriumorange in Rustline, kaltweiß im Core, warm in Lantern Hill – Beleuchtung gehört zur Bezirksidentität (M3).
+
+### 5.5 Glaubwürdige Stadtstruktur
+
+Realismus ist auch *Plan*: Die Stadt muss aussehen, als wäre sie über Jahrzehnte gewachsen.
+- **Straßenhierarchie und Maße:** Hauptstraßen 3–4 Spuren, Nebenstraßen 2, Gassen 1; Gehwegbreite, Bordsteinhöhe (≈ 15 cm), Kreuzungsradien und Parkbuchten sind Parameter je Bezirk.
+- **Blockgrößen nach Bezirk:** Core 100–140 m, Altstadt 30–60 m, Vorstadt gewunden mit Sackgassen, Industrie große Blöcke (nach Verfahren in [Q1][Q2][Q3]).
+- **Landnutzungslogik:** Gewerbe und Läden an Hauptstraßen, Wohnen in Nebenstraßen, Tankstellen/Supermärkte an Einfallstraßen, Lager/Industrie in Hafennähe; Gebäudefront und Eingänge zur Straße gerichtet, Hinterhöfe und Zufahrten.
+- **Gelände:** Straßen folgen Höhenlinien (Terrassierung, Serpentinen, Stützmauern, Treppen), Brücken/Tunnel an echten Hindernissen.
+- **Infrastruktur sichtbar:** Strommasten und Leitungen, Brunnen, U-Bahn-Zugänge, Bushaltestellen, Mülltonnen-Rhythmus, Baustellen.
+- **Soziale Gegensätze lesbar machen:** Gehwegzustand, Beleuchtung, Sauberkeit und Kameradichte unterscheiden reiche und arme Viertel (Kapitel 8).
+
+### 5.6 Stufen, Technik, Risiken
+
+| Stufe | Umfang |
+|---|---|
+| MVP | Material-Bibliothek (12 Materialien, PBR, KTX2), ACES-/AgX-Tonemapping und einheitliche Farbpipeline, 4 Himmels-Environment-Maps, CSM (3 Kaskaden), Decal-Atlas mit 20 Decals, 30 Props, `wear`-Attribut, Qualitäts-Presets |
+| Ausbau | Nässe-Shader mit Pfützen, Gebäude-Verschleiß, Bezirks-Prop-Sets, Text-Atlas, Aegis-Kameras als Props, SSAO/GTAO, dynamische Auflösung, Fahrzeuglack mit Clearcoat |
+| Wunschziel | WebGPU-Pfad (SSR, Compute-Culling), volumetrischer Nebel, Fensterinterieurs per Parallax-Cubemap, Photogrammetrie-Hero-Assets, Jahreszeiten |
+
+**Technische Umsetzung:** Asset-Pipeline `tools/assets/` (Skript: PNG → KTX2, glTF → Meshopt/Draco, Atlas-Packer); Chunk-Generator (M2) erzeugt Props/Decals regelbasiert; alle Qualitätsstufen laufen über **ein** Preset-Objekt (M12).
+**Abhängigkeiten:** M2, M3, M9, M12. **Risiken:** (1) Asset-Menge und Lizenzen → CC0 + Prozeduralmaterialien, Lizenzliste; (2) Ladezeit durch Texturen → Streaming nach Bezirk, KTX2, Platzhalter-Mip zuerst; (3) „Look-Drift“ zwischen Bezirken → eine Material- und Farbpipeline, zentrale Look-Dev-Szene; (4) Performance-Einbruch auf Low-End → Presets und dynamische Auflösung. **Aufwand:** MVP 6 PT · Ausbau 20 PT · Wunsch 25+ PT (ohne Kunstproduktion; Assets zusätzlich).
+
+---
+
+## 6. Story-Engine, Entscheidungen und Fraktionen (M14)
+
+**Ziel:** Eine ausgereifte Haupthandlung, deren Wendungen vom Verhalten des Spielers abhängen – über Entscheidungen, Ruf, Fraktionen und Beziehungen – mit mehreren Enden. Das Missions-Framework (M7) führt Aufträge aus; M14 entscheidet, *welche* Aufträge, Wendungen und Enden es gibt.
+
+### 6.1 Gestaltungsprinzipien (damit der Umfang beherrschbar bleibt)
+
+1. **Perlenketten-Struktur (Bottleneck):** Eine feste Kette von *Hauptknoten* (alle Spieler erreichen sie), dazwischen **verzweigte Abschnitte**, die wieder zusammenlaufen. Das verhindert die kombinatorische Explosion: Entscheidungen ändern *Inhalt, Verbündete, Schauplatz und Ausgang*, nicht den gesamten Handlungsbaum.
+2. **Konsequenzen sichtbar in der Welt**, nicht nur im Dialog: Bezirke verändern sich (Weltzustand-Tags, 6.5).
+3. **Keine Gut/Böse-Anzeige.** Statt eines Moralbalkens zählen **konkrete Taten** (Flags) und **Beziehungen**; Fraktionen belohnen und bestrafen unterschiedlich.
+4. **Wendungen entstehen aus Daten:** Wer verrät, wer überlebt, wer hilft – ergibt sich aus Vertrauenswerten und Flags, nicht aus einem Würfelwurf.
+5. **Test per Simulation:** Ein Skript spielt die Entscheidungsgraphen durch und beweist, dass jedes Ende erreichbar ist und es keine Sackgassen gibt (6.6).
+
+### 6.2 Fraktionen
+
+| Fraktion | Rolle in der Dystopie | Zentrum | Will | Gibt dem Spieler |
+|---|---|---|---|---|
+| **Aurelia Holdings** | Konzern; betreibt das Überwachungsnetz Aegis und die Konzernpolizei | Kestrel Core | Aegis „Phase Zwei“ einführen (Zugang zu Straßen, Kredit, Wohnen an einen Verhaltens-Score koppeln) | Geld, Kennzeichen-Löschung, Aufstieg, Schutz vor Aegis |
+| **Kestrel Civil Guard (KCG)** | Private Sicherheitspolizei, vom Konzern finanziert (M6) | Core, Greenmoor | Ordnung und Konzerninteressen | (Gegner/Zwangsmittel; über Bestechung beeinflussbar) |
+| **Dockers' Union** | Hafenarbeiter, Streikbewegung | Saltmarket | Hafenautonomie, faire Löhne | Schmuggel-/Fahrerjobs, Verstecke, Muskeln |
+| **Lantern Collective** | Hacker, Aktivisten, Anwohner der Altstadt | Lantern Hill | Aegis stoppen, Beweise veröffentlichen | Hacking-Fähigkeiten (Kameras, Ampeln), Informationen |
+| **Rustline Wrenchers** | Garagen-/Rennszene, Schrottkönige | Rustline | Eigenständigkeit, Geld, Respekt | Fahrzeuge, Tuning, Straßenrennen, Fluchtwege |
+
+Zusätzlich Greenmoor als „Fraktion ohne Stimme“: Anwohner, die auf Sicherheit pochen; sie lenken die Polizeipräsenz.
+
+### 6.3 Ruf- und Entscheidungssystem
+
+Vier getrennte Werte (jede Größe hat einen eigenen Zweck):
+
+| Wert | Skala | Wirkung |
+|---|---|---|
+| **Fraktionsstand** (je Fraktion) | −100 … +100, Schwellen: Feind / Misstrauisch / Neutral / Verbündet / Vertraut | Schaltet Aufträge, Preise, Fluchthilfe, Fraktionsfinale frei; Feinde greifen an |
+| **Bezirks-Heat** (je Bezirk, M6) | 0 … 5 | Polizeidruck und Wachsamkeit im Bezirk |
+| **Aegis-Profil** (global) | 0 … 100 | Wie schnell Kameras einen erkennen; sinkt durch Kennzeichentausch, Hacks, Untertauchen; steigt durch Kennzeichen-Treffer bei Verbrechen |
+| **NPC-Vertrauen** (je Schlüsselfigur) | −3 … +3 | Bestimmt Wendungen (Verrat, Hilfe, Opfer) |
+
+Dazu **Tat-Flags** (Boolesche Werte wie `killedCivilians`, `betrayedUnion`, `savedJonas`, `leakedLedger`), die Bedingungen für Missionen, Dialoge und Enden bilden.
+Konsequenzen laufen über **Effekte** (Datenmodell 6.5): Standard ändern, Flag setzen, Weltzustand-Tag setzen, Mission freischalten/sperren, Gegenstand geben.
+
+### 6.4 Haupthandlung: „Nullstunde“
+
+**Protagonistin:** *Mira Voss*, ehemalige Rennfahrerin und Fluchtwagenfahrerin. Die Namen sind fiktiv und frei änderbar.
+**Setup:** Mira kehrt nach sieben Jahren zurück, weil ihr Bruder *Jonas Voss*, Datenanalyst bei Aurelia, verschwunden ist. Bei der Einreise am Highway-Checkpoint registriert Aegis ihr Kennzeichen – sie ist ab jetzt im Netz. In 14 Spieltagen geht Aegis „Phase Zwei“ live (Countdown „Nullstunde“).
+
+| Akt | Inhalt | Wendepunkt | Spielerabhängigkeit |
+|---|---|---|---|
+| **Prolog – Rückkehr** | Tutorial-Kurierfahrten, Checkpoint, erste Kontakte in Saltmarket und Rustline | – | Erste Loyalität: Wer hilft Mira zuerst (Union oder Wrenchers)? Startstände +20/+10 |
+| **Akt I – Schuldner** | Aufträge für Union und Wrenchers, Spur zu Jonas; Aegis-Kameras prägen das Fahren | **W1 – „Der Fund“:** Jonas lebt und hat einen Datenträger („Ledger-Kern“) mit Beweisen gegen Aurelia versteckt | Wem Mira den Fund zeigt, bestimmt die Hauptallianz (Union, Collective oder Konzern); sie bekommt zwei Verbündete |
+| **Akt II – Netz** | Kampf um Informationen; Heat-Bezirke; Kamera-Hacks; Konzern lockt mit Angeboten | **W2 – „Verrat“:** Eine Vertrauensperson verrät Mira an die KCG. **Wer** verrät, hängt vom NPC-Vertrauen ab (höchstes Vertrauen = Verrat wiegt am schwersten; niedriges Vertrauen = Verrat erwartet, früher) | Verhalten in Akt I wirkt unmittelbar; ein Spieler mit konsequent hohem Vertrauen aller wird *nicht* verraten (dafür andere Wendung) |
+| | | **W3 – „Der Preis“:** Aurelia bietet Mira Jonas’ Freiheit, Kennzeichenlöschung und eine Position an – gegen Verrat an ihren Verbündeten | Annehmen/Ablehnen/Vortäuschen (Doppelspiel möglich, wenn Vertrauen und Aegis-Profil niedrig) |
+| **Akt III – Nullstunde** | Kampf um die Bezirke; Fraktionen stehen auf den Barrikaden; Welt sichtbar verändert | **W4 – „Der Vorabend“:** Jonas’ Schicksal (gerettet / Doppelagent / tot) | Ergibt sich aus Flags (`savedJonas`, `betrayedX`) und Vertrauen |
+| **Finale – Uplink** | Mission auf Route 9 und am Ashridge-Sendemast („Aegis Uplink“) | **W5 – „Die Entscheidung“:** Aegis übernehmen, abschalten, verkaufen oder fliehen | Verfügbare Optionen hängen von Allianzen und Flags ab |
+
+**Mehrere Enden** (Bedingungen als Daten in 6.5):
+
+| Ende | Titel | Bedingung (vereinfacht) | Folge für die Welt |
+|---|---|---|---|
+| E1 | **Goldener Käfig** | Konzernstand ≥ Vertraut, W3 angenommen | Aegis geht live; Mira wird Teil des Systems; Welt behält die Überwachung, nur der Spieler profitiert |
+| E2 | **Hafenrepublik** | Union ≥ Vertraut, Konzern ≤ Feind | Docks autonom, Stadt gespalten; Core bleibt unter Aurelia |
+| E3 | **Blackout** | Collective ≥ Vertraut, Uplink zerstört | Netz fällt, Stadt dunkel und chaotisch; Hoffnung und Anarchie |
+| E4 | **Exil** | Fluchtroute gewählt oder kein Allianz-Schwellwert erreicht | Mira und Jonas verlassen die Stadt; Stadt bleibt unverändert; Kurz-Ende |
+| E5 *(geheim)* | **Offene Bücher** | Alle drei Fraktionen ≥ Verbündet, `savedJonas`, kein `killedCivilians` | Beweise werden veröffentlicht; Aegis wird gerichtlich gestoppt; fragile Reform |
+
+**Umfang (Richtwert):** 14 Hauptknoten, je Fraktionsroute 4 Zweigmissionen (Union, Collective, Wrenchers, Konzern), 4–6 Entscheidungsszenen, 5 Wendepunkte, 5 Enden → ca. **28–32 Missionen** plus ca. 10–15 Nebenaufträge je Bezirk-Fraktion.
+
+**Hinweis zur Originalität:** Handlung, Figuren, Fraktionen und Schauplätze sind frei erfunden; es werden nur allgemeine Dystopie-Motive (Überwachung, Konzernmacht, soziale Spaltung) verwendet.
+
+### 6.5 Datenmodell
+
+Alle Story-Inhalte sind **Daten** (JSON/JS-Module in `data/story/`), kein Code. Die Engine (`sim/story.js`) wertet Bedingungen aus und wendet Effekte an.
+
+```js
+// data/story/schema (Beschreibung als JSDoc/TypeScript-ähnlich)
+
+/** Dauerhafter Story-Zustand, wird gespeichert (M8) und – online – serverseitig geführt (M15). */
+GameStory = {
+  schema: 3,                        // Speicherstand-Version
+  day: 4, hour: 17.5,               // Spielzeit (Countdown Nullstunde)
+  standing: { aurelia: -10, union: 35, collective: 5, wrenchers: 20, kcg: -25 },
+  npcTrust: { jonas: 2, brann: 1, nox: -1, ravn: -2 },   // −3..+3
+  flags: { savedJonas: false, betrayedUnion: false, killedCivilians: 0 },
+  worldTags: { saltmarket: ['strike'], lantern: ['aegis_dense'] }, // Bezirks-Tags (M3/M5/M6/M9)
+  completed: ['p1', 'a1_dockjob', 'w1_find'],
+  active: ['a2_hack_cams'],
+  decisions: [{ id: 'w1_show_ledger', choice: 'union', at: 1730 }], // für Rückblick/Statistik
+  aegis: 42                         // Aegis-Profil
+}
+
+/** Ein Missionsknoten. Hauptknoten haben main: true. */
+Mission = {
+  id: 'w2_betrayal', title: 'Verrat', main: true, act: 2,
+  requires: [Cond],                 // wann verfügbar
+  excludes: [Cond],                 // wann gesperrt
+  variants: [                       // inhaltliche Varianten je Zustand
+    { when: [{ npcTrust: ['brann', '>=', 2] }], script: 'w2_brann_betrays' },
+    { when: [{ npcTrust: ['nox', '>=', 2] }],   script: 'w2_nox_betrays' },
+    { when: [],                                  script: 'w2_ravn_ambush' }  // Fallback
+  ],
+  steps: [ /* Schritte des Runners (M7) */ ],
+  choices: [Choice],                // Entscheidungen innerhalb der Mission
+  onSuccess: [Effect], onFail: [Effect]
+}
+
+Choice = {
+  id: 'w3_offer', text: 'Aurelias Angebot…',
+  options: [
+    { id: 'accept', text: 'Annehmen',   when: [],                         effects: [Effect] },
+    { id: 'refuse', text: 'Ablehnen',   when: [],                         effects: [Effect] },
+    { id: 'fake',   text: 'Vortäuschen', when: [{ aegis: ['<', 30] }, { npcTrust: ['nox', '>=', 1] }], effects: [Effect] }
+  ]
+}
+
+Cond   = { standing: ['union', '>=', 50] } | { flag: ['savedJonas', '==', true] }
+       | { npcTrust: ['nox', '>=', 2] }    | { done: 'a1_dockjob' }
+       | { tag: ['saltmarket', 'has', 'strike'] } | { aegis: ['<', 30] }
+       | { any: [Cond] } | { all: [Cond] } | { not: Cond }
+
+Effect = { standing: ['union', +15] } | { npcTrust: ['nox', -1] } | { flag: ['betrayedUnion', true] }
+       | { tag: ['saltmarket', 'add', 'strike'] } | { unlock: 'a3_union_blockade' } | { lock: 'a3_collective_hack' }
+       | { money: +500 } | { aegis: +10 } | { heat: ['saltmarket', +1] }
+
+Ending = { id: 'E2', title: 'Hafenrepublik', priority: 20,
+           when: [{ standing: ['union', '>=', 70] }, { standing: ['aurelia', '<=', -50] }],
+           epilogue: 'epilogue_e2', worldTagsAfter: { saltmarket: ['free_port'] } }
+```
+
+**Auswertung:** Ende = das Ende mit der höchsten `priority`, dessen `when` erfüllt ist; `E4 Exil` ist Fallback. Bedingungen sind rein deklarativ → serverseitig prüfbar (wichtig für Anti-Cheat, Kapitel 7) und im Story-Simulator testbar.
+
+### 6.6 Weltzustand, Konsequenzen und Test
+
+- **Weltzustand-Tags** (z. B. `strike`, `aegis_dense`, `blackout`, `free_port`, `gentrified`) wirken als Parameter-Überschreibungen auf `DistrictDef` (M3): andere Verkehrsprofile (M5), mehr/weniger Kameras und KCG (M6), geschlossene Docks, Lichter, Graffiti (M13), Ambient-Klang (M10).
+- **Story-Simulator** (`tests/storySim.mjs`, Node): erzeugt zufällig alle Entscheidungskombinationen (oder eine feste Stichprobe von mehreren Tausend), spielt den Graph durch und meldet: nicht erreichbare Missionen/Enden, Sackgassen (keine aktive/verfügbare Mission vor einem Hauptknoten), widersprüchliche Flags. Wird in CI/Skript ausgeführt.
+- **Rückblick:** Entscheidungsprotokoll (`decisions`) speist ein „Was wäre gewesen“-Menü nach dem Ende (Wiederspielwert).
+
+### 6.7 Stufen, Technik, Risiken
+
+| Stufe | Umfang |
+|---|---|
+| MVP | Datenmodell + Engine (Bedingungen/Effekte), 2 Fraktionsstände, 1 Entscheidungsszene, 1 Wendung (W1), 2 Enden, Speichern; Story-Simulator-Grundversion |
+| Ausbau | Alle 5 Fraktionen, 4 NPC-Vertrauenswerte, W1–W5, E1–E4, Weltzustand-Tags mit sichtbaren Bezirksänderungen, Dialog-UI mit Entscheidungsoptionen, Rückblick-Menü |
+| Wunschziel | Geheimes Ende E5, Beziehungsszenen, dynamische Nebenaufträge je Weltzustand, Lokalisierung (DE/EN), Editor-Werkzeug für Story-Graphen |
+
+**Technische Umsetzung:** reine Daten + deterministische Engine; kein Zufall in Story-Entscheidungen; Ereignisse über den Event-Bus (`mission.completed`, `crime`, `district.entered`); Texte in `data/story/text.de.json`.
+**Abhängigkeiten:** M7 (Runner), M6 (Verbrechen/Heat), M3/M5/M9/M13 (Weltzustand-Wirkung), M8 (Speichern). **Risiken:** (1) Content-Umfang → Perlenkette und Variantentexte statt vollständiger Verzweigung; (2) Soft-Locks → Story-Simulator, Notfall-Reset „Mission neu starten“; (3) Konsistenzfehler in Dialogen → Bedingungen zentral prüfen, Review-Checkliste; (4) Mehrspieler: globale Story-Spoiler → Story bleibt **pro Spieler** (Kapitel 7.8). **Aufwand:** MVP 8 PT · Ausbau 20 PT · Wunsch 25+ PT (ohne Texte/Vertonung).
+
+---
+
+## 7. Open World trifft MMO: Server und Mehrspieler (M15)
+
+**Ziel:** Eine geteilte, persistente Stadt für viele Spieler *zusätzlich* zu einem vollwertigen Einzelspielermodus. **Reihenfolge ist verbindlich:** erst Einzelspieler stabil (bis Meilenstein 8), dann Server und Mehrspieler (ab Meilenstein 9).
+
+### 7.1 Ehrliche Einordnung
+
+- „MMO“ im Browser heißt realistisch: **ein Realm mit ca. 50–100 gleichzeitigen Spielern** (Richtwert, per Lasttest zu bestimmen), nicht Tausende in einer Szene. Mehrere Realms nebeneinander skalieren die Gesamtzahl.
+- Ein MMO braucht **Dauerbetrieb**: Server, Datenbank, Backups, Moderation, Datenschutz (DSGVO), Kosten. Das ist ein eigenes Projekt neben dem Spiel. Deshalb: Mehrspieler ist **optional** und das Spiel muss ohne Server voll funktionieren.
+- Der Browser-Client ist **nicht vertrauenswürdig** (JS ist les- und manipulierbar). Absolute Cheat-Freiheit gibt es nicht; es geht um *Schadensbegrenzung durch Serverautorität* (7.7).
+
+### 7.2 Architektur
+
+```mermaid
+flowchart LR
+  subgraph CL["Client (Browser)"]
+    C1["Rendering, UI, Audio (M2/M10/M11/M13)"]
+    C2["Prädiktion + Interpolation"]
+  end
+  subgraph LB["Gateway"]
+    GW["Node.js + WebSocket (wss)<br/>Auth, Rate-Limit, Routing"]
+  end
+  subgraph RL["Realm (Weltinstanz, ~50–100 Spieler)"]
+    Z1["Zone-Prozess: Kestrel Core"]
+    Z2["Zone-Prozess: Saltmarket"]
+    Z3["Zone-Prozess: Umland/Highway"]
+    ST["Story-Dienst (pro Spieler, M14)"]
+  end
+  subgraph DB["Persistenz"]
+    PG[("PostgreSQL: Konten, Charaktere, Weltzustand")]
+    RD[("Redis: Sessions, Pub/Sub, Warteschlangen")]
+  end
+  C1 --> C2
+  C2 <-->|"Eingaben / Snapshots (binär)"| GW
+  GW --> Z1
+  GW --> Z2
+  GW --> Z3
+  Z1 <-->|"Übergabe an Zonengrenze"| Z2
+  Z2 <--> Z3
+  Z1 --> ST
+  Z2 --> ST
+  Z3 --> ST
+  ST --> PG
+  Z1 --> PG
+  GW --> RD
+  Z1 --> RD
+```
+
+**Grundentscheidungen**
+- **Node.js + `ws`** (einfach, ausreichend; `uWebSockets.js` als Option, falls Durchsatz zum Engpass wird – die Herstellerzahlen dazu sind nicht unabhängig belegt) [Q19]. Sicher nur über `wss://` (TLS) hinter einem Reverse-Proxy.
+- **Autoritativer Server:** Der Server führt die Simulation (dieselben Module `sim/*` wie im Client), der Client sendet nur **Eingaben**, nie Ergebnisse.
+- **Ein Prozess pro Zone**, weil eine laufende Spielschleife den Node-Event-Loop blockiert; schwere Teile gehören in Worker-Threads/Prozesse [Q19].
+- **Einzelspieler = derselbe Code:** Ein **LocalServer** (Web Worker im Browser) führt dieselbe Simulation für genau einen Spieler und speichert lokal (IndexedDB). Der Client kennt nur ein Interface `World.connect(transport)`: Transport = `LocalTransport` (Worker) oder `WebSocketTransport` (Server).
+
+### 7.3 Zonen und Sharding
+
+| Begriff | Bedeutung |
+|---|---|
+| **Realm** | Eine vollständige Weltinstanz mit eigener Spielerliste, Weltzustand und Wirtschaft; maximal ca. 50–100 Spieler (Richtwert). Weitere Spieler → weiterer Realm (Shard). Spieler wählen Realm oder werden zugewiesen. |
+| **Zone** | Räumlicher Teil des Realms, z. B. die 6 Bezirke plus Umland (≈ 8 Zonen). Jede Zone läuft als eigener Prozess/Thread mit eigener Tick-Schleife. |
+| **Interessenbereich (Area of Interest)** | Ein Spieler bekommt nur Entitäten innerhalb von ca. 300–400 m (Gitter = Chunks). Spart Bandbreite und CPU [Q19]. |
+| **Grenzübergang (Handoff)** | Nähert sich eine Entität der Zonengrenze, wird sie in der Nachbarzone als „Geist“ gespiegelt und beim Überschreiten übergeben (Zustand + Sequenznummer). Ein Überlappungsstreifen von ca. 100 m verhindert Flackern. |
+| **Phase** | Privater Story-Ausschnitt eines Spielers (7.8): Story-NPCs und Missionsobjekte existieren nur für ihn/seine Gruppe. |
+
+*Hinweis:* Zu zonenbasiertem Sharding mit Grenz-Handoff fand die Recherche **keine belastbare Einzelquelle**; die Konzeption folgt allgemeinen Praktiken (Rooms/Instanzen, Interessenmanagement) und ist früh per Prototyp und Lasttest zu validieren.
+
+### 7.4 Was synchronisiert wird
+
+| Objekt | Autorität | Rate | Methode |
+|---|---|---|---|
+| Spielerfigur / Eigenes Fahrzeug | Server validiert, Client sagt voraus | Eingaben 30–60 Hz, Snapshots 15–20 Hz | Client-Prädiktion + Server-Korrektur (Reconciliation) [Q20] |
+| Fremde Spieler und Fahrzeuge | Server | 15–20 Hz (verteilt nach Entfernung) | Entity Interpolation (ca. 100–150 ms zeitversetzt) [Q21] |
+| Kollisionen zwischen Spielern | Server | ereignisbasiert | Server entscheidet, Client zeigt Effekt |
+| Ambient-Verkehr/Passanten | **Nahe an Spielern: Server (Sim-Stufe A)**, fern: lokal deterministisch (Seed + Spielzeit) | 5–10 Hz nah | Wichtige Fahrzeuge (Polizei, Missionsziele) immer serverseitig; Hintergrundverkehr darf je Client leicht abweichen |
+| Polizei/Fahndung | Server | ereignisbasiert + 10 Hz Positionen | Server-Dispatcher; Sichtlinie serverseitig |
+| Geld, Inventar, Fahrzeugbesitz, Standing, Flags | **Nur Server** | bei Änderung | Transaktional in der Datenbank |
+| Missionsfortschritt | Server (pro Spieler) | bei Ereignis | Server prüft Bedingungen (Position, Zeit, Zustand) |
+| Weltzustand (Bezirks-Tags, Fraktionskontrolle) | Server (pro Realm) | langsam (Minuten) | Aggregation aus Spieleraktionen mit Dämpfung |
+| Tageszeit/Wetter | Server (pro Realm) | 1 Hz | Client interpoliert lokal |
+| Chat/Ping/Emotes | Server | Ereignis | Rate-Limit, Filter |
+
+**Bandbreitenbudget (Überschlag):** 20 sichtbare Fahrzeuge × ca. 24 Byte × 15 Hz ≈ 7 KB/s je Client abwärts, plus Weltereignisse. Mit Delta-Kompression und Quantisierung (Position in cm, Winkel in 1/256) deutlich darunter. Zielwert < 30 KB/s je Client.
+
+### 7.5 Netzcode
+
+- **Binärprotokoll** (eigene `DataView`-Kodierung oder MessagePack), versionierte Nachrichten, `tick`- und `seq`-Nummern.
+- **Client-Prädiktion und Reconciliation:** Client wendet Eingaben sofort an, merkt sich unbestätigte Eingaben mit Sequenznummer; bei Server-Snapshot setzt er den Zustand zurück und wiederholt ausstehende Eingaben. Für andere Spieler **Interpolation** statt Prädiktion [Q20][Q21].
+- **Tick-Raten:** Simulation 60 Hz (deterministischer Fixed-Step, M4), Netzwerk-Snapshots 15–20 Hz (üblicher Kompromiss; höhere Raten nur wo nötig) [Q19].
+- **Lag-Kompensation** nur für Trefferprüfungen (später); Fahrzeuge bleiben bei Prädiktion/Interpolation.
+- **Verbindungsabbruch:** Fahrzeug bleibt kurz „Geist“ (5 s), Wiederverbinden mit Sitzungstoken.
+
+### 7.6 Persistenz
+
+| Daten | Speicher | Anmerkung |
+|---|---|---|
+| Konten, Anmeldung | PostgreSQL | E-Mail-Login mit Magic Link oder OAuth; keine Passwörter im Klartext, ggf. Passkeys |
+| Charaktere (Story-Zustand `GameStory`, Geld, Fahrzeuge, Standing, Flags) | PostgreSQL (JSONB + relationale Kerne) | Schema-Versionierung und Migrationen von Anfang an |
+| Weltzustand je Realm | PostgreSQL | Periodisch (alle 1–5 min) und bei Ereignissen („write-behind“) |
+| Sitzungen, Warteschlangen, Realm-übergreifender Chat | Redis (Pub/Sub) | Flüchtig |
+| Einzelspieler-Speicher | IndexedDB (Browser) | Gleiches Schema wie online → ein Pfad im Code |
+
+**Regeln:** Wirtschaftliche Änderungen (Kauf, Belohnung) als **Transaktion**; Backups täglich; Löschkonzept für personenbezogene Daten (DSGVO: Auskunft, Löschung; Hosting in der EU bevorzugen).
+
+### 7.7 Anti-Cheat – Grundlagen (realistisch)
+
+Ein Browser-Client lässt sich nicht „absichern“. Strategie ist **Serverautorität plus Plausibilitätsprüfung**:
+
+1. **Never trust the client:** Geld, Fahrzeuge, Standing, Flags, Missionsabschluss und Schaden entscheidet nur der Server.
+2. **Eingaben statt Zustände:** Client sendet Lenkung/Gas/Bremse, nie Positionen. Der Server simuliert mit denselben Fahrzeugdaten; Abweichungen führen zu Korrektur (Rubber-Banding), nicht zum Vertrauen.
+3. **Plausibilitätsgrenzen:** maximale Beschleunigung/Geschwindigkeit je Fahrzeug, Teleport-Erkennung, Sprunghöhen, Schussrate; Verstöße zählen auf ein Konto-Risiko-Konto.
+4. **Rate-Limits und Größenlimits** je Nachricht und Verbindung; Validierung aller Felder (kein Vertrauen in Typ/Bereich).
+5. **Authentifizierung:** kurzlebige, signierte Tokens (z. B. JWT) über sichere Cookies; Sitzungsbindung; keine Geheimnisse im Client.
+6. **Deterministische Story-Prüfung:** Missions-Bedingungen (6.5) sind deklarativ → Server wertet sie selbst aus.
+7. **Protokolle und Replays:** Eingabeprotokolle in Ringpuffer; auffällige Sitzungen nachträglich analysierbar; Melde-Funktion und Moderationswerkzeuge.
+8. **Ehrlichkeit nach außen:** Kein Client-seitiger „Anti-Cheat“ als Sicherheitsversprechen; Schutz vor Automatisierung (Bots) über Verhaltensanalyse und Rate-Limits. Offline-Charaktere sind **nicht** in den Online-Modus übertragbar (Cheat-Risiko), Ausnahme: reine Story-Flags ohne Geld/Fahrzeuge, wenn das Spiel das erlauben soll.
+
+### 7.8 Einzelspieler-Story und gemeinsame Welt zusammenbringen
+
+Drei Modi, ein Spiel:
+
+| Modus | Welt | Story | Persistenz |
+|---|---|---|---|
+| **Offline** | LocalServer im Browser | Vollständig, einziger Spieler | IndexedDB, lokal |
+| **Online – Story** | Geteilter Realm | **Pro Spieler privat (Phasen):** Story-NPCs, Missionsobjekte, Entscheidungen existieren nur für ihn/seine Gruppe; Mitspieler sehen nur die gemeinsame Welt | Server (Charakter) |
+| **Online – Freispiel** | Geteilter Realm | Keine Hauptstory; Nebenaufträge, Fraktionskonflikte, Rennen, Events | Server |
+
+**Verzahnung:**
+- **Persönliche Entscheidungen bleiben persönlich.** Ein Spieler, der E3 „Blackout“ erreicht, verändert nicht den Realm für alle (keine globalen Spoiler, keine „verbrannte“ Welt).
+- **Gemeinsame Welt reagiert langsam auf Gemeinschaftsverhalten:** Aggregierte Spieleraktionen (z. B. Kameras gehackt, Docks beschützt, Straßenrennen) verschieben **Fraktionskontrolle der Bezirke** im Realm (Zähler mit Zerfall, z. B. wöchentlich bilanziert). Das erzeugt eine dystopische Metaspiel-Ebene: Welche Gruppe kontrolliert den Bezirk?
+- **Weltzustand-Tags (6.6)** gibt es zweimal: *persönliche* (Phase) und *Realm-weite* (Gemeinschaft). Die Darstellung wählt: persönliche Tags überlagern für den Spieler.
+- **Gruppen:** Eine Gruppe (2–4) teilt eine Missionsphase; Entscheidungen werden per Abstimmung oder durch den Gruppenführer getroffen.
+- **Aegis als Mehrspielermechanik:** Spieler können Kameras hacken (zeitlich begrenzt für alle im Umkreis sichtbar), KCG-Einsätze auslösen oder abfangen; Heat gilt je Bezirk **pro Spieler**.
+
+### 7.9 Stufen, Technik, Risiken
+
+| Stufe | Umfang |
+|---|---|
+| MVP (MS9) | `World.connect(transport)`-Abstraktion; LocalServer im Worker (Einzelspieler läuft darüber); Node-Gateway, Anmeldung, 1 Realm, 1 Zone; Prädiktion/Interpolation für Fahrzeuge; Charakter-Persistenz; 2 Clients gleichzeitig fahren sichtbar |
+| Ausbau (MS10) | Mehrere Zonen mit Handoff; Interessenverwaltung; serverseitiger Ambient-Verkehr in Spielernähe; Polizei-Dispatcher serverseitig; Anti-Cheat-Plausibilitätsprüfung; Lasttest mit simulierten 50–100 Bots; Chat; Moderationswerkzeug |
+| Wunschziel (MS11) | Mehrere Realms, Matchmaking, Fraktionskontrolle der Bezirke, Events/Saisons, Gruppen mit gemeinsamer Story-Phase, Replays, Telemetrie-Dashboard |
+
+**Abhängigkeiten:** Setzt eine saubere Trennung von Sim und Render (M1–M12), ein serialisierbares `GameState` (M8) und die Story-Engine (M14) voraus. **Risiken:** (1) **Betrieb und Kosten** (Hosting, Backups, Updates) → klein starten, ein Realm, Kosten vorab kalkulieren; (2) **Latenz/Fahrzeugsynchronisation** (hohe Geschwindigkeiten) → Prädiktion und Interpolation früh prototypen; (3) **Zonenübergabe** komplex → anfangs *eine* Zone pro Realm, erst nach Lasttest teilen; (4) **Cheater** → Serverautorität von Beginn an, nicht nachrüsten; (5) **DSGVO/Jugendschutz/Moderation** → vor Öffnung rechtlich klären; (6) **Doppelter Content-Pfad** (Einzel/Online) → ein gemeinsamer Daten- und Codepfad (7.2). **Aufwand:** MVP 15 PT · Ausbau 30 PT · Wunsch 40+ PT (ohne Betrieb).
+
+---
+
+## 8. Die Welt: Kestrel Bay (dystopisch)
+
+**Kestrel Bay** ist eine fiktive, dystopische Hafenmetropole an einer halbmondförmigen Bucht: Der Konzern *Aurelia Holdings* hält die Innenstadt und das Überwachungsnetz **Aegis**, an den Rändern leben Hafenarbeiter, Schrotthändler und Aktivisten in „blinden“ Vierteln. Die Stadt ist komplett erfunden; Namen, Fraktionen und Orte stammen aus keinem bestehenden Spiel. Das Meer liegt im Westen, im Osten steigen die **Ashridge-Berge** auf; die Stadt zieht sich vom Strand über Industrie und Zentrum bis in die Hanglagen. Größe: **Stadtgebiet ca. 3 × 3 km**, Umland insgesamt ca. 6 × 6 km (Browser-realistisch mit Chunk-Streaming; der Prototyp hat 0,64 × 0,64 km). Fahrzeit durch die Stadt bei Höchsttempo ca. 2 Minuten, Rundfahrt über Umland ca. 8–10 Minuten.
+
+### 8.1 Karte (schematisch)
 
 ```
  N ↑
@@ -436,99 +802,147 @@ Alle MVPs zusammen: grob **10–12 Arbeitswochen** (eine Person mit KI-Unterstü
  └──────────────────────────────────────────────────────────┘
 ```
 
-### 5.2 Die sechs Bezirke
+### 8.2 Die sechs Bezirke – dystopisch
 
-| # | Bezirk | Charakter und Stimmung | Optik und Straßenform | Landmarke | Verkehr / Passanten | Klang |
-|---|---|---|---|---|---|---|
-| 1 | **Kestrel Core** (Zentrum, Finanzviertel) | Kühl, glänzend, leistungsorientiert; tagsüber geschäftig, nachts leergefegt, Skyline leuchtet | Hochhäuser 60–180 m, Glas/Stahl, kühle Blau-/Grautöne; **orthogonales Raster**, breite Alleen, Einbahnsysteme | **Aurelia Tower** (190 m, Krone aus LED-Streifen, von überall sichtbar) | Dichter Tagesverkehr (Taxis, Limousinen), Anzugpassanten; abends dünn | Gedämpfter Verkehrsteppich, Hupen, ferne Sirenen |
-| 2 | **Saltmarket** (alter Hafen) | Rau, ehrlich, nach Salz und Diesel; Schichtarbeit, Schmuggel im Schatten | Container, Kräne, Lagerhallen, Kopfsteinpflaster, rostiges Orange/Grün; **unregelmäßige Straßen, Sackgassen, Kais** | **Die Kranreihe** (drei rote Hafenkräne, nachts Warnlichter) | LKW, Gabelstapler, Arbeiter in Frühschicht; kaum Touristen | Schiffshörner, Möwen, Metall auf Metall |
-| 3 | **Lantern Hill** (Altstadt am Hang) | Warm, verwinkelt, nächtliches Leben; Bars, Märkte, Papierlaternen/Glühbirnenketten | 3–6 Geschosse, Terrakotta/Ocker, Balkone, Treppen; **enge, kurvige Gassen am Hang**, Einbahn, steile Rampen | **Glockenturm von St. Merrin** + beleuchtete Treppe | Fußgängerreich, Roller, Lieferwagen, enge Passagen | Gespräche, Musik aus Bars, Kirchenglocke zur vollen Stunde |
-| 4 | **Greenmoor** (Vorstadt, Villen) | Ruhig, grün, privilegiert; trügerische Idylle, Streifenwagen häufiger | Einfamilienhäuser, Hecken, Alleebäume, Pastelltöne; **geschwungene Straßen, Sackgassen (Cul-de-Sac), Golfplatz** | **Greenmoor Country Club** mit Wasserturm | Wenig Verkehr, Jogger, Gärtner, Lieferdienste; Polizei patrouilliert dicht | Vögel, Rasenmäher, Sprinkler |
-| 5 | **Rustline** (Industrie/Güterbahnhof) | Düster, laut, rückwärtsgewandt; Schrottplätze, Garagenszene, Straßenrennen nachts | Fabrikhallen, Schornsteine, Bahngleise, Schrott, Beton, Natriumlicht (Orange); **große Blöcke, Bahnübergänge** | **Raffinerie** mit Flammenfackel + Wasserturm-Skelett | LKW, Pendlerbusse, kaum Fußgänger; nachts illegale Rennen | Maschinenlärm, Pressluft, Zugpfeifen |
-| 6 | **Sunstrip** (Strand/Promenade) | Bunt, entspannt, touristisch; Tag: Surfer/Familien, Nacht: Neon-Party | Palmen, Pastell, Neonreklame, Holzpromenade, Pier; **küstenparallele Boulevards + Fußgängerzonen** | **Riesenrad am Pier** (Kestrel Wheel) | Cabrios, Skater, Fahrräder, dichte Fußgängermengen am Abend | Brandung, Reggae-/Synth-Musik, Jahrmarkt |
+Leitgedanke: Kestrel Bay ist **vertikal und sozial geteilt**. Je näher am Konzernturm, desto sauberer, heller und überwachter; je weiter weg, desto verfallener, dunkler und „blind“ – aber freier. Jeder Bezirk hat eine Rolle im Machtgefüge, eine eigene Optik und eine eigene Spielregel.
 
-**Wiedererkennungsregeln (Designdisziplin):** Jeder Bezirk hat eine **Leitfarbe** (Core: Stahlblau, Saltmarket: Rostorange, Lantern Hill: Ocker/Warmgelb, Greenmoor: Grün/Pastell, Rustline: Orange-Grau/Natrium, Sunstrip: Türkis/Pink), eine **Silhouettenform** am Horizont und ein **eigenes Straßenmuster**. Gewünschtes Ergebnis: Ein Screenshot ohne HUD reicht, um den Bezirk zu benennen.
+| # | Bezirk | Rolle in der Dystopie | Optik und Straßenform | Landmarke | Überwachung und Macht (Spielregel) | Verkehr / Passanten | Klang |
+|---|---|---|---|---|---|---|---|
+| 1 | **Kestrel Core** (Zentrum, Konzernviertel) | Sitz von Aurelia Holdings; Fassade von Ordnung und Wohlstand; Zugang nur mit „sauberem“ Profil | Hochhäuser 60–180 m, Glas/Stahl, Stahlblau/Weiß, makellos; orthogonales Raster, breite Alleen, Drohnen am Himmel | **Aurelia Tower** (190 m, LED-Krone, in der Stadt allgegenwärtig) | **Aegis maximal:** Kamera-Dichte hoch, Kennzeichen-Treffer sofort, KCG-Streifen dicht; Sperrzonen für niedriges Profil | Dichter Tagesverkehr (Limousinen, Taxis), Anzugträger; nachts leer | Gedämpftes Rauschen, Drohnenbrummen, Lautsprecher-Durchsagen |
+| 2 | **Saltmarket** (alter Hafen) | Arbeiterviertel, Hafenlogistik; Union gegen Konzern; Streikgefahr | Container, Kräne, Kopfsteinpflaster, rostiges Orange/Grün; unregelmäßige Straßen, Sackgassen, Kais | **Die Kranreihe** (drei rote Hafenkräne mit Warnlichtern) | Mittel: Kameras nur an Toren; Union kontrolliert Schichtwechsel; Schmuggelrouten | LKW, Gabelstapler, Frühschicht-Arbeiter | Schiffshörner, Möwen, Metall auf Metall |
+| 3 | **Lantern Hill** (Altstadt am Hang) | Widerstandsnest und Nachtleben; vom Konzern als „Sanierungsgebiet“ vorgesehen | 3–6 Geschosse, Terrakotta/Ocker, Balkone, Treppen; enge, kurvige Gassen am Hang | **Glockenturm St. Merrin** + beleuchtete Treppe | **Aegis lückenhaft:** viele Kameras gehackt/verdeckt; Collective betreibt Untergrundnetz; Abrisskommandos als Gefahr | Fußgängerreich, Roller, Lieferwagen | Bars, Musik, Kirchenglocke |
+| 4 | **Greenmoor** (Gated Vorstadt) | Wohlhabende Enklave hinter Zäunen; privat finanzierte KCG-Patrouillen; Angst vor „den anderen“ | Villen, Hecken, Zäune, Schranken, Pastell, Golfplatz; geschwungene Straßen, Cul-de-Sacs | **Country-Club-Wasserturm** | **Aegis privat:** Kennzeichen-Leser an Toren; Fremde werden sofort gemeldet; Polizei reagiert schnell | Wenig Verkehr, Jogger, Gärtner, Lieferdrohnen | Sprinkler, Vögel, Rasenmäher |
+| 5 | **Rustline** (Industrie / Schrott) | Vergessener Gürtel; Garagenszene, Straßenrennen, illegale Werkstätten; Umweltverschmutzung | Fabrikhallen, Schornsteine, Gleise, Schrott, Natriumlicht (Orange); große Blöcke, Bahnübergänge | **Raffinerie** mit Flammenfackel | **Aegis fast blind:** wenige Kameras, KCG meidet das Gebiet; Fluchtraum, aber kaum Schutz | LKW, Pendlerbusse, nachts Rennen | Maschinen, Pressluft, Zugpfeifen |
+| 6 | **Sunstrip** (Promenade / Strand) | Fassade der Freizeit; Touristen und Influencer, darunter Armut im Hinterland; Werbung allgegenwärtig | Palmen, Neon, Promenade, Pier, Pastell; küstenparallele Boulevards und Fußgängerzonen | **Kestrel Wheel** (Riesenrad am Pier) | **Aegis als Werbung:** Gesichtserkennung für personalisierte Anzeigen, viele Kameras an Hotspots; lockeres Polizeiverhalten, strenge Wegweisung | Cabrios, Skater, dichte Abendmengen | Brandung, Synth-Musik, Jahrmarkt |
 
-### 5.3 Umland
+**Soziale Gegensätze (sichtbar machen):** Gehwegzustand, Beleuchtung, Sauberkeit, Werbung vs. Graffiti, Müll, Barrikaden und die **Kameradichte** unterscheiden Bezirke (Kapitel 5.5). Wer sich in Core mit hohem Aegis-Profil bewegt, wird verfolgt; in Rustline ist man unsichtbar – aber ohne Hilfe.
+
+**Wiedererkennungsregeln (Designdisziplin):** Jeder Bezirk hat eine **Leitfarbe** (Core: Stahlblau, Saltmarket: Rostorange, Lantern Hill: Ocker/Warmgelb, Greenmoor: Grün/Pastell, Rustline: Orange-Grau/Natrium, Sunstrip: Türkis/Pink), eine **Silhouettenform** am Horizont, ein **eigenes Straßenmuster** und eine **Aegis-Dichte** als spielbare Eigenschaft. Gewünschtes Ergebnis: Ein Screenshot ohne HUD reicht, um den Bezirk zu benennen.
+
+### 8.2a Dystopie-Mechaniken (Kurzüberblick)
+
+| Mechanik | Beschreibung | Module |
+|---|---|---|
+| **Aegis-Kameras** | Spielobjekte: erfassen Kennzeichen/Gesicht im Sichtkegel, erhöhen Aegis-Profil bei Verbrechen; hackbar (Minispiel), blendbar, zerstörbar | M6, M13, M14 |
+| **Kennzeichen-System** | Kennzeichen tauschen, fälschen, löschen (Fraktionsdienst); gestohlene Fahrzeuge „heiß“ | M4, M6 |
+| **Sperrzonen und Checkpoints** | Core und Greenmoor kontrollieren niedrige Profile; Zugang über Schranken, Dienstleistungen oder Umgehung | M5, M6 |
+| **Aegis „Phase Zwei“** | Story-Countdown; verändert Welt: neue Kameras, Straßensperren, Score-Anzeige für NPCs | M14 |
+| **Soziale Zonen** | Bezirke haben Zugangsregeln; Reichtum/Profil bestimmt, wo man nicht auffällt | M3, M6 |
+| **Wirtschaft der Ungleichheit** | Preise und Löhne unterscheiden sich je Bezirk; Schwarzmarkt in Rustline | M8 |
+
+### 8.3 Umland
 
 | Bereich | Beschreibung | Spielerischer Zweck |
 |---|---|---|
 | **Küstenstraße „Coast Road“** | 12 km Serpentinenstraße am Wasser, Klippen, Tunnel, Strandabschnitte | Genussfahrt, Rennen, Flucht |
-| **Ashridge-Berge** | Gebirgsstraße mit Haarnadelkurven, Aussichtspunkt mit Stadtpanorama, Windpark, Sendemast | Offroad-/Driftgebiet, Schlussszenen, Panorama |
-| **Route 9 (Highway)** | 6-spurige Schnellstraße vom Zentrum ostwärts, Brücken, Anschlussstellen, Mautstation | Hochgeschwindigkeits-Verfolgungen, Verkehrsfluss |
+| **Ashridge-Berge** | Gebirgsstraße mit Haarnadelkurven, Aussichtspunkt mit Stadtpanorama, Windpark, **Aegis-Uplink-Sendemast** (Finale) | Offroad-/Driftgebiet, Schlussszenen, Panorama |
+| **Route 9 (Highway)** | 6-spurige Schnellstraße vom Zentrum ostwärts, Brücken, Anschlussstellen, **Aegis-Checkpoint mit Kennzeichenerfassung** (Stadteingang, Prolog) | Hochgeschwindigkeits-Verfolgungen, Verkehrsfluss, Kennzeichen-Mechanik |
 | **Salzebene** | Flache, weiße Ebene südlich von Rustline, Salzpfannen | Freies Fahren, Rennstrecken, Verstecke |
 | **Bucht & Pier** | Wasserfläche mit Booten, Pier, Leuchtturm | Landmarke, später Boote/Wasserflucht |
 | **Tunnel „Ashridge Tube“** | 1,4 km Straßentunnel durch den Berg, Lichtwechsel, Echo | Fluchtweg (Sichtlinie bricht ab), Audio-Showpiece |
 
 **Weltgrenzen:** Statt unsichtbarer Wand → Meer im Westen, Bergkamm im Osten/Norden, Salzebene mit Sperrgebiet im Süden; wer weiterfährt, bekommt eine erzählerische Umkehr-Aufforderung (Sperre, Sandsturm).
 
-### 5.4 Orientierung ohne Karte
+### 8.4 Orientierung ohne Karte
 
 Wie in [Q7] beschrieben: Landmarken sind von vielen Punkten sichtbar und geben ein Ziel; eine **Hierarchie** (Aurelia Tower > Kranreihe/Riesenrad/Raffinerie > Bezirksmarken) verhindert Beliebigkeit; Straßen laufen als **Leitlinien** auf Landmarken zu. Nachts leuchten Landmarken stärker (LED-Krone, Fackel, Riesenrad), damit die Orientierung zu jeder Tageszeit trägt.
 
 ---
 
-## 6. Roadmap mit Meilensteinen
+## 9. Roadmap mit Meilensteinen
 
 Alle Meilensteine haben ein **überprüfbares Done-Kriterium**. Messgrößen: `renderer.info` (Draw Calls), Debug-Overlay (fps), Benchmark-Flug (fester Seed).
-**Koordinationshinweis:** Solange eine andere Session `game.js` direkt weiterentwickelt, startet M1 erst nach deren Abschluss/Merge, damit keine widersprüchlichen Änderungen entstehen.
+**Reihenfolge-Regel:** Meilensteine 1–8 machen den **Einzelspieler stabil und vollständig**; erst danach folgen Server und Mehrspieler (MS9–MS11).
+**Stand des Prototyps:** läuft lokal ohne Konsolenfehler (Iteration 1 des Iterationsplans abgeschlossen); Meilenstein 1 baut direkt darauf auf. Solange eine andere Session `game.js` direkt weiterentwickelt, startet die Modularisierung erst nach deren Abschluss, damit keine widersprüchlichen Änderungen entstehen.
 
-### Meilenstein 1 – Fundament auf dem Prototyp *(≈ 1–1,5 Wochen)*
-Baut **direkt auf `game.js`** auf, ohne die Spielbarkeit zu verlieren.
-- `game.js` in ES-Module zerlegen (Struktur siehe Kapitel 7), Verhalten unverändert.
-- `Rng(seed)` statt `Math.random()` für Weltgenerierung; Seed per URL (`?seed=…`).
+### Teil A – Einzelspieler
+
+#### Meilenstein 1 – Fundament auf dem Prototyp *(≈ 1–1,5 Wochen)*
+- `game.js` in ES-Module zerlegen (Kapitel 10), Verhalten unverändert; Simulation/Render trennen.
+- `Rng(seed)` statt `Math.random()` für die Weltgenerierung; Seed per URL (`?seed=…`).
 - Gebäude/Bäume/Gehwege als **Instanzen** mit geteiltem Material (Fenster-Nachtlicht über Shader/Instanzattribut).
 - Debug-Overlay (`F3`): fps, Frame-ms, Draw Calls, Dreiecke.
-- **Done:** (1) Spielablauf wie vorher (Fahren, Verkehr, Polizei, Mission, Tag/Nacht). (2) Gleicher Seed → pixelgleiche Stadt in zwei Läufen. (3) Draw Calls im Overlay **≤ 150** (statt mehrere Hundert). (4) Kein einzelner Frame > 33 ms im 60-s-Benchmark-Flug.
+- **Done:** (1) Spielablauf wie vorher (Fahren, Verkehr, Polizei, Mission, Tag/Nacht). (2) Gleicher Seed → gleiche Stadt in zwei Läufen. (3) Draw Calls im Overlay **≤ 150**. (4) Kein einzelner Frame > 33 ms im 60-s-Benchmark-Flug.
 
-### Meilenstein 2 – Straßengraph und lebendiger Verkehr *(≈ 2 Wochen)*
-- `CityData` mit Straßengraph (Knoten/Kanten/Spuren); alle Agenten fahren auf dem Graph.
+#### Meilenstein 2 – Straßengraph und lebendiger Verkehr *(≈ 2 Wochen)*
+- `CityData` mit Straßengraph (Knoten/Kanten/Spuren); Verkehr/Fußgänger/Polizei fahren auf dem Graph.
 - Ampeln/Vorfahrt, Abstandhalten, Spawn am Aktivradius; Minimap aus `CityData`.
-- **Done:** 60 s Messlauf mit 120 Fahrzeugen ohne Stillstands-Deadlock > 10 s; kein Fahrzeug überfährt rot (automatisch geloggt: 0 Verstöße); Sim-Zeit ≤ 4 ms/Frame.
+- **Done:** 60-s-Messlauf mit 120 Fahrzeugen ohne Stillstands-Deadlock > 10 s; 0 geloggte Rotlichtverstöße; Sim-Zeit ≤ 4 ms/Frame.
 
-### Meilenstein 3 – Bezirke und prozedurale Vielfalt *(≈ 2–3 Wochen)*
-- Generator MVP (Parzellen, Bezirksparameter), **vier** Bezirke spielbar (Core, Saltmarket, Sunstrip, Greenmoor), je Landmarke; Bezirksname beim Einfahren.
-- **Done:** (1) Blindtest: 5 Screenshots ohne HUD werden von 3 Testpersonen zu ≥ 80 % richtig dem Bezirk zugeordnet. (2) Generator-Test: 100 Seeds ohne Gebäude auf Straße und mit vollständig verbundenem Graph.
+#### Meilenstein 3 – Bezirke, dystopische Identität, Look-Dev *(≈ 3 Wochen)*
+- Generator MVP (Parzellen, Bezirksparameter), **vier** Bezirke spielbar (Core, Saltmarket, Sunstrip, Greenmoor) mit Landmarken, Bezirksname beim Einfahren.
+- **Look-Dev-Szene** und Realismus-MVP (M13): 12 PBR-Materialien (KTX2), Tonemapping, 4 Himmelsproben, CSM, 20 Decals, 30 Props, `wear`-Attribut.
+- Aegis-Kameras als erste Props (nur Optik und Sichtkegel).
+- **Done:** (1) Blindtest: 5 Screenshots ohne HUD werden von 3 Testpersonen zu ≥ 80 % richtig dem Bezirk zugeordnet. (2) Generator-Test: 100 Seeds ohne Gebäude auf Straße und mit vollständig verbundenem Graph. (3) Mittleres Preset hält ≥ 60 fps im Benchmark-Flug durch alle vier Bezirke.
 
-### Meilenstein 4 – Streaming und große Welt *(≈ 2–3 Wochen)*
-- Chunk-Streaming mit Worker, LOD-Stufen, Terrain mit Höhen; Welt auf 3 × 3 km Stadt + Umland erweitern.
-- **Done:** Fahrt von Küste zu Berggipfel (ca. 6 km) im Benchmark-Flug: durchschnittlich ≥ 60 fps im Preset „Mittel“, 1-%-Low ≥ 40 fps, Speicher nach 10 Minuten Fahrt ± 10 % konstant (kein Leck), kein sichtbares Pop-in näher als 300 m.
+#### Meilenstein 4 – Streaming und große Welt *(≈ 2–3 Wochen)*
+- Chunk-Streaming mit Worker, LOD-Stufen, Terrain mit Höhen; Welt auf ca. 3 × 3 km Stadt + Umland erweitern.
+- **Done:** Fahrt von Küste zu Berggipfel (ca. 6 km) im Benchmark-Flug: durchschnittlich ≥ 60 fps im Preset „Mittel“, 1-%-Low ≥ 40 fps; Speicher nach 10 Minuten Fahrt ± 10 % konstant; kein sichtbares Pop-in näher als 300 m.
 
-### Meilenstein 5 – Fahren und Polizei auf Spielniveau *(≈ 2–3 Wochen)*
-- Fahrzeugdatenblätter, Drift, Raycast-Rad-Physik, Schaden (MVP); Polizei mit Sichtlinie, Suchzustand, Bezirks-Ruf.
-- **Done:** (1) 5 Fahrzeugklassen mit deutlich unterschiedlichem Fahrverhalten (Beschleunigung 0–100, Kurvenfahrt) in Messtabelle. (2) Verfolgung kann ohne Cheat durch Verstecken in Tunnel/Gasse beendet werden (Playtest: ≥ 3 von 5 Testpersonen schütteln die Polizei innerhalb von 3 Minuten ab, ≥ 1 wird festgenommen).
+#### Meilenstein 5 – Fahren und Polizei auf Spielniveau *(≈ 2–3 Wochen)*
+- Fahrzeugdatenblätter, Drift, Raycast-Räder, Schaden (M4); Polizei mit Sichtlinie, Suchzustand, Bezirks-Heat und Aegis-Kennzeichenerfassung (M6).
+- **Done:** (1) 5 Fahrzeugklassen mit deutlich unterschiedlichem Fahrverhalten (Messtabelle 0–100 km/h, Kurvenradius). (2) Verfolgung kann ohne Cheat beendet werden (Playtest: ≥ 3 von 5 Testpersonen schütteln die Polizei innerhalb von 3 Minuten ab, ≥ 1 wird festgenommen).
 
-### Meilenstein 6 – Missionen, Wirtschaft, Speichern *(≈ 3 Wochen)*
-- Missions-Framework, 4 Missionstypen, 5 Story-Missionen, Garage/Speichern, Vollkarte mit GPS.
-- **Done:** Spielstand speichern/laden reproduziert Geld, Position, Fahrzeug, Ruf und Missionsstand exakt (automatischer Test); 5 Story-Missionen von Anfang bis Ende ohne Skript-Blocker (3 Durchläufe protokolliert).
+#### Meilenstein 6 – Missionen, Story-Engine, Speichern *(≈ 3–4 Wochen)*
+- Missions-Framework (M7), Story-Engine MVP (M14: Datenmodell, Fraktionsstand, Entscheidung, Flags), Prolog + Akt I (ca. 6 Missionen) mit Wendepunkt W1; Garage/Speichern (M8), Vollkarte mit GPS (M11).
+- **Done:** (1) Speichern/Laden reproduziert Geld, Position, Fahrzeug, Standing, Flags und Missionsstand exakt (automatischer Test). (2) Story-Simulator läuft grün: alle Entscheidungen von Prolog bis W1 durchspielbar, keine Sackgasse. (3) Zwei verschiedene Entscheidungen bei W1 führen nachweislich zu unterschiedlichen Folgemissionen und Weltzustand-Tags.
 
-### Meilenstein 7 – Atmosphäre: Wetter, Audio, Nacht *(≈ 2–3 Wochen)*
-- Wetter-Zustandsautomat, nasse Straßen, Sirenen/Motoren/Umgebungsklang je Bezirk, Straßenbeleuchtung.
-- **Done:** Alle 5 Wetterzustände wechseln ohne fps-Einbruch > 15 %; jeder Bezirk hat eigene Umgebungs-Audiospur (Hörtest: 80 % richtige Zuordnung bei geschlossenen Augen/ohne Bild); Straßenlaternen nachts ohne mehr als 4 echte Lichter.
+#### Meilenstein 7 – Atmosphäre: Wetter, Audio, Nacht, Nässe *(≈ 3 Wochen)*
+- Wetter-Zustandsautomat, Nässe-Shader, Verschleiß-Look (M13 Ausbau), Sirenen/Motoren/Umgebungsklang je Bezirk, Straßenbeleuchtung nach Bezirk.
+- **Done:** Alle 5 Wetterzustände wechseln ohne fps-Einbruch > 15 %; jeder Bezirk hat eine eigene Audio-Umgebung (Hörtest: ≥ 80 % richtige Zuordnung ohne Bild); nachts nie mehr als 4 (Mittel) bzw. 8 (Hoch) echte Lichter laut `renderer.info`.
 
-### Meilenstein 8 – Ausbau, Politur, Release-Kandidat *(≈ 4+ Wochen)*
-- Umland komplett (Highway, Coast Road, Tunnel), Story-Kampagne 12–15 Missionen, restliche Bezirke, Tuning-Feinschliff, Barrierefreiheit.
-- **Done:** Vollständiger Durchlauf der Kampagne durch 3 Testpersonen ohne Blocker; Benchmark-Flug auf drei Referenzgeräten (Highend, Mittelklasse, Integrierte GPU) erreicht die Budgets aus Kapitel 4 / M12; Ladezeit bis Start ≤ 10 s.
+#### Meilenstein 8 – Einzelspieler-Vollversion (Release-Kandidat) *(≈ 6+ Wochen)*
+- Alle 6 Bezirke und Umland (Highway, Coast Road, Tunnel), Story komplett: Akt II–III, W2–W5, Enden E1–E4, Nebenaufträge, Weltzustand-Tags sichtbar, Aegis-Mechaniken (Kameras hacken, Kennzeichen), Tuning-Feinschliff.
+- **Done:** (1) Vollständiger Durchlauf der Kampagne durch 3 Testpersonen ohne Blocker; jedes der Enden E1–E4 wurde mindestens einmal erreicht. (2) Story-Simulator: 5000 zufällige Entscheidungsläufe, 0 Sackgassen, jedes Ende erreichbar. (3) Benchmark-Flug auf drei Referenzgeräten (Highend, Mittelklasse, integrierte GPU) erfüllt die Budgets aus M12. (4) Ladezeit bis Start ≤ 10 s. (5) **Einzelspieler-Stabilitätstest:** 2 Stunden Dauerlauf ohne Absturz, Speicher stabil.
+
+### Teil B – Mehrspieler (erst nach Meilenstein 8)
+
+#### Meilenstein 9 – Server-Fundament *(≈ 4 Wochen)*
+- `World.connect(transport)`-Abstraktion; **LocalServer** (Einzelspieler läuft über denselben Netzpfad); Node-Gateway mit `ws`, Anmeldung, 1 Realm, 1 Zone; Persistenz (PostgreSQL); Prädiktion/Interpolation für Fahrzeuge.
+- **Done:** (1) Einzelspieler-Regressionstest aus MS8 besteht unverändert über den LocalServer. (2) Zwei Browser-Clients fahren im selben Realm und sehen sich gegenseitig flüssig (≤ 150 ms Interpolationsverzug, keine Sprünge > 1 m bei 100 ms simulierter Latenz und 2 % Paketverlust). (3) Server-Neustart verliert keinen Charakterstand (Geld, Fahrzeuge, Standing, Flags).
+
+#### Meilenstein 10 – Mehrspieler-Welt und Anti-Cheat *(≈ 6 Wochen)*
+- Mehrere Zonen mit Handoff, Interessenverwaltung, serverseitiger Ambient-Verkehr in Spielernähe, Polizei-Dispatcher serverseitig, Story-Phasen pro Spieler, Plausibilitätsprüfungen, Rate-Limits, Chat.
+- **Done:** (1) Lasttest mit 50 simulierten Spielern (Bots): Tick-Zeit ≤ 30 ms (95. Perzentil), Bandbreite < 30 KB/s je Client. (2) Cheat-Testsuite: manipulierte Clients, die Teleport, Geld-Zuwachs oder Missionsabschluss melden, werden zu 100 % abgelehnt (automatische Tests). (3) Zwei Spieler spielen **verschiedene** Story-Stände im selben Realm ohne gegenseitige Spoiler.
+
+#### Meilenstein 11 – Live-Ausbau *(≈ 6+ Wochen, offen)*
+- Mehrere Realms, Fraktionskontrolle der Bezirke, Events/Saisons, Gruppen mit gemeinsamer Story-Phase, Telemetrie, Moderation, Datenschutz-/Betriebskonzept.
+- **Done:** 100 Spieler im Realm stabil (Lasttest 2 h), Backups und Wiederherstellung getestet, DSGVO-Auskunft und -Löschung funktionieren.
 
 ### Abhängigkeitsfolge
 
 ```mermaid
 flowchart LR
   M1["MS1 Fundament"] --> M2["MS2 Graph & Verkehr"]
-  M2 --> M3["MS3 Bezirke & Generator"]
+  M2 --> M3["MS3 Bezirke & Look-Dev"]
   M3 --> M4["MS4 Streaming & große Welt"]
   M2 --> M5["MS5 Fahren & Polizei"]
-  M4 --> M6["MS6 Missionen & Wirtschaft"]
+  M4 --> M6["MS6 Missionen & Story-Engine"]
   M5 --> M6
   M6 --> M7["MS7 Wetter & Audio"]
-  M7 --> M8["MS8 Ausbau & Release"]
+  M7 --> M8["MS8 Einzelspieler-Vollversion"]
+  M8 --> M9["MS9 Server-Fundament"]
+  M9 --> M10["MS10 Mehrspieler & Anti-Cheat"]
+  M10 --> M11["MS11 Live-Ausbau"]
 ```
 
-MS4 und MS5 können parallel laufen (unterschiedliche Dateibereiche), sofern zwei Personen/Sessions arbeiten und nicht dieselben Dateien berühren.
+MS4 und MS5 können parallel laufen (unterschiedliche Dateibereiche), sofern zwei Personen/Sessions arbeiten und nicht dieselben Dateien berühren. **Vorarbeit für den Server** (Trennung Sim/Render, serialisierbares `GameState`, deklarative Story-Bedingungen) fällt bereits in MS1–MS6 an und kostet dort kaum Mehraufwand.
+
+### Zuordnung zum Iterationsplan
+
+| Iteration ([`ITERATIONSPLAN.md`](ITERATIONSPLAN.md)) | Entspricht Meilenstein |
+|---|---|
+| 1 – Prototyp lauffähig | Voraussetzung (erledigt) |
+| 2 – Spielgefühl und Details | MS5 (Fahren), Teile von MS7 (Sound, Licht) |
+| 3 – Welt: Bezirke, Küste, Landmarken | MS3 und MS4 |
+| 4 – Zu Fuß, Polizei, Missionen | MS5 und MS6 (Zu-Fuß-Spiel ist im Konzept ein **Ausbau** von M4/M5 und noch nicht eingeplant → ergänzen) |
+| 5 – Modularisierung | MS1 (vorziehen empfohlen, weil alle weiteren Meilensteine davon abhängen) |
+
+**Empfehlung:** Iteration 5 (Modularisierung) vor Iteration 2–4 ziehen, sonst wird jede neue Funktion in die Ein-Datei-Struktur gebaut und später doppelt angefasst.
 
 ---
 
-## 7. Empfohlene Dateistruktur (ES-Module)
+## 10. Empfohlene Dateistruktur (ES-Module)
 
 Ziel: von der einen `game.js` auf **native ES-Module** (`<script type="module">`), ohne Pflicht zu einem Bundler; ab Meilenstein 4 (Worker) optional **Vite** für Dev-Server und Build. Three.js wird per Importmap oder Paket eingebunden (feste Version pinnen).
 
@@ -541,7 +955,9 @@ E:\Projekte\GTA 6\
 ├─ data/                      # reine Daten, keine Logik
 │  ├─ districts/              # core.js, saltmarket.js, lanternHill.js, greenmoor.js, rustline.js, sunstrip.js
 │  ├─ vehicles.js             # Datenblätter
+│  ├─ materials.js            # M13: PBR-Material-Bibliothek, Texel-Dichte, Presets
 │  ├─ missions/               # *.json (Schrittlisten)
+│  ├─ story/                  # M14: factions.js, npcs.js, missions/*.json, endings.js, text.de.json
 │  └─ economy.js              # Preise, Belohnungen
 ├─ src/
 │  ├─ main.js                 # Bootstrap, Game-Loop (Fixed-Step + Render)
@@ -572,6 +988,8 @@ E:\Projekte\GTA 6\
 │  │  ├─ police.js            # M6: Dispatcher, Zustände
 │  │  ├─ law.js               # Verbrechen, Ruf
 │  │  ├─ missions.js          # M7: Runner
+│  │  ├─ story.js             # M14: Bedingungen/Effekte, Fraktionsstand, Enden
+│  │  ├─ aegis.js             # Überwachung: Kameras, Kennzeichen, Aegis-Profil
 │  │  ├─ economy.js           # M8
 │  │  └─ environment.js       # M9: Zeit/Wetter
 │  ├─ audio/
@@ -581,26 +999,43 @@ E:\Projekte\GTA 6\
 │  ├─ ui/
 │  │  ├─ hud.js, minimap.js, fullmap.js, menu.js, toast.js   # M11
 │  │  └─ input.js             # Tastatur/Gamepad
+│  ├─ net/                    # M15: client-seitig
+│  │  ├─ transport.js         # Interface World.connect(transport)
+│  │  ├─ localTransport.js    # LocalServer im Web Worker (Einzelspieler)
+│  │  ├─ wsTransport.js       # WebSocket zum Server
+│  │  ├─ protocol.js          # Binärkodierung (geteilt mit Server)
+│  │  └─ prediction.js        # Prädiktion, Reconciliation, Interpolation
 │  ├─ workers/
-│  │  └─ chunkWorker.js       # Chunk-Geometrie im Worker
+│  │  ├─ chunkWorker.js       # Chunk-Geometrie im Worker
+│  │  └─ localServerWorker.js # führt sim/* für den Einzelspieler aus
 │  └─ tools/
 │     ├─ debugOverlay.js      # M12: F3-Overlay
 │     ├─ profiler.js
 │     └─ benchmark.js         # Benchmark-Flug
+├─ server/                    # M15 (ab MS9): Node.js, nutzt dieselben src/sim und src/world
+│  ├─ gateway.js              # ws, Auth, Rate-Limits
+│  ├─ realm.js                # Weltinstanz, Spielerliste
+│  ├─ zone.js                 # Zonen-Prozess, Interessenverwaltung, Handoff
+│  ├─ persistence.js          # PostgreSQL/Redis, Migrationen
+│  └─ validation.js           # Plausibilitätsprüfungen (Anti-Cheat)
+├─ tools/
+│  └─ assets/                 # M13: PNG→KTX2, glTF→Meshopt, Atlas-Packer
 └─ tests/
    ├─ generator.test.mjs      # Seed-Tests (Node)
-   └─ mission.test.mjs
+   ├─ mission.test.mjs
+   ├─ storySim.mjs            # M14: Story-Simulator (alle Enden erreichbar, keine Sackgassen)
+   └─ cheat.test.mjs          # M15: manipulierte Clients werden abgelehnt
 ```
 
 **Migrationsregeln:**
-1. `src/sim/*` und `src/world/*` importieren **nie** Three.js (nur `render/` und `ui/` tun das) – sonst ist Sim-LOD/Worker/Test nicht möglich.
+1. `src/sim/*` und `src/world/*` importieren **nie** Three.js und **nie** DOM/`window` (nur `render/` und `ui/` tun das) – sonst ist Sim-LOD/Worker/Test **und der spätere Einsatz im Node-Server** nicht möglich.
 2. Kein globaler Zustand: Module bekommen `ctx` (World, State, Bus) übergeben.
 3. Jeder Schritt der Zerlegung muss lauffähig bleiben (Strangler-Muster): Funktionen blockweise aus `game.js` herauslösen, `game.js` wird schrittweise zur dünnen `main.js`.
 4. Der Prototyp-Code bleibt bis MS1 vollständig im Git/Backup; der Prototyp ist derzeit **nicht** unter Versionskontrolle → **`git init` als allererster Schritt** (Verzeichnis ist kein Repository).
 
 ---
 
-## 8. Quellen
+## 11. Quellen
 
 Die Recherche wurde per Websuche durchgeführt. Viele Treffer sind Blogs, Foren und Fachartikel unterschiedlicher Qualität; wo eine Quelle nur sekundär oder anekdotisch ist, ist das vermerkt. Konkrete Zahlen (Draw-Call-Budgets, Millisekunden) sind **Richtwerte** und müssen am eigenen Prototyp gemessen werden.
 
@@ -637,16 +1072,29 @@ Die Recherche wurde per Websuche durchgeführt. Viele Treffer sind Blogs, Foren 
 
 **Nicht belegt / ausdrücklich offen:** Detailzahlen zu Fußgängermengen im Browser, Compute-Shader-Reife in Three.js-WebGPU, Rapier-Fahrzeugcontroller-Verfügbarkeit – im Meilenstein 2/4/5 am eigenen Code zu prüfen.
 
+
+**Realismus und Materialien (Ergänzung)**
+- [Q18] Three.js-Forum: *ORM texture doesn't work properly* (Kanal-Zuordnung bei gepackten ORM-Maps) und Hinweise zu KTX2-Kompression (ETC1S vs. UASTC, widersprüchliche Empfehlungen – an eigenen Daten testen): https://discourse.threejs.org/t/orm-texture-doesnt-work-properly/51342 · https://www.soft8soft.com/docs/manual/en/introduction/Texture-Compression.html *(Foren/Handbuch, keine Nässe-Shader-Quelle gefunden)*
+
+**Server und Mehrspieler**
+- [Q19] Praxisleitfäden zu WebSocket-Spielservern in Node.js (Tickrate 20 Hz üblich, Interessenmanagement, Räume/Instanzen, Event-Loop-Blockade, `ws` vs. `uWebSockets.js`): https://abratabia.com/multiplayer-web-games/websockets.php · https://pkgpulse.com/guides/best-websocket-libraries-nodejs-2026 *(Blog-Niveau; Leistungszahlen unverifiziert; zu zonenbasiertem Sharding mit Grenz-Handoff wurde keine belastbare Quelle gefunden)*
+- [Q20] Gambetta, G.: *Fast-Paced Multiplayer (Part II): Client-Side Prediction and Server Reconciliation*: https://gabrielgambetta.com/client-side-prediction-server-reconciliation.html
+- [Q21] Gambetta, G.: *Fast-Paced Multiplayer (Part III): Entity Interpolation*: https://gabrielgambetta.com/entity-interpolation.html · Teil IV (Lag-Kompensation): https://gabrielgambetta.com/lag-compensation.html
+
+**Nicht belegt / ausdrücklich offen (Ergänzung):** Nässe-/Pfützen-Shader in Three.js, Zonen-Handoff im Browser-MMO, tatsächliche Realm-Obergrenzen (Spielerzahl) – jeweils am Prototyp bzw. per Lasttest zu validieren. Story-Struktur („Perlenkette“), Ruf-/Aegis-System und Anti-Cheat-Liste sind eigene Entwürfe auf Basis allgemeiner Praxis, keine übernommenen Fremdkonzepte.
+
 ---
 
-## 9. Zusammenfassung und die 5 nächsten Schritte
+## 12. Zusammenfassung und die 5 nächsten Schritte
 
-**Kurzfassung:** MTA 6 wird zu einer eigenen Küstenmetropole (**Kestrel Bay**, sechs klar unterscheidbare Bezirke plus Umland mit Küstenstraße, Bergen, Highway und Tunnel). Die Welt entsteht als **Hybrid aus handgesetzten Landmarken/Hauptachsen und prozeduraler Füllung** über einen gemeinsamen Straßengraph. Technisch tragen **Instancing, Chunk-Streaming mit Worker, Sim-LOD für Verkehr/Passanten** und feste Performance-Budgets. Differenzierung durch **Tagesrhythmus pro Bezirk** und **Bezirks-Ruf-System**. Das Ganze ist in zwölf Module mit klaren Schnittstellen und acht überprüfbare Meilensteine gegliedert; der Prototyp ist der direkte Einstieg (Meilenstein 1).
+**Kurzfassung:** MTA 6 wird zu einer eigenständigen, dystopisch-realistischen Küstenmetropole (**Kestrel Bay**, sechs Bezirke zwischen Konzernturm und Schrottgürtel, dazu Umland mit Küstenstraße, Bergen, Highway und Tunnel). Die Welt entsteht als **Hybrid aus handgesetzten Landmarken/Hauptachsen und prozeduraler Füllung** über einen gemeinsamen Straßengraph. Realismus kommt aus einer disziplinierten Pipeline (PBR, KTX2, Decals, Verschleiß, Nässe, Wetter) innerhalb fester Browser-Budgets. Die Story **„Nullstunde“** reagiert über Fraktionsstand, NPC-Vertrauen, Taten-Flags und Weltzustand mit fünf Wendepunkten und fünf Enden; sie ist als Daten modelliert und per Simulator testbar. Ein autoritativer Node-Server mit Zonen und Realms macht daraus später eine geteilte Welt, in der die Story pro Spieler privat bleibt. Differenzierung: **Tagesrhythmus pro Bezirk**, **Bezirks-Ruf** und das **Aegis-Überwachungsprofil** als spielbare Dystopie.
+
+Das Ganze besteht aus 15 Modulen und 11 überprüfbaren Meilensteinen; **Einzelspieler wird in MS1–MS8 zuerst stabil**, Mehrspieler folgt in MS9–MS11.
 
 ### Die 5 wichtigsten nächsten Schritte
 
-1. **Versionskontrolle einrichten** (`git init`, erster Commit mit Prototyp) und abwarten, bis die laufende Prototyp-Session ihre Änderungen an `game.js` abgeschlossen hat – danach Meilenstein 1 starten.
-2. **`game.js` in ES-Module zerlegen** (Kapitel 7), dabei `Rng(seed)` einführen und `sim/`-Code frei von Three.js halten.
-3. **Instancing + Debug-Overlay (F3) einbauen**: Gebäude, Bäume, Gehwege als Instanzen; Draw-Call-Ziel ≤ 150 und Benchmark-Flug als Ausgangsmessung festhalten.
-4. **Straßengraph (`CityData`) einführen** und Verkehr/Fußgänger/Polizei darauf umstellen (Meilenstein 2) – er ist die Grundlage für KI, Karte, GPS und Missionen.
-5. **Bezirks-Definitionen und Landmarken festlegen** (`data/districts/`), zuerst für vier Bezirke (Core, Saltmarket, Sunstrip, Greenmoor), und den **Blindtest** (Screenshots ohne HUD) als Qualitätsmaßstab für Meilenstein 3 vorbereiten.
+1. **Versionskontrolle einrichten** (`git init`, erster Commit mit Prototyp) und abwarten, bis die laufende Prototyp-Session `game.js` abgeschlossen hat – danach Meilenstein 1 starten.
+2. **Modularisieren (Iteration 5 vorziehen):** `game.js` in ES-Module zerlegen, `Rng(seed)` einführen, `sim/` und `world/` ohne Three.js halten – Voraussetzung für Streaming, Story-Engine und späteren Server.
+3. **Instancing + Debug-Overlay (F3):** Gebäude, Bäume, Gehwege als Instanzen; Ziel ≤ 150 Draw Calls; Benchmark-Flug als Ausgangsmessung.
+4. **Straßengraph (`CityData`) einführen** und Verkehr/Fußgänger/Polizei darauf umstellen (MS2) – Grundlage für KI, Karte, GPS, Missionen und später die Zonen.
+5. **Story-Datenmodell und Bezirks-Definitionen festschreiben** (`data/story/`, `data/districts/`) und eine **Look-Dev-Szene** mit 12 PBR-Materialien aufbauen – damit Stimmung, Dystopie und Realismus früh am Bild geprüft werden, bevor Inhalte in Masse entstehen.
