@@ -11,6 +11,7 @@ shader_type spatial;
 varying vec3 wp;
 const float P = 80.0;
 const float HALF = 320.0;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
 void vertex() { wp = (MODEL_MATRIX * vec4(VERTEX, 1.0)).xyz; }
 void fragment() {
 	vec2 q = wp.xz + HALF;
@@ -36,8 +37,11 @@ void fragment() {
 			}
 		}
 	}
+	float n = hash(floor(wp.xz * 2.5)) * 0.5 + hash(floor(wp.xz * 0.4)) * 0.5;
+	col *= 0.88 + 0.24 * n;
+	if (inside && !(roadx || roadz) && min(d.x, d.y) < 8.5) col *= 0.7;
 	ALBEDO = col;
-	ROUGHNESS = rough;
+	ROUGHNESS = rough - 0.1 * n;
 }
 """
 
@@ -101,6 +105,13 @@ var agents: Array[Agent] = []
 var rng := RandomNumberGenerator.new()
 var test_mode := false
 var test_time := 0.0
+var fps_mode := false
+var fps_time := 0.0
+var lamp_positions: Array[Vector3] = []
+var lamp_lights: Array[OmniLight3D] = []
+var lamp_head_mat: StandardMaterial3D
+var lamp_timer := 0.0
+var tree_xforms: Array[Vector3] = []
 
 func rr(k: float) -> float:
 	return k * P - HALF
@@ -108,10 +119,12 @@ func rr(k: float) -> float:
 func _ready() -> void:
 	rng.seed = 6
 	test_mode = "--test" in OS.get_cmdline_user_args()
+	fps_mode = "--fps" in OS.get_cmdline_user_args()
 	_setup_input()
 	_build_environment()
 	_build_ground()
 	_build_city()
+	_build_lamps()
 	_build_car()
 	_build_traffic()
 	_build_hud()
@@ -142,9 +155,22 @@ func _build_environment() -> void:
 	env.tonemap_mode = Environment.TONE_MAPPER_ACES
 	env.ssao_enabled = true
 	env.ssr_enabled = true
+	env.ssao_radius = 2.0
+	env.ssao_intensity = 2.0
 	env.glow_enabled = true
+	env.glow_intensity = 0.9
+	env.glow_bloom = 0.08
+	env.sdfgi_enabled = true
+	env.sdfgi_cascades = 3
+	env.sdfgi_use_occlusion = true
 	env.fog_enabled = true
 	env.fog_density = 0.0006
+	env.volumetric_fog_enabled = true
+	env.volumetric_fog_density = 0.004
+	env.volumetric_fog_gi_inject = 1.0
+	env.adjustment_enabled = true
+	env.adjustment_contrast = 1.08
+	env.adjustment_saturation = 1.12
 	var we := WorldEnvironment.new()
 	we.environment = env
 	add_child(we)
@@ -183,6 +209,9 @@ func _build_city() -> void:
 		for j in N:
 			var cx := rr(i) + P / 2.0
 			var cz := rr(j) + P / 2.0
+			if rng.randf() < 0.14:
+				_make_park(cx, cz)
+				continue
 			var dist := Vector2(cx, cz).length() / (HALF * 1.2)
 			var max_h := lerpf(80.0, 16.0, clampf(dist, 0.0, 1.0))
 			var lots: Array = []
@@ -219,6 +248,136 @@ func _make_building(x: float, z: float, w: float, d: float, h: float, color: Col
 	cs.shape = bs
 	body.add_child(cs)
 	add_child(body)
+	# Details: Dachaufbau, bei Hochhaeusern ein zurueckgesetztes Obergeschoss und eine Antenne
+	if h > 38.0:
+		var tier := MeshInstance3D.new()
+		var tm := BoxMesh.new()
+		tm.size = Vector3(w * 0.7, h * 0.22, d * 0.7)
+		tier.mesh = tm
+		tier.material_override = bld_mat
+		tier.set_instance_shader_parameter("tint", color.darkened(0.08))
+		tier.position = Vector3(0, h / 2.0 + tm.size.y / 2.0, 0)
+		body.add_child(tier)
+		var ant := MeshInstance3D.new()
+		var cm := CylinderMesh.new()
+		cm.top_radius = 0.15
+		cm.bottom_radius = 0.3
+		cm.height = 12.0
+		ant.mesh = cm
+		var am := StandardMaterial3D.new()
+		am.albedo_color = Color(0.2, 0.2, 0.22)
+		ant.material_override = am
+		ant.position = Vector3(0, h / 2.0 + tm.size.y + 6.0, 0)
+		body.add_child(ant)
+	else:
+		var ac := MeshInstance3D.new()
+		var am2 := BoxMesh.new()
+		am2.size = Vector3(w * 0.25, 1.6, d * 0.2)
+		ac.mesh = am2
+		var acm := StandardMaterial3D.new()
+		acm.albedo_color = Color(0.4, 0.42, 0.45)
+		ac.material_override = acm
+		ac.position = Vector3(w * 0.2, h / 2.0 + 0.8, d * 0.15)
+		body.add_child(ac)
+
+func _multimesh(mesh: Mesh, xforms: Array, mat: Material) -> void:
+	var mm := MultiMesh.new()
+	mm.transform_format = MultiMesh.TRANSFORM_3D
+	mm.mesh = mesh
+	mm.instance_count = xforms.size()
+	for i in xforms.size():
+		mm.set_instance_transform(i, xforms[i])
+	var mmi := MultiMeshInstance3D.new()
+	mmi.multimesh = mm
+	mmi.material_override = mat
+	add_child(mmi)
+
+func _make_park(cx: float, cz: float) -> void:
+	var gr := MeshInstance3D.new()
+	var gm := BoxMesh.new()
+	gm.size = Vector3(56, 0.2, 56)
+	gr.mesh = gm
+	var mat := StandardMaterial3D.new()
+	mat.albedo_color = Color(0.24, 0.42, 0.18)
+	mat.roughness = 1.0
+	gr.material_override = mat
+	gr.position = Vector3(cx, 0.1, cz)
+	add_child(gr)
+	for i in 16:
+		tree_xforms.append(Vector3(cx + rng.randf_range(-25, 25), 0, cz + rng.randf_range(-25, 25)))
+
+func _build_trees() -> void:
+	var trunk := CylinderMesh.new()
+	trunk.top_radius = 0.3
+	trunk.bottom_radius = 0.45
+	trunk.height = 3.0
+	var crown := SphereMesh.new()
+	crown.radius = 2.8
+	crown.height = 5.6
+	var tmat := StandardMaterial3D.new()
+	tmat.albedo_color = Color(0.3, 0.2, 0.12)
+	var cmat := StandardMaterial3D.new()
+	cmat.albedo_color = Color(0.17, 0.42, 0.16)
+	cmat.roughness = 1.0
+	var trunks: Array = []
+	var crowns: Array = []
+	for p in tree_xforms:
+		var s := rng.randf_range(0.8, 1.4)
+		trunks.append(Transform3D(Basis().scaled(Vector3(s, s, s)), p + Vector3(0, 1.5 * s, 0)))
+		crowns.append(Transform3D(Basis().scaled(Vector3(s, s, s)), p + Vector3(0, 5.2 * s, 0)))
+	_multimesh(trunk, trunks, tmat)
+	_multimesh(crown, crowns, cmat)
+
+func _build_lamps() -> void:
+	_build_trees()
+	for k in N + 1:
+		for j in N:
+			var mid := rr(j) + P / 2.0
+			for s in [-1.0, 1.0]:
+				lamp_positions.append(Vector3(rr(k) + s * 9.0, 0.0, mid))
+				lamp_positions.append(Vector3(mid, 0.0, rr(k) + s * 9.0))
+	for i in N + 1:
+		for j in N + 1:
+			for sx in [-1.0, 1.0]:
+				for sz in [-1.0, 1.0]:
+					lamp_positions.append(Vector3(rr(i) + sx * 9.5, 0.0, rr(j) + sz * 9.5))
+	var pole := CylinderMesh.new()
+	pole.top_radius = 0.1
+	pole.bottom_radius = 0.16
+	pole.height = 7.0
+	var head := BoxMesh.new()
+	head.size = Vector3(0.9, 0.18, 0.5)
+	var pmat := StandardMaterial3D.new()
+	pmat.albedo_color = Color(0.18, 0.19, 0.2)
+	pmat.metallic = 0.6
+	lamp_head_mat = StandardMaterial3D.new()
+	lamp_head_mat.albedo_color = Color(1.0, 0.85, 0.6)
+	lamp_head_mat.emission_enabled = true
+	lamp_head_mat.emission = Color(1.0, 0.8, 0.5)
+	lamp_head_mat.emission_energy_multiplier = 0.0
+	var poles: Array = []
+	var heads: Array = []
+	for p in lamp_positions:
+		poles.append(Transform3D(Basis(), p + Vector3(0, 3.5, 0)))
+		heads.append(Transform3D(Basis(), p + Vector3(0, 7.1, 0)))
+	_multimesh(pole, poles, pmat)
+	_multimesh(head, heads, lamp_head_mat)
+	for i in 8:
+		var l := OmniLight3D.new()
+		l.omni_range = 30.0
+		l.light_color = Color(1.0, 0.8, 0.55)
+		l.light_energy = 0.0
+		add_child(l)
+		lamp_lights.append(l)
+
+func _update_lamp_lights(night: float) -> void:
+	lamp_head_mat.emission_energy_multiplier = night * 6.0
+	var cp := car.global_position
+	var sorted := lamp_positions.duplicate()
+	sorted.sort_custom(func(a: Vector3, b: Vector3) -> bool: return a.distance_squared_to(cp) < b.distance_squared_to(cp))
+	for i in lamp_lights.size():
+		lamp_lights[i].global_position = sorted[i] + Vector3(0, 6.5, 0)
+		lamp_lights[i].light_energy = night * 4.0
 
 func _paint(c: Color, metal: float = 0.5) -> StandardMaterial3D:
 	var m := StandardMaterial3D.new()
@@ -448,6 +607,15 @@ func _process(delta: float) -> void:
 	env.fog_light_color = horizon
 	bld_mat.set_shader_parameter("night", night)
 	headlight.light_energy = night * 6.0
+	lamp_timer -= delta
+	if lamp_timer <= 0.0:
+		lamp_timer = 0.25
+		_update_lamp_lights(night)
+	if fps_mode:
+		fps_time += delta
+		if fps_time > 6.0:
+			print("FPS=", Engine.get_frames_per_second())
+			get_tree().quit()
 	# Kamera folgt dem Auto (Front = -Z)
 	var fwd := car.global_transform.basis.z
 	fwd.y = 0.0
