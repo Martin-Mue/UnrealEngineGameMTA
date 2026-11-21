@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "MTADialogueSubsystem.h"
 #include "MTAHUD.generated.h"
 
 class UFont;
@@ -53,6 +54,18 @@ public:
 	bool bShowHelpLine = true;
 
 private:
+	// --- NPC-Gespraeche und Interaktions-Prompt -------------------------------------------------
+	void DrawInteractionPrompt();
+	void DrawConversation();
+	void UpdateConversationInput();
+
+	UFUNCTION()
+	void OnDialogueViewChanged(const FMTADialogueView& View);
+
+	FMTADialogueView DialogueView;
+	bool bDialogueBound = false;
+	bool bMoveLocked = false;
+
 	void DrawStatus(AMTA6GameMode* GM);
 	void DrawToastAndOverlays(AMTA6GameMode* GM);
 	void DrawDialog(AMTA6GameMode* GM);

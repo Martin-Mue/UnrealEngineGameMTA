@@ -58,6 +58,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UMTAMapDataStore> MapStore;
 
+	/** Erzeugt die ansprechbaren Schluessel-NPCs (nur Figuren mit Dialog) in ihren Bezirken. */
+	void SpawnDialogueNPCs();
+
 	void SpawnMenu();
 	void HandleMenuSave(FString Slot);
 	void HandleMenuLoad(FString Slot);

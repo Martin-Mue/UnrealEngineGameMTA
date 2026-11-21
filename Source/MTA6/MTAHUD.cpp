@@ -1,6 +1,8 @@
 #include "MTAHUD.h"
 
 #include "MTA6GameMode.h"
+#include "MTACharacter.h"
+#include "MTAInteractionComponent.h"
 #include "MTAMinimapTypes.h"
 #include "MTAMissionComponent.h"
 #include "MTAStorySubsystem.h"
@@ -64,6 +66,149 @@ void AMTAHUD::DrawHUD()
 	DrawMinimap(GM);
 	DrawToastAndOverlays(GM);
 	DrawDialog(GM);
+
+	UpdateConversationInput();
+	DrawInteractionPrompt();
+	DrawConversation();
+}
+
+// --- NPC-Gespraeche -----------------------------------------------------------------------------
+
+void AMTAHUD::OnDialogueViewChanged(const FMTADialogueView& View)
+{
+	DialogueView = View;
+}
+
+void AMTAHUD::UpdateConversationInput()
+{
+	UGameInstance* GI = GetGameInstance();
+	UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
+	if (!Dialog || !PlayerOwner)
+	{
+		return;
+	}
+	if (!bDialogueBound)
+	{
+		Dialog->OnDialogueView.AddDynamic(this, &AMTAHUD::OnDialogueViewChanged);
+		bDialogueBound = true;
+	}
+
+	const bool bActive = Dialog->IsInConversation() && DialogueView.bActive;
+
+	// Bewegung und Kamera sperren, solange gesprochen wird
+	if (bActive && !bMoveLocked)
+	{
+		PlayerOwner->SetIgnoreMoveInput(true);
+		PlayerOwner->SetIgnoreLookInput(true);
+		bMoveLocked = true;
+	}
+	else if (!bActive && bMoveLocked)
+	{
+		PlayerOwner->SetIgnoreMoveInput(false);
+		PlayerOwner->SetIgnoreLookInput(false);
+		bMoveLocked = false;
+	}
+	if (!bActive)
+	{
+		return;
+	}
+
+	if (DialogueView.bIsChoice)
+	{
+		static const FKey Keys[9] = { EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven, EKeys::Eight, EKeys::Nine };
+		for (int32 i = 0; i < 9 && i < DialogueView.Options.Num(); ++i)
+		{
+			if (PlayerOwner->WasInputKeyJustPressed(Keys[i]))
+			{
+				Dialog->ChooseOption(DialogueView.Options[i].Index);
+				break;
+			}
+		}
+	}
+	else if (PlayerOwner->WasInputKeyJustPressed(EKeys::Enter) || PlayerOwner->WasInputKeyJustPressed(EKeys::SpaceBar))
+	{
+		Dialog->Continue();
+	}
+	if (PlayerOwner->WasInputKeyJustPressed(EKeys::BackSpace))
+	{
+		Dialog->EndConversation();
+	}
+}
+
+void AMTAHUD::DrawInteractionPrompt()
+{
+	if (DialogueView.bActive || !PlayerOwner)
+	{
+		return;
+	}
+	const AMTACharacter* Hero = Cast<AMTACharacter>(PlayerOwner->GetPawn());
+	if (!Hero || !Hero->Interaction)
+	{
+		return;
+	}
+	const FText Prompt = Hero->Interaction->GetPromptText();
+	if (Prompt.IsEmpty())
+	{
+		return;
+	}
+	DrawCenteredText(FString::Printf(TEXT("[E] %s"), *Prompt.ToString()), Canvas->ClipY * 0.70f, FLinearColor(1.f, 0.88f, 0.45f, 1.f), 0.9f * UIScale);
+}
+
+void AMTAHUD::DrawConversation()
+{
+	if (!DialogueView.bActive)
+	{
+		return;
+	}
+
+	const float S = 0.85f * UIScale;
+	const float Pad = 18.f * UIScale;
+	const float Width = FMath::Min(900.f * UIScale, Canvas->ClipX - 40.f * UIScale);
+	const float TextWidth = Width - 2.f * Pad;
+	const float LineH = 26.f * UIScale;
+
+	TArray<FString> Lines;
+	TArray<FLinearColor> Colors;
+	if (!DialogueView.SpeakerName.IsEmpty())
+	{
+		Lines.Add(DialogueView.SpeakerName);
+		Colors.Add(FLinearColor(1.f, 0.82f, 0.35f, 1.f));
+	}
+	TArray<FString> Wrapped;
+	WrapText(DialogueView.Text, TextWidth, S, Wrapped);
+	for (const FString& L : Wrapped)
+	{
+		Lines.Add(L);
+		Colors.Add(FLinearColor::White);
+	}
+	if (DialogueView.bIsChoice)
+	{
+		for (int32 i = 0; i < DialogueView.Options.Num() && i < 9; ++i)
+		{
+			const FMTADialogueOptionView& O = DialogueView.Options[i];
+			FString Label = FString::Printf(TEXT("[%d] %s"), i + 1, *O.Text);
+			if (O.bHasCheck)
+			{
+				Label += FString::Printf(TEXT("  (%s %d/%d)"), *O.Skill.ToString(), O.PlayerValue, O.Difficulty);
+			}
+			Lines.Add(Label);
+			Colors.Add(O.bHasCheck && !O.bWillSucceed ? FLinearColor(1.f, 0.55f, 0.45f, 1.f) : FLinearColor(0.75f, 0.95f, 0.8f, 1.f));
+		}
+	}
+	else
+	{
+		Lines.Add(TEXT("[Enter] Weiter    [Rueck] Beenden"));
+		Colors.Add(FLinearColor(0.7f, 0.7f, 0.7f, 1.f));
+	}
+
+	const float Height = Pad * 2.f + LineH * Lines.Num();
+	const float X = (Canvas->ClipX - Width) * 0.5f;
+	const float Y = Canvas->ClipY - Height - 40.f * UIScale;
+	DrawRect(FLinearColor(0.02f, 0.03f, 0.06f, 0.88f), X, Y, Width, Height);
+	for (int32 i = 0; i < Lines.Num(); ++i)
+	{
+		DrawShadowText(Lines[i], X + Pad, Y + Pad + LineH * i, Colors[i], S);
+	}
 }
 
 // --- Text-Hilfen ------------------------------------------------------------------------------

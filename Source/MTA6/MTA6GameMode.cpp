@@ -3,6 +3,10 @@
 #include "MTACharacter.h"
 #include "MTAHeatSubsystem.h"
 #include "MTAHUD.h"
+#include "MTACityGenerator.h"
+#include "MTADialogueNPC.h"
+#include "MTADialogueSubsystem.h"
+#include "MTANPCSubsystem.h"
 #include "MTAMenuController.h"
 #include "MTAMenuMap.h"
 #include "MTAWorldAIManager.h"
@@ -55,6 +59,92 @@ void AMTA6GameMode::SpawnWorldAI()
 	WorldAI->OnPlayerHitByAI.AddDynamic(this, &AMTA6GameMode::HandlePlayerHitByAI);
 	WorldAI->OnArrested.AddDynamic(this, &AMTA6GameMode::HandleArrested);
 	OnGatherMinimapBlips.AddUObject(this, &AMTA6GameMode::GatherAIBlips);
+}
+
+namespace
+{
+	/** Bezirks-Kennung aus npcs.json -> Enum des Stadtgenerators. */
+	EMTADistrict DistrictFromId(FName Id)
+	{
+		if (Id == FName("saltmarket")) return EMTADistrict::Saltmarket;
+		if (Id == FName("lantern")) return EMTADistrict::LanternHill;
+		if (Id == FName("greenmoor")) return EMTADistrict::Greenmoor;
+		if (Id == FName("rustline")) return EMTADistrict::Rustline;
+		if (Id == FName("sunstrip")) return EMTADistrict::Sunstrip;
+		return EMTADistrict::Core;
+	}
+}
+
+void AMTA6GameMode::SpawnDialogueNPCs()
+{
+	UWorld* World = GetWorld();
+	UGameInstance* GI = GetGameInstance();
+	UMTANPCSubsystem* Npcs = GI ? GI->GetSubsystem<UMTANPCSubsystem>() : nullptr;
+	UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
+	if (!World || !Npcs || !Dialog)
+	{
+		return;
+	}
+	const AMTACityGenerator* City = AMTACityGenerator::FindCityGenerator(this);
+
+	TMap<EMTADistrict, int32> UsedPerDistrict;
+	int32 Spawned = 0;
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	for (const FName& Id : Npcs->GetAllNPCIds())
+	{
+		FMTANPCProfile Profile;
+		if (Dialog->GetDialogueForNPC(Id).IsNone() || !Npcs->GetProfile(Id, Profile))
+		{
+			continue;
+		}
+
+		FVector Loc;
+		if (Spawned < 3)
+		{
+			// Die ersten drei stehen direkt beim Start, damit man sofort ein Gespraech ausprobieren kann.
+			const FVector Forward = StartRotation.Vector();
+			const FVector Right = FRotationMatrix(StartRotation).GetUnitAxis(EAxis::Y);
+			Loc = StartLocation + Forward * 1000.f + Right * (-450.f + 300.f * Spawned) + FVector(0.f, 0.f, 20.f);
+		}
+		else if (City)
+		{
+			// Sonst am Gehweg einer Kreuzung im eigenen Bezirk
+			const EMTADistrict D = DistrictFromId(Profile.District);
+			int32 Pick = UsedPerDistrict.FindOrAdd(D)++;
+			FVector Spot = FVector::ZeroVector;
+			bool bFound = false;
+			for (int32 BX = 0; BX < MTACity::Blocks && !bFound; ++BX)
+			{
+				for (int32 BY = 0; BY < MTACity::Blocks; ++BY)
+				{
+					if (City->GetBlockDistrict(BX, BY) == D && Pick-- == 0)
+					{
+						Spot = City->GetIntersectionLocation(BX, BY) + FVector(MTACity::SidewalkOffset + 150.f, MTACity::SidewalkOffset + 150.f, 20.f);
+						bFound = true;
+						break;
+					}
+				}
+			}
+			if (!bFound)
+			{
+				continue;
+			}
+			Loc = Spot;
+		}
+		else
+		{
+			continue;
+		}
+
+		if (AMTADialogueNPC* Npc = World->SpawnActor<AMTADialogueNPC>(AMTADialogueNPC::StaticClass(), Loc, FRotator(0.f, FMath::FRandRange(0.f, 360.f), 0.f), Params))
+		{
+			Npc->SetupNPC(Id, Profile.DisplayName);
+			++Spawned;
+		}
+	}
+	UE_LOG(LogTemp, Display, TEXT("MTA6: %d ansprechbare NPCs erzeugt"), Spawned);
 }
 
 void AMTA6GameMode::SpawnMenu()
@@ -173,6 +263,7 @@ void AMTA6GameMode::BeginPlay()
 	Super::BeginPlay();
 	SpawnStartVehicle();
 	SpawnWorldAI();
+	SpawnDialogueNPCs();
 	SpawnMenu();
 	Money = StartMoney;
 	Hour = FMath::Fmod(StartHour, 24.f);
