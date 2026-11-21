@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "Widgets/SWeakWidget.h"
 #include "MTAAccessibilitySubsystem.h"
+#include "MTADialogueSubsystem.h"
 #include "MTALocalizationSubsystem.h"
 #include "MTAMenuMap.h"
 #include "MTAMenuStyle.h"
@@ -97,7 +98,15 @@ void AMTAMenuController::Tick(float DeltaSeconds)
 		if (Photo->IsActive()) { return; } // Fotomodus hat eigene Eingabe
 	}
 
-	if (PC->WasInputKeyJustPressed(EKeys::Escape) || PC->WasInputKeyJustPressed(EKeys::Gamepad_Special_Right))
+	// Waehrend eines NPC-Gespraechs beendet Esc das Gespraech (das HUD behandelt es); kein Pausenmenue.
+	bool bTalking = false;
+	if (const UGameInstance* GI = GetGameInstance())
+	{
+		const UMTADialogueSubsystem* Dialog = GI->GetSubsystem<UMTADialogueSubsystem>();
+		bTalking = Dialog && Dialog->IsInConversation();
+	}
+
+	if (!bTalking && (PC->WasInputKeyJustPressed(EKeys::Escape) || PC->WasInputKeyJustPressed(EKeys::Gamepad_Special_Right)))
 	{
 		ShowPauseMenu();
 	}

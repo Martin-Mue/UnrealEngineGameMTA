@@ -28,9 +28,9 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|HUD")
 	TObjectPtr<UFont> HudFont;
 
-	/** Referenzhoehe fuer die Skalierung (bei 1080 Pixeln Hoehe ist der Faktor 1). */
+	/** Referenzhoehe fuer die Skalierung (bei dieser Hoehe ist der Faktor 1; kleiner = groessere Schrift). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|HUD")
-	float ReferenceHeight = 1080.f;
+	float ReferenceHeight = 640.f;
 
 	/** Kantenlaenge der Minimap in Pixeln (bei Referenzhoehe). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|HUD|Minimap")

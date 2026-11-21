@@ -140,7 +140,8 @@ void AMTAHUD::UpdateConversationInput()
 	{
 		Dialog->Continue();
 	}
-	if (PlayerOwner->WasInputKeyJustPressed(EKeys::BackSpace))
+	// Gespraech jederzeit beenden: Esc, Rueck- oder X-Taste
+	if (PlayerOwner->WasInputKeyJustPressed(EKeys::Escape) || PlayerOwner->WasInputKeyJustPressed(EKeys::BackSpace) || PlayerOwner->WasInputKeyJustPressed(EKeys::X))
 	{
 		Dialog->EndConversation();
 	}
@@ -170,7 +171,7 @@ void AMTAHUD::DrawInteractionPrompt()
 	{
 		return;
 	}
-	DrawCenteredText(FString::Printf(TEXT("[E] %s"), *PromptText), Canvas->ClipY * 0.70f, FLinearColor(1.f, 0.88f, 0.45f, 1.f), 0.9f * UIScale);
+	DrawCenteredText(FString::Printf(TEXT("[E] %s"), *PromptText), Canvas->ClipY * 0.70f, FLinearColor(1.f, 0.88f, 0.45f, 1.f), 1.2f * UIScale);
 }
 
 AMTADialogueNPC* AMTAHUD::FindNearbyNPC() const
@@ -202,11 +203,11 @@ void AMTAHUD::DrawConversation()
 		return;
 	}
 
-	const float S = 0.85f * UIScale;
-	const float Pad = 18.f * UIScale;
-	const float Width = FMath::Min(900.f * UIScale, Canvas->ClipX - 40.f * UIScale);
+	const float S = 1.0f * UIScale;
+	const float Pad = 22.f * UIScale;
+	const float Width = FMath::Min(1000.f * UIScale, Canvas->ClipX - 40.f * UIScale);
 	const float TextWidth = Width - 2.f * Pad;
-	const float LineH = 26.f * UIScale;
+	const float LineH = 34.f * UIScale;
 
 	TArray<FString> Lines;
 	TArray<FLinearColor> Colors;
@@ -238,9 +239,12 @@ void AMTAHUD::DrawConversation()
 	}
 	else
 	{
-		Lines.Add(TEXT("[Enter] Weiter    [Rueck] Beenden"));
-		Colors.Add(FLinearColor(0.7f, 0.7f, 0.7f, 1.f));
+		Lines.Add(TEXT("[Enter] Weiter"));
+		Colors.Add(FLinearColor(0.85f, 0.85f, 0.85f, 1.f));
 	}
+	// Immer sichtbar: so beendet man das Gespraech
+	Lines.Add(TEXT("[Esc] Gespraech beenden"));
+	Colors.Add(FLinearColor(1.f, 0.6f, 0.5f, 1.f));
 
 	const float Height = Pad * 2.f + LineH * Lines.Num();
 	const float X = (Canvas->ClipX - Width) * 0.5f;

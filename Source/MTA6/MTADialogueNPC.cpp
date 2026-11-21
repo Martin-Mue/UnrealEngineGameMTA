@@ -41,7 +41,7 @@ AMTADialogueNPC::AMTADialogueNPC()
 	NameLabel->SetupAttachment(RootComponent);
 	NameLabel->SetRelativeLocation(FVector(0.f, 0.f, 125.f));
 	NameLabel->SetHorizontalAlignment(EHTA_Center);
-	NameLabel->SetWorldSize(18.f);
+	NameLabel->SetWorldSize(30.f);
 	NameLabel->SetTextRenderColor(FColor(255, 214, 90));
 	NameLabel->SetText(FText::FromString(TEXT("NPC")));
 }
