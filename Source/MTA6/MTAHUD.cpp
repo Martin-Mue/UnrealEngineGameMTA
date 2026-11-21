@@ -1,7 +1,9 @@
 #include "MTAHUD.h"
 
+#include "EngineUtils.h"
 #include "MTA6GameMode.h"
 #include "MTACharacter.h"
+#include "MTADialogueNPC.h"
 #include "MTAInteractionComponent.h"
 #include "MTAMinimapTypes.h"
 #include "MTAMissionComponent.h"
@@ -93,6 +95,15 @@ void AMTAHUD::UpdateConversationInput()
 		bDialogueBound = true;
 	}
 
+	// Rueckfall: E startet das Gespraech mit dem naechsten NPC, falls die Interaktions-Komponente es nicht tat
+	if (!Dialog->IsInConversation() && PlayerOwner->WasInputKeyJustPressed(EKeys::E))
+	{
+		if (AMTADialogueNPC* Near = FindNearbyNPC())
+		{
+			IMTAInteractable::Execute_Interact(Near, PlayerOwner->GetPawn());
+		}
+	}
+
 	const bool bActive = Dialog->IsInConversation() && DialogueView.bActive;
 
 	// Bewegung und Kamera sperren, solange gesprochen wird
@@ -146,12 +157,42 @@ void AMTAHUD::DrawInteractionPrompt()
 	{
 		return;
 	}
-	const FText Prompt = Hero->Interaction->GetPromptText();
-	if (Prompt.IsEmpty())
+	FString PromptText = Hero->Interaction->GetPromptText().ToString();
+	if (PromptText.IsEmpty())
+	{
+		// Rueckfall: naechster ansprechbarer NPC in Reichweite
+		if (const AMTADialogueNPC* Near = FindNearbyNPC())
+		{
+			PromptText = FString::Printf(TEXT("Mit %s sprechen"), *Near->DisplayName);
+		}
+	}
+	if (PromptText.IsEmpty())
 	{
 		return;
 	}
-	DrawCenteredText(FString::Printf(TEXT("[E] %s"), *Prompt.ToString()), Canvas->ClipY * 0.70f, FLinearColor(1.f, 0.88f, 0.45f, 1.f), 0.9f * UIScale);
+	DrawCenteredText(FString::Printf(TEXT("[E] %s"), *PromptText), Canvas->ClipY * 0.70f, FLinearColor(1.f, 0.88f, 0.45f, 1.f), 0.9f * UIScale);
+}
+
+AMTADialogueNPC* AMTAHUD::FindNearbyNPC() const
+{
+	const APawn* Pawn = PlayerOwner ? PlayerOwner->GetPawn() : nullptr;
+	UWorld* World = GetWorld();
+	if (!Pawn || !World || !Pawn->IsA<AMTACharacter>())
+	{
+		return nullptr;
+	}
+	AMTADialogueNPC* Best = nullptr;
+	float BestDist = 500.f;
+	for (TActorIterator<AMTADialogueNPC> It(World); It; ++It)
+	{
+		const float D = FVector::Dist2D(It->GetActorLocation(), Pawn->GetActorLocation());
+		if (D < BestDist)
+		{
+			BestDist = D;
+			Best = *It;
+		}
+	}
+	return Best;
 }
 
 void AMTAHUD::DrawConversation()

@@ -61,6 +61,10 @@ public:
 	/** Erzeugt die ansprechbaren Schluessel-NPCs (nur Figuren mit Dialog) in ihren Bezirken. */
 	void SpawnDialogueNPCs();
 
+	/** Automatischer Selbsttest (Start mit Parameter -MTA6SelfTest): prueft Kernfunktionen und beendet das Spiel. */
+	void RunSelfTest();
+	FTimerHandle SelfTestHandle;
+
 	void SpawnMenu();
 	void HandleMenuSave(FString Slot);
 	void HandleMenuLoad(FString Slot);

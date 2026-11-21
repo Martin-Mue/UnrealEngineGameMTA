@@ -3,6 +3,12 @@
 #include "MTACharacter.h"
 #include "MTAHeatSubsystem.h"
 #include "MTAHUD.h"
+#include "EngineUtils.h"
+#include "HAL/PlatformMisc.h"
+#include "Misc/CommandLine.h"
+#include "Misc/Parse.h"
+#include "MTAInteractionInterface.h"
+#include "TimerManager.h"
 #include "MTACityGenerator.h"
 #include "MTADialogueNPC.h"
 #include "MTADialogueSubsystem.h"
@@ -147,6 +153,71 @@ void AMTA6GameMode::SpawnDialogueNPCs()
 	UE_LOG(LogTemp, Display, TEXT("MTA6: %d ansprechbare NPCs erzeugt"), Spawned);
 }
 
+void AMTA6GameMode::RunSelfTest()
+{
+	UWorld* World = GetWorld();
+	UGameInstance* GI = GetGameInstance();
+	int32 Failures = 0;
+	auto Check = [&Failures](const TCHAR* Name, bool bOk)
+	{
+		UE_LOG(LogTemp, Display, TEXT("SELFTEST %s: %s"), Name, bOk ? TEXT("OK") : TEXT("FEHLER"));
+		if (!bOk) { ++Failures; }
+	};
+
+	// 1) Grundobjekte
+	APawn* Hero = UGameplayStatics::GetPlayerPawn(this, 0);
+	Check(TEXT("Spielfigur vorhanden"), Cast<AMTACharacter>(Hero) != nullptr);
+	Check(TEXT("Startauto vorhanden"), StartVehicle != nullptr);
+	Check(TEXT("Welt-KI vorhanden"), WorldAI != nullptr);
+	Check(TEXT("Menue vorhanden"), Menu != nullptr);
+	Check(TEXT("Stadtgenerator vorhanden"), AMTACityGenerator::FindCityGenerator(this) != nullptr);
+
+	// 2) NPC-Gespraech: zur ersten Figur gehen, Interaktion ausloesen, Gespraech durchklicken
+	TArray<AMTADialogueNPC*> Npcs;
+	for (TActorIterator<AMTADialogueNPC> It(World); It; ++It) { Npcs.Add(*It); }
+	Check(TEXT("16 ansprechbare NPCs"), Npcs.Num() == 16);
+	UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
+	if (Hero && Npcs.Num() > 0 && Dialog)
+	{
+		Hero->SetActorLocation(Npcs[0]->GetActorLocation() + FVector(-150.f, 0.f, 30.f));
+		IMTAInteractable::Execute_Interact(Npcs[0], Hero);
+		Check(TEXT("Gespraech startet"), Dialog->IsInConversation());
+		int32 Steps = 0;
+		while (Dialog->IsInConversation() && Steps < 40)
+		{
+			const FMTADialogueView View = Dialog->GetCurrentView();
+			if (View.bIsChoice && View.Options.Num() > 0)
+			{
+				// Die letzte Antwort ist meist der Abschied; die erste kreist oft im Themenmenue.
+				Dialog->ChooseOption(View.Options.Last().Index);
+			}
+			else
+			{
+				Dialog->Continue();
+			}
+			++Steps;
+		}
+		UE_LOG(LogTemp, Display, TEXT("SELFTEST Gespraech: %d Schritte bis zum Ende"), Steps);
+		Check(TEXT("Gespraech endet"), !Dialog->IsInConversation());
+	}
+
+	// 3) Speichern und Laden
+	Money = 4321;
+	const bool bSaved = SaveGameToSlot(true);
+	Money = 1;
+	const bool bLoaded = LoadGameFromSlot();
+	Check(TEXT("Speichern"), bSaved);
+	Check(TEXT("Laden"), bLoaded);
+	Check(TEXT("Geld nach Laden"), Money == 4321);
+
+	// 4) Story
+	UMTAStorySubsystem* Story = GI ? GI->GetSubsystem<UMTAStorySubsystem>() : nullptr;
+	Check(TEXT("Story verfuegbare Missionen"), Story && Story->GetAvailableMissions().Num() > 0);
+
+	UE_LOG(LogTemp, Display, TEXT("SELFTEST ERGEBNIS: %d Fehler"), Failures);
+	FPlatformMisc::RequestExit(false);
+}
+
 void AMTA6GameMode::SpawnMenu()
 {
 	UWorld* World = GetWorld();
@@ -265,6 +336,10 @@ void AMTA6GameMode::BeginPlay()
 	SpawnWorldAI();
 	SpawnDialogueNPCs();
 	SpawnMenu();
+	if (FParse::Param(FCommandLine::Get(), TEXT("MTA6SelfTest")))
+	{
+		GetWorldTimerManager().SetTimer(SelfTestHandle, this, &AMTA6GameMode::RunSelfTest, 6.f, false);
+	}
 	Money = StartMoney;
 	Hour = FMath::Fmod(StartHour, 24.f);
 	GameTime = 0.f;
