@@ -842,6 +842,7 @@ void UMTADialogueSubsystem::InterruptConversation(FName Reason)
 		}
 	}
 	OnConversationEnded.Broadcast(Npc, true);
+	OnDialogueView.Broadcast(View);
 }
 
 void UMTADialogueSubsystem::EndConversation()
@@ -861,6 +862,8 @@ void UMTADialogueSubsystem::EndConversation()
 		}
 	}
 	OnConversationEnded.Broadcast(Npc, false);
+	// Anzeige informieren: der zurueckgesetzte Zustand ist "nicht aktiv" (sonst bleibt die Gespraechsbox stehen)
+	OnDialogueView.Broadcast(View);
 }
 
 // ------------------------------------------------------------------------------------------------

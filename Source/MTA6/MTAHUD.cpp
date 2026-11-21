@@ -104,6 +104,12 @@ void AMTAHUD::UpdateConversationInput()
 		}
 	}
 
+	// Ist das Gespraech zu Ende, darf keine alte Gespraechsbox stehen bleiben
+	if (!Dialog->IsInConversation() && DialogueView.bActive)
+	{
+		DialogueView = FMTADialogueView();
+	}
+
 	const bool bActive = Dialog->IsInConversation() && DialogueView.bActive;
 
 	// Bewegung und Kamera sperren, solange gesprochen wird
