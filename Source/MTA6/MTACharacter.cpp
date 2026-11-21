@@ -1,8 +1,12 @@
 ﻿#include "MTACharacter.h"
 
+#include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "UObject/ConstructorHelpers.h"
 #include "Engine/World.h"
 #include "Engine/HitResult.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -20,6 +24,25 @@ AMTACharacter::AMTACharacter(const FObjectInitializer& ObjectInitializer)
 	PrimaryActorTick.bCanEverTick = true;
 
 	GetCapsuleComponent()->InitCapsuleSize(38.f, 92.f);
+
+	// Standard-Figur: Mannequin aus den Epic-Vorlagen (Content/Mannequin). Fehlt das Asset, bleibt das Mesh leer.
+	if (USkeletalMeshComponent* Body = GetMesh())
+	{
+		static ConstructorHelpers::FObjectFinderOptional<USkeletalMesh> HeroMesh(TEXT("/Game/Mannequin/Character/Mesh/SK_Mannequin.SK_Mannequin"));
+		static ConstructorHelpers::FClassFinder<UAnimInstance> HeroAnim(TEXT("/Game/Mannequin/Animations/ThirdPerson_AnimBP"));
+		if (HeroMesh.Succeeded())
+		{
+			Body->SetSkeletalMesh(HeroMesh.Get());
+		}
+		if (HeroAnim.Succeeded())
+		{
+			Body->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+			Body->SetAnimInstanceClass(HeroAnim.Class);
+		}
+		// Das UE4-Mannequin schaut nach +Y und steht auf der Kapselmitte
+		Body->SetRelativeLocation(FVector(0.f, 0.f, -92.f));
+		Body->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+	}
 
 	// Figur dreht sich in Bewegungsrichtung, Kamera folgt dem Controller.
 	bUseControllerRotationPitch = false;

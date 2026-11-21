@@ -26,6 +26,13 @@ public:
 	AMTA6GameMode();
 
 	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
+
+	/** Das beim Start neben der Spielfigur erzeugte Auto. */
+	UPROPERTY(BlueprintReadOnly, Category = "MTA6|Setup")
+	TObjectPtr<APawn> StartVehicle;
+
+	/** Erzeugt das Startauto neben der Startposition. */
+	void SpawnStartVehicle();
 	virtual void RestartPlayer(AController* NewPlayer) override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;

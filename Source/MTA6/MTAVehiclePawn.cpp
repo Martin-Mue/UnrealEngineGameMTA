@@ -4,12 +4,18 @@
 #include "MTAMissionComponent.h"
 #include "MTAMinimapTypes.h"
 
+#include "MTAVehicleWheels.h"
+
+#include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
 #include "ChaosVehicleMovementComponent.h"
+#include "ChaosWheeledVehicleMovementComponent.h"
 #include "Components/InputComponent.h"
 #include "Components/SkeletalMeshComponent.h"
+#include "Engine/SkeletalMesh.h"
 #include "Engine/World.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "UObject/ConstructorHelpers.h"
 
 AMTAVehiclePawn::AMTAVehiclePawn(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -20,6 +26,39 @@ AMTAVehiclePawn::AMTAVehiclePawn(const FObjectInitializer& ObjectInitializer)
 	if (USkeletalMeshComponent* VehicleMesh = GetMesh())
 	{
 		VehicleMesh->BodyInstance.bNotifyRigidBodyCollision = true;
+
+		// Standard-Fahrzeug: Sportwagen aus den Epic-Vorlagen (Content/Vehicles/SportsCar). Fehlt das Asset, bleibt
+		// das Mesh leer (ein Blueprint kann es dann ersetzen).
+		static ConstructorHelpers::FObjectFinderOptional<USkeletalMesh> CarMesh(TEXT("/Game/Vehicles/SportsCar/SKM_SportsCar.SKM_SportsCar"));
+		static ConstructorHelpers::FClassFinder<UAnimInstance> CarAnim(TEXT("/Game/Vehicles/SportsCar/ABP_SportsCar"));
+		if (CarMesh.Succeeded())
+		{
+			VehicleMesh->SetSkeletalMesh(CarMesh.Get());
+		}
+		if (CarAnim.Succeeded())
+		{
+			VehicleMesh->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+			VehicleMesh->SetAnimInstanceClass(CarAnim.Class);
+		}
+	}
+
+	// Raeder und Antrieb (Heckantrieb): Knochennamen des Template-Sportwagens
+	if (UChaosWheeledVehicleMovementComponent* Move = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent()))
+	{
+		Move->WheelSetups.SetNum(4);
+		Move->WheelSetups[0].WheelClass = UMTAWheelFront::StaticClass();
+		Move->WheelSetups[0].BoneName = FName("Wheel_FL");
+		Move->WheelSetups[1].WheelClass = UMTAWheelFront::StaticClass();
+		Move->WheelSetups[1].BoneName = FName("Wheel_FR");
+		Move->WheelSetups[2].WheelClass = UMTAWheelRear::StaticClass();
+		Move->WheelSetups[2].BoneName = FName("Wheel_BL");
+		Move->WheelSetups[3].WheelClass = UMTAWheelRear::StaticClass();
+		Move->WheelSetups[3].BoneName = FName("Wheel_BR");
+
+		Move->EngineSetup.MaxTorque = 600.f;
+		Move->EngineSetup.MaxRPM = 7000.f;
+		Move->Mass = 1500.f;
+		Move->DragCoefficient = 0.3f;
 	}
 
 	// Verfolgerkamera: Godot-Vorbild 11 m hinter, 4,6 m ueber dem Auto

@@ -1,5 +1,6 @@
 #include "MTA6GameMode.h"
 
+#include "MTACharacter.h"
 #include "MTAHeatSubsystem.h"
 #include "MTAHUD.h"
 #include "MTAMissionComponent.h"
@@ -20,7 +21,8 @@ AMTA6GameMode::AMTA6GameMode()
 	PrimaryActorTick.bStartWithTickEnabled = true;
 
 	HUDClass = AMTAHUD::StaticClass();
-	DefaultPawnClass = AMTAVehiclePawn::StaticClass();
+	// Der Spieler startet zu Fuss (Mannequin) neben seinem Auto und steigt mit F ein.
+	DefaultPawnClass = AMTACharacter::StaticClass();
 	VehiclePawnClassPath = FSoftClassPath(TEXT("/Game/Vehicles/BP_MTAVehicle.BP_MTAVehicle_C"));
 
 	MissionComponent = CreateDefaultSubobject<UMTAMissionComponent>(TEXT("MissionComponent"));
@@ -30,19 +32,40 @@ void AMTA6GameMode::InitGame(const FString& MapName, const FString& Options, FSt
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
-	// Fahrzeug-Blueprint nur laden, wenn das Paket existiert (keine Warnungen ohne Assets)
+}
+
+void AMTA6GameMode::SpawnStartVehicle()
+{
+	UWorld* World = GetWorld();
+	if (!World)
+	{
+		return;
+	}
+
+	// Fahrzeug-Blueprint nur laden, wenn das Paket existiert; sonst die C++-Klasse (Sportwagen aus der Vorlage).
+	UClass* CarClass = AMTAVehiclePawn::StaticClass();
 	if (VehiclePawnClassPath.IsValid() && FPackageName::DoesPackageExist(VehiclePawnClassPath.GetLongPackageName()))
 	{
-		if (UClass* VehicleClass = VehiclePawnClassPath.TryLoadClass<APawn>())
+		if (UClass* Loaded = VehiclePawnClassPath.TryLoadClass<APawn>())
 		{
-			DefaultPawnClass = VehicleClass;
+			CarClass = Loaded;
 		}
 	}
+
+	// Startauto neben der Spielfigur, in Fahrtrichtung der Figur gedreht
+	const FVector Forward = StartRotation.Vector();
+	const FVector Right = FRotationMatrix(StartRotation).GetUnitAxis(EAxis::Y);
+	const FVector CarLocation = StartLocation + Forward * 500.f + Right * 350.f + FVector(0.f, 0.f, 80.f);
+
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+	StartVehicle = World->SpawnActor<APawn>(CarClass, CarLocation, StartRotation, Params);
 }
 
 void AMTA6GameMode::BeginPlay()
 {
 	Super::BeginPlay();
+	SpawnStartVehicle();
 	Money = StartMoney;
 	Hour = FMath::Fmod(StartHour, 24.f);
 	GameTime = 0.f;
