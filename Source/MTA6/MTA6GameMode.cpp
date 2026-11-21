@@ -4,6 +4,11 @@
 #include "MTAHeatSubsystem.h"
 #include "MTAHUD.h"
 #include "EngineUtils.h"
+#include "Dom/JsonObject.h"
+#include "Misc/FileHelper.h"
+#include "Misc/Paths.h"
+#include "Serialization/JsonReader.h"
+#include "Serialization/JsonSerializer.h"
 #include "MTAAudioAmbienceSubsystem.h"
 #include "MTAInteriorSubsystem.h"
 #include "MTABuildingEntry.h"
@@ -348,6 +353,21 @@ void AMTA6GameMode::RunSelfTest()
 		UE_LOG(LogTemp, Display, TEXT("SELFTEST Betreten (Gebaeude %s): %s"), *Entries[0]->GetName(), bEntered ? TEXT("ja") : TEXT("nein (z. B. verschlossen)"));
 	}
 
+	// 2c) Einfuehrung und Kodex
+	Check(TEXT("Einfuehrung geladen (7 Seiten)"), IntroPages.Num() == 7);
+	Check(TEXT("Kodex geladen (5 Kategorien)"), CodexCategories.Num() == 5);
+	OpenCodex();
+	Check(TEXT("Kodex-Index oeffnet"), IsCodexIndexOpen());
+	OpenCodexCategory(3);
+	Check(TEXT("Kodex-Kategorie Personen"), GetStoryPageCount() == 10);
+	CloseStoryPages();
+	Check(TEXT("Esc im Kodex fuehrt zum Index"), IsCodexIndexOpen());
+	CloseStoryPages();
+	Check(TEXT("Kodex schliesst"), !IsStoryPageOpen());
+	ShowIntro();
+	for (int32 i = 0; i < 20 && IsStoryPageOpen(); ++i) { AdvanceStoryPage(); }
+	Check(TEXT("Einfuehrung laeuft durch"), !IsStoryPageOpen());
+
 	// 3) Speichern und Laden
 	Money = 4321;
 	const bool bSaved = SaveGameToSlot(true);
@@ -485,6 +505,12 @@ void AMTA6GameMode::BeginPlay()
 	SpawnEnterableBuildings();
 	SetupWorldSystems();
 	SpawnMenu();
+	LoadIntroData();
+	if (!FParse::Param(FCommandLine::Get(), TEXT("MTA6SelfTest")))
+	{
+		// Einfuehrung kurz nach dem Start zeigen
+		GetWorldTimerManager().SetTimer(IntroHandle, this, &AMTA6GameMode::ShowIntro, 1.5f, false);
+	}
 	if (FParse::Param(FCommandLine::Get(), TEXT("MTA6SelfTest")))
 	{
 		GetWorldTimerManager().SetTimer(SelfTestHandle, this, &AMTA6GameMode::RunSelfTest, 6.f, false);
@@ -533,7 +559,155 @@ AMTAVehiclePawn* AMTA6GameMode::GetPlayerVehicle() const
 
 bool AMTA6GameMode::IsDialogOpen() const
 {
-	return MissionComponent && MissionComponent->IsDialogOpen();
+	// Auch Einfuehrung, Kodex und Auftragsbriefing pausieren das Spiel
+	return (MissionComponent && MissionComponent->IsDialogOpen()) || IsStoryPageOpen();
+}
+
+// --- Einfuehrung, Kodex, Briefing -----------------------------------------------------------
+
+void AMTA6GameMode::LoadIntroData()
+{
+	IntroPages.Reset();
+	CodexCategoryNames.Reset();
+	CodexCategories.Reset();
+
+	FString Text;
+	if (!FFileHelper::LoadFileToString(Text, *(FPaths::ProjectContentDir() / TEXT("Data/intro.json"))))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MTA6: intro.json nicht lesbar"));
+		return;
+	}
+	TSharedPtr<FJsonObject> Root;
+	if (!FJsonSerializer::Deserialize(TJsonReaderFactory<>::Create(Text), Root) || !Root.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("MTA6: intro.json ungueltig"));
+		return;
+	}
+
+	auto ParsePage = [](const TSharedPtr<FJsonObject>& O) -> FMTAStoryPage
+	{
+		FMTAStoryPage P;
+		if (O.IsValid())
+		{
+			O->TryGetStringField(TEXT("title"), P.Title);
+			O->TryGetStringField(TEXT("body"), P.Body);
+		}
+		return P;
+	};
+
+	const TArray<TSharedPtr<FJsonValue>>* Intro = nullptr;
+	if (Root->TryGetArrayField(TEXT("intro"), Intro))
+	{
+		for (const TSharedPtr<FJsonValue>& V : *Intro) { IntroPages.Add(ParsePage(V->AsObject())); }
+	}
+	const TArray<TSharedPtr<FJsonValue>>* Cats = nullptr;
+	if (Root->TryGetArrayField(TEXT("codex"), Cats))
+	{
+		for (const TSharedPtr<FJsonValue>& C : *Cats)
+		{
+			const TSharedPtr<FJsonObject> CO = C->AsObject();
+			if (!CO.IsValid()) { continue; }
+			FString Name;
+			CO->TryGetStringField(TEXT("category"), Name);
+			TArray<FMTAStoryPage> Pages;
+			const TArray<TSharedPtr<FJsonValue>>* Entries = nullptr;
+			if (CO->TryGetArrayField(TEXT("entries"), Entries))
+			{
+				for (const TSharedPtr<FJsonValue>& E : *Entries) { Pages.Add(ParsePage(E->AsObject())); }
+			}
+			CodexCategoryNames.Add(Name);
+			CodexCategories.Add(Pages);
+		}
+	}
+	UE_LOG(LogTemp, Display, TEXT("MTA6: Einfuehrung %d Seiten, Kodex %d Kategorien"), IntroPages.Num(), CodexCategories.Num());
+}
+
+void AMTA6GameMode::ShowStoryPages(const TArray<FMTAStoryPage>& Pages, const FString& Heading, bool bInCodexMode)
+{
+	if (Pages.IsEmpty())
+	{
+		return;
+	}
+	StoryPages = Pages;
+	StoryPageIndex = 0;
+	StoryHeading = Heading;
+	bCodexIndex = false;
+	bCodexMode = bInCodexMode;
+}
+
+void AMTA6GameMode::AdvanceStoryPage()
+{
+	if (StoryPages.IsEmpty())
+	{
+		return;
+	}
+	if (StoryPageIndex + 1 < StoryPages.Num())
+	{
+		++StoryPageIndex;
+	}
+	else
+	{
+		CloseStoryPages();
+	}
+}
+
+void AMTA6GameMode::CloseStoryPages()
+{
+	// Im Kodex fuehrt Esc zuerst zurueck zum Index, danach schliesst es
+	if (bCodexMode && !bCodexIndex && !StoryPages.IsEmpty())
+	{
+		StoryPages.Reset();
+		bCodexIndex = true;
+		return;
+	}
+	StoryPages.Reset();
+	StoryPageIndex = 0;
+	bCodexIndex = false;
+	bCodexMode = false;
+}
+
+void AMTA6GameMode::OpenCodex()
+{
+	if (CodexCategories.IsEmpty())
+	{
+		return;
+	}
+	StoryPages.Reset();
+	bCodexMode = true;
+	bCodexIndex = true;
+}
+
+void AMTA6GameMode::OpenCodexCategory(int32 CategoryIndex)
+{
+	if (!CodexCategories.IsValidIndex(CategoryIndex))
+	{
+		return;
+	}
+	bCodexIndex = false;
+	ShowStoryPages(CodexCategories[CategoryIndex], FString::Printf(TEXT("KODEX: %s"), *CodexCategoryNames[CategoryIndex].ToUpper()), true);
+}
+
+TArray<FString> AMTA6GameMode::GetCodexCategoryNames() const
+{
+	return CodexCategoryNames;
+}
+
+void AMTA6GameMode::CheckMissionBriefing()
+{
+	if (!MissionComponent || IsStoryPageOpen() || IsDialogOpen())
+	{
+		return;
+	}
+	const FMTAMission Mission = MissionComponent->GetCurrentMission();
+	if (Mission.Id.IsEmpty() || Mission.Id == LastBriefedMissionId)
+	{
+		return;
+	}
+	LastBriefedMissionId = Mission.Id;
+	FMTAStoryPage Page;
+	Page.Title = Mission.Title;
+	Page.Body = Mission.Text + TEXT("\n\nZiel: Fahre zum gelben Marker. Die Entfernung steht links oben im Anzeigefeld.");
+	ShowStoryPages({ Page }, TEXT("NEUER AUFTRAG"));
 }
 
 // --- Geld / Fahndung / Zeit -------------------------------------------------------------
@@ -643,6 +817,7 @@ void AMTA6GameMode::Tick(float DeltaSeconds)
 	BustedOverlayTimeLeft = FMath::Max(0.f, BustedOverlayTimeLeft - DeltaSeconds);
 
 	GatherMinimapBlips();
+	CheckMissionBriefing();
 
 	// Karte im Menue: Spielerposition und Blickrichtung nachfuehren
 	if (MapStore)

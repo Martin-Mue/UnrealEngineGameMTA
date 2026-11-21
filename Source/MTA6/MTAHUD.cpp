@@ -4,6 +4,7 @@
 #include "MTA6GameMode.h"
 #include "MTACharacter.h"
 #include "MTADialogueNPC.h"
+#include "MTANPCSubsystem.h"
 #include "MTAInteractionComponent.h"
 #include "MTAMinimapTypes.h"
 #include "MTAMissionComponent.h"
@@ -72,6 +73,138 @@ void AMTAHUD::DrawHUD()
 	UpdateConversationInput();
 	DrawInteractionPrompt();
 	DrawConversation();
+	UpdateStoryPageInput(GM);
+	UpdateInputLock(GM);
+	DrawStoryPage(GM);
+}
+
+// --- Einfuehrung, Kodex, Auftragsbriefing -----------------------------------------------------
+
+void AMTAHUD::UpdateInputLock(AMTA6GameMode* GM)
+{
+	if (!PlayerOwner)
+	{
+		return;
+	}
+	UGameInstance* GI = GetGameInstance();
+	const UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
+	const bool bWantLock = GM->IsStoryPageOpen() || (Dialog && Dialog->IsInConversation() && DialogueView.bActive);
+	if (bWantLock && !bMoveLocked)
+	{
+		PlayerOwner->SetIgnoreMoveInput(true);
+		PlayerOwner->SetIgnoreLookInput(true);
+		bMoveLocked = true;
+	}
+	else if (!bWantLock && bMoveLocked)
+	{
+		PlayerOwner->SetIgnoreMoveInput(false);
+		PlayerOwner->SetIgnoreLookInput(false);
+		bMoveLocked = false;
+	}
+}
+
+void AMTAHUD::UpdateStoryPageInput(AMTA6GameMode* GM)
+{
+	if (!PlayerOwner)
+	{
+		return;
+	}
+	if (!GM->IsStoryPageOpen())
+	{
+		// Kodex oeffnen (nicht waehrend eines Gespraechs)
+		UGameInstance* GI = GetGameInstance();
+		const UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
+		const bool bTalking = Dialog && Dialog->IsInConversation();
+		if (!bTalking && PlayerOwner->WasInputKeyJustPressed(EKeys::K))
+		{
+			GM->OpenCodex();
+		}
+		return;
+	}
+
+	if (GM->IsCodexIndexOpen())
+	{
+		static const FKey Keys[9] = { EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven, EKeys::Eight, EKeys::Nine };
+		const int32 Num = GM->GetCodexCategoryNames().Num();
+		for (int32 i = 0; i < 9 && i < Num; ++i)
+		{
+			if (PlayerOwner->WasInputKeyJustPressed(Keys[i]))
+			{
+				GM->OpenCodexCategory(i);
+				return;
+			}
+		}
+	}
+	else if (PlayerOwner->WasInputKeyJustPressed(EKeys::Enter) || PlayerOwner->WasInputKeyJustPressed(EKeys::SpaceBar))
+	{
+		GM->AdvanceStoryPage();
+		return;
+	}
+	if (PlayerOwner->WasInputKeyJustPressed(EKeys::Escape) || PlayerOwner->WasInputKeyJustPressed(EKeys::BackSpace) || PlayerOwner->WasInputKeyJustPressed(EKeys::K))
+	{
+		GM->CloseStoryPages();
+	}
+}
+
+void AMTAHUD::DrawStoryPage(AMTA6GameMode* GM)
+{
+	if (!GM->IsStoryPageOpen())
+	{
+		return;
+	}
+	DrawRect(FLinearColor(0.f, 0.f, 0.02f, 0.82f), 0.f, 0.f, Canvas->ClipX, Canvas->ClipY);
+
+	const float Width = FMath::Min(1100.f * UIScale, Canvas->ClipX - 100.f * UIScale);
+	const float X = (Canvas->ClipX - Width) * 0.5f;
+	float Y = Canvas->ClipY * 0.14f;
+	const float BodyScale = 1.1f * UIScale;
+	const float LineH = 36.f * UIScale;
+
+	if (GM->IsCodexIndexOpen())
+	{
+		Y += DrawShadowText(TEXT("KODEX"), X, Y, FLinearColor(0.62f, 0.72f, 0.9f, 1.f), 0.9f * UIScale) + 10.f * UIScale;
+		Y += DrawShadowText(TEXT("Was moechtest du nachschlagen?"), X, Y, FLinearColor(1.f, 0.82f, 0.35f, 1.f), 1.6f * UIScale) + 30.f * UIScale;
+		const TArray<FString> Names = GM->GetCodexCategoryNames();
+		for (int32 i = 0; i < Names.Num() && i < 9; ++i)
+		{
+			DrawShadowText(FString::Printf(TEXT("[%d]  %s"), i + 1, *Names[i]), X, Y, FLinearColor::White, BodyScale * 1.1f);
+			Y += LineH * 1.4f;
+		}
+		DrawShadowText(TEXT("[Esc] Schliessen"), X, Canvas->ClipY * 0.88f, FLinearColor(0.85f, 0.85f, 0.85f, 1.f), 0.9f * UIScale);
+		return;
+	}
+
+	const FMTAStoryPage* Page = GM->GetCurrentStoryPage();
+	if (!Page)
+	{
+		return;
+	}
+	const FString Counter = GM->GetStoryPageCount() > 1 ? FString::Printf(TEXT("%s  %d/%d"), *GM->GetStoryHeading(), GM->GetStoryPageIndex() + 1, GM->GetStoryPageCount()) : GM->GetStoryHeading();
+	Y += DrawShadowText(Counter, X, Y, FLinearColor(0.62f, 0.72f, 0.9f, 1.f), 0.9f * UIScale) + 10.f * UIScale;
+	Y += DrawShadowText(Page->Title, X, Y, FLinearColor(1.f, 0.82f, 0.35f, 1.f), 1.8f * UIScale) + 26.f * UIScale;
+
+	TArray<FString> Paragraphs;
+	Page->Body.ParseIntoArray(Paragraphs, TEXT("\n"), false);
+	for (const FString& Para : Paragraphs)
+	{
+		if (Para.IsEmpty())
+		{
+			Y += LineH * 0.6f;
+			continue;
+		}
+		TArray<FString> Wrapped;
+		WrapText(Para, Width, BodyScale, Wrapped);
+		for (const FString& L : Wrapped)
+		{
+			DrawShadowText(L, X, Y, FLinearColor::White, BodyScale);
+			Y += LineH;
+		}
+	}
+
+	const bool bLast = GM->GetStoryPageIndex() + 1 >= GM->GetStoryPageCount();
+	FString Hint = bLast ? TEXT("[Enter] Schliessen") : TEXT("[Enter] Weiter");
+	Hint += GM->bCodexMode ? TEXT("     [Esc] Zurueck") : TEXT("     [Esc] Ueberspringen");
+	DrawShadowText(Hint, X, Canvas->ClipY * 0.88f, FLinearColor(0.85f, 0.85f, 0.85f, 1.f), 0.9f * UIScale);
 }
 
 // --- NPC-Gespraeche -----------------------------------------------------------------------------
@@ -112,19 +245,6 @@ void AMTAHUD::UpdateConversationInput()
 
 	const bool bActive = Dialog->IsInConversation() && DialogueView.bActive;
 
-	// Bewegung und Kamera sperren, solange gesprochen wird
-	if (bActive && !bMoveLocked)
-	{
-		PlayerOwner->SetIgnoreMoveInput(true);
-		PlayerOwner->SetIgnoreLookInput(true);
-		bMoveLocked = true;
-	}
-	else if (!bActive && bMoveLocked)
-	{
-		PlayerOwner->SetIgnoreMoveInput(false);
-		PlayerOwner->SetIgnoreLookInput(false);
-		bMoveLocked = false;
-	}
 	if (!bActive)
 	{
 		return;
@@ -221,6 +341,47 @@ void AMTAHUD::DrawConversation()
 	{
 		Lines.Add(DialogueView.SpeakerName);
 		Colors.Add(FLinearColor(1.f, 0.82f, 0.35f, 1.f));
+	}
+	// Kontext zur Figur: Beruf, Fraktion, Bezirk und ein kurzer Steckbrief
+	if (const UGameInstance* GI = GetGameInstance())
+	{
+		const UMTANPCSubsystem* Npcs = GI->GetSubsystem<UMTANPCSubsystem>();
+		const FMTANPCProfile* P = Npcs ? Npcs->FindProfile(DialogueView.NPCId) : nullptr;
+		if (P)
+		{
+			auto FactionName = [](FName F) -> FString
+			{
+				if (F == FName("aurelia")) return TEXT("Aurelia Holdings");
+				if (F == FName("kcg")) return TEXT("Civil Guard");
+				if (F == FName("union")) return TEXT("Dockers' Union");
+				if (F == FName("collective")) return TEXT("Lantern Collective");
+				if (F == FName("wrenchers")) return TEXT("Rustline Wrenchers");
+				return FString();
+			};
+			FString Info = P->Occupation;
+			const FString Fac = FactionName(P->Faction);
+			if (!Fac.IsEmpty()) { Info += TEXT("  |  ") + Fac; }
+			Info += TEXT("  |  ") + Npcs->GetDistrictName(P->District);
+			TArray<FString> InfoLines;
+			WrapText(Info, TextWidth, S * 0.8f, InfoLines);
+			for (const FString& L : InfoLines)
+			{
+				Lines.Add(L);
+				Colors.Add(FLinearColor(0.62f, 0.72f, 0.9f, 1.f));
+			}
+			if (!P->Bio.IsEmpty())
+			{
+				TArray<FString> BioLines;
+				WrapText(P->Bio, TextWidth, S * 0.8f, BioLines);
+				for (int32 i = 0; i < BioLines.Num() && i < 2; ++i)
+				{
+					Lines.Add(BioLines[i] + (i == 1 && BioLines.Num() > 2 ? TEXT("...") : TEXT("")));
+					Colors.Add(FLinearColor(0.62f, 0.62f, 0.68f, 1.f));
+				}
+			}
+			Lines.Add(TEXT(" "));
+			Colors.Add(FLinearColor::White);
+		}
 	}
 	TArray<FString> Wrapped;
 	WrapText(DialogueView.Text, TextWidth, S, Wrapped);

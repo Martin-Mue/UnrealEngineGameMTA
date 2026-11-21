@@ -12,6 +12,13 @@ class AMTAVehiclePawn;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMTAGameEventSignature);
 
+/** Eine Textseite der Einfuehrung, des Kodex oder eines Auftragsbriefings. */
+struct FMTAStoryPage
+{
+	FString Title;
+	FString Body;
+};
+
 /**
  * Standard-GameMode von MTA 6 (Port des Spielflusses aus godot/main.gd).
  * Wird in Config/DefaultEngine.ini als globaler Default gesetzt.
@@ -60,6 +67,44 @@ public:
 
 	/** Erzeugt die ansprechbaren Schluessel-NPCs (nur Figuren mit Dialog) in ihren Bezirken. */
 	void SpawnDialogueNPCs();
+
+	// --- Einfuehrung, Kodex und Auftragsbriefing (Content/Data/intro.json) -----------------------
+
+	/** Laedt Einfuehrungsseiten und Kodex. */
+	void LoadIntroData();
+
+	/** Zeigt Textseiten an (Enter = weiter, Esc = schliessen). Das Spiel pausiert dabei. */
+	void ShowStoryPages(const TArray<FMTAStoryPage>& Pages, const FString& Heading, bool bCodexMode = false);
+	void AdvanceStoryPage();
+	void CloseStoryPages();
+
+	/** Kodex: Index mit Kategorien (Taste K), danach Kategorie waehlen. */
+	void OpenCodex();
+	void OpenCodexCategory(int32 CategoryIndex);
+
+	bool IsStoryPageOpen() const { return StoryPages.Num() > 0 || bCodexIndex; }
+	bool IsCodexIndexOpen() const { return bCodexIndex; }
+	int32 GetStoryPageIndex() const { return StoryPageIndex; }
+	int32 GetStoryPageCount() const { return StoryPages.Num(); }
+	const FString& GetStoryHeading() const { return StoryHeading; }
+	const FMTAStoryPage* GetCurrentStoryPage() const { return StoryPages.IsValidIndex(StoryPageIndex) ? &StoryPages[StoryPageIndex] : nullptr; }
+	TArray<FString> GetCodexCategoryNames() const;
+
+	/** Zeigt bei einem neuen Story-Auftrag dessen Beschreibung. */
+	void CheckMissionBriefing();
+
+	void ShowIntro() { ShowStoryPages(IntroPages, TEXT("EINFUEHRUNG")); }
+
+	TArray<FMTAStoryPage> IntroPages;
+	TArray<FString> CodexCategoryNames;
+	TArray<TArray<FMTAStoryPage>> CodexCategories;
+	TArray<FMTAStoryPage> StoryPages;
+	int32 StoryPageIndex = 0;
+	FString StoryHeading;
+	bool bCodexIndex = false;
+	bool bCodexMode = false;
+	FString LastBriefedMissionId;
+	FTimerHandle IntroHandle;
 
 	/** Wetter, Radio, Wirtschaft, Entdeckungen, NPC-Zeit und Umgebungsklang laufen mit der Spielzeit. */
 	void SetupWorldSystems();

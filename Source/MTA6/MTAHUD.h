@@ -54,6 +54,11 @@ public:
 	bool bShowHelpLine = true;
 
 private:
+	// --- Einfuehrung, Kodex, Auftragsbriefing ----------------------------------------------------
+	void UpdateStoryPageInput(AMTA6GameMode* GM);
+	void UpdateInputLock(AMTA6GameMode* GM);
+	void DrawStoryPage(AMTA6GameMode* GM);
+
 	// --- NPC-Gespraeche und Interaktions-Prompt -------------------------------------------------
 	void DrawInteractionPrompt();
 	class AMTADialogueNPC* FindNearbyNPC() const;

@@ -1,0 +1,187 @@
+{
+  "intro": [
+    {
+      "title": "Kestrel Bay",
+      "body": "Eine Hafenstadt an einer Bucht, glänzend und rostig zugleich. Im Zentrum stehen die Türme des Konzerns Aurelia Holdings, an den Kais rosten die Kräne, in der Altstadt hängen Wäscheleinen zwischen Antennen.\n\nHier gehört fast alles Aurelia: die Wohnungen, die Kredite, die Straßenbahnen, selbst die Polizei. Und seit einigen Jahren gehört der Stadt auch ein Auge, das nie schläft."
+    },
+    {
+      "title": "Aegis",
+      "body": "Aegis ist das Überwachungsnetz von Aurelia. Kameras an jeder Ecke lesen Kennzeichen, Gesichter und Gewohnheiten und rechnen daraus einen Wert aus, den Verhaltens-Score.\n\nNoch ist er nur eine Statistik. Aber in vierzehn Tagen startet Phase Zwei: Dann entscheidet der Score darüber, welche Straßen du befahren darfst, welchen Kredit du bekommst und ob du deine Wohnung behältst. Die Stadt nennt diesen Tag die Nullstunde."
+    },
+    {
+      "title": "Die Mächte der Stadt",
+      "body": "Aurelia Holdings will Phase Zwei. Die Civil Guard (KCG), eine Privatpolizei des Konzerns, sorgt für Ordnung. Die Dockers' Union im Hafen kämpft um Löhne und Selbstbestimmung. Das Lantern Collective, Hacker und Anwohner der Altstadt, will Aegis stoppen. Die Rustline Wrenchers, Schrottkönige und Rennfahrer, wollen vor allem eins: in Ruhe gelassen werden.\n\nJeder von ihnen wird dich brauchen. Und jeder wird dir etwas dafür abverlangen."
+    },
+    {
+      "title": "Mira Voss",
+      "body": "Das bist du. Früher warst du Rennfahrerin und Fluchtwagenfahrerin, die beste, die in dieser Stadt je aufgetreten ist. Vor sieben Jahren bist du gegangen, mit einer Schuld im Gepäck, über die du nicht sprichst.\n\nJetzt bist du zurück, weil dein Bruder verschwunden ist. Am Highway-Checkpoint hat Aegis dein Kennzeichen erfasst. Seitdem bist du im Netz."
+    },
+    {
+      "title": "Jonas",
+      "body": "Dein Bruder Jonas Voss arbeitete als Datenanalyst bei Aurelia, in genau dem Bereich, der Aegis auswertet. Vor drei Wochen hörte er auf, sich zu melden. Seine Wohnung war leergeräumt, sein Konto gesperrt, sein Name aus den Mitarbeiterlisten gelöscht.\n\nBevor er verschwand, schickte er dir nur eine Nachricht: ein Wort, das du verstehen musst, und eine Adresse in Saltmarket."
+    },
+    {
+      "title": "Dein Weg",
+      "body": "Niemand in Kestrel Bay hilft dir umsonst. Du wirst Jobs annehmen, Gefälligkeiten tauschen, Fraktionen gegeneinander ausspielen und entscheiden, wem du vertraust. Was du tust, merkt sich die Stadt: Dein Ruf in einem Bezirk bleibt dort hängen, deine Entscheidungen verändern, wer dir später hilft, wer dich verrät und wie das alles endet.\n\nDie Geschichte hat mehrere Enden. Keines davon ist ohne Preis."
+    },
+    {
+      "title": "Dein erster Schritt",
+      "body": "Fahre zum gelben Marker. Dort wartet dein erster Kontakt. Unterwegs lohnt es sich, mit den Menschen zu sprechen (Taste E): Sie wissen mehr, als sie zuerst sagen.\n\nStichwörter, die dir begegnen, findest du jederzeit im Kodex (Taste K).\n\nViel Glück, Mira."
+    }
+  ],
+  "codex": [
+    {
+      "category": "Welt",
+      "entries": [
+        {
+          "title": "Kestrel Bay",
+          "body": "Hafenstadt an einer Bucht, etwa eine Million Einwohner. Die Stadt gliedert sich in sechs Bezirke, die sich in Stimmung und Macht stark unterscheiden. Außerhalb liegen Küstenstraße, Berge und die Route 9, der einzige Highway aus der Stadt."
+        },
+        {
+          "title": "Aegis",
+          "body": "Das Überwachungsnetz von Aurelia Holdings. Kameras lesen Kennzeichen und Gesichter, ein Algorithmus bewertet Verhalten. Es gibt Kameras an Straßen, an Privatgrundstücken, an Werbetafeln und an Checkpoints. Das Collective kann einzelne Kameras hacken und abschalten."
+        },
+        {
+          "title": "Phase Zwei und die Nullstunde",
+          "body": "Der Tag, an dem Aegis seine Bewertung verbindlich macht. Danach hängen Straßen, Kredite und Wohnungen am Verhaltens-Score. Die Bewohner nennen den Termin die Nullstunde. Wer bis dahin etwas ändern will, hat vierzehn Tage."
+        },
+        {
+          "title": "Der Ledger-Kern",
+          "body": "Ein Datenträger mit Beweisen gegen Aurelia: Aegis hat Menschen falsch verhaftet, und der Konzern wusste davon. Wer ihn besitzt, kann Aurelia schaden oder sie erpressen. Jonas hat ihn versteckt."
+        },
+        {
+          "title": "Route 9",
+          "body": "Der Highway ins Umland, ein Checkpoint verbindet ihn mit der Stadt. Wer hier einreist, wird von Aegis erfasst. Am Rand der Strecke liegt der Sendemast von Ashridge."
+        }
+      ]
+    },
+    {
+      "category": "Fraktionen",
+      "entries": [
+        {
+          "title": "Aurelia Holdings",
+          "body": "Der Konzern, dem die halbe Stadt gehört. Er betreibt Aegis und bezahlt die Civil Guard. Aurelia belohnt Gehorsam mit Geld, Schutz und Aufstieg, und bestraft Leaks mit allem, was Aegis über dich weiß."
+        },
+        {
+          "title": "Kestrel Civil Guard (KCG)",
+          "body": "Die Sicherheitspolizei des Konzerns. Sie hat Befugnisse wie eine Staatspolizei, aber Auftraggeber wie eine Firma. Fahndung und Festnahmen laufen über sie. Manche Offiziere haben Zweifel."
+        },
+        {
+          "title": "Dockers' Union",
+          "body": "Hafenarbeiter und Streikbewegung in Saltmarket. Sie will Selbstverwaltung der Docks und faire Löhne. Sie bietet dir Schmuggel- und Fahreraufträge, Verstecke und Muskeln."
+        },
+        {
+          "title": "Lantern Collective",
+          "body": "Hacker, Aktivisten und Anwohner der Altstadt Lantern Hill. Sie wollen Aegis stoppen und Beweise veröffentlichen. Sie geben dir Kamera-Hacks, Informationen und Zugang zu Netzwerken."
+        },
+        {
+          "title": "Rustline Wrenchers",
+          "body": "Garagenbesitzer, Schrotthändler und Straßenrennfahrer in Rustline. Sie schätzen Eigenständigkeit, Geld und Respekt. Sie liefern dir Fahrzeuge, Tuning, Rennen und Fluchtwege."
+        }
+      ]
+    },
+    {
+      "category": "Bezirke",
+      "entries": [
+        {
+          "title": "Kestrel Core",
+          "body": "Das Konzernviertel: Glas, Stahl, Aegis-Kameras überall. Hier stehen der Aurelia Tower und die Wohntürme der Führungskräfte. Wer hier auffällt, ist schnell bekannt."
+        },
+        {
+          "title": "Saltmarket",
+          "body": "Hafen und Heimat der Dockers' Union. Kräne, Container, Streikposten. Tagsüber wird gearbeitet, nachts wird geschmuggelt."
+        },
+        {
+          "title": "Lantern Hill",
+          "body": "Die Altstadt: enge Gassen, Laternen, Hinterhöfe. Hier sitzt das Collective. Die Konzernpläne wollen das Viertel abreißen."
+        },
+        {
+          "title": "Greenmoor",
+          "body": "Eine bewachte Wohnsiedlung für Aurelia-Angestellte: saubere Gärten, strenge Regeln. Hier gilt Wohlverhalten als Tugend, und Nachbarn melden sich gegenseitig."
+        },
+        {
+          "title": "Rustline",
+          "body": "Industriegebiet mit Schrottplätzen und Garagen. Heimat der Wrenchers. Hier finden die Rennen statt, und hier ist es leicht, ein Auto verschwinden zu lassen."
+        },
+        {
+          "title": "Sunstrip",
+          "body": "Promenade und Pier, Nachtleben und Nachtmarkt. Hier sendet das Piratenradio Open Line. Wer unauffällig Menschen treffen will, tut es hier."
+        }
+      ]
+    },
+    {
+      "category": "Personen",
+      "entries": [
+        {
+          "title": "Mira Voss",
+          "body": "Du. Ehemalige Rennfahrerin und Fluchtfahrerin, sieben Jahre fort. Du trägst eine alte Schuld, für die dein Bruder damals bezahlt hat."
+        },
+        {
+          "title": "Jonas Voss",
+          "body": "Dein Bruder, Datenanalyst bei Aurelia, verschwunden. Er hat Beweise gegen Aegis gesichert und fürchtet, dass jemand aus seinem Umfeld ihn verrät."
+        },
+        {
+          "title": "Brann",
+          "body": "Tomasz Brandt, genannt Brann, Wortführer der Dockers' Union. Ein Mann mit großem Herzen, der den Hafen retten will und dafür auch dunkle Verhandlungen führt."
+        },
+        {
+          "title": "Nox",
+          "body": "Ein Hacker vom Lantern Collective. Er will Aegis stoppen und seine Schwester retten. Er weiß viel über dich und noch mehr über Jonas."
+        },
+        {
+          "title": "Commander Ravn Okoye",
+          "body": "Offizier der Civil Guard. Er glaubt an Ordnung, aber nicht mehr sicher daran, dass Aegis sie schafft. Er könnte dein größter Gegner oder dein wichtigster Verbündeter werden."
+        },
+        {
+          "title": "Dutch",
+          "body": "Odalys Halloran, Schrotthändlerin und Fixerin der Wrenchers. Sie wettet auf alle Seiten und hält ihre Versprechen genau so lange, wie es sich lohnt."
+        },
+        {
+          "title": "Dr. Idris Kandel",
+          "body": "Vorstand bei Aurelia und Architekt von Phase Zwei. Er spricht leise und hält Sichtbarkeit für Schutz. Seine Überzeugung hat einen Grund."
+        },
+        {
+          "title": "Pia Sorensen",
+          "body": "Moderatorin der Sendung Open Line. Sie sucht die Wahrheit und die Quote, und sie hat eine Quelle im Konzern, die sie die Lerche nennt."
+        },
+        {
+          "title": "Yara Quill",
+          "body": "Bewohnerin der Altstadt und Aktivistin. Sie will Lantern Hill vor dem Abriss retten."
+        },
+        {
+          "title": "Edda Marsh",
+          "body": "Eine Mutter, die ihrem kranken Sohn eine Behandlung ermöglichen will und dafür ihre eigenen Verhaltensdaten verkauft."
+        }
+      ]
+    },
+    {
+      "category": "Begriffe",
+      "entries": [
+        {
+          "title": "Fahndung",
+          "body": "Wenn du Straftaten begehst, steigt deine Fahndung (Sterne). Die Civil Guard schickt dann Streifen. Ruhe bewahren, außer Sicht kommen und eine Weile nichts anstellen senkt sie wieder."
+        },
+        {
+          "title": "Bezirks-Ruf",
+          "body": "Auffälligkeit wird je Bezirk gemerkt. Wer in Saltmarket Ärger macht, ist dort bekannt, aber nicht automatisch überall. Der Ruf kühlt langsam ab."
+        },
+        {
+          "title": "Aegis-Profil",
+          "body": "Wie gut das Netz dich erkennt. Sichtungen und Kennzeichen-Treffer bei Straftaten erhöhen es. Verstecke, Kennzeichenwechsel und Hacks senken es."
+        },
+        {
+          "title": "Fraktionsstand",
+          "body": "Wie die fünf Gruppen zu dir stehen. Hoher Stand schaltet Aufträge, Preise und Hilfe frei. Niedriger Stand bringt Misstrauen und im schlimmsten Fall Angriffe."
+        },
+        {
+          "title": "Vertrauen",
+          "body": "Wichtige Personen vertrauen dir mehr oder weniger. Das entscheidet, wer dir hilft, wer dich in entscheidenden Momenten verrät und wer überlebt."
+        },
+        {
+          "title": "Entscheidungen",
+          "body": "Viele Gespräche und Aufträge haben mehrere Antworten. Es gibt keine gute oder schlechte Wahl, nur Folgen. Sie reichen bis in die Enden."
+        }
+      ]
+    }
+  ]
+}
