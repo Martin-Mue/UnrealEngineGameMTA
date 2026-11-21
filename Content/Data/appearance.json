@@ -1,0 +1,3684 @@
+{
+ "schema": 1,
+ "note": "Aussehen-Daten für MTA 6. Bezirksreihenfolge der Archetyp-Gewichte: core, saltmarket, lanternhill, greenmoor, rustline, sunstrip",
+ "districtOrder": [
+  "core",
+  "saltmarket",
+  "lanternhill",
+  "greenmoor",
+  "rustline",
+  "sunstrip"
+ ],
+ "frameOrder": [
+  "feminine",
+  "masculine",
+  "androgynous"
+ ],
+ "bodyOrder": [
+  "slim",
+  "average",
+  "athletic",
+  "heavy"
+ ],
+ "faceMorphs": [
+  {
+   "id": "jaw_width",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "chin_length",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "chin_prominence",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "nose_length",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "nose_width",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "nose_bridge",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "eye_size",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "eye_spacing",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "eye_tilt",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "brow_height",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "brow_thickness",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "cheek_fullness",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "cheekbone_height",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "lip_fullness",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "mouth_width",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "ear_size",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "forehead_height",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "face_length",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "face_width",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  },
+  {
+   "id": "neck_thickness",
+   "min": -1,
+   "max": 1,
+   "default": 0
+  }
+ ],
+ "skinTones": [
+  "#f3d9c4",
+  "#ecc9a8",
+  "#e2b58f",
+  "#d4a074",
+  "#c48b5e",
+  "#b37748",
+  "#9d6438",
+  "#85502d",
+  "#6e3f24",
+  "#58301b",
+  "#442414",
+  "#321a0f"
+ ],
+ "eyeColors": [
+  {
+   "color": "#5a4632",
+   "weight": 5
+  },
+  {
+   "color": "#3b2a1e",
+   "weight": 4
+  },
+  {
+   "color": "#6f8a9c",
+   "weight": 2
+  },
+  {
+   "color": "#5b7a4a",
+   "weight": 1
+  },
+  {
+   "color": "#8a8f94",
+   "weight": 1
+  },
+  {
+   "color": "#7b5a2e",
+   "weight": 2
+  }
+ ],
+ "hairColors": [
+  {
+   "color": "#16100c",
+   "weight": 5,
+   "kind": "natural"
+  },
+  {
+   "color": "#2b1d14",
+   "weight": 5,
+   "kind": "natural"
+  },
+  {
+   "color": "#4a3222",
+   "weight": 4,
+   "kind": "natural"
+  },
+  {
+   "color": "#6b4a2f",
+   "weight": 2,
+   "kind": "natural"
+  },
+  {
+   "color": "#b08a4f",
+   "weight": 1.5,
+   "kind": "natural"
+  },
+  {
+   "color": "#d3b878",
+   "weight": 0.8,
+   "kind": "natural"
+  },
+  {
+   "color": "#8a3a1f",
+   "weight": 0.7,
+   "kind": "natural"
+  },
+  {
+   "color": "#1c1c1c",
+   "weight": 3,
+   "kind": "natural"
+  },
+  {
+   "color": "#ff2a8a",
+   "weight": 1,
+   "kind": "dyed"
+  },
+  {
+   "color": "#18e0c8",
+   "weight": 1,
+   "kind": "dyed"
+  },
+  {
+   "color": "#7a3cff",
+   "weight": 1,
+   "kind": "dyed"
+  },
+  {
+   "color": "#e8e8f0",
+   "weight": 0.6,
+   "kind": "dyed"
+  },
+  {
+   "color": "#ff6a1a",
+   "weight": 0.6,
+   "kind": "dyed"
+  },
+  {
+   "color": "#2b9bff",
+   "weight": 0.8,
+   "kind": "dyed"
+  }
+ ],
+ "hairStyles": [
+  {
+   "id": "hair_bald",
+   "name": "Glatze",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 18,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_buzz",
+   "name": "Buzzcut",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_short_crop",
+   "name": "Kurz gestutzt",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_short_side_part",
+   "name": "Kurz mit Seitenscheitel",
+   "frames": [
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_quiff",
+   "name": "Tolle",
+   "frames": [
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 70,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_curly_short",
+   "name": "Kurze Locken",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 6,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_afro_short",
+   "name": "Kurzer Afro",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 6,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_afro_medium",
+   "name": "Afro mittel",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 12,
+   "ageMax": 80,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_medium_wavy",
+   "name": "Mittellang gewellt",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 12,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_bob",
+   "name": "Bob",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_long_straight",
+   "name": "Lang glatt",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 8,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_long_wavy",
+   "name": "Lang gewellt",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 8,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_ponytail",
+   "name": "Pferdeschwanz",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 8,
+   "ageMax": 70,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_braids",
+   "name": "Zöpfe",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 6,
+   "ageMax": 70,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_bun_top",
+   "name": "Dutt",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 80,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_mohawk",
+   "name": "Irokese",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 55,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_undercut",
+   "name": "Undercut",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 60,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_undercut_long",
+   "name": "Undercut lang",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 55,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_slicked_back",
+   "name": "Zurückgekämmt",
+   "frames": [
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 18,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_pixie",
+   "name": "Pixie",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 12,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_locs",
+   "name": "Dreadlocks",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 14,
+   "ageMax": 70,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_cornrows",
+   "name": "Cornrows",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 8,
+   "ageMax": 60,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_elder_thin",
+   "name": "Schütteres Haar",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 60,
+   "ageMax": 99,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_child_short",
+   "name": "Kinder kurz",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 3,
+   "ageMax": 13,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_child_pigtails",
+   "name": "Kinder Zöpfchen",
+   "frames": [
+    "feminine",
+    "androgynous"
+   ],
+   "ageMin": 3,
+   "ageMax": 13,
+   "groom": "",
+   "cards": ""
+  },
+  {
+   "id": "hair_cyber_neon",
+   "name": "Neon-Streifen-Schnitt",
+   "frames": [
+    "feminine",
+    "masculine",
+    "androgynous"
+   ],
+   "ageMin": 16,
+   "ageMax": 50,
+   "groom": "",
+   "cards": ""
+  }
+ ],
+ "beardStyles": [
+  {
+   "id": "beard_none",
+   "name": "Kein Bart"
+  },
+  {
+   "id": "beard_stubble",
+   "name": "Dreitagebart"
+  },
+  {
+   "id": "beard_short_full",
+   "name": "Kurzer Vollbart"
+  },
+  {
+   "id": "beard_full_long",
+   "name": "Langer Vollbart"
+  },
+  {
+   "id": "beard_goatee",
+   "name": "Ziegenbart"
+  },
+  {
+   "id": "beard_moustache",
+   "name": "Schnurrbart"
+  },
+  {
+   "id": "beard_chinstrap",
+   "name": "Kinnband"
+  },
+  {
+   "id": "beard_soul_patch",
+   "name": "Fliege"
+  },
+  {
+   "id": "beard_gray_full",
+   "name": "Grauer Vollbart"
+  }
+ ],
+ "marks": [
+  {
+   "id": "scar_cheek_left",
+   "name": "Narbe Wange links",
+   "kind": "scar",
+   "regions": [
+    "face"
+   ],
+   "glows": false,
+   "conspicuous": 0.15,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "scar_brow_right",
+   "name": "Narbe Augenbraue rechts",
+   "kind": "scar",
+   "regions": [
+    "face"
+   ],
+   "glows": false,
+   "conspicuous": 0.1,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "scar_lip",
+   "name": "Lippennarbe",
+   "kind": "scar",
+   "regions": [
+    "face"
+   ],
+   "glows": false,
+   "conspicuous": 0.1,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "scar_neck_burn",
+   "name": "Brandnarbe am Hals",
+   "kind": "scar",
+   "regions": [
+    "neck"
+   ],
+   "glows": false,
+   "conspicuous": 0.2,
+   "color": "#b88070",
+   "decal": ""
+  },
+  {
+   "id": "scar_forearm_burn",
+   "name": "Verbrennung am Unterarm",
+   "kind": "scar",
+   "regions": [
+    "armleft",
+    "armright"
+   ],
+   "glows": false,
+   "conspicuous": 0.15,
+   "color": "#b88070",
+   "decal": ""
+  },
+  {
+   "id": "scar_torso_surgery",
+   "name": "OP-Narbe Torso",
+   "kind": "scar",
+   "regions": [
+    "torso"
+   ],
+   "glows": false,
+   "conspicuous": 0.05,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "scar_hand_cut",
+   "name": "Schnittnarbe Hand",
+   "kind": "scar",
+   "regions": [
+    "hands"
+   ],
+   "glows": false,
+   "conspicuous": 0.05,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "scar_leg_crash",
+   "name": "Unfallnarbe Bein",
+   "kind": "scar",
+   "regions": [
+    "legs"
+   ],
+   "glows": false,
+   "conspicuous": 0.05,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "scar_scalp",
+   "name": "Narbe Kopfhaut",
+   "kind": "scar",
+   "regions": [
+    "scalp"
+   ],
+   "glows": false,
+   "conspicuous": 0.1,
+   "color": "#c9a090",
+   "decal": ""
+  },
+  {
+   "id": "tat_dock_anchor",
+   "name": "Anker (Hafen)",
+   "kind": "tattoo",
+   "regions": [
+    "armleft",
+    "armright",
+    "hands"
+   ],
+   "glows": false,
+   "conspicuous": 0.2,
+   "color": "#2a3a4a",
+   "decal": ""
+  },
+  {
+   "id": "tat_wrenchers_gear",
+   "name": "Zahnrad (Wrenchers)",
+   "kind": "tattoo",
+   "regions": [
+    "armleft",
+    "armright",
+    "neck"
+   ],
+   "glows": false,
+   "conspicuous": 0.3,
+   "color": "#3a2a2a",
+   "decal": ""
+  },
+  {
+   "id": "tat_collective_lantern",
+   "name": "Laterne (Collective)",
+   "kind": "tattoo",
+   "regions": [
+    "armleft",
+    "armright",
+    "neck"
+   ],
+   "glows": false,
+   "conspicuous": 0.3,
+   "color": "#2a3a3a",
+   "decal": ""
+  },
+  {
+   "id": "tat_circuit_sleeve",
+   "name": "Schaltkreis-Ärmel",
+   "kind": "tattoo",
+   "regions": [
+    "armleft",
+    "armright"
+   ],
+   "glows": false,
+   "conspicuous": 0.45,
+   "color": "#1a1f26",
+   "decal": ""
+  },
+  {
+   "id": "tat_barcode_neck",
+   "name": "Barcode im Nacken",
+   "kind": "tattoo",
+   "regions": [
+    "neck"
+   ],
+   "glows": false,
+   "conspicuous": 0.6,
+   "color": "#1a1a1a",
+   "decal": ""
+  },
+  {
+   "id": "tat_band_tribal",
+   "name": "Armband-Muster",
+   "kind": "tattoo",
+   "regions": [
+    "armleft",
+    "armright"
+   ],
+   "glows": false,
+   "conspicuous": 0.25,
+   "color": "#1a1a1a",
+   "decal": ""
+  },
+  {
+   "id": "tat_script_forearm",
+   "name": "Schriftzug Unterarm",
+   "kind": "tattoo",
+   "regions": [
+    "armleft",
+    "armright"
+   ],
+   "glows": false,
+   "conspicuous": 0.25,
+   "color": "#202830",
+   "decal": ""
+  },
+  {
+   "id": "tat_rose_shoulder",
+   "name": "Rose Schulter",
+   "kind": "tattoo",
+   "regions": [
+    "torso",
+    "back"
+   ],
+   "glows": false,
+   "conspicuous": 0.15,
+   "color": "#3a2a30",
+   "decal": ""
+  },
+  {
+   "id": "tat_checker_hand",
+   "name": "Zielflagge Hand",
+   "kind": "tattoo",
+   "regions": [
+    "hands"
+   ],
+   "glows": false,
+   "conspicuous": 0.3,
+   "color": "#202020",
+   "decal": ""
+  },
+  {
+   "id": "tat_back_skyline",
+   "name": "Skyline Rücken",
+   "kind": "tattoo",
+   "regions": [
+    "back"
+   ],
+   "glows": false,
+   "conspicuous": 0.1,
+   "color": "#1a2028",
+   "decal": ""
+  },
+  {
+   "id": "imp_temple_port",
+   "name": "Neuralport an der Schläfe",
+   "kind": "implant",
+   "regions": [
+    "face",
+    "scalp"
+   ],
+   "glows": true,
+   "conspicuous": 0.8,
+   "color": "#18e0c8",
+   "decal": ""
+  },
+  {
+   "id": "imp_eye_ring",
+   "name": "Iris-Ring-Implantat",
+   "kind": "implant",
+   "regions": [
+    "face"
+   ],
+   "glows": true,
+   "conspicuous": 0.85,
+   "color": "#ffd21f",
+   "decal": ""
+  },
+  {
+   "id": "imp_forearm_display",
+   "name": "Unterhaut-LED-Streifen",
+   "kind": "implant",
+   "regions": [
+    "armleft",
+    "armright"
+   ],
+   "glows": true,
+   "conspicuous": 0.7,
+   "color": "#ff2a8a",
+   "decal": ""
+  },
+  {
+   "id": "imp_spine_ports",
+   "name": "Wirbelsäulen-Ports",
+   "kind": "implant",
+   "regions": [
+    "back",
+    "neck"
+   ],
+   "glows": true,
+   "conspicuous": 0.7,
+   "color": "#7a3cff",
+   "decal": ""
+  },
+  {
+   "id": "imp_jaw_plate",
+   "name": "Kieferplatte",
+   "kind": "implant",
+   "regions": [
+    "face"
+   ],
+   "glows": false,
+   "conspicuous": 0.6,
+   "color": "#8a8f94",
+   "decal": ""
+  },
+  {
+   "id": "imp_hand_contacts",
+   "name": "Handkontakte",
+   "kind": "implant",
+   "regions": [
+    "hands"
+   ],
+   "glows": true,
+   "conspicuous": 0.55,
+   "color": "#2b9bff",
+   "decal": ""
+  },
+  {
+   "id": "imp_ear_comm",
+   "name": "Ohr-Kommunikator",
+   "kind": "implant",
+   "regions": [
+    "face"
+   ],
+   "glows": false,
+   "conspicuous": 0.45,
+   "color": "#8a8f94",
+   "decal": ""
+  },
+  {
+   "id": "imp_aegis_tag_wrist",
+   "name": "Aegis-ID-Chip (Handgelenk)",
+   "kind": "implant",
+   "regions": [
+    "armleft",
+    "armright"
+   ],
+   "glows": false,
+   "conspicuous": 0.1,
+   "color": "#9fb4cf",
+   "decal": ""
+  }
+ ],
+ "crowdMeshGroups": {
+  "adult_fem": [],
+  "adult_masc": [],
+  "child": [],
+  "elder": []
+ },
+ "originOutfits": {
+  "racer": "origin_racer",
+  "dockkid": "origin_dockkid",
+  "corp_defector": "origin_corp_defector"
+ },
+ "archetypes": [
+  {
+   "id": "dock_worker",
+   "name": "Dockarbeiterin / Hafenarbeiter",
+   "tags": [
+    "worker",
+    "union"
+   ],
+   "faction": "union",
+   "ageMin": 20,
+   "ageMax": 58,
+   "frameWeights": [
+    0.35,
+    0.65,
+    0
+   ],
+   "bodyWeights": [
+    0.05,
+    0.35,
+    0.35,
+    0.25
+   ],
+   "districtWeights": [
+    0.05,
+    1,
+    0.1,
+    0.05,
+    0.3,
+    0.15
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "fac_union_dock",
+    "fac_union_coverall"
+   ],
+   "beardChance": 0.35,
+   "makeupChance": 0.03,
+   "scarChance": 0.15,
+   "tattooChance": 0.3,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "tat_dock_anchor",
+    "scar_hand_cut",
+    "scar_forearm_burn"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "crane_operator",
+   "name": "Kranführer",
+   "tags": [
+    "worker",
+    "union"
+   ],
+   "faction": "union",
+   "ageMin": 28,
+   "ageMax": 60,
+   "frameWeights": [
+    0.25,
+    0.75,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0,
+    1,
+    0,
+    0,
+    0.1,
+    0.05
+   ],
+   "dayWeight": 1.2,
+   "nightWeight": 0.2,
+   "outfitPresets": [
+    "arch_crane_operator"
+   ],
+   "beardChance": 0.3,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "union_activist",
+   "name": "Gewerkschafts-Aktivist",
+   "tags": [
+    "activist",
+    "union"
+   ],
+   "faction": "union",
+   "ageMin": 20,
+   "ageMax": 55,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.05,
+    1,
+    0.2,
+    0.05,
+    0.1,
+    0.05
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_union_activist"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.15,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "tat_dock_anchor"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "smuggler",
+   "name": "Schmuggler",
+   "tags": [
+    "crime"
+   ],
+   "faction": "union",
+   "ageMin": 22,
+   "ageMax": 50,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.05,
+    1,
+    0.1,
+    0,
+    0.4,
+    0.1
+   ],
+   "dayWeight": 0.4,
+   "nightWeight": 1.6,
+   "outfitPresets": [
+    "arch_smuggler"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.05,
+   "scarChance": 0.2,
+   "tattooChance": 0.2,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "construction_worker",
+   "name": "Bauarbeiter",
+   "tags": [
+    "worker"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 60,
+   "frameWeights": [
+    0.15,
+    0.85,
+    0
+   ],
+   "bodyWeights": [
+    0.05,
+    0.3,
+    0.4,
+    0.25
+   ],
+   "districtWeights": [
+    0.4,
+    0.8,
+    0.1,
+    0.2,
+    0.8,
+    0.2
+   ],
+   "dayWeight": 1.4,
+   "nightWeight": 0.1,
+   "outfitPresets": [
+    "arch_construction"
+   ],
+   "beardChance": 0.35,
+   "makeupChance": 0.2,
+   "scarChance": 0.15,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "corp_employee",
+   "name": "Konzernangestellter",
+   "tags": [
+    "corp"
+   ],
+   "faction": "aurelia",
+   "ageMin": 23,
+   "ageMax": 58,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    1,
+    0.05,
+    0.05,
+    0.4,
+    0,
+    0.15
+   ],
+   "dayWeight": 1.4,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "fac_aurelia_office",
+    "dist_core_day"
+   ],
+   "beardChance": 0.12,
+   "makeupChance": 0.45,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.06,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "imp_aegis_tag_wrist",
+    "imp_ear_comm"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "corp_executive",
+   "name": "Führungskraft Aurelia",
+   "tags": [
+    "corp",
+    "wealthy"
+   ],
+   "faction": "aurelia",
+   "ageMin": 35,
+   "ageMax": 65,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.55,
+    0.25,
+    0.05
+   ],
+   "districtWeights": [
+    0.7,
+    0,
+    0,
+    0.3,
+    0,
+    0.1
+   ],
+   "dayWeight": 1,
+   "nightWeight": 0.6,
+   "outfitPresets": [
+    "fac_aurelia_exec"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.5,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.1,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 2,
+   "markPool": [
+    "imp_aegis_tag_wrist",
+    "imp_ear_comm"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "aegis_technician",
+   "name": "Aegis-Techniker",
+   "tags": [
+    "corp",
+    "tech"
+   ],
+   "faction": "aurelia",
+   "ageMin": 24,
+   "ageMax": 50,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.9,
+    0.1,
+    0.1,
+    0.1,
+    0.1,
+    0.1
+   ],
+   "dayWeight": 1.2,
+   "nightWeight": 0.4,
+   "outfitPresets": [
+    "fac_aurelia_tech"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.4,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "imp_temple_port",
+    "imp_hand_contacts",
+    "imp_ear_comm"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "kcg_patrol",
+   "name": "Streife der Civil Guard",
+   "tags": [
+    "law",
+    "kcg"
+   ],
+   "faction": "kcg",
+   "ageMin": 22,
+   "ageMax": 52,
+   "frameWeights": [
+    0.3,
+    0.7,
+    0
+   ],
+   "bodyWeights": [
+    0.05,
+    0.35,
+    0.45,
+    0.15
+   ],
+   "districtWeights": [
+    1,
+    0.35,
+    0.3,
+    0.7,
+    0.2,
+    0.4
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "fac_kcg_patrol"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.05,
+   "scarChance": 0.08,
+   "tattooChance": 0.02,
+   "implantChance": 0.1,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "imp_ear_comm",
+    "imp_aegis_tag_wrist"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "kcg_riot",
+   "name": "Einsatzkraft Civil Guard",
+   "tags": [
+    "law",
+    "kcg",
+    "rare"
+   ],
+   "faction": "kcg",
+   "ageMin": 22,
+   "ageMax": 45,
+   "frameWeights": [
+    0.2,
+    0.8,
+    0
+   ],
+   "bodyWeights": [
+    0,
+    0.2,
+    0.6,
+    0.2
+   ],
+   "districtWeights": [
+    0.3,
+    0.2,
+    0.2,
+    0.1,
+    0.1,
+    0.1
+   ],
+   "dayWeight": 0.6,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "fac_kcg_riot"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0,
+   "scarChance": 0.08,
+   "tattooChance": 0,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "private_security",
+   "name": "Wachmann (privat)",
+   "tags": [
+    "security"
+   ],
+   "faction": "",
+   "ageMin": 22,
+   "ageMax": 58,
+   "frameWeights": [
+    0.25,
+    0.75,
+    0
+   ],
+   "bodyWeights": [
+    0.05,
+    0.35,
+    0.3,
+    0.3
+   ],
+   "districtWeights": [
+    0.8,
+    0.2,
+    0.4,
+    0.3,
+    0.1,
+    0.6
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_security_private"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.02,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "bouncer",
+   "name": "Türsteher",
+   "tags": [
+    "security",
+    "night"
+   ],
+   "faction": "",
+   "ageMin": 24,
+   "ageMax": 50,
+   "frameWeights": [
+    0.15,
+    0.85,
+    0
+   ],
+   "bodyWeights": [
+    0,
+    0.2,
+    0.5,
+    0.3
+   ],
+   "districtWeights": [
+    0.3,
+    0.1,
+    0.8,
+    0,
+    0.2,
+    1
+   ],
+   "dayWeight": 0.1,
+   "nightWeight": 2,
+   "outfitPresets": [
+    "arch_bouncer"
+   ],
+   "beardChance": 0.4,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.25,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "hacker",
+   "name": "Hackerin / Hacker",
+   "tags": [
+    "tech",
+    "collective"
+   ],
+   "faction": "collective",
+   "ageMin": 18,
+   "ageMax": 45,
+   "frameWeights": [
+    0.4,
+    0.4,
+    0.2
+   ],
+   "bodyWeights": [
+    0.4,
+    0.45,
+    0.1,
+    0.05
+   ],
+   "districtWeights": [
+    0.05,
+    0.1,
+    1,
+    0,
+    0.15,
+    0.1
+   ],
+   "dayWeight": 0.5,
+   "nightWeight": 1.5,
+   "outfitPresets": [
+    "fac_collective_hacker"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.3,
+   "scarChance": 0.08,
+   "tattooChance": 0.2,
+   "implantChance": 0.35,
+   "dyedHairChance": 0.35,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "imp_temple_port",
+    "imp_hand_contacts",
+    "tat_circuit_sleeve",
+    "tat_collective_lantern"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "collective_activist",
+   "name": "Aktivistin Lantern Collective",
+   "tags": [
+    "activist",
+    "collective"
+   ],
+   "faction": "collective",
+   "ageMin": 18,
+   "ageMax": 60,
+   "frameWeights": [
+    0.5,
+    0.4,
+    0.1
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.05,
+    0.1,
+    1,
+    0.02,
+    0.1,
+    0.1
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "fac_collective_activist"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.25,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.2,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "tat_collective_lantern",
+    "scar_cheek_left"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "artist",
+   "name": "Straßenkünstler",
+   "tags": [
+    "culture"
+   ],
+   "faction": "",
+   "ageMin": 18,
+   "ageMax": 55,
+   "frameWeights": [
+    0.45,
+    0.4,
+    0.15
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.1,
+    0.1,
+    1,
+    0.05,
+    0.2,
+    0.6
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_artist"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.35,
+   "scarChance": 0.08,
+   "tattooChance": 0.3,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.3,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "musician",
+   "name": "Musikerin",
+   "tags": [
+    "culture",
+    "night"
+   ],
+   "faction": "",
+   "ageMin": 18,
+   "ageMax": 55,
+   "frameWeights": [
+    0.5,
+    0.4,
+    0.1
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.15,
+    0.1,
+    0.9,
+    0,
+    0.2,
+    0.8
+   ],
+   "dayWeight": 0.4,
+   "nightWeight": 1.6,
+   "outfitPresets": [
+    "arch_musician"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.4,
+   "scarChance": 0.08,
+   "tattooChance": 0.3,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.3,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "mod_artist",
+   "name": "Body-Mod-Künstlerin",
+   "tags": [
+    "tech",
+    "culture"
+   ],
+   "faction": "collective",
+   "ageMin": 24,
+   "ageMax": 50,
+   "frameWeights": [
+    0.5,
+    0.35,
+    0.15
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0,
+    0.1,
+    0.8,
+    0,
+    0.3,
+    0.5
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_mod_artist"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.5,
+   "implantChance": 0.6,
+   "dyedHairChance": 0.4,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "imp_forearm_display",
+    "imp_jaw_plate",
+    "tat_circuit_sleeve",
+    "imp_eye_ring"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "street_vendor",
+   "name": "Straßenhändler",
+   "tags": [
+    "trade"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 68,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.2,
+    1,
+    0.8,
+    0.05,
+    0.4,
+    0.9
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.4,
+   "outfitPresets": [
+    "arch_vendor"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "shopkeeper",
+   "name": "Ladenbesitzer",
+   "tags": [
+    "trade"
+   ],
+   "faction": "",
+   "ageMin": 30,
+   "ageMax": 68,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.6,
+    0.7,
+    0.6,
+    0.5,
+    0.5,
+    0.6
+   ],
+   "dayWeight": 1.4,
+   "nightWeight": 0.2,
+   "outfitPresets": [
+    "arch_shopkeeper"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "chef",
+   "name": "Koch / Köchin",
+   "tags": [
+    "trade",
+    "food"
+   ],
+   "faction": "",
+   "ageMin": 22,
+   "ageMax": 60,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.5,
+    0.6,
+    0.5,
+    0.1,
+    0.2,
+    0.8
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_chef"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.15,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "bartender",
+   "name": "Barkeeper",
+   "tags": [
+    "night",
+    "service"
+   ],
+   "faction": "",
+   "ageMin": 21,
+   "ageMax": 50,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.4,
+    0.5,
+    0.9,
+    0,
+    0.4,
+    1
+   ],
+   "dayWeight": 0.3,
+   "nightWeight": 1.8,
+   "outfitPresets": [
+    "arch_bartender"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.35,
+   "scarChance": 0.08,
+   "tattooChance": 0.3,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "club_goer",
+   "name": "Nachtschwärmer",
+   "tags": [
+    "night"
+   ],
+   "faction": "",
+   "ageMin": 18,
+   "ageMax": 40,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.3,
+    0.1,
+    0.9,
+    0,
+    0.3,
+    1
+   ],
+   "dayWeight": 0.05,
+   "nightWeight": 2.5,
+   "outfitPresets": [
+    "arch_clubgoer"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.6,
+   "scarChance": 0.08,
+   "tattooChance": 0.15,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.3,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "racer",
+   "name": "Rennfahrer",
+   "tags": [
+    "racing",
+    "wrenchers"
+   ],
+   "faction": "wrenchers",
+   "ageMin": 20,
+   "ageMax": 45,
+   "frameWeights": [
+    0.35,
+    0.65,
+    0
+   ],
+   "bodyWeights": [
+    0.2,
+    0.5,
+    0.3,
+    0
+   ],
+   "districtWeights": [
+    0,
+    0.05,
+    0,
+    0,
+    1,
+    0.1
+   ],
+   "dayWeight": 0.6,
+   "nightWeight": 1.5,
+   "outfitPresets": [
+    "fac_wrenchers_racer",
+    "arch_racer"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.1,
+   "scarChance": 0.08,
+   "tattooChance": 0.25,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "tat_checker_hand",
+    "scar_leg_crash"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "mechanic",
+   "name": "Mechanikerin / Mechaniker",
+   "tags": [
+    "worker",
+    "wrenchers"
+   ],
+   "faction": "wrenchers",
+   "ageMin": 20,
+   "ageMax": 60,
+   "frameWeights": [
+    0.35,
+    0.65,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0,
+    0.1,
+    0,
+    0,
+    1,
+    0.05
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "fac_wrenchers_mechanic"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.2,
+   "tattooChance": 0.25,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "tat_wrenchers_gear",
+    "scar_forearm_burn"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "wrenchers_crew",
+   "name": "Wrenchers-Crew",
+   "tags": [
+    "crime",
+    "wrenchers"
+   ],
+   "faction": "wrenchers",
+   "ageMin": 18,
+   "ageMax": 50,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0,
+    0.1,
+    0.05,
+    0,
+    1,
+    0.1
+   ],
+   "dayWeight": 0.7,
+   "nightWeight": 1.3,
+   "outfitPresets": [
+    "fac_wrenchers_crew"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.2,
+   "tattooChance": 0.4,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.15,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "tat_wrenchers_gear",
+    "scar_cheek_left"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "scrapper",
+   "name": "Schrotthändler",
+   "tags": [
+    "trade",
+    "wrenchers"
+   ],
+   "faction": "wrenchers",
+   "ageMin": 25,
+   "ageMax": 68,
+   "frameWeights": [
+    0.3,
+    0.7,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0,
+    0.2,
+    0,
+    0,
+    1,
+    0
+   ],
+   "dayWeight": 1.2,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "arch_scrapper"
+   ],
+   "beardChance": 0.4,
+   "makeupChance": 0.2,
+   "scarChance": 0.2,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "courier",
+   "name": "Fahrradkurier",
+   "tags": [
+    "service"
+   ],
+   "faction": "",
+   "ageMin": 18,
+   "ageMax": 40,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.3,
+    0.4,
+    0.3,
+    0
+   ],
+   "districtWeights": [
+    1,
+    0.2,
+    0.7,
+    0.2,
+    0.1,
+    0.5
+   ],
+   "dayWeight": 1.4,
+   "nightWeight": 0.6,
+   "outfitPresets": [
+    "arch_courier"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "delivery_driver",
+   "name": "Lieferfahrer",
+   "tags": [
+    "service"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 55,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    1,
+    0.4,
+    0.3,
+    0.6,
+    0.2,
+    0.9
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.7,
+   "outfitPresets": [
+    "arch_delivery"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "taxi_driver",
+   "name": "Taxifahrer",
+   "tags": [
+    "service"
+   ],
+   "faction": "",
+   "ageMin": 26,
+   "ageMax": 65,
+   "frameWeights": [
+    0.25,
+    0.75,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    1,
+    0.6,
+    0.5,
+    0.4,
+    0.4,
+    0.8
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_taxi"
+   ],
+   "beardChance": 0.3,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "medic",
+   "name": "Pflegekraft",
+   "tags": [
+    "service",
+    "care"
+   ],
+   "faction": "",
+   "ageMin": 22,
+   "ageMax": 60,
+   "frameWeights": [
+    0.7,
+    0.3,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.8,
+    0.3,
+    0.3,
+    0.9,
+    0.2,
+    0.2
+   ],
+   "dayWeight": 1,
+   "nightWeight": 1,
+   "outfitPresets": [
+    "arch_medic"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.3,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "cleaner",
+   "name": "Reinigungskraft",
+   "tags": [
+    "worker"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 65,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    1,
+    0.2,
+    0.1,
+    0.3,
+    0,
+    0.3
+   ],
+   "dayWeight": 0.6,
+   "nightWeight": 1.4,
+   "outfitPresets": [
+    "arch_cleaner"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.1,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "student",
+   "name": "Student",
+   "tags": [
+    "young"
+   ],
+   "faction": "",
+   "ageMin": 18,
+   "ageMax": 28,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.3,
+    0.5,
+    0.15,
+    0.05
+   ],
+   "districtWeights": [
+    0.4,
+    0.1,
+    1,
+    0.3,
+    0.1,
+    0.4
+   ],
+   "dayWeight": 1.2,
+   "nightWeight": 0.8,
+   "outfitPresets": [
+    "arch_student"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.3,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.2,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "teen",
+   "name": "Jugendlicher",
+   "tags": [
+    "young"
+   ],
+   "faction": "",
+   "ageMin": 14,
+   "ageMax": 18,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.35,
+    0.45,
+    0.2,
+    0
+   ],
+   "districtWeights": [
+    0.3,
+    0.5,
+    0.7,
+    0.5,
+    0.4,
+    0.6
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "arch_teen"
+   ],
+   "beardChance": 0,
+   "makeupChance": 0.25,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.25,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "child",
+   "name": "Kind",
+   "tags": [
+    "child"
+   ],
+   "faction": "",
+   "ageMin": 4,
+   "ageMax": 13,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.3,
+    0.5,
+    0.2,
+    0
+   ],
+   "districtWeights": [
+    0.3,
+    0.4,
+    0.5,
+    1,
+    0.2,
+    0.5
+   ],
+   "dayWeight": 1.2,
+   "nightWeight": 0.05,
+   "outfitPresets": [
+    "gen_child",
+    "gen_child_dress"
+   ],
+   "beardChance": 0,
+   "makeupChance": 0,
+   "scarChance": 0.02,
+   "tattooChance": 0,
+   "implantChance": 0,
+   "dyedHairChance": 0,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "child"
+  },
+  {
+   "id": "parent",
+   "name": "Elternteil",
+   "tags": [
+    "civilian"
+   ],
+   "faction": "greenmoor",
+   "ageMin": 26,
+   "ageMax": 50,
+   "frameWeights": [
+    0.6,
+    0.4,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.3,
+    0.2,
+    0.3,
+    1,
+    0.1,
+    0.5
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "arch_parent"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "retiree",
+   "name": "Rentner / Rentnerin",
+   "tags": [
+    "elder"
+   ],
+   "faction": "",
+   "ageMin": 62,
+   "ageMax": 88,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.25,
+    0.45,
+    0.05,
+    0.25
+   ],
+   "districtWeights": [
+    0.3,
+    0.3,
+    0.3,
+    1,
+    0.2,
+    0.6
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.1,
+   "outfitPresets": [
+    "gen_elder"
+   ],
+   "beardChance": 0.25,
+   "makeupChance": 0.15,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.02,
+   "dyedHairChance": 0,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "elder"
+  },
+  {
+   "id": "greenmoor_resident",
+   "name": "Greenmoor-Bewohner",
+   "tags": [
+    "civilian"
+   ],
+   "faction": "greenmoor",
+   "ageMin": 25,
+   "ageMax": 75,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.2,
+    0,
+    0.05,
+    1,
+    0,
+    0.1
+   ],
+   "dayWeight": 1.2,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "fac_greenmoor_resident",
+    "dist_greenmoor_day"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.3,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "jogger",
+   "name": "Jogger",
+   "tags": [
+    "sport"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 55,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.3,
+    0.3,
+    0.4,
+    0
+   ],
+   "districtWeights": [
+    0.5,
+    0.05,
+    0.1,
+    1,
+    0.05,
+    0.8
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.3,
+   "outfitPresets": [
+    "arch_jogger"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "tourist",
+   "name": "Tourist",
+   "tags": [
+    "civilian",
+    "outsider"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 70,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.5,
+    0.05,
+    0.3,
+    0.1,
+    0,
+    1
+   ],
+   "dayWeight": 1.4,
+   "nightWeight": 0.4,
+   "outfitPresets": [
+    "arch_tourist"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "beachgoer",
+   "name": "Strandgänger",
+   "tags": [
+    "civilian",
+    "leisure"
+   ],
+   "faction": "",
+   "ageMin": 16,
+   "ageMax": 65,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.2,
+    0.4,
+    0.3,
+    0.1
+   ],
+   "districtWeights": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1
+   ],
+   "dayWeight": 1.5,
+   "nightWeight": 0.1,
+   "outfitPresets": [
+    "arch_beachgoer",
+    "dist_sunstrip_day"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.15,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "surfer",
+   "name": "Surfer",
+   "tags": [
+    "sport",
+    "leisure"
+   ],
+   "faction": "",
+   "ageMin": 16,
+   "ageMax": 50,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.2,
+    0.4,
+    0.4,
+    0
+   ],
+   "districtWeights": [
+    0,
+    0,
+    0,
+    0,
+    0,
+    1
+   ],
+   "dayWeight": 1.5,
+   "nightWeight": 0.05,
+   "outfitPresets": [
+    "arch_surfer"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.2,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.08,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "vagrant",
+   "name": "Obdachlose Person",
+   "tags": [
+    "poor"
+   ],
+   "faction": "",
+   "ageMin": 25,
+   "ageMax": 70,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.4,
+    0.4,
+    0.05,
+    0.15
+   ],
+   "districtWeights": [
+    0.1,
+    0.8,
+    0.5,
+    0,
+    0.7,
+    0.2
+   ],
+   "dayWeight": 0.8,
+   "nightWeight": 1.1,
+   "outfitPresets": [
+    "arch_vagrant"
+   ],
+   "beardChance": 0.5,
+   "makeupChance": 0,
+   "scarChance": 0.3,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "scar_cheek_left",
+    "scar_hand_cut",
+    "imp_aegis_tag_wrist"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "fixer",
+   "name": "Vermittler",
+   "tags": [
+    "crime",
+    "wealthy"
+   ],
+   "faction": "",
+   "ageMin": 28,
+   "ageMax": 60,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    0.3,
+    0.3,
+    0.3,
+    0.1,
+    0.2,
+    0.5
+   ],
+   "dayWeight": 0.5,
+   "nightWeight": 1.5,
+   "outfitPresets": [
+    "arch_fixer"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.2,
+   "scarChance": 0.08,
+   "tattooChance": 0.1,
+   "implantChance": 0.15,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [
+    "imp_ear_comm",
+    "imp_eye_ring"
+   ],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "local_commuter",
+   "name": "Pendler",
+   "tags": [
+    "civilian"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 62,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    1,
+    0.8,
+    0.5,
+    0.6,
+    0.5,
+    0.5
+   ],
+   "dayWeight": 1.3,
+   "nightWeight": 0.4,
+   "outfitPresets": [
+    "dist_core_day",
+    "dist_saltmarket_day",
+    "dist_lanternhill_day",
+    "dist_rustline_day",
+    "dist_greenmoor_day",
+    "dist_sunstrip_day"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.3,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  },
+  {
+   "id": "night_commuter",
+   "name": "Spätheimkehrer",
+   "tags": [
+    "civilian",
+    "night"
+   ],
+   "faction": "",
+   "ageMin": 20,
+   "ageMax": 55,
+   "frameWeights": [
+    0.5,
+    0.5,
+    0
+   ],
+   "bodyWeights": [
+    0.15,
+    0.5,
+    0.25,
+    0.1
+   ],
+   "districtWeights": [
+    1,
+    0.6,
+    0.8,
+    0.2,
+    0.6,
+    0.9
+   ],
+   "dayWeight": 0.1,
+   "nightWeight": 2,
+   "outfitPresets": [
+    "dist_core_night",
+    "dist_lanternhill_night",
+    "dist_rustline_night",
+    "dist_sunstrip_night"
+   ],
+   "beardChance": 0.1,
+   "makeupChance": 0.35,
+   "scarChance": 0.08,
+   "tattooChance": 0.08,
+   "implantChance": 0.03,
+   "dyedHairChance": 0.05,
+   "heightOffsetCm": 0,
+   "markPool": [],
+   "meshGroup": "adult"
+  }
+ ],
+ "keyCharacters": [
+  {
+   "id": "mira_voss",
+   "name": "Mira Voss",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "athletic",
+   "age": 29,
+   "heightCm": 171,
+   "build": 0.38,
+   "muscle": 0.55,
+   "skinTone": 0.42,
+   "freckles": 0.12,
+   "eyeColor": "#5a4632",
+   "faceMorphs": {
+    "jaw_width": -0.15,
+    "cheekbone_height": 0.3,
+    "brow_thickness": 0.2,
+    "nose_bridge": 0.1,
+    "lip_fullness": 0.15,
+    "eye_tilt": 0.1
+   },
+   "hair": {
+    "style": "hair_ponytail",
+    "color": "#2b1d14",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.1,
+    "lip": "#7a3b3b",
+    "eye": "#2a2020"
+   },
+   "marks": [
+    {
+     "id": "scar_brow_right",
+     "intensity": 0.8
+    },
+    {
+     "id": "scar_hand_cut",
+     "intensity": 0.6
+    }
+   ],
+   "outfitPreset": "key_mira"
+  },
+  {
+   "id": "jonas_voss",
+   "name": "Jonas Voss",
+   "archetype": "",
+   "origin": "",
+   "frame": "masculine",
+   "bodyType": "slim",
+   "age": 33,
+   "heightCm": 182,
+   "build": 0.35,
+   "muscle": 0.25,
+   "skinTone": 0.42,
+   "freckles": 0,
+   "eyeColor": "#5a4632",
+   "faceMorphs": {
+    "jaw_width": -0.1,
+    "nose_bridge": 0.2,
+    "eye_size": 0.05,
+    "brow_height": 0.1
+   },
+   "hair": {
+    "style": "hair_short_side_part",
+    "color": "#2b1d14",
+    "gray": 0.05
+   },
+   "beard": {
+    "style": "beard_stubble",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "imp_aegis_tag_wrist",
+     "intensity": 1
+    }
+   ],
+   "outfitPreset": "key_jonas"
+  },
+  {
+   "id": "idris_kandel",
+   "name": "Dr. Idris Kandel",
+   "archetype": "",
+   "origin": "",
+   "frame": "masculine",
+   "bodyType": "average",
+   "age": 57,
+   "heightCm": 178,
+   "build": 0.45,
+   "muscle": 0.2,
+   "skinTone": 0.62,
+   "freckles": 0,
+   "eyeColor": "#3b2a1e",
+   "faceMorphs": {
+    "face_length": 0.15,
+    "brow_thickness": 0.1,
+    "cheek_fullness": -0.15,
+    "chin_prominence": 0.1
+   },
+   "hair": {
+    "style": "hair_slicked_back",
+    "color": "#6b6b70",
+    "gray": 0.75
+   },
+   "beard": {
+    "style": "beard_short_full",
+    "color": "#8a8a90"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "imp_ear_comm",
+     "intensity": 1
+    },
+    {
+     "id": "imp_aegis_tag_wrist",
+     "intensity": 1
+    }
+   ],
+   "outfitPreset": "key_kandel"
+  },
+  {
+   "id": "ravn_okoye",
+   "name": "Cmdr. Ravn Okoye",
+   "archetype": "",
+   "origin": "",
+   "frame": "masculine",
+   "bodyType": "athletic",
+   "age": 46,
+   "heightCm": 187,
+   "build": 0.5,
+   "muscle": 0.6,
+   "skinTone": 0.85,
+   "freckles": 0,
+   "eyeColor": "#3b2a1e",
+   "faceMorphs": {
+    "jaw_width": 0.3,
+    "chin_prominence": 0.2,
+    "brow_thickness": 0.3,
+    "neck_thickness": 0.3
+   },
+   "hair": {
+    "style": "hair_buzz",
+    "color": "#1c1c1c",
+    "gray": 0.35
+   },
+   "beard": {
+    "style": "beard_chinstrap",
+    "color": "#2a2a2a"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "scar_cheek_left",
+     "intensity": 0.9
+    },
+    {
+     "id": "imp_ear_comm",
+     "intensity": 1
+    }
+   ],
+   "outfitPreset": "key_okoye"
+  },
+  {
+   "id": "tomasz_brann",
+   "name": "Tomasz \"Brann\" Brandt",
+   "archetype": "",
+   "origin": "",
+   "frame": "masculine",
+   "bodyType": "heavy",
+   "age": 52,
+   "heightCm": 184,
+   "build": 0.8,
+   "muscle": 0.6,
+   "skinTone": 0.25,
+   "freckles": 0.15,
+   "eyeColor": "#6f8a9c",
+   "faceMorphs": {
+    "jaw_width": 0.4,
+    "face_width": 0.3,
+    "nose_width": 0.25,
+    "brow_thickness": 0.4,
+    "neck_thickness": 0.5,
+    "ear_size": 0.2
+   },
+   "hair": {
+    "style": "hair_short_crop",
+    "color": "#8a8a8a",
+    "gray": 0.6
+   },
+   "beard": {
+    "style": "beard_gray_full",
+    "color": "#9a9a9a"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "tat_dock_anchor",
+     "intensity": 1
+    },
+    {
+     "id": "scar_forearm_burn",
+     "intensity": 0.8
+    },
+    {
+     "id": "scar_hand_cut",
+     "intensity": 0.7
+    }
+   ],
+   "outfitPreset": "key_brann"
+  },
+  {
+   "id": "nox",
+   "name": "Nox",
+   "archetype": "",
+   "origin": "",
+   "frame": "androgynous",
+   "bodyType": "slim",
+   "age": 26,
+   "heightCm": 175,
+   "build": 0.3,
+   "muscle": 0.2,
+   "skinTone": 0.3,
+   "freckles": 0,
+   "eyeColor": "#8a8f94",
+   "faceMorphs": {
+    "face_length": 0.2,
+    "cheekbone_height": 0.4,
+    "eye_size": 0.25,
+    "eye_tilt": 0.25,
+    "lip_fullness": -0.1,
+    "jaw_width": -0.3,
+    "chin_length": 0.15
+   },
+   "hair": {
+    "style": "hair_undercut_long",
+    "color": "#18e0c8",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.5,
+    "lip": "#2a2a3a",
+    "eye": "#18e0c8"
+   },
+   "marks": [
+    {
+     "id": "imp_temple_port",
+     "intensity": 1
+    },
+    {
+     "id": "imp_hand_contacts",
+     "intensity": 1
+    },
+    {
+     "id": "tat_circuit_sleeve",
+     "intensity": 0.9
+    },
+    {
+     "id": "imp_forearm_display",
+     "intensity": 0.8
+    }
+   ],
+   "outfitPreset": "key_nox"
+  },
+  {
+   "id": "yara_quill",
+   "name": "Yara Quill",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "average",
+   "age": 44,
+   "heightCm": 166,
+   "build": 0.5,
+   "muscle": 0.25,
+   "skinTone": 0.72,
+   "freckles": 0,
+   "eyeColor": "#3b2a1e",
+   "faceMorphs": {
+    "cheek_fullness": 0.3,
+    "lip_fullness": 0.3,
+    "nose_width": 0.15,
+    "eye_size": 0.1
+   },
+   "hair": {
+    "style": "hair_locs",
+    "color": "#2b1d14",
+    "gray": 0.3
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.15,
+    "lip": "#6a2a2a",
+    "eye": "#2a2020"
+   },
+   "marks": [
+    {
+     "id": "tat_collective_lantern",
+     "intensity": 0.9
+    }
+   ],
+   "outfitPreset": "key_yara"
+  },
+  {
+   "id": "dutch_halloran",
+   "name": "Odalys \"Dutch\" Halloran",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "athletic",
+   "age": 41,
+   "heightCm": 175,
+   "build": 0.5,
+   "muscle": 0.6,
+   "skinTone": 0.35,
+   "freckles": 0.25,
+   "eyeColor": "#5b7a4a",
+   "faceMorphs": {
+    "jaw_width": 0.25,
+    "brow_thickness": 0.3,
+    "nose_bridge": 0.3,
+    "mouth_width": 0.2,
+    "cheekbone_height": 0.2
+   },
+   "hair": {
+    "style": "hair_undercut",
+    "color": "#8a3a1f",
+    "gray": 0.1
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.05,
+    "lip": "#6a3030",
+    "eye": "#2a2020"
+   },
+   "marks": [
+    {
+     "id": "tat_wrenchers_gear",
+     "intensity": 1
+    },
+    {
+     "id": "scar_lip",
+     "intensity": 0.8
+    },
+    {
+     "id": "scar_forearm_burn",
+     "intensity": 0.7
+    }
+   ],
+   "outfitPreset": "key_dutch"
+  },
+  {
+   "id": "pia_sorensen",
+   "name": "Pia Sorensen",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "slim",
+   "age": 38,
+   "heightCm": 168,
+   "build": 0.4,
+   "muscle": 0.2,
+   "skinTone": 0.15,
+   "freckles": 0.1,
+   "eyeColor": "#6f8a9c",
+   "faceMorphs": {
+    "face_length": 0.1,
+    "cheekbone_height": 0.2,
+    "lip_fullness": 0.1,
+    "eye_size": 0.1
+   },
+   "hair": {
+    "style": "hair_bob",
+    "color": "#b08a4f",
+    "gray": 0.1
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.45,
+    "lip": "#9a3a4a",
+    "eye": "#3a2a3a"
+   },
+   "marks": [],
+   "outfitPreset": "key_pia"
+  }
+ ],
+ "creatorPresets": [
+  {
+   "id": "cp_mira_default",
+   "name": "Mira (Standard)",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "athletic",
+   "age": 29,
+   "heightCm": 171,
+   "build": 0.38,
+   "muscle": 0.55,
+   "skinTone": 0.42,
+   "freckles": 0.12,
+   "eyeColor": "#5a4632",
+   "faceMorphs": {
+    "jaw_width": -0.15,
+    "cheekbone_height": 0.3,
+    "brow_thickness": 0.2
+   },
+   "hair": {
+    "style": "hair_ponytail",
+    "color": "#2b1d14",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "scar_brow_right",
+     "intensity": 0.8
+    }
+   ],
+   "outfitPreset": "key_mira"
+  },
+  {
+   "id": "cp_cropped_runner",
+   "name": "Kurzhaar-Läuferin",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "slim",
+   "age": 26,
+   "heightCm": 168,
+   "build": 0.3,
+   "muscle": 0.4,
+   "skinTone": 0.7,
+   "freckles": 0,
+   "eyeColor": "#3b2a1e",
+   "faceMorphs": {
+    "cheek_fullness": 0.2,
+    "lip_fullness": 0.3
+   },
+   "hair": {
+    "style": "hair_afro_short",
+    "color": "#16100c",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [],
+   "outfitPreset": "origin_racer"
+  },
+  {
+   "id": "cp_dock_born",
+   "name": "Hafenkind",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "average",
+   "age": 32,
+   "heightCm": 169,
+   "build": 0.5,
+   "muscle": 0.45,
+   "skinTone": 0.25,
+   "freckles": 0.2,
+   "eyeColor": "#6f8a9c",
+   "faceMorphs": {
+    "jaw_width": 0.15,
+    "nose_width": 0.1,
+    "brow_thickness": 0.15
+   },
+   "hair": {
+    "style": "hair_braids",
+    "color": "#6b4a2f",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "tat_dock_anchor",
+     "intensity": 0.9
+    },
+    {
+     "id": "scar_hand_cut",
+     "intensity": 0.6
+    }
+   ],
+   "outfitPreset": "origin_dockkid"
+  },
+  {
+   "id": "cp_corp_defector",
+   "name": "Konzern-Aussteigerin",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "slim",
+   "age": 34,
+   "heightCm": 173,
+   "build": 0.35,
+   "muscle": 0.2,
+   "skinTone": 0.55,
+   "freckles": 0,
+   "eyeColor": "#5a4632",
+   "faceMorphs": {
+    "face_length": 0.1,
+    "cheekbone_height": 0.25,
+    "eye_size": 0.1
+   },
+   "hair": {
+    "style": "hair_bob",
+    "color": "#1c1c1c",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.3,
+    "lip": "#7a2a3a",
+    "eye": "#2a2a3a"
+   },
+   "marks": [
+    {
+     "id": "imp_aegis_tag_wrist",
+     "intensity": 1
+    },
+    {
+     "id": "imp_ear_comm",
+     "intensity": 0.9
+    }
+   ],
+   "outfitPreset": "origin_corp_defector"
+  },
+  {
+   "id": "cp_neon_edge",
+   "name": "Neon-Kante",
+   "archetype": "",
+   "origin": "",
+   "frame": "androgynous",
+   "bodyType": "athletic",
+   "age": 27,
+   "heightCm": 174,
+   "build": 0.4,
+   "muscle": 0.5,
+   "skinTone": 0.3,
+   "freckles": 0,
+   "eyeColor": "#8a8f94",
+   "faceMorphs": {
+    "jaw_width": -0.1,
+    "cheekbone_height": 0.3,
+    "eye_tilt": 0.2
+   },
+   "hair": {
+    "style": "hair_cyber_neon",
+    "color": "#ff2a8a",
+    "gray": 0
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0.4,
+    "lip": "#2a2a3a",
+    "eye": "#18e0c8"
+   },
+   "marks": [
+    {
+     "id": "imp_temple_port",
+     "intensity": 1
+    },
+    {
+     "id": "tat_circuit_sleeve",
+     "intensity": 0.8
+    }
+   ],
+   "outfitPreset": "dist_lanternhill_night"
+  },
+  {
+   "id": "cp_veteran",
+   "name": "Gezeichnete Veteranin",
+   "archetype": "",
+   "origin": "",
+   "frame": "feminine",
+   "bodyType": "athletic",
+   "age": 41,
+   "heightCm": 176,
+   "build": 0.5,
+   "muscle": 0.55,
+   "skinTone": 0.8,
+   "freckles": 0,
+   "eyeColor": "#3b2a1e",
+   "faceMorphs": {
+    "jaw_width": 0.2,
+    "brow_thickness": 0.25
+   },
+   "hair": {
+    "style": "hair_buzz",
+    "color": "#8a8a8a",
+    "gray": 0.5
+   },
+   "beard": {
+    "style": "beard_none",
+    "color": "#2b1d14"
+   },
+   "makeup": {
+    "intensity": 0,
+    "lip": "#8a3b3b",
+    "eye": "#3a2a2a"
+   },
+   "marks": [
+    {
+     "id": "scar_cheek_left",
+     "intensity": 1
+    },
+    {
+     "id": "scar_neck_burn",
+     "intensity": 0.8
+    },
+    {
+     "id": "imp_jaw_plate",
+     "intensity": 0.8
+    }
+   ],
+   "outfitPreset": "fac_wrenchers_crew"
+  }
+ ]
+}

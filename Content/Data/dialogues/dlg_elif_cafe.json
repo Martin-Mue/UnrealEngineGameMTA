@@ -1,0 +1,33 @@
+{
+  "id": "dlg_elif_cafe", "npc": "elif_tamar", "title": "Café Ocker", "kind": "flirt",
+  "start": "open",
+  "entries": [
+    {"when": [{"flag": ["dlg.elif.date", "==", true]}], "node": "after_walk"}
+  ],
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Tagesempfehlung: Regen gegen vier, danach Aufklarung. Ach so, du meinst Kaffee. Schwarz, oder mit einer Geschichte?", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Schwarz. Die Geschichte erzähl ich dir dafür.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "story"},
+      {"text": "Mit Geschichte. Deiner.", "next": "her_story"},
+      {"text": "Was kostet ein Kaffee hier?", "next": "shop"},
+      {"text": "Nur kurz Pause.", "next": "bye"}]},
+    "shop": {"type": "trade", "shop": "cafe_ochre", "next": "c1"},
+    "story": {"type": "line", "who": "@npc", "text": "Eine Rennfahrerin, die zurückkommt, um jemanden zu finden. Das ist eine gute Geschichte. Aber du erzählst sie wie jemand, der das Ende fürchtet.", "next": "c2"},
+    "her_story": {"type": "line", "who": "@npc", "text": "Meine? Ich hab einmal im Core gearbeitet, in einer Kaffeekette, in der man lächeln musste, bis der Scanner piept. Eines Tages hab ich nicht gelächelt. Seitdem hab ich ein Café, in dem keine Tasse zur anderen passt.", "next": "c2"},
+    "c2": {"type": "choice", "options": [
+      {"text": "Mir gefällt das hier. Die Tassen. Und wie du über das Wetter redest.", "check": {"skill": "persuade", "difficulty": 2, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 1]}], "value": 1}], "success": "warm", "fail": "polite"}},
+      {"text": "Was weißt du über die Leute hier am Hang?", "next": "info"},
+      {"text": "Ich sollte gehen.", "next": "bye"}]},
+    "warm": {"type": "line", "who": "@npc", "text": "Das sagen die meisten über die Tassen. Das mit dem Wetter sagt keiner. Ich schließe um zehn. Danach geh ich die Treppe hoch zum Turm, da sieht man, ob es morgen regnet. Begleitest du mich?", "next": "c3"},
+    "polite": {"type": "line", "who": "@npc", "text": "Danke. Ehrlich. Aber ich kenn dich noch nicht gut genug, um mich über ein Kompliment zu freuen. Komm öfter vorbei. Dann üben wir beide.", "next": "c1"},
+    "c3": {"type": "choice", "options": [
+      {"text": "Gern. Ich bring nichts mit außer guter Laune.", "effects": [{"flag": ["dlg.elif.date", true]}, {"npcTrust": ["@npc", 1]}], "next": "yes"},
+      {"text": "Heute nicht. Aber frag mich nochmal.", "next": "later"}]},
+    "yes": {"type": "line", "who": "@npc", "text": "Gute Laune reicht. Und vielleicht eine Jacke. Der Wind am Turm ist ehrlicher als alle hier.", "next": "end"},
+    "later": {"type": "line", "who": "@npc", "text": "Ich frag. Ich bin hartnäckig, wie das Wetter.", "next": "end"},
+    "info": {"type": "line", "who": "@npc", "text": "Der Hausmeister Bertil schreibt alles auf. Die Ärztin oben hilft allen. Und eine Drohnentechnikerin aus dem Core kommt jeden Tag und bestellt nichts. Ich glaube, sie meint mich. Ich weiß nur nicht, ob ich es will.", "effects": [{"flag": ["dlg.clue.bertil_spy", true]}], "next": "c1"},
+    "after_walk": {"type": "line", "who": "@npc", "text": "Es hat gestern nicht geregnet. Ich hatte unrecht, und es war trotzdem ein schöner Abend. Das passiert mir selten. Schwarz, wie immer?", "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Bis dann. Regen gegen vier, vergiss das nicht.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

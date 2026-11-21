@@ -1,0 +1,33 @@
+{
+  "id": "dlg_pia_open_line", "npc": "pia", "title": "Open Line, nach der Sendung", "kind": "informant",
+  "start": "open",
+  "topics": [
+    {"id": "city", "label": "Fragen zur Stadt", "node": "t_city"},
+    {"id": "greenmoor", "label": "Fragen zu Greenmoor", "node": "t_greenmoor"},
+    {"id": "union", "label": "Fragen zur Union", "node": "t_union"},
+    {"id": "source", "label": "Fragen zu ihrer Quelle", "when": [{"npcTrust": ["@npc", ">=", 2]}], "node": "t_source"}
+  ],
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Du bist die Anruferin aus der Nacht, die nicht angerufen hat. Ich erkenne Leute an der Art, wie sie schweigen. Setz dich. Die Rotlicht-Lampe ist aus.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Was erzählt die Stadt über mich?", "next": "about_me"},
+      {"text": "Ich hab Fragen.", "next": "topics"},
+      {"text": "Ich hab eine Geschichte für dich.", "when": [{"any": [{"flag": ["dlg.clue.ravn_list", "==", true]}, {"flag": ["dlg.clue.jodie_leak", "==", true]}]}], "next": "story"},
+      {"text": "Was hört man so?", "next": "rumors"},
+      {"text": "Ich lass dich schlafen.", "next": "bye"}]},
+    "about_me": {"type": "rumor", "who": "@npc", "about": "player", "text": "Über dich? Lass mich vorlesen, was die Hörer erzählen:", "fallback": "Noch nichts. Das ist in dieser Stadt entweder Glück oder ein Zeichen, dass du langweilig fährst.", "next": "c1"},
+    "rumors": {"type": "rumor", "who": "@npc", "text": "Die Leitungen glühen. Ein Auszug:", "fallback": "Heute riefen nur Leute an, die sich über ihre Hecken beschweren. Greenmoor in Höchstform.", "next": "c1"},
+    "topics": {"type": "topics", "who": "@npc", "text": "Frag. Aber nur Fragen, deren Antworten ich auch senden würde.", "next": "c1"},
+    "t_city": {"type": "line", "who": "@npc", "text": "Die Stadt hat Angst und nennt es Ordnung. Der Hafen hat Hunger und nennt es Streik. Und der Turm hat Pläne und nennt es Phase Zwei. Ich nenne es Sendezeit.", "next": "topics"},
+    "t_greenmoor": {"type": "line", "who": "@npc", "text": "Richter Whitlow hat in seinem letzten Amtsjahr erstaunlich oft nach Score geurteilt. Ich habe Kontoauszüge, aber keinen Mut. Wenn jemand anders sie veröffentlichen würde...", "effects": [{"flag": ["dlg.clue.gideon_scores", true]}], "next": "topics"},
+    "t_union": {"type": "line", "who": "@npc", "text": "Brann hat zweimal mit einem Konzernvermittler gegessen, im Noodle Vault, an Odettes hinterstem Tisch. Odette hat es mir erzählt, Odette erzählt nichts umsonst. Und Hedda Marlows Sohn will zur Civil Guard. Der Hafen ist ein Dorf mit Kränen.", "effects": [{"flag": ["dlg.clue.brann_deal", true]}, {"flag": ["dlg.clue.hedda_son", true]}], "next": "topics"},
+    "t_source": {"type": "line", "who": "@npc", "text": "Meine Quelle sitzt im Turm, misst Glück und findet nur Angst. Mehr sage ich nicht. Wenn ihm etwas passiert, weiß ich, wer gefragt hat.", "effects": [{"flag": ["dlg.clue.pia_source", true]}], "next": "topics"},
+    "story": {"type": "line", "who": "@npc", "text": "Zeig her. ...Das ist keine Geschichte, das ist eine Bombe mit Sendezeit. Wenn ich das bringe, bin ich morgen entweder berühmt oder verschwunden. Willst du, dass ich es bringe?", "next": "c_story"},
+    "c_story": {"type": "choice", "options": [
+      {"text": "Bring es. Die Leute sollen es wissen.", "effects": [{"flag": ["story_aired", true]}, {"standing": ["collective", 10]}, {"standing": ["aurelia", -10]}, {"aegis": 5}, {"npcTrust": ["@npc", 1]}, {"rumor": {"type": "hacked_camera", "subject": "player", "severity": 0.5}}], "next": "aired"},
+      {"text": "Noch nicht. Wir brauchen mehr.", "next": "c1"}]},
+    "aired": {"type": "line", "who": "@npc", "text": "Dann gehen wir um zwei Uhr live. Halt das Radio an. Und halt dich von Fenstern fern.", "next": "end"},
+    "bye": {"type": "line", "who": "@npc", "text": "Gute Nacht, Anruferin. Ruf mal wirklich an.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

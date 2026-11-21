@@ -1,0 +1,38 @@
+{
+  "id": "dlg_kiosk_ojo", "npc": "augustin_ojo", "title": "Kiosk Gezeiten", "kind": "trader",
+  "start": "greet",
+  "entries": [
+    {"when": [{"flag": ["dlg.ojo.met", "==", true]}, {"npcTrust": ["@npc", ">=", 1]}], "node": "greet_friend"},
+    {"when": [{"flag": ["dlg.ojo.met", "==", true]}], "node": "greet_again"}
+  ],
+  "topics": [
+    {"id": "union", "label": "Fragen zur Union", "node": "t_union"},
+    {"id": "jonas", "label": "Fragen zu Jonas", "when": [{"done": "p1"}], "node": "t_jonas"},
+    {"id": "marek", "label": "Fragen zu Mareks Schulden", "when": [{"npcTrust": ["@npc", ">=", 1]}], "node": "t_marek"}
+  ],
+  "nodes": {
+    "greet": {"type": "line", "who": "@npc", "text": "Telefonkarten, Kaugummi, Tabak, Wahrheit. In der Reihenfolge der Beliebtheit. Was darf's sein?", "effects": [{"flag": ["dlg.ojo.met", true]}], "next": "hub"},
+    "greet_again": {"type": "line", "who": "@npc", "text": "Ah, die Kundschaft mit dem nervösen Gaspedal. Wieder da.", "next": "hub"},
+    "greet_friend": {"type": "line", "who": "@npc", "text": "Für dich hab ich die Zeitung von morgen zurückgelegt. Natürlich gibt's keine. Aber ich hab Kaffee.", "next": "hub"},
+    "hub": {"type": "choice", "options": [
+      {"text": "Ich will was kaufen.", "next": "shop"},
+      {"text": "Was erzählt man sich so?", "next": "rumors"},
+      {"text": "Ich hab Fragen.", "next": "topics"},
+      {"text": "Ich lad dich auf einen Kaffee ein. Aus deinem eigenen Automaten.", "when": [{"not": {"flag": ["dlg.ojo.coffee", "==", true]}}], "effects": [{"money": -5}, {"npcTrust": ["@npc", 1]}, {"flag": ["dlg.ojo.coffee", true]}], "next": "coffee"},
+      {"text": "Nichts. Ich wollte nur gucken.", "next": "bye"}]},
+    "shop": {"type": "trade", "shop": "kiosk_tide", "next": "hub"},
+    "rumors": {"type": "rumor", "who": "@npc", "text": "Gerüchte kosten heute nur die Hälfte. Es regnet ja bald.", "fallback": "Heute ist es still. Verdächtig still. Das allein ist ein Gerücht.", "next": "hub"},
+    "coffee": {"type": "line", "who": "@npc", "text": "Du bezahlst mich mit meinem eigenen Kaffee. Das ist entweder Frechheit oder Wirtschaftspolitik. Ich mag dich.", "next": "hub"},
+    "topics": {"type": "topics", "who": "@npc", "text": "Frag. Antworten kosten nichts, die guten nur ein bisschen mehr.", "next": "hub"},
+    "t_union": {"type": "line", "who": "@npc", "text": "Brann hält die Union zusammen wie ein Mann, der einen Sack Katzen trägt. Laut, zerkratzt und stolz drauf. Wenn du für ihn fährst, fahr pünktlich. Er zählt.", "next": "topics"},
+    "t_jonas": {"type": "check", "cond": {"npcTrust": ["@npc", ">=", 1]}, "yes": "t_jonas_yes", "no": "t_jonas_no"},
+    "t_jonas_no": {"type": "line", "who": "@npc", "text": "Voss? Viele Leute verschwinden. Die meisten wollen es. Komm wieder, wenn ich dich besser kenne.", "next": "topics"},
+    "t_jonas_yes": {"type": "line", "who": "@npc", "text": "Ein Mann mit Analystenbrille hat hier vor drei Wochen eine Telefonkarte gekauft und mit Kleingeld aus dem Core bezahlt. Er hat nach dem Weg nach Rustline gefragt. Und nach einem Hostel ohne Fragen.", "effects": [{"flag": ["dlg.clue.jonas_rustline", true]}], "next": "topics"},
+    "t_marek": {"type": "choice", "options": [
+      {"text": "Wie viel schuldet Marek dir?", "next": "t_marek_info"},
+      {"text": "Vergiss es. Geht mich nichts an.", "next": "topics"}]},
+    "t_marek_info": {"type": "line", "who": "@npc", "text": "Dreihundert, aber das ist nicht das Problem. Das Problem ist, dass er mit Scheinen aus der Streikkasse zahlen wollte. Die haben einen Stempel. Sag's niemandem. Also, sag's Brann nicht als Erste.", "effects": [{"flag": ["dlg.clue.marek_embezzle", true]}, {"rumor": {"type": "npc_secret", "subject": "marek_doyle", "secret": "marek_embezzle", "severity": 0.6}}], "next": "topics"},
+    "bye": {"type": "line", "who": "@npc", "text": "Komm wieder. Die Wahrheit wird hier jeden Tag frisch geliefert, nur nicht immer pünktlich.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

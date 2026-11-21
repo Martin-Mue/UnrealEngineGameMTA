@@ -8,7 +8,8 @@ public class MTA6 : ModuleRules
 
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
-			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "ChaosVehicles"
+			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
+			"ChaosVehicles", "Json", "JsonUtilities", "UMG", "Slate", "SlateCore"
 		});
 	}
 }

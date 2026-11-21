@@ -1,0 +1,120 @@
+{
+  "schema": 1,
+  "origins": [
+    {
+      "id": "racer",
+      "name": "Rennfahrerin",
+      "summary": "Streckenfahrerin aus dem Umland, Ruf als 'schnell', Garage in Rustline.",
+      "backstory": "Sieben Jahre auf staubigen Bahnen hinter der Salzebene, Preisgeld in bar, Schulden bei jedem Teilehaendler. Die Wrenchers erinnern sich an die Nacht, in der sie mit drei Raedern ins Ziel kam.",
+      "prologVariant": "p1_racer",
+      "startMoney": 800,
+      "startDebt": 0,
+      "aegisDelta": 0,
+      "standing": { "wrenchers": 20, "kcg": -5 },
+      "startVehicle": "rookfield_bulwark",
+      "startDistrict": "rustline",
+      "garage": { "district": "rustline", "level": 0 },
+      "perkPoints": 2,
+      "startSkills": ["drv_steady_hands", "drv_tire_whisperer"],
+      "treeXp": { "driving": 300 },
+      "items": [["tool_wrench", 1], ["repair_kit", 1]],
+      "traits": [
+        { "id": "trait_quick_hands", "name": "Rennroutine", "positive": true,  "effects": [{ "stat": "vehicle.grip", "mul": 1.03 }, { "stat": "xp.drift", "mul": 1.2 }] },
+        { "id": "trait_known_face",  "name": "Bekanntes Gesicht", "positive": false, "effects": [{ "stat": "heat.gain", "mul": 1.05 }] }
+      ],
+      "flags": { "origin": "racer", "knowsWrenchers": true, "nickname": "Dreirad" }
+    },
+    {
+      "id": "harbor_kid",
+      "name": "Hafenkind",
+      "summary": "Aufgewachsen zwischen Containern in Saltmarket; die Union vertraut ihr.",
+      "backstory": "Mutter Kranfuehrerin, Vater verschwunden nach dem ersten Streik. Kennt jede Sackgasse am Kai und jeden Wachmann, der fuer eine Kiste Zigaretten wegsieht.",
+      "prologVariant": "p1_harbor",
+      "startMoney": 600,
+      "startDebt": 0,
+      "aegisDelta": -5,
+      "standing": { "union": 20, "aurelia": -5 },
+      "startVehicle": "halvard_wren",
+      "startDistrict": "saltmarket",
+      "garage": { "district": "saltmarket", "level": 0 },
+      "perkPoints": 2,
+      "startSkills": ["net_haggler", "stl_blind_spots"],
+      "treeXp": { "network": 200, "stealth": 100 },
+      "items": [["tool_tow_rope", 1], ["contraband_meds", 2]],
+      "traits": [
+        { "id": "trait_dock_slang",   "name": "Hafen-Slang", "positive": true,  "effects": [{ "stat": "social.persuade", "add": 0.05 }, { "stat": "econ.blackMarketSell", "mul": 1.05 }] },
+        { "id": "trait_union_debts",  "name": "Unionsbeitraege", "positive": false, "effects": [{ "stat": "econ.rewardMoney", "mul": 0.97 }] }
+      ],
+      "flags": { "origin": "harbor_kid", "smuggleRoutesKnown": true, "harborSlang": true }
+    },
+    {
+      "id": "corporate_dropout",
+      "name": "Konzern-Aussteigerin",
+      "summary": "Ex-Angestellte von Aurelia; kennt Aegis von innen, aber Aegis kennt sie auch.",
+      "backstory": "Fuenf Jahre Datenqualitaet in der Abteilung, die heute 'Phase Zwei' heisst. Gekuendigt nach einer Frage zu viel. Der Abfindungskredit laeuft noch.",
+      "prologVariant": "p1_corporate",
+      "startMoney": 2500,
+      "startDebt": 3000,
+      "aegisDelta": 20,
+      "standing": { "aurelia": 10, "collective": -5 },
+      "startVehicle": "nauvik_kettle",
+      "startDistrict": "core",
+      "garage": null,
+      "perkPoints": 2,
+      "startSkills": ["tec_dongle_tinker", "net_smooth_talk"],
+      "treeXp": { "tech": 300 },
+      "items": [["dongle_basic", 1]],
+      "traits": [
+        { "id": "trait_aegis_insider", "name": "Aegis-Kenntnis", "positive": true,  "effects": [{ "stat": "tech.hackSpeed", "mul": 1.2 }, { "stat": "tech.hackTrace", "mul": 0.85 }] },
+        { "id": "trait_flagged",       "name": "Im System markiert", "positive": false, "effects": [{ "stat": "aegis.plateDetect", "mul": 1.1 }] }
+      ],
+      "flags": { "origin": "corporate_dropout", "corporateJargon": true, "kcgKnowsHer": true }
+    },
+    {
+      "id": "ex_guard",
+      "name": "Ex-Streifenfahrerin",
+      "summary": "Fuhr drei Jahre KCG-Streife in Greenmoor, bis sie einen Bericht nicht unterschreiben wollte.",
+      "backstory": "Sie kennt die Funkcodes, die Schichtplaene und die Kollegen, die man bestechen kann. Die Wache nennt sie Verraeterin, die Strasse traut ihr nicht.",
+      "prologVariant": "p1_guard",
+      "startMoney": 1400,
+      "startDebt": 0,
+      "aegisDelta": 5,
+      "standing": { "kcg": 10, "union": -10, "collective": -10 },
+      "startVehicle": "halvard_meridian",
+      "startDistrict": "greenmoor",
+      "garage": null,
+      "perkPoints": 2,
+      "startSkills": ["drv_late_braker", "net_envelope"],
+      "treeXp": { "driving": 150, "network": 150 },
+      "items": [["tool_slimjim", 1]],
+      "traits": [
+        { "id": "trait_radio_codes",  "name": "Kennt die Funkcodes", "positive": true,  "effects": [{ "stat": "heat.decay", "mul": 1.1 }, { "stat": "econ.bribeSuccess", "add": 0.05 }] },
+        { "id": "trait_turncoat",     "name": "Ruf als Verraeterin", "positive": false, "effects": [{ "stat": "standing.gain", "mul": 0.9 }] }
+      ],
+      "flags": { "origin": "ex_guard", "knowsRadioCodes": true, "kcgTurncoat": true }
+    },
+    {
+      "id": "lantern_courier",
+      "name": "Lantern-Kurierin",
+      "summary": "Faehrt fuer das Piratenradio Daten durch die Altstadt, immer an den Kameras vorbei.",
+      "backstory": "Aufgewachsen ueber einer Druckerei am Glockenturm. Kennt jeden toten Winkel zwischen den Treppen und hat noch nie ein Kennzeichen laenger als einen Monat gefahren.",
+      "prologVariant": "p1_courier",
+      "startMoney": 500,
+      "startDebt": 0,
+      "aegisDelta": -15,
+      "standing": { "collective": 20, "aurelia": -10, "kcg": -5 },
+      "startVehicle": "velloro_strix",
+      "startDistrict": "lanternhill",
+      "garage": { "district": "lanternhill", "level": 0 },
+      "perkPoints": 2,
+      "startSkills": ["stl_grey_jacket", "stl_quiet_engine"],
+      "treeXp": { "stealth": 300 },
+      "items": [["plate_blank", 1], ["evidence_footage", 1]],
+      "traits": [
+        { "id": "trait_blind_routes", "name": "Blinde Routen", "positive": true,  "effects": [{ "stat": "aegis.plateDetect", "mul": 0.9 }, { "stat": "aegis.decay", "mul": 1.1 }] },
+        { "id": "trait_no_credit",    "name": "Keine Kreditwuerdigkeit", "positive": false, "effects": [{ "stat": "econ.loanRate", "mul": 1.25 }] }
+      ],
+      "flags": { "origin": "lantern_courier", "pirateRadioContact": true, "knowsBlindSpots": true }
+    }
+  ]
+}

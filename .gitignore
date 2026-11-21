@@ -11,3 +11,6 @@ DerivedDataCache/
 node_modules/
 .godot/
 *.import
+
+# Erzeugte Audiodateien (reproduzierbar mit tools/audio/gen_all.py)
+Content/Audio/Generated/*.wav

@@ -1,0 +1,29 @@
+{
+  "id": "dlg_maren_clinic", "npc": "maren_solberg", "title": "Hinterzimmerklinik", "kind": "doctor",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Hände waschen, dann reden. Hier drin ist das einzige Gesetz Hygiene.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ich bin verletzt.", "next": "heal"},
+      {"text": "Ich bringe was für Edgar. Hedda hat mich geschickt.", "when": [{"flag": ["dlg.hedda.edgar_task", "==", true]}], "effects": [{"money": -100}, {"npcTrust": ["hedda_marlow", 1]}, {"flag": ["dlg.hedda.edgar_done", true]}], "next": "edgar"},
+      {"text": "Ich brauche Medikamente.", "next": "shop"},
+      {"text": "Warum haben sie dir die Lizenz genommen?", "next": "license"},
+      {"text": "Brann schickt mich. Wegen der Lieferung.", "when": [{"flag": ["dlg.brann.told_maren", "==", true]}], "next": "union_drop"},
+      {"text": "Schon gut.", "next": "bye"}]},
+    "heal": {"type": "trade", "shop": "clinic", "next": "after_heal"},
+    "after_heal": {"type": "line", "who": "@npc", "text": "Genäht. Nicht hübsch, aber ehrlich. Wenn jemand fragt: Du bist gegen einen Laternenpfahl gelaufen. Am Hang glaubt man das jedem.", "next": "c1"},
+    "shop": {"type": "trade", "shop": "clinic", "next": "c1"},
+    "edgar": {"type": "line", "who": "@npc", "text": "Für Edgar. Gut. Er wird wieder laufen, irgendwann. Und er wird fragen, wer bezahlt hat. Soll ich es ihm sagen?", "next": "c_edgar"},
+    "c_edgar": {"type": "choice", "options": [
+      {"text": "Sag ihm, es war die Fahrerin. Er soll wissen, dass es mir leidtut.", "effects": [{"rumor": {"type": "helped_someone", "subject": "player", "severity": 0.4}}, {"npcTrust": ["@npc", 1]}], "next": "c1"},
+      {"text": "Sag ihm gar nichts.", "next": "c1"}]},
+    "license": {"type": "line", "who": "@npc", "text": "Ich habe einen Jungen ohne Score behandelt. Richter Whitlow hat geurteilt, dass ich damit das Gesundheitssystem untergrabe. Seitdem untergrabe ich es täglich und gründlich.", "next": "c_license"},
+    "c_license": {"type": "choice", "options": [
+      {"text": "Whitlow hat für Aurelia geurteilt. Ich kann es vielleicht beweisen.", "when": [{"flag": ["dlg.clue.gideon_scores", "==", true]}], "effects": [{"npcTrust": ["@npc", 2]}, {"flag": ["dlg.maren.hope", true]}], "next": "hope"},
+      {"text": "Das tut mir leid.", "next": "c1"}]},
+    "hope": {"type": "line", "who": "@npc", "text": "Beweisen. Wissen Sie, wie lange ich dieses Wort nicht gehört habe, ohne dass jemand gelacht hat? Bringen Sie es Pia Sorensen, nicht mir. Ich habe keine Zeit für Hoffnung, ich habe Patienten.", "next": "c1"},
+    "union_drop": {"type": "line", "who": "@npc", "text": "Die Kisten. Ja. Antibiotika und Insulin für die Containersiedlung. Wenn Ines Varga erfährt, dass sie durch Tor 4 kamen, verliert Hedda ihren Kran. Also erfährt sie es nicht.", "effects": [{"standing": ["union", 3]}, {"standing": ["collective", 3]}], "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Passen Sie auf sich auf. Ich habe nur noch zwei Packungen Nahtmaterial.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

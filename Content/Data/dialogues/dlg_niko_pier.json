@@ -1,0 +1,26 @@
+{
+  "id": "dlg_niko_pier", "npc": "niko_strand", "title": "Am Pier", "kind": "smuggler",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Der Wind schmeckt nach Diesel und Ärger. Du bist entweder Kundin oder Civil Guard. Für Civil Guard bist du zu schlecht angezogen.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ich brauche eine Überfahrt. Für zwei, ohne Fragen.", "next": "passage"},
+      {"text": "Was hast du im Angebot?", "next": "shop"},
+      {"text": "Piet Halvorsen redet mit der Civil Guard.", "when": [{"flag": ["dlg.clue.piet_informant", "==", true]}], "next": "warn"},
+      {"text": "Nichts. Schöner Abend.", "next": "bye"}]},
+    "shop": {"type": "trade", "shop": "niko_boat", "next": "c1"},
+    "passage": {"type": "line", "who": "@npc", "text": "Zwei. Ohne Fragen. Das kostet mehr als mit Fragen, weil ich die Antworten selbst erfinden muss. Fünfzehnhundert. Bei Nebel die Hälfte.", "next": "c_pass"},
+    "c_pass": {"type": "choice", "options": [
+      {"text": "Fünfzehnhundert. Abgemacht.", "effects": [{"money": -1500}, {"flag": ["dlg.niko.passage", true]}], "next": "deal"},
+      {"text": "Siebenhundert. Und ich fahre dir den Wagen zum Pier, wann immer du willst.", "check": {"skill": "persuade", "difficulty": 3, "bonus": [{"when": [{"skill": ["driving", ">=", 3]}], "value": 1}, {"when": [{"npcTrust": ["marisol_ybarra", ">=", 1]}], "value": 1}], "success": "deal_cheap", "fail": "no_deal"}},
+      {"text": "Wenn du nicht fährst, erfährt die Hafenmeisterei von deinem Boot.", "check": {"skill": "intimidate", "difficulty": 5, "success": "deal_forced", "fail": "no_deal"}},
+      {"text": "Zu teuer.", "next": "c1"}]},
+    "deal": {"type": "line", "who": "@npc", "text": "Wenn es so weit ist, ruf bei Marisol im Motel an und frag nach Zimmer 9. Sie sagt dann, es ist belegt. Das heißt: heute Nacht.", "next": "c1"},
+    "deal_cheap": {"type": "line", "who": "@npc", "text": "Du handelst wie meine Großmutter, und die hat ein Boot gegen einen Konzern gewonnen. Siebenhundert. Und du fährst, wenn ich rufe.", "effects": [{"money": -700}, {"flag": ["dlg.niko.passage", true]}, {"npcTrust": ["@npc", 1]}], "next": "deal"},
+    "deal_forced": {"type": "line", "who": "@npc", "text": "...Gut. Ich fahre. Aber merk dir: Auf dem Wasser gibt es keine Zeugen. Auch nicht für Leute, die drohen.", "effects": [{"flag": ["dlg.niko.passage", true]}, {"npcTrust": ["@npc", -2]}], "next": "c1"},
+    "no_deal": {"type": "line", "who": "@npc", "text": "Nein. Das Meer verhandelt nicht, und ich bin heute das Meer.", "next": "c1"},
+    "warn": {"type": "line", "who": "@npc", "text": "Piet. Ich hab's geahnt. Er hat zu oft gefragt, wann ich fahre, und nie, wohin. Danke. Das vergess ich nicht.", "effects": [{"npcTrust": ["@npc", 2]}, {"relation": ["@npc", "piet_halvorsen", "friendship", -40]}, {"relation": ["@npc", "piet_halvorsen", "rivalry", 40]}, {"rumor": {"type": "npc_secret", "subject": "piet_halvorsen", "secret": "piet_informant", "severity": 0.7}}], "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Schöner Abend? Hier gibt es nur Abende, die man überlebt. Gute Nacht.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

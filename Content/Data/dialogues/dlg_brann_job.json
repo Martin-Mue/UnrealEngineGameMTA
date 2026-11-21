@@ -1,0 +1,31 @@
+{
+  "id": "dlg_brann_job", "npc": "brann", "title": "Branns Angebot", "kind": "quest_giver",
+  "start": "open",
+  "entries": [
+    {"when": [{"flag": ["dlg.brann.job_taken", "==", true]}], "node": "after_job"}
+  ],
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Du bist Voss' Schwester. Die Rennfahrerin, die ein Rennen verkauft hat. Hier im Hafen haben Leute deswegen Geld verloren.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Das ist sieben Jahre her. Ich bin hier, um es besser zu machen.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "honest"},
+      {"text": "Ich verkaufe nichts mehr. Ich fahre nur noch.", "next": "neutral"},
+      {"text": "Und du? Hast du nie etwas verkauft, Brann?", "check": {"skill": "intimidate", "difficulty": 3, "bonus": [{"when": [{"flag": ["dlg.clue.brann_deal", "==", true]}], "value": 2}], "success": "pressure_ok", "fail": "pressure_fail"}}]},
+    "honest": {"type": "line", "who": "@npc", "text": "Besser machen. Das sagen alle, die zurückkommen. Aber du hast mir in die Augen gesehen. Das tun die wenigsten.", "next": "offer"},
+    "neutral": {"type": "line", "who": "@npc", "text": "Fahren. Gut. Fahrer brauchen wir. Moral haben wir genug.", "next": "offer"},
+    "pressure_ok": {"type": "line", "who": "@npc", "text": "...Pass auf, was du in meiner Halle sagst. Gut. Du weißt Dinge. Dann weißt du auch, dass ich keine Wahl hatte, mit denen zu reden. Wir reden nicht mehr darüber.", "effects": [{"npcTrust": ["@npc", -1]}, {"flag": ["dlg.brann.exposed_private", true]}], "next": "offer"},
+    "pressure_fail": {"type": "line", "who": "@npc", "text": "Ich hab drei Streiks gewonnen, Mädchen. Mit Fragen wie dieser gewinnst du nicht mal ein Würfelspiel im Ballast.", "effects": [{"npcTrust": ["@npc", -1]}], "next": "offer"},
+    "offer": {"type": "line", "who": "@npc", "text": "Ich hab Fracht ohne Papiere. Medikamente für die Containersiedlung, und Ines Varga riegelt um sechs die Kais ab. Du fährst sie durch Tor 4, bevor die Schicht wechselt.", "next": "c2"},
+    "c2": {"type": "choice", "options": [
+      {"text": "Ich mach's.", "effects": [{"flag": ["dlg.brann.job_taken", true]}, {"standing": ["union", 5]}, {"rumor": {"type": "union_job", "subject": "player", "severity": 0.3}}], "next": "accept"},
+      {"text": "Was zahlst du?", "next": "pay"},
+      {"text": "Ich fahre nur, wenn ich weiß, wer auf der anderen Seite wartet.", "check": {"skill": "persuade", "difficulty": 2, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 1]}], "value": 1}], "success": "who_ok", "fail": "who_fail"}},
+      {"text": "Nicht heute.", "next": "decline"}]},
+    "pay": {"type": "line", "who": "@npc", "text": "Vierhundert und ein Bier bei Roz, das du selbst bezahlst. Die Union ist arm, nicht großzügig.", "next": "c2"},
+    "who_ok": {"type": "line", "who": "@npc", "text": "Maren Solberg, die Ärztin am Hang. Sie bringt die Sachen weiter. Wenn du sie verrätst, verrätst du alle, die husten.", "effects": [{"flag": ["dlg.brann.told_maren", true]}, {"npcTrust": ["@npc", 1]}], "next": "c2"},
+    "who_fail": {"type": "line", "who": "@npc", "text": "Wer wartet, ist nicht dein Problem. Dein Problem ist die Uhr.", "next": "c2"},
+    "accept": {"type": "line", "who": "@npc", "text": "Gut. Hedda sieht dich vom Kran aus. Wenn sie dreimal blinkt, ist die Civil Guard am Tor. Dann fährst du über Pier 7.", "next": "end"},
+    "decline": {"type": "line", "who": "@npc", "text": "Dann fahr spazieren. Aber wenn du wiederkommst, steht vielleicht jemand anderes hier, der dich weniger mag.", "effects": [{"npcTrust": ["@npc", -1]}], "next": "end"},
+    "after_job": {"type": "line", "who": "@npc", "text": "Du warst pünktlich. Die Leute reden schon. Pass auf, dass sie nicht zu laut reden.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

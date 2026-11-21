@@ -1,0 +1,32 @@
+{
+  "id": "dlg_ravn_coffee", "npc": "ravn", "title": "Kaffee mit dem Commander", "kind": "police",
+  "start": "open",
+  "entries": [
+    {"when": [{"npcTrust": ["@npc", ">=", 2]}], "node": "warm_open"}
+  ],
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Miss Voss. Ich trinke meinen Kaffee im Stehen, damit niemand denkt, ich hätte Zeit. Sie haben zwei Minuten.", "next": "c1"},
+    "warm_open": {"type": "line", "who": "@npc", "text": "Voss. Stellen Sie sich nicht zu nah, die Kamera dort hat ein Gedächtnis. Was brauchen Sie?", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Warum lässt Aegis Unschuldige verhaften, Commander?", "next": "aegis"},
+      {"text": "Ich suche meinen Bruder. Ihre Leute auch?", "next": "jonas"},
+      {"text": "Plant die Civil Guard eine Razzia?", "when": [{"npcTrust": ["@npc", ">=", 2]}], "next": "raid"},
+      {"text": "Ich will nur einen Kaffee.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "coffee"},
+      {"text": "Ich gehe.", "next": "bye"}]},
+    "coffee": {"type": "line", "who": "@npc", "text": "Der Kaffee hier ist schlecht. Das ist das Einzige im Core, das nicht vorgibt, etwas anderes zu sein. Prost.", "next": "c1"},
+    "aegis": {"type": "check", "cond": {"npcTrust": ["@npc", ">=", 1]}, "yes": "aegis_honest", "no": "aegis_official"},
+    "aegis_official": {"type": "line", "who": "@npc", "text": "Aegis verhaftet niemanden. Meine Beamten verhaften. Aegis gibt Hinweise. Das ist die offizielle Antwort, und ich habe sie oft genug geübt, um sie zu glauben.", "next": "c1"},
+    "aegis_honest": {"type": "line", "who": "@npc", "text": "Weil eine Fehlerquote von null Komma drei Prozent im Vorstand wie Präzision klingt. Auf der Straße sind es elf Menschen. Ich habe ihre Namen. Mit Füller.", "effects": [{"flag": ["dlg.clue.ravn_list", true]}], "next": "c_list"},
+    "c_list": {"type": "choice", "options": [
+      {"text": "Geben Sie mir die Liste. Ich bringe sie an die Öffentlichkeit.", "check": {"skill": "persuade", "difficulty": 5, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 2]}], "value": 2}, {"when": [{"not": {"flag": ["killedCivilians", "==", true]}}], "value": 1}], "success": "list_given", "fail": "list_refused"}},
+      {"text": "Was machen Sie mit der Liste?", "next": "list_why"},
+      {"text": "Danke für die Ehrlichkeit.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "c1"}]},
+    "list_given": {"type": "line", "who": "@npc", "text": "Nicht hier. Nicht heute. Aber wenn Phase Zwei live geht, liegt eine Kopie bei Ambrose, dem Portier im Spire, Schachtel 215. Ich habe nichts gesagt.", "effects": [{"flag": ["dlg.ravn.list_promised", true]}, {"npcTrust": ["@npc", 1]}], "next": "c1"},
+    "list_refused": {"type": "line", "who": "@npc", "text": "Öffentlichkeit ist ein Ort, an dem Wahrheit verhaftet wird. Ich behalte sie noch. Fragen Sie mich wieder, wenn ich Sie besser kenne.", "next": "c1"},
+    "list_why": {"type": "line", "who": "@npc", "text": "Ich lese sie. Jeden Abend. Irgendwann werde ich jemandem begegnen, dem ich sie geben kann. Bis dahin ist sie mein Gewissen in Papierform.", "next": "c1"},
+    "jonas": {"type": "line", "who": "@npc", "text": "Die Civil Guard sucht ihn wegen Datendiebstahls. Aber ich habe keine Wagen ohne Licht geschickt. Wer das tut, trägt keine Uniform. Fragen Sie im Turm, nicht hier.", "effects": [{"flag": ["dlg.clue.corp_hunters", true]}], "next": "c1"},
+    "raid": {"type": "line", "who": "@npc", "text": "Lantern Hill. Übermorgen, vier Uhr früh. Ich habe Ihnen das nicht gesagt, weil ich es nicht weiß. Sagen Sie den Leuten am Hang, sie sollen lüften. Gründlich.", "effects": [{"flag": ["dlg.ravn.raid_warning", true]}, {"standing": ["collective", 5]}, {"rumor": {"type": "helped_someone", "subject": "player", "severity": 0.2}}], "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Fahren Sie vorschriftsmäßig, Voss. Ich bitte selten um etwas.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

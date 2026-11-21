@@ -1,0 +1,182 @@
+{
+  "schema": 1,
+  "xp": {
+    "levelBase": 900, "levelExp": 1.32, "maxLevel": 50,
+    "perkPointsPerLevel": 1, "bonusPerkEvery": 5,
+    "masteryThresholds": [0, 250, 700, 1600, 3200, 6000]
+  },
+  "xpSources": {
+    "gig": 120, "gig_tier2": 180, "gig_tier3": 260,
+    "race_finish": 120, "race_win": 260, "chase": 200, "escape": 220,
+    "contract": 650, "side": 400, "main": 500, "event": 300,
+    "drift_100m": 15, "camera_hacked": 60, "camera_slalom": 140,
+    "dialog_persuade": 80, "deal_closed": 50, "plate_swap": 40, "lay_low_hour": 20
+  },
+  "treeXpSources": {
+    "drift_100m": ["driving", 12], "race_finish": ["driving", 60], "escape": ["stealth", 80], "chase": ["driving", 70],
+    "camera_hacked": ["tech", 50], "camera_slalom": ["stealth", 70], "dialog_persuade": ["network", 60],
+    "deal_closed": ["network", 30], "plate_swap": ["stealth", 30], "lay_low_hour": ["stealth", 15], "gig": ["network", 10]
+  },
+
+  "trees": [
+    {
+      "id": "driving", "name": "Fahren", "description": "Fahrzeugbeherrschung: Grip, Bremsen, Drift, Verfolgungen.",
+      "skills": [
+        { "id": "drv_steady_hands", "name": "Ruhige Haende", "tier": 1, "maxRank": 3, "cost": [1, 1, 1], "requires": [], "level": 1,
+          "desc": "Feinere Lenkung bei hohem Tempo.", "effects": [{ "stat": "vehicle.steer", "mul": 1.03 }, { "stat": "vehicle.cornering", "mul": 1.03 }] },
+        { "id": "drv_late_braker", "name": "Spaetbremser", "tier": 1, "maxRank": 3, "cost": [1, 1, 1], "requires": [], "level": 1,
+          "desc": "Kuerzere Bremswege.", "effects": [{ "stat": "vehicle.brake", "mul": 1.05 }] },
+        { "id": "drv_tire_whisperer", "name": "Reifenfluesterin", "tier": 1, "maxRank": 3, "cost": [1, 1, 2], "requires": [], "level": 2,
+          "desc": "Mehr Haftung auf jedem Belag.", "effects": [{ "stat": "vehicle.grip", "mul": 1.03 }] },
+        { "id": "drv_fuel_saver", "name": "Spritsparerin", "tier": 1, "maxRank": 2, "cost": [1, 1], "requires": [], "level": 1,
+          "desc": "Vorausschauend fahren senkt Verbrauch und Tankkosten.", "effects": [{ "stat": "vehicle.fuelUse", "mul": 0.93 }, { "stat": "econ.fuelCost", "mul": 0.96 }] },
+        { "id": "drv_drift_line", "name": "Driftlinie", "tier": 2, "maxRank": 3, "cost": [1, 2, 2], "requires": ["drv_tire_whisperer"], "level": 4, "mastery": 1,
+          "desc": "Kontrollierte Driftwinkel; Drift bringt mehr Erfahrung.", "effects": [{ "stat": "vehicle.cornering", "mul": 0.97 }, { "stat": "xp.drift", "mul": 1.15 }] },
+        { "id": "drv_launch", "name": "Ampelstart", "tier": 2, "maxRank": 3, "cost": [1, 2, 2], "requires": [], "level": 5, "mastery": 1,
+          "desc": "Schnellere Gangwechsel beim Anfahren.", "effects": [{ "stat": "vehicle.shiftTime", "mul": 0.92 }] },
+        { "id": "drv_crash_sense", "name": "Aufprallgespuer", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": ["drv_late_braker"], "level": 6, "mastery": 1,
+          "desc": "Instinktives Abfangen senkt Unfallschaeden.", "effects": [{ "stat": "vehicle.damageResist", "add": 0.05 }] },
+        { "id": "drv_pit_maneuver", "name": "Abdraengen", "tier": 3, "maxRank": 1, "cost": [3], "requires": ["drv_crash_sense", "drv_steady_hands:2"], "level": 10, "mastery": 2,
+          "desc": "Schaltet die Verfolgungsoption 'Abdraengen' frei.", "effects": [], "tags": ["ability.pit"] },
+        { "id": "drv_slipstream", "name": "Windschatten", "tier": 3, "maxRank": 2, "cost": [2, 3], "requires": ["drv_launch:2"], "level": 12, "mastery": 2,
+          "desc": "Hoeheres Endtempo durch saubere Linie.", "effects": [{ "stat": "vehicle.topSpeed", "mul": 1.03 }, { "stat": "vehicle.drag", "mul": 0.97 }] },
+        { "id": "drv_salt_flats", "name": "Salzebenen-Gefuehl", "tier": 3, "maxRank": 2, "cost": [2, 2], "requires": ["drv_drift_line:2"], "level": 12, "mastery": 2,
+          "desc": "Offroad und lose Oberflaechen: Federung arbeitet ruhiger.", "effects": [{ "stat": "vehicle.damping", "mul": 1.06 }, { "stat": "vehicle.grip", "mul": 1.02 }] },
+        { "id": "drv_escape_artist", "name": "Fluchtkuenstlerin", "tier": 4, "maxRank": 2, "cost": [3, 3], "requires": ["drv_pit_maneuver", "drv_slipstream"], "level": 18, "mastery": 3,
+          "desc": "Heat faellt nach Sichtkontaktverlust schneller.", "effects": [{ "stat": "heat.decay", "mul": 1.12 }] },
+        { "id": "drv_ghost_line", "name": "Geisterlinie", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["drv_escape_artist", "drv_salt_flats"], "level": 24, "mastery": 4,
+          "desc": "Meisterschaft: mehr Grip, mehr Bremskraft, Rennpreise +10 %.", "effects": [{ "stat": "vehicle.grip", "mul": 1.05 }, { "stat": "vehicle.brake", "mul": 1.05 }, { "stat": "econ.rewardMoney", "mul": 1.05 }], "tags": ["ability.ghost_line"] }
+      ]
+    },
+    {
+      "id": "tech", "name": "Technik/Hacking", "description": "Werkstatt, Elektronik und Eingriffe in das Aegis-Netz.",
+      "skills": [
+        { "id": "tec_wrench_basics", "name": "Schraubergrundlagen", "tier": 1, "maxRank": 3, "cost": [1, 1, 1], "requires": [], "level": 1,
+          "desc": "Billigere Reparaturen.", "effects": [{ "stat": "econ.repairCost", "mul": 0.94 }] },
+        { "id": "tec_dongle_tinker", "name": "Dongle-Bastlerin", "tier": 1, "maxRank": 2, "cost": [1, 1], "requires": [], "level": 2,
+          "desc": "Kamera-Hacks laufen schneller.", "effects": [{ "stat": "tech.hackSpeed", "mul": 1.1 }] },
+        { "id": "tec_field_repair", "name": "Feldreparatur", "tier": 1, "maxRank": 2, "cost": [1, 2], "requires": ["tec_wrench_basics"], "level": 3,
+          "desc": "Reparatursets wirken staerker.", "effects": [{ "stat": "item.repairKit", "mul": 1.25 }] },
+        { "id": "tec_tuning_eye", "name": "Tuning-Blick", "tier": 1, "maxRank": 3, "cost": [1, 1, 2], "requires": [], "level": 2,
+          "desc": "Guenstigere Tuningteile.", "effects": [{ "stat": "econ.tuningCost", "mul": 0.95 }] },
+        { "id": "tec_signal_reader", "name": "Signalleserin", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": ["tec_dongle_tinker"], "level": 5, "mastery": 1,
+          "desc": "Groessere Hack-Reichweite.", "effects": [{ "stat": "tech.hackRange", "mul": 1.2 }] },
+        { "id": "tec_clean_trace", "name": "Saubere Spur", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": ["tec_dongle_tinker"], "level": 6, "mastery": 1,
+          "desc": "Hacks hinterlassen weniger Aegis-Spuren.", "effects": [{ "stat": "tech.hackTrace", "mul": 0.8 }] },
+        { "id": "tec_engine_map", "name": "Kennfeld-Tuning", "tier": 2, "maxRank": 3, "cost": [1, 2, 2], "requires": ["tec_tuning_eye"], "level": 6, "mastery": 1,
+          "desc": "Mehr Drehmoment aus jeder Maschine.", "effects": [{ "stat": "vehicle.torque", "mul": 1.03 }] },
+        { "id": "tec_traffic_lights", "name": "Ampelkontrolle", "tier": 3, "maxRank": 1, "cost": [3], "requires": ["tec_signal_reader"], "level": 10, "mastery": 2,
+          "desc": "Ampeln in Reichweite auf Gruen/Rot schalten.", "effects": [], "tags": ["ability.hack_traffic"] },
+        { "id": "tec_plate_forger", "name": "Kennzeichen-Faelscherin", "tier": 3, "maxRank": 2, "cost": [2, 3], "requires": ["tec_clean_trace"], "level": 11, "mastery": 2,
+          "desc": "Kennzeichenwechsel billiger und wirksamer.", "effects": [{ "stat": "econ.plateCost", "mul": 0.8 }, { "stat": "aegis.plateSwap", "mul": 1.15 }] },
+        { "id": "tec_armor_weld", "name": "Panzerschweissen", "tier": 3, "maxRank": 2, "cost": [2, 2], "requires": ["tec_engine_map", "tec_field_repair"], "level": 12, "mastery": 2,
+          "desc": "Panzerung ohne viel Zusatzgewicht.", "effects": [{ "stat": "vehicle.durability", "mul": 1.06 }, { "stat": "vehicle.mass", "mul": 0.99 }] },
+        { "id": "tec_remote_hack", "name": "Fernzugriff", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["tec_traffic_lights", "tec_clean_trace:2"], "level": 18, "mastery": 3,
+          "desc": "Kameras aus der Distanz hacken (Modul-Effekt ohne Konzernlizenz).", "effects": [{ "stat": "tech.hackRange", "mul": 1.5 }], "tags": ["ability.camera_hack_remote"] },
+        { "id": "tec_ghost_firmware", "name": "Geister-Firmware", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["tec_remote_hack", "tec_plate_forger"], "level": 25, "mastery": 4,
+          "desc": "Meisterschaft: das eigene Fahrzeug erscheint in Aegis als Rauschen.", "effects": [{ "stat": "vehicle.visibility", "mul": 0.85 }, { "stat": "aegis.plateDetect", "mul": 0.85 }], "tags": ["ability.ghost_firmware"] }
+      ]
+    },
+    {
+      "id": "network", "name": "Verhandeln/Netzwerk", "description": "Preise, Kontakte, Bestechung und Fraktionsgunst.",
+      "skills": [
+        { "id": "net_haggler", "name": "Feilscherin", "tier": 1, "maxRank": 3, "cost": [1, 1, 1], "requires": [], "level": 1,
+          "desc": "Bessere Einkaufspreise.", "effects": [{ "stat": "econ.buyPrice", "mul": 0.97 }] },
+        { "id": "net_reseller", "name": "Zwischenhaendlerin", "tier": 1, "maxRank": 3, "cost": [1, 1, 1], "requires": [], "level": 1,
+          "desc": "Bessere Verkaufspreise.", "effects": [{ "stat": "econ.sellPrice", "mul": 1.04 }] },
+        { "id": "net_regulars", "name": "Stammkundschaft", "tier": 1, "maxRank": 2, "cost": [1, 2], "requires": [], "level": 2,
+          "desc": "Gigs zahlen mehr.", "effects": [{ "stat": "econ.rewardMoney", "mul": 1.04 }] },
+        { "id": "net_smooth_talk", "name": "Glatte Zunge", "tier": 1, "maxRank": 3, "cost": [1, 1, 2], "requires": [], "level": 2,
+          "desc": "Bonus auf Ueberzeugen-Pruefungen in Dialogen.", "effects": [{ "stat": "social.persuade", "add": 0.05 }] },
+        { "id": "net_envelope", "name": "Der Umschlag", "tier": 2, "maxRank": 3, "cost": [1, 2, 2], "requires": ["net_smooth_talk"], "level": 5, "mastery": 1,
+          "desc": "Bestechung billiger und erfolgreicher.", "effects": [{ "stat": "econ.bribeCost", "mul": 0.92 }, { "stat": "econ.bribeSuccess", "add": 0.03 }] },
+        { "id": "net_fence", "name": "Hehlerkontakte", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": ["net_reseller"], "level": 6, "mastery": 1,
+          "desc": "Schwarzmarkt zahlt besser.", "effects": [{ "stat": "econ.blackMarketSell", "mul": 1.06 }, { "stat": "econ.blackMarketBuy", "mul": 0.96 }] },
+        { "id": "net_word_travels", "name": "Es spricht sich herum", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": ["net_regulars"], "level": 6, "mastery": 1,
+          "desc": "Fraktionsstand steigt schneller.", "effects": [{ "stat": "standing.gain", "mul": 1.1 }] },
+        { "id": "net_credit_line", "name": "Kreditlinie", "tier": 3, "maxRank": 2, "cost": [2, 3], "requires": ["net_haggler:2"], "level": 10, "mastery": 2,
+          "desc": "Aurelia gewaehrt niedrigere Zinsen (man kennt die richtigen Formulare).", "effects": [{ "stat": "econ.loanRate", "mul": 0.88 }] },
+        { "id": "net_lawyer", "name": "Anwalt auf Kurzwahl", "tier": 3, "maxRank": 2, "cost": [2, 2], "requires": ["net_envelope:2"], "level": 11, "mastery": 2,
+          "desc": "Niedrigere Bussgelder und Kautionen.", "effects": [{ "stat": "econ.fineAmount", "mul": 0.88 }] },
+        { "id": "net_safe_hands", "name": "Sichere Haende", "tier": 3, "maxRank": 1, "cost": [3], "requires": ["net_fence"], "level": 12, "mastery": 2,
+          "desc": "Bei Festnahme wird weniger beschlagnahmt.", "effects": [{ "stat": "inv.confiscateChance", "mul": 0.7 }] },
+        { "id": "net_broker", "name": "Maklerin der Docks", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["net_word_travels", "net_safe_hands"], "level": 18, "mastery": 3,
+          "desc": "Schaltet Gig-Stufe 3 in allen Bezirken unabhaengig vom Stand frei.", "effects": [], "tags": ["unlock.gig_tier3_all"] },
+        { "id": "net_kingmaker", "name": "Strippenzieherin", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["net_broker", "net_credit_line"], "level": 25, "mastery": 4,
+          "desc": "Meisterschaft: Rabatt ueberall, Belohnungen +8 %.", "effects": [{ "stat": "econ.buyPrice", "mul": 0.95 }, { "stat": "econ.rewardMoney", "mul": 1.08 }], "tags": ["ability.kingmaker"] }
+      ]
+    },
+    {
+      "id": "stealth", "name": "Untertauchen/Aegis-Tarnung", "description": "Profil senken, Kameras meiden, Heat abschuetteln.",
+      "skills": [
+        { "id": "stl_grey_jacket", "name": "Graue Jacke", "tier": 1, "maxRank": 3, "cost": [1, 1, 1], "requires": [], "level": 1,
+          "desc": "Aegis-Profil steigt langsamer.", "effects": [{ "stat": "aegis.gain", "mul": 0.95 }] },
+        { "id": "stl_blind_spots", "name": "Tote Winkel", "tier": 1, "maxRank": 3, "cost": [1, 1, 2], "requires": [], "level": 2,
+          "desc": "Kameras erkennen das Fahrzeug seltener.", "effects": [{ "stat": "aegis.plateDetect", "mul": 0.95 }] },
+        { "id": "stl_quiet_engine", "name": "Leiser Motor", "tier": 1, "maxRank": 2, "cost": [1, 1], "requires": [], "level": 2,
+          "desc": "Weniger Laerm, weniger Aufmerksamkeit.", "effects": [{ "stat": "vehicle.noise", "mul": 0.88 }] },
+        { "id": "stl_safehouse_habit", "name": "Unterschlupf-Routine", "tier": 1, "maxRank": 2, "cost": [1, 2], "requires": [], "level": 3,
+          "desc": "Aegis-Profil sinkt beim Untertauchen schneller.", "effects": [{ "stat": "aegis.decay", "mul": 1.15 }] },
+        { "id": "stl_dull_paint", "name": "Mattgrau-Prinzip", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": ["stl_blind_spots"], "level": 5, "mastery": 1,
+          "desc": "Jedes Fahrzeug wirkt unauffaelliger.", "effects": [{ "stat": "vehicle.visibility", "mul": 0.93 }] },
+        { "id": "stl_cold_trail", "name": "Kalte Spur", "tier": 2, "maxRank": 3, "cost": [1, 2, 2], "requires": ["stl_grey_jacket"], "level": 6, "mastery": 1,
+          "desc": "Heat sinkt schneller.", "effects": [{ "stat": "heat.decay", "mul": 1.08 }] },
+        { "id": "stl_plate_swap_pro", "name": "Schneller Kennzeichentausch", "tier": 2, "maxRank": 2, "cost": [2, 2], "requires": [], "level": 6, "mastery": 1,
+          "desc": "Kennzeichentausch senkt das Profil staerker.", "effects": [{ "stat": "aegis.plateSwap", "mul": 1.15 }] },
+        { "id": "stl_crowd_blend", "name": "In der Menge", "tier": 3, "maxRank": 2, "cost": [2, 2], "requires": ["stl_dull_paint"], "level": 10, "mastery": 2,
+          "desc": "In dichtem Verkehr sinkt die Erkennung zusaetzlich.", "effects": [{ "stat": "aegis.trafficCover", "add": 0.1 }] },
+        { "id": "stl_slow_heat", "name": "Unter dem Radar", "tier": 3, "maxRank": 2, "cost": [2, 3], "requires": ["stl_cold_trail:2"], "level": 11, "mastery": 2,
+          "desc": "Vergehen erzeugen weniger Heat.", "effects": [{ "stat": "heat.gain", "mul": 0.9 }] },
+        { "id": "stl_hidden_compartment", "name": "Doppelter Boden", "tier": 3, "maxRank": 2, "cost": [2, 2], "requires": ["stl_safehouse_habit"], "level": 12, "mastery": 2,
+          "desc": "Kofferraum-Schmuggelware wird seltener gefunden; +2 Kofferraumplaetze.", "effects": [{ "stat": "inv.trunkHide", "mul": 0.75 }, { "stat": "vehicle.cargoSlots", "add": 1 }] },
+        { "id": "stl_null_profile", "name": "Nullprofil", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["stl_crowd_blend", "stl_plate_swap_pro"], "level": 18, "mastery": 3,
+          "desc": "Aegis-Profil kann nicht ueber 85 steigen, solange kein Verbrechen gefilmt wird.", "effects": [{ "stat": "aegis.cap", "add": -15 }], "tags": ["ability.null_profile"] },
+        { "id": "stl_phantom", "name": "Phantom von Kestrel Bay", "tier": 4, "maxRank": 1, "cost": [4], "requires": ["stl_null_profile", "stl_slow_heat"], "level": 25, "mastery": 4,
+          "desc": "Meisterschaft: Festnahmen dauern laenger, Heat-Zerfall stark erhoeht.", "effects": [{ "stat": "heat.arrestTime", "mul": 1.3 }, { "stat": "heat.decay", "mul": 1.15 }], "tags": ["ability.phantom"] }
+      ]
+    }
+  ],
+
+  "reputation": {
+    "tiers": [
+      { "id": "enemy", "name": "Feind", "min": -100 },
+      { "id": "suspicious", "name": "Misstrauisch", "min": -40 },
+      { "id": "neutral", "name": "Neutral", "min": -10 },
+      { "id": "allied", "name": "Verbuendet", "min": 25 },
+      { "id": "trusted", "name": "Vertraut", "min": 60 }
+    ],
+    "rewards": {
+      "union": [
+        { "id": "union_dockpass", "threshold": 25, "name": "Hafenausweis", "money": 500, "perkPoints": 0, "items": [["key_union_yard", 1]], "effects": [{ "stat": "econ.buyPrice", "mul": 0.97 }], "tags": ["unlock.gig_tier2_saltmarket"] },
+        { "id": "union_routes", "threshold": 45, "name": "Schmuggelrouten", "money": 0, "perkPoints": 1, "effects": [{ "stat": "inv.confiscateChance", "mul": 0.85 }], "tags": ["unlock.smuggle_routes"] },
+        { "id": "union_brother", "threshold": 75, "name": "Schwester der Docks", "money": 2500, "perkPoints": 1, "effects": [{ "stat": "econ.rewardMoney", "mul": 1.05 }], "tags": ["unlock.gig_tier3_saltmarket", "unlock.safehouse_saltmarket"] }
+      ],
+      "collective": [
+        { "id": "coll_mesh", "threshold": 25, "name": "Zugang zum Mesh", "money": 0, "perkPoints": 0, "items": [["dongle_basic", 2]], "effects": [{ "stat": "tech.hackSpeed", "mul": 1.1 }], "tags": ["unlock.gig_tier2_lanternhill"] },
+        { "id": "coll_blindmap", "threshold": 45, "name": "Karte der blinden Kameras", "money": 0, "perkPoints": 1, "effects": [{ "stat": "aegis.plateDetect", "mul": 0.9 }], "tags": ["unlock.blindspot_map"] },
+        { "id": "coll_ghost", "threshold": 75, "name": "Geist des Collective", "money": 1500, "perkPoints": 1, "effects": [{ "stat": "tech.hackTrace", "mul": 0.8 }], "tags": ["unlock.gig_tier3_lanternhill"] }
+      ],
+      "wrenchers": [
+        { "id": "wr_parts", "threshold": 25, "name": "Teilelager", "money": 0, "perkPoints": 0, "effects": [{ "stat": "econ.tuningCost", "mul": 0.9 }], "tags": ["unlock.gig_tier2_rustline", "unlock.tuning_rustline_t3"] },
+        { "id": "wr_races", "threshold": 45, "name": "Startplatz Nachtrennen", "money": 800, "perkPoints": 1, "effects": [], "tags": ["unlock.races_tier2", "unlock.dealer_wrenchers"] },
+        { "id": "wr_crown", "threshold": 75, "name": "Schrottkrone", "money": 3000, "perkPoints": 1, "effects": [{ "stat": "econ.repairCost", "mul": 0.85 }], "tags": ["unlock.gig_tier3_rustline", "unlock.vehicle_unique_wrenchers"] }
+      ],
+      "aurelia": [
+        { "id": "aur_clearance", "threshold": 25, "name": "Gruene Freigabe", "money": 0, "perkPoints": 0, "effects": [{ "stat": "econ.loanRate", "mul": 0.9 }], "tags": ["unlock.core_checkpoint_pass"] },
+        { "id": "aur_erasure", "threshold": 45, "name": "Kennzeichen-Loeschung", "money": 0, "perkPoints": 1, "effects": [{ "stat": "aegis.plateSwap", "mul": 1.3 }], "tags": ["unlock.plate_erasure_service"] },
+        { "id": "aur_executive", "threshold": 75, "name": "Vorstandsfahrdienst", "money": 5000, "perkPoints": 1, "effects": [{ "stat": "econ.rewardMoney", "mul": 1.05 }], "tags": ["unlock.gig_tier3_core", "unlock.dealer_core_premium"] }
+      ],
+      "kcg": [
+        { "id": "kcg_blind_eye", "threshold": 25, "name": "Ein Auge zudruecken", "money": 0, "perkPoints": 0, "effects": [{ "stat": "econ.fineAmount", "mul": 0.9 }], "tags": [] },
+        { "id": "kcg_friend", "threshold": 50, "name": "Freund der Wache", "money": 0, "perkPoints": 1, "effects": [{ "stat": "econ.bribeSuccess", "add": 0.08 }], "tags": ["unlock.patrol_auction"] }
+      ]
+    },
+    "penalties": {
+      "union": [{ "id": "union_blacklist", "threshold": -40, "effects": [{ "stat": "econ.buyPrice", "mul": 1.1 }], "tags": ["lock.saltmarket_gigs"] }],
+      "collective": [{ "id": "coll_doxxed", "threshold": -40, "effects": [{ "stat": "aegis.gain", "mul": 1.15 }], "tags": [] }],
+      "wrenchers": [{ "id": "wr_banned", "threshold": -40, "effects": [{ "stat": "econ.tuningCost", "mul": 1.2 }], "tags": ["lock.rustline_races"] }],
+      "aurelia": [{ "id": "aur_flagged", "threshold": -40, "effects": [{ "stat": "econ.loanRate", "mul": 1.3 }], "tags": ["lock.core_checkpoint"] }],
+      "kcg": [{ "id": "kcg_marked", "threshold": -40, "effects": [{ "stat": "heat.gain", "mul": 1.15 }], "tags": [] }]
+    }
+  }
+}

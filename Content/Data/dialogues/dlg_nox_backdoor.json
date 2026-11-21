@@ -1,0 +1,31 @@
+{
+  "id": "dlg_nox_backdoor", "npc": "nox", "title": "Die Hintertür", "kind": "hacker",
+  "start": "open",
+  "entries": [
+    {"when": [{"npcTrust": ["@npc", "<=", -2]}], "node": "cold"}
+  ],
+  "nodes": {
+    "cold": {"type": "line", "who": "@npc", "text": "Ich hab dein Gesicht aus drei Kameras gelöscht. Aus meinem Gedächtnis krieg ich es nicht raus. Geh.", "next": "end"},
+    "open": {"type": "line", "who": "@npc", "text": "Du bist an der Kamera am Treppenabsatz vorbeigegangen und hast nicht hochgeguckt. Entweder bist du klug oder müde. Setz dich.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ich suche Jonas.", "next": "jonas"},
+      {"text": "Ich brauche eine Kamera, die wegsieht.", "next": "job"},
+      {"text": "Was machst du hier eigentlich den ganzen Tag?", "effects": [{"npcTrust": ["@npc", 1]}], "next": "life"},
+      {"text": "Nichts. Falsche Tür.", "next": "end"}]},
+    "life": {"type": "line", "who": "@npc", "text": "Ich lese Aegis Gedichte vor. Es versteht sie nicht, aber es hört gut zu. Und manchmal, wenn es zu sehr zuhört, vergisst es zu sehen.", "next": "c1"},
+    "jonas": {"type": "check", "cond": {"npcTrust": ["@npc", ">=", 2]}, "yes": "jonas_truth", "no": "jonas_deflect"},
+    "jonas_deflect": {"type": "line", "who": "@npc", "text": "Viele Leute heißen Jonas. Die Hälfte davon ist in einer Datenbank, die andere Hälfte wünscht, sie wäre es nicht.", "next": "c1"},
+    "jonas_truth": {"type": "line", "who": "@npc", "text": "Ich kenne ihn länger, als ich gesagt habe. Ich hab ihm geholfen, etwas zu verkaufen, damit du deine Schulden loswirst. Er wollte nicht, dass du es weißt. Jetzt weißt du es. Wir sind quitt, oder wir sind es nie.", "effects": [{"flag": ["dlg.nox.confessed", true]}, {"npcTrust": ["jonas", 1]}], "next": "c1"},
+    "job": {"type": "line", "who": "@npc", "text": "Welche Kamera? Im Core sind sie wach, am Hafen schläfrig, in Rustline tot. Für Wache brauche ich Zeit, für Schläfrige brauche ich Tee.", "next": "c_job"},
+    "c_job": {"type": "choice", "options": [
+      {"text": "Ich mach es selbst. Zeig mir, wie.", "check": {"skill": "hack", "difficulty": 3, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 1]}], "value": 1}], "success": "hack_ok", "fail": "hack_fail"}},
+      {"text": "Mach du es. Ich zahle.", "effects": [{"money": -300}, {"standing": ["collective", 3]}], "next": "paid"},
+      {"text": "Das Archiv im Core. Die Kameras am Lieferantentor.", "when": [{"standing": ["collective", ">=", 20]}], "next": "archive"},
+      {"text": "Ich überleg's mir.", "next": "c1"}]},
+    "hack_ok": {"type": "line", "who": "@npc", "text": "Siehst du? Du hast die Schleife gefunden, bevor ich sie erklärt habe. Die Kamera am Kiosk Gezeiten sieht jetzt dreißig Sekunden lang nur Möwen. Respekt.", "effects": [{"npcTrust": ["@npc", 1]}, {"aegis": -3}, {"rumor": {"type": "hacked_camera", "subject": "player", "severity": 0.3}}], "next": "c1"},
+    "hack_fail": {"type": "line", "who": "@npc", "text": "Nein, nein, nicht da drücken, das ist der... okay. Jetzt weiß die Kamera, dass jemand sie gestreichelt hat. Geh die nächsten zwei Tage nicht an Tor 4 vorbei.", "effects": [{"aegis": 4}, {"heat": ["saltmarket", 1]}], "next": "c1"},
+    "paid": {"type": "line", "who": "@npc", "text": "Bezahlt ist bezahlt. Heute Nacht zwischen zwei und drei sieht das Tor nur Nebel. Selbst wenn keiner ist.", "next": "c1"},
+    "archive": {"type": "line", "who": "@npc", "text": "Das Archiv. Gut. Odette Brisk hat einen Lieferanteneingang mit Kabelschacht. Wenn du von dort kommst, brauchst du nur eine Kamera, nicht neun. Sag Odette, die Nudeln waren zu salzig. Dann weiß sie Bescheid.", "effects": [{"flag": ["dlg.clue.archive_route", true]}, {"npcTrust": ["odette_brisk", 1]}], "next": "c1"},
+    "end": {"type": "end"}
+  }
+}

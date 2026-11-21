@@ -1,0 +1,8175 @@
+{
+ "schema": 1,
+ "meshConvention": "/Game/Characters/Clothing/{Slot}/SK_{Id}.SK_{Id}",
+ "note": "mesh bleibt leer, bis ein Skeletal Mesh zugeordnet ist (tools/ue_characters/assign_clothing_meshes.py). Leer = Platzhalter/Kapselkörper.",
+ "slots": [
+  "hat",
+  "glasses",
+  "mask",
+  "neck",
+  "top",
+  "jacket",
+  "fullbody",
+  "bottom",
+  "gloves",
+  "shoes",
+  "bag"
+ ],
+ "styles": [
+  "workwear",
+  "business",
+  "casual",
+  "street",
+  "sport",
+  "formal",
+  "uniform",
+  "tactical",
+  "underground",
+  "luxury",
+  "beach",
+  "weather"
+ ],
+ "palettes": {
+  "workwear_orange": [
+   "#d9661f",
+   "#c9821a",
+   "#e0a21c",
+   "#8a8d91"
+  ],
+  "workwear_blue": [
+   "#2e4a6b",
+   "#37597d",
+   "#4a5c70",
+   "#6b6f73"
+  ],
+  "workwear_earth": [
+   "#5b5a3f",
+   "#6b4f33",
+   "#4a4d52",
+   "#7a6a4f"
+  ],
+  "denim": [
+   "#2a3a55",
+   "#1c2433",
+   "#3c5575",
+   "#141820"
+  ],
+  "mono_dark": [
+   "#16181b",
+   "#23262b",
+   "#2e3238",
+   "#3b3f45"
+  ],
+  "mono_light": [
+   "#e9e7e1",
+   "#d4d2cc",
+   "#b8b6b1",
+   "#f2f2f0"
+  ],
+  "corporate": [
+   "#e6e9ee",
+   "#9fb4cf",
+   "#27384f",
+   "#4a4f57",
+   "#1f2a3a"
+  ],
+  "kcg_navy": [
+   "#1b2433",
+   "#202c40",
+   "#2a3447"
+  ],
+  "tactical_black": [
+   "#14161a",
+   "#1d2024",
+   "#262b2f"
+  ],
+  "neon_street": [
+   "#ff2a8a",
+   "#18e0c8",
+   "#ffd21f",
+   "#7a3cff",
+   "#ff6a1a",
+   "#2b9bff"
+  ],
+  "earth_casual": [
+   "#6b5a45",
+   "#8a7a62",
+   "#4f5a4a",
+   "#7d6451",
+   "#a08f78",
+   "#5a4a3a"
+  ],
+  "beach_bright": [
+   "#f2c14e",
+   "#e8763a",
+   "#2fb8a8",
+   "#f4efe3",
+   "#ef5a7a",
+   "#4aa3df"
+  ],
+  "luxury": [
+   "#101012",
+   "#2a1f33",
+   "#3b2d1f",
+   "#d8cfb8",
+   "#5b1f2b"
+  ],
+  "elder_muted": [
+   "#8c8478",
+   "#6f7a7a",
+   "#a89f8e",
+   "#756a5e",
+   "#8a8f99"
+  ],
+  "child_bright": [
+   "#ff7a2f",
+   "#3fb6e8",
+   "#ffd23f",
+   "#8be04e",
+   "#ff6fa3"
+  ],
+  "hacker_dark": [
+   "#1a1f26",
+   "#2a2f3a",
+   "#232b2b",
+   "#3a2a44"
+  ],
+  "racing": [
+   "#e8e8e8",
+   "#d63a2f",
+   "#1f4aa8",
+   "#111111",
+   "#f0c419"
+  ],
+  "weather_bright": [
+   "#f5d21f",
+   "#e8731a",
+   "#2a8fd6",
+   "#d9d9d9"
+  ],
+  "rust_leather": [
+   "#2a1d16",
+   "#3b281c",
+   "#1b1b1b",
+   "#4a3626"
+  ]
+ },
+ "rules": {
+  "requiredSlots": [
+   "shoes"
+  ],
+  "requiredUnlessFullbody": [
+   "top",
+   "bottom"
+  ],
+  "tagConflicts": [
+   [
+    "visor_helmet",
+    "covers_eyes"
+   ],
+   [
+    "hood_up",
+    "hat_rigid"
+   ],
+   [
+    "covers_face",
+    "covers_face_second"
+   ]
+  ],
+  "styleClashes": [
+   [
+    "formal",
+    "beach"
+   ],
+   [
+    "formal",
+    "sport"
+   ],
+   [
+    "uniform",
+    "underground"
+   ],
+   [
+    "uniform",
+    "beach"
+   ],
+   [
+    "luxury",
+    "workwear"
+   ],
+   [
+    "business",
+    "beach"
+   ],
+   [
+    "tactical",
+    "beach"
+   ],
+   [
+    "luxury",
+    "beach"
+   ]
+  ],
+  "fullbodyDefaultBlocks": [
+   "top",
+   "bottom"
+  ],
+  "coldBelowC": 8,
+  "hotAboveC": 30,
+  "weatherStyle": "weather"
+ },
+ "items": [
+  {
+   "id": "hat_cap_dock",
+   "name": "Hafenmütze",
+   "slot": "hat",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": -5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 18,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_beanie_wool",
+   "name": "Wollmütze",
+   "slot": "hat",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 10,
+   "rain": 0.2,
+   "conspicuous": 0.1,
+   "price": 12,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_hardhat_yellow",
+   "name": "Schutzhelm gelb",
+   "slot": "hat",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -10,
+   "tempMax": 40,
+   "rain": 0.3,
+   "conspicuous": 0.3,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "hat_rigid"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "hat_kcg_cap",
+   "name": "Dienstmütze Civil Guard",
+   "slot": "hat",
+   "style": "uniform",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -5,
+   "tempMax": 30,
+   "rain": 0.2,
+   "conspicuous": 0.6,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "hat_kcg_helmet",
+   "name": "Einsatzhelm Civil Guard",
+   "slot": "hat",
+   "style": "tactical",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -10,
+   "tempMax": 35,
+   "rain": 0.4,
+   "conspicuous": 0.8,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "hat_rigid",
+    "visor_helmet",
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "hat_bucket_sun",
+   "name": "Sonnenhut",
+   "slot": "hat",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 15,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 22,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_fedora_felt",
+   "name": "Filzhut",
+   "slot": "hat",
+   "style": "formal",
+   "districts": [
+    "core",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 25,
+   "rain": 0.3,
+   "conspicuous": 0.4,
+   "price": 65,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_snapback_neon",
+   "name": "Snapback mit Neon-Patch",
+   "slot": "hat",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 35,
+   "rain": 0.1,
+   "conspicuous": 0.5,
+   "price": 28,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_helmet_race_open",
+   "name": "Rennhelm offen",
+   "slot": "hat",
+   "style": "sport",
+   "districts": [
+    "rustline"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 0,
+   "tempMax": 35,
+   "rain": 0.3,
+   "conspicuous": 0.6,
+   "price": 140,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "hat_rigid"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "hat_headband_sweat",
+   "name": "Schweißband",
+   "slot": "hat",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 15,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 6,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_beret_wool",
+   "name": "Baskenmütze",
+   "slot": "hat",
+   "style": "casual",
+   "districts": [
+    "lanternhill",
+    "greenmoor"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": -5,
+   "tempMax": 22,
+   "rain": 0.3,
+   "conspicuous": 0.3,
+   "price": 24,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_cap_aurelia",
+   "name": "Konzernkappe",
+   "slot": "hat",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.4,
+   "price": 20,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_straw_wide",
+   "name": "Strohhut breit",
+   "slot": "hat",
+   "style": "beach",
+   "districts": [
+    "sunstrip",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 18,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 26,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_cap_child",
+   "name": "Kinder-Basecap",
+   "slot": "hat",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 40,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 10,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "hat_flatcap_tweed",
+   "name": "Schiebermütze",
+   "slot": "hat",
+   "style": "casual",
+   "districts": [
+    "saltmarket",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": -2,
+   "tempMax": 24,
+   "rain": 0.3,
+   "conspicuous": 0.2,
+   "price": 27,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "glass_sun_aviator",
+   "name": "Pilotenbrille",
+   "slot": "glasses",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 12,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.4,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_round_wire",
+   "name": "Runde Drahtbrille",
+   "slot": "glasses",
+   "style": "casual",
+   "districts": [
+    "lanternhill",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 60,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_visor_sport",
+   "name": "Sportvisor",
+   "slot": "glasses",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.4,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_reading",
+   "name": "Lesebrille",
+   "slot": "glasses",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_aegis_hud",
+   "name": "Datenbrille mit Konzern-HUD",
+   "slot": "glasses",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 0,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.7,
+   "price": 380,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_goggles_welder",
+   "name": "Schweißerbrille",
+   "slot": "glasses",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -5,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.5,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_mirror_privacy",
+   "name": "Spiegelglas-Brille (Anti-Erkennung)",
+   "slot": "glasses",
+   "style": "underground",
+   "districts": [
+    "lanternhill",
+    "rustline"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": -5,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.8,
+   "price": 140,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes",
+    "anti_aegis"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glass_heavy_frame",
+   "name": "Kastenbrille",
+   "slot": "glasses",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 50,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_eyes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_respirator_half",
+   "name": "Halbmaske Atemschutz",
+   "slot": "mask",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -5,
+   "tempMax": 40,
+   "rain": 0.3,
+   "conspicuous": 0.5,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_surgical",
+   "name": "OP-Maske",
+   "slot": "mask",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 4,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_bandana",
+   "name": "Halstuch-Maske",
+   "slot": "mask",
+   "style": "street",
+   "districts": [
+    "rustline",
+    "saltmarket"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 5,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.6,
+   "price": 8,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_balaclava",
+   "name": "Sturmhaube",
+   "slot": "mask",
+   "style": "tactical",
+   "districts": [],
+   "factions": [],
+   "tempMin": -15,
+   "tempMax": 15,
+   "rain": 0.1,
+   "conspicuous": 0.9,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face",
+    "hood_up"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_aegis_blur",
+   "name": "Gesichtsraster-Maske (Anti-Aegis)",
+   "slot": "mask",
+   "style": "underground",
+   "districts": [
+    "lanternhill"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 0,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.95,
+   "price": 180,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face",
+    "anti_aegis"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_smog_filter",
+   "name": "Smogfilter-Maske",
+   "slot": "mask",
+   "style": "casual",
+   "districts": [
+    "rustline",
+    "saltmarket"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.4,
+   "price": 25,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_festival_neon",
+   "name": "Neon-Festivalmaske",
+   "slot": "mask",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 15,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.7,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "mask_kcg_visor",
+   "name": "Visier Civil Guard",
+   "slot": "mask",
+   "style": "tactical",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -10,
+   "tempMax": 35,
+   "rain": 0.5,
+   "conspicuous": 0.8,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "covers_face",
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "neck_scarf_wool",
+   "name": "Wollschal",
+   "slot": "neck",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": -15,
+   "tempMax": 10,
+   "rain": 0.2,
+   "conspicuous": 0.1,
+   "price": 20,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "neck_scarf_silk",
+   "name": "Seidentuch",
+   "slot": "neck",
+   "style": "luxury",
+   "districts": [
+    "core",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 90,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "neck_tie_corp_blue",
+   "name": "Krawatte Konzernblau",
+   "slot": "neck",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 25,
+   "gender": "masc",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "neck_tie_loose",
+   "name": "Gelockerte Krawatte",
+   "slot": "neck",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 18,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "neck_towel_work",
+   "name": "Arbeitshandtuch",
+   "slot": "neck",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": 10,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 5,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "neck_chain_gold",
+   "name": "Goldkette",
+   "slot": "neck",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "rustline"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.6,
+   "price": 240,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "neck_lanyard_badge",
+   "name": "Ausweisband mit Badge",
+   "slot": "neck",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "top_tee_white",
+   "name": "T-Shirt weiß",
+   "slot": "top",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 15,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 12,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_tee_black",
+   "name": "T-Shirt schwarz",
+   "slot": "top",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 15,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 12,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_tee_band_print",
+   "name": "Band-Shirt",
+   "slot": "top",
+   "style": "street",
+   "districts": [
+    "lanternhill",
+    "rustline"
+   ],
+   "factions": [],
+   "tempMin": 12,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 25,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_tank_sport",
+   "name": "Sport-Tanktop",
+   "slot": "top",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 18,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 18,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_tank_beach",
+   "name": "Strand-Tanktop",
+   "slot": "top",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 20,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 15,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_shirt_oxford_white",
+   "name": "Oxford-Hemd weiß",
+   "slot": "top",
+   "style": "business",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_shirt_oxford_blue",
+   "name": "Oxford-Hemd blau",
+   "slot": "top",
+   "style": "business",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 8,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_blouse_silk",
+   "name": "Seidenbluse",
+   "slot": "top",
+   "style": "formal",
+   "districts": [
+    "core",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 120,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_polo_sunstrip",
+   "name": "Polo mit Palmenstickerei",
+   "slot": "top",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 18,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_flannel_check",
+   "name": "Flanellhemd kariert",
+   "slot": "top",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline",
+    "greenmoor"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": 0,
+   "tempMax": 25,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 32,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_henley_gray",
+   "name": "Henley grau",
+   "slot": "top",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 28,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 28,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_sweater_knit",
+   "name": "Strickpullover",
+   "slot": "top",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "lanternhill",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 18,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_turtleneck_black",
+   "name": "Rollkragenpullover schwarz",
+   "slot": "top",
+   "style": "formal",
+   "districts": [
+    "core",
+    "lanternhill"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 0,
+   "tempMax": 22,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 60,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_hoodie_gray",
+   "name": "Kapuzenpullover grau",
+   "slot": "top",
+   "style": "street",
+   "districts": [],
+   "factions": [],
+   "tempMin": 2,
+   "tempMax": 22,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_hoodie_neon",
+   "name": "Kapuzenpullover Neonprint",
+   "slot": "top",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 26,
+   "rain": 0.1,
+   "conspicuous": 0.5,
+   "price": 50,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_jersey_race",
+   "name": "Rennteam-Jersey",
+   "slot": "top",
+   "style": "sport",
+   "districts": [
+    "rustline"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 10,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.5,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_undershirt_dock",
+   "name": "Arbeits-Unterhemd",
+   "slot": "top",
+   "style": "workwear",
+   "districts": [
+    "saltmarket"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": 12,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 10,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_shirt_hawaii",
+   "name": "Hemd mit Blumenmuster",
+   "slot": "top",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 20,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.5,
+   "price": 38,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_crop_neon",
+   "name": "Cropshirt neon",
+   "slot": "top",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 18,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.7,
+   "price": 22,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_corset_leather",
+   "name": "Lederkorsett",
+   "slot": "top",
+   "style": "underground",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.8,
+   "price": 130,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_kcg_uniform_shirt",
+   "name": "Dienstuniform-Hemd Civil Guard",
+   "slot": "top",
+   "style": "uniform",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0.1,
+   "conspicuous": 0.6,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "top_aurelia_polo",
+   "name": "Konzern-Poloshirt",
+   "slot": "top",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 12,
+   "tempMax": 38,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "top_hackertee_circuit",
+   "name": "Shirt mit Platinenmuster",
+   "slot": "top",
+   "style": "underground",
+   "districts": [
+    "lanternhill"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 10,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_chef_whites",
+   "name": "Kochjacke weiß",
+   "slot": "top",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "sunstrip",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_bartender_shirt",
+   "name": "Barkeeper-Hemd schwarz",
+   "slot": "top",
+   "style": "formal",
+   "districts": [
+    "sunstrip",
+    "lanternhill",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 12,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_cardigan_elder",
+   "name": "Strickjacke Rentner",
+   "slot": "top",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 2,
+   "tempMax": 24,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 42,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_shirt_linen_elder",
+   "name": "Leinenhemd hell",
+   "slot": "top",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 15,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 36,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_tee_child_print",
+   "name": "Kinder-T-Shirt mit Aufdruck",
+   "slot": "top",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 12,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 10,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_sweater_child",
+   "name": "Kinder-Pullover",
+   "slot": "top",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 18,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 18,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_scrubs_medic",
+   "name": "Pflege-Kasack",
+   "slot": "top",
+   "style": "workwear",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_cleaner_tunic",
+   "name": "Reinigungs-Kittel",
+   "slot": "top",
+   "style": "workwear",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 20,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "top_tee_union_print",
+   "name": "Union-Streik-Shirt",
+   "slot": "top",
+   "style": "workwear",
+   "districts": [
+    "saltmarket"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": 10,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.4,
+   "price": 15,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_hivis_orange",
+   "name": "Warnweste orange",
+   "slot": "jacket",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": -5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.5,
+   "price": 20,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_denim",
+   "name": "Jeansjacke",
+   "slot": "jacket",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 25,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 60,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_leather_biker",
+   "name": "Lederjacke Biker",
+   "slot": "jacket",
+   "style": "street",
+   "districts": [
+    "rustline",
+    "lanternhill"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 0,
+   "tempMax": 22,
+   "rain": 0.3,
+   "conspicuous": 0.5,
+   "price": 220,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_bomber_green",
+   "name": "Bomberjacke grün",
+   "slot": "jacket",
+   "style": "street",
+   "districts": [],
+   "factions": [],
+   "tempMin": 2,
+   "tempMax": 20,
+   "rain": 0.2,
+   "conspicuous": 0.3,
+   "price": 85,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_trench_dark",
+   "name": "Trenchcoat dunkel",
+   "slot": "jacket",
+   "style": "formal",
+   "districts": [
+    "core",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 2,
+   "tempMax": 20,
+   "rain": 0.8,
+   "conspicuous": 0.4,
+   "price": 190,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_raincoat_yellow",
+   "name": "Regenjacke gelb",
+   "slot": "jacket",
+   "style": "weather",
+   "districts": [],
+   "factions": [],
+   "tempMin": 2,
+   "tempMax": 22,
+   "rain": 1,
+   "conspicuous": 0.7,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_rain_poncho_clear",
+   "name": "Regenponcho transparent",
+   "slot": "jacket",
+   "style": "weather",
+   "districts": [],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 28,
+   "rain": 0.9,
+   "conspicuous": 0.5,
+   "price": 8,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_parka_winter",
+   "name": "Winterparka",
+   "slot": "jacket",
+   "style": "weather",
+   "districts": [],
+   "factions": [],
+   "tempMin": -20,
+   "tempMax": 6,
+   "rain": 0.6,
+   "conspicuous": 0.2,
+   "price": 140,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_puffer_neon",
+   "name": "Daunenjacke neon",
+   "slot": "jacket",
+   "style": "street",
+   "districts": [
+    "lanternhill",
+    "sunstrip",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 10,
+   "rain": 0.4,
+   "conspicuous": 0.7,
+   "price": 130,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_blazer_navy",
+   "name": "Blazer marineblau",
+   "slot": "jacket",
+   "style": "business",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 5,
+   "tempMax": 25,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 120,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_blazer_grey",
+   "name": "Blazer grau",
+   "slot": "jacket",
+   "style": "business",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 25,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 110,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_suit_black",
+   "name": "Anzugjacke schwarz",
+   "slot": "jacket",
+   "style": "formal",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 25,
+   "rain": 0.2,
+   "conspicuous": 0.3,
+   "price": 210,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_kcg_duty",
+   "name": "Dienstjacke Civil Guard",
+   "slot": "jacket",
+   "style": "uniform",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -5,
+   "tempMax": 22,
+   "rain": 0.5,
+   "conspicuous": 0.6,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_kcg_armor_vest",
+   "name": "Schutzweste Civil Guard",
+   "slot": "jacket",
+   "style": "tactical",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -10,
+   "tempMax": 35,
+   "rain": 0.3,
+   "conspicuous": 0.85,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_aurelia_exec_coat",
+   "name": "Vorstandsmantel",
+   "slot": "jacket",
+   "style": "luxury",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": -5,
+   "tempMax": 20,
+   "rain": 0.6,
+   "conspicuous": 0.4,
+   "price": 680,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_collective_patchwork",
+   "name": "Flickenjacke (Collective)",
+   "slot": "jacket",
+   "style": "underground",
+   "districts": [
+    "lanternhill"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 2,
+   "tempMax": 22,
+   "rain": 0.2,
+   "conspicuous": 0.6,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_wrencher_mechanic",
+   "name": "Mechanikerjacke Wrenchers",
+   "slot": "jacket",
+   "style": "workwear",
+   "districts": [
+    "rustline"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 0,
+   "tempMax": 25,
+   "rain": 0.3,
+   "conspicuous": 0.4,
+   "price": 75,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_fleece_gray",
+   "name": "Fleecejacke grau",
+   "slot": "jacket",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "lanternhill",
+    "saltmarket"
+   ],
+   "factions": [],
+   "tempMin": -2,
+   "tempMax": 16,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 50,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_windbreaker_teal",
+   "name": "Windjacke türkis",
+   "slot": "jacket",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 22,
+   "rain": 0.5,
+   "conspicuous": 0.4,
+   "price": 60,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_lab_coat",
+   "name": "Kittel weiß",
+   "slot": "jacket",
+   "style": "workwear",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_dinner_jacket",
+   "name": "Smoking-Jacke",
+   "slot": "jacket",
+   "style": "luxury",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 26,
+   "rain": 0.1,
+   "conspicuous": 0.5,
+   "price": 520,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_cloak_hooded",
+   "name": "Kapuzenumhang",
+   "slot": "jacket",
+   "style": "underground",
+   "districts": [
+    "lanternhill"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 2,
+   "tempMax": 24,
+   "rain": 0.5,
+   "conspicuous": 0.65,
+   "price": 95,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "hood_up"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_vest_union_quilted",
+   "name": "Steppweste Union",
+   "slot": "jacket",
+   "style": "workwear",
+   "districts": [
+    "saltmarket"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": -5,
+   "tempMax": 14,
+   "rain": 0.3,
+   "conspicuous": 0.3,
+   "price": 48,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_poncho_child",
+   "name": "Kinder-Regenponcho",
+   "slot": "jacket",
+   "style": "weather",
+   "districts": [],
+   "factions": [],
+   "tempMin": 2,
+   "tempMax": 25,
+   "rain": 0.9,
+   "conspicuous": 0.5,
+   "price": 14,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_coat_elder_wool",
+   "name": "Wollmantel Rentner",
+   "slot": "jacket",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 12,
+   "rain": 0.3,
+   "conspicuous": 0.2,
+   "price": 150,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_delivery_vest",
+   "name": "Lieferdienst-Weste",
+   "slot": "jacket",
+   "style": "workwear",
+   "districts": [
+    "core",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.6,
+   "price": 10,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_security_jacket",
+   "name": "Wachdienst-Jacke privat",
+   "slot": "jacket",
+   "style": "uniform",
+   "districts": [
+    "core",
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 25,
+   "rain": 0.4,
+   "conspicuous": 0.5,
+   "price": 65,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "jkt_hawker_apron",
+   "name": "Händlerschürze",
+   "slot": "jacket",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 40,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 14,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_coverall_blue",
+   "name": "Overall blau",
+   "slot": "fullbody",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": 5,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.3,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_coverall_orange",
+   "name": "Overall orange (Hafen)",
+   "slot": "fullbody",
+   "style": "workwear",
+   "districts": [
+    "saltmarket"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": 5,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.6,
+   "price": 60,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_racing_suit",
+   "name": "Rennanzug",
+   "slot": "fullbody",
+   "style": "sport",
+   "districts": [
+    "rustline"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 8,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.7,
+   "price": 260,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_kcg_riot_suit",
+   "name": "Einsatzanzug Civil Guard",
+   "slot": "fullbody",
+   "style": "tactical",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -10,
+   "tempMax": 35,
+   "rain": 0.4,
+   "conspicuous": 0.95,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom",
+    "jacket"
+   ],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "full_dress_evening",
+   "name": "Abendkleid",
+   "slot": "fullbody",
+   "style": "luxury",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.6,
+   "price": 420,
+   "gender": "fem",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_dress_summer",
+   "name": "Sommerkleid",
+   "slot": "fullbody",
+   "style": "beach",
+   "districts": [
+    "sunstrip",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 18,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 58,
+   "gender": "fem",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_dress_office",
+   "name": "Etuikleid",
+   "slot": "fullbody",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 8,
+   "tempMax": 32,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 95,
+   "gender": "fem",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_hazmat_yellow",
+   "name": "Schutzanzug gelb",
+   "slot": "fullbody",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 30,
+   "rain": 1,
+   "conspicuous": 0.9,
+   "price": 120,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom",
+    "jacket",
+    "neck"
+   ],
+   "tags": [
+    "covers_face"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "full_wetsuit_surf",
+   "name": "Neoprenanzug",
+   "slot": "fullbody",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 32,
+   "rain": 1,
+   "conspicuous": 0.4,
+   "price": 140,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_robe_house",
+   "name": "Hausmantel",
+   "slot": "fullbody",
+   "style": "casual",
+   "districts": [
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_dress_child",
+   "name": "Kinderkleid",
+   "slot": "fullbody",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 22,
+   "gender": "fem",
+   "child": true,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_chef_set",
+   "name": "Küchenschürze und Hose",
+   "slot": "fullbody",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 50,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "full_jumpsuit_tech",
+   "name": "Techniker-Jumpsuit",
+   "slot": "fullbody",
+   "style": "workwear",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 8,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.5,
+   "price": 90,
+   "gender": "any",
+   "child": false,
+   "blocks": [
+    "top",
+    "bottom"
+   ],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_jeans_blue",
+   "name": "Jeans blau",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 35,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_jeans_black",
+   "name": "Jeans schwarz",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 35,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 50,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_jeans_ripped",
+   "name": "Jeans zerrissen",
+   "slot": "bottom",
+   "style": "street",
+   "districts": [
+    "rustline",
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_cargo_olive",
+   "name": "Cargohose oliv",
+   "slot": "bottom",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 48,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_cargo_black",
+   "name": "Cargohose schwarz",
+   "slot": "bottom",
+   "style": "tactical",
+   "districts": [],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.3,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_chinos_beige",
+   "name": "Chino beige",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [
+    "core",
+    "greenmoor",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_slacks_gray",
+   "name": "Anzughose grau",
+   "slot": "bottom",
+   "style": "business",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 5,
+   "tempMax": 30,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 75,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_slacks_black",
+   "name": "Anzughose schwarz",
+   "slot": "bottom",
+   "style": "formal",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 30,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 90,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_skirt_pencil",
+   "name": "Bleistiftrock",
+   "slot": "bottom",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 8,
+   "tempMax": 32,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 60,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_skirt_pleated",
+   "name": "Faltenrock",
+   "slot": "bottom",
+   "style": "street",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 12,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.4,
+   "price": 38,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_shorts_denim",
+   "name": "Jeansshorts",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [
+    "sunstrip",
+    "greenmoor",
+    "rustline"
+   ],
+   "factions": [],
+   "tempMin": 20,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_shorts_board",
+   "name": "Boardshorts",
+   "slot": "bottom",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 22,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 32,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_shorts_sport",
+   "name": "Sportshorts",
+   "slot": "bottom",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 20,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 22,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_leggings_black",
+   "name": "Leggings schwarz",
+   "slot": "bottom",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 30,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_trackpants",
+   "name": "Trainingshose",
+   "slot": "bottom",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 28,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_work_trousers_dock",
+   "name": "Arbeitshose Hafen",
+   "slot": "bottom",
+   "style": "workwear",
+   "districts": [
+    "saltmarket"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": 0,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_overalls_bib",
+   "name": "Latzhose",
+   "slot": "bottom",
+   "style": "workwear",
+   "districts": [
+    "rustline",
+    "saltmarket"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.3,
+   "price": 50,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_kcg_trousers",
+   "name": "Diensthose Civil Guard",
+   "slot": "bottom",
+   "style": "uniform",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -5,
+   "tempMax": 35,
+   "rain": 0.3,
+   "conspicuous": 0.6,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "bot_leather_pants",
+   "name": "Lederhose",
+   "slot": "bottom",
+   "style": "underground",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 25,
+   "rain": 0.3,
+   "conspicuous": 0.7,
+   "price": 160,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_joggers_neon",
+   "name": "Jogger mit Neonstreifen",
+   "slot": "bottom",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.6,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_trousers_wool_elder",
+   "name": "Wollhose Rentner",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 20,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_shorts_child",
+   "name": "Kinder-Shorts",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 18,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.2,
+   "price": 12,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_pants_child",
+   "name": "Kinderhose",
+   "slot": "bottom",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 30,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 16,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bot_scrubs_trousers",
+   "name": "Pflege-Hose",
+   "slot": "bottom",
+   "style": "workwear",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 25,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "glv_work_leather",
+   "name": "Arbeitshandschuhe Leder",
+   "slot": "gloves",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -10,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 15,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "glv_winter_knit",
+   "name": "Strickhandschuhe",
+   "slot": "gloves",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": -20,
+   "tempMax": 8,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 14,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "glv_driving_leather",
+   "name": "Fahrerhandschuhe",
+   "slot": "gloves",
+   "style": "sport",
+   "districts": [
+    "rustline",
+    "core"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 0,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 70,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "glv_tactical",
+   "name": "Taktische Handschuhe",
+   "slot": "gloves",
+   "style": "tactical",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -15,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.7,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "glv_fingerless",
+   "name": "Fingerlose Handschuhe",
+   "slot": "gloves",
+   "style": "street",
+   "districts": [
+    "rustline",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 18,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "glv_lab_nitrile",
+   "name": "Nitrilhandschuhe",
+   "slot": "gloves",
+   "style": "workwear",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 35,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 3,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_sneaker_white",
+   "name": "Sneaker weiß",
+   "slot": "shoes",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 65,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_sneaker_black",
+   "name": "Sneaker schwarz",
+   "slot": "shoes",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 65,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_sneaker_neon",
+   "name": "Sneaker neon",
+   "slot": "shoes",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.5,
+   "price": 90,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_boots_work_steel",
+   "name": "Stahlkappenstiefel",
+   "slot": "shoes",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -10,
+   "tempMax": 40,
+   "rain": 0.6,
+   "conspicuous": 0.2,
+   "price": 85,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_boots_combat",
+   "name": "Kampfstiefel",
+   "slot": "shoes",
+   "style": "tactical",
+   "districts": [],
+   "factions": [],
+   "tempMin": -15,
+   "tempMax": 35,
+   "rain": 0.6,
+   "conspicuous": 0.4,
+   "price": 110,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_boots_kcg",
+   "name": "Dienststiefel Civil Guard",
+   "slot": "shoes",
+   "style": "uniform",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -10,
+   "tempMax": 35,
+   "rain": 0.6,
+   "conspicuous": 0.6,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "sho_oxford_black",
+   "name": "Oxford-Schuhe schwarz",
+   "slot": "shoes",
+   "style": "formal",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 30,
+   "rain": 0.2,
+   "conspicuous": 0.1,
+   "price": 140,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "formal_shoes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "sho_loafer_brown",
+   "name": "Loafer braun",
+   "slot": "shoes",
+   "style": "business",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 32,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 95,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "formal_shoes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "sho_heels_black",
+   "name": "Pumps schwarz",
+   "slot": "shoes",
+   "style": "formal",
+   "districts": [
+    "core"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 110,
+   "gender": "fem",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "formal_shoes"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "sho_sandals",
+   "name": "Sandalen",
+   "slot": "shoes",
+   "style": "beach",
+   "districts": [
+    "sunstrip",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 20,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_flipflops",
+   "name": "Flip-Flops",
+   "slot": "shoes",
+   "style": "beach",
+   "districts": [
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 24,
+   "tempMax": 45,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 10,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_rain_boots_yellow",
+   "name": "Gummistiefel gelb",
+   "slot": "shoes",
+   "style": "weather",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 20,
+   "rain": 1,
+   "conspicuous": 0.6,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_chelsea_leather",
+   "name": "Chelsea-Boots Leder",
+   "slot": "shoes",
+   "style": "casual",
+   "districts": [
+    "core",
+    "lanternhill",
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 25,
+   "rain": 0.4,
+   "conspicuous": 0.2,
+   "price": 130,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_running",
+   "name": "Laufschuhe",
+   "slot": "shoes",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.3,
+   "price": 80,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_driver_race",
+   "name": "Fahrerschuhe Rennen",
+   "slot": "shoes",
+   "style": "sport",
+   "districts": [
+    "rustline"
+   ],
+   "factions": [
+    "wrenchers"
+   ],
+   "tempMin": 8,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.4,
+   "price": 120,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_slipper_house",
+   "name": "Hausschuhe",
+   "slot": "shoes",
+   "style": "casual",
+   "districts": [
+    "greenmoor"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 30,
+   "rain": 0,
+   "conspicuous": 0.1,
+   "price": 18,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_sneaker_child",
+   "name": "Kinder-Sneaker",
+   "slot": "shoes",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 28,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_boots_hiking",
+   "name": "Wanderstiefel",
+   "slot": "shoes",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 30,
+   "rain": 0.7,
+   "conspicuous": 0.2,
+   "price": 120,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_boots_platform",
+   "name": "Plateaustiefel",
+   "slot": "shoes",
+   "style": "underground",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 5,
+   "tempMax": 30,
+   "rain": 0.2,
+   "conspicuous": 0.6,
+   "price": 150,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "sho_dock_gumboots",
+   "name": "Hafen-Gummistiefel",
+   "slot": "shoes",
+   "style": "workwear",
+   "districts": [
+    "saltmarket"
+   ],
+   "factions": [
+    "union"
+   ],
+   "tempMin": 0,
+   "tempMax": 28,
+   "rain": 1,
+   "conspicuous": 0.2,
+   "price": 30,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_backpack_black",
+   "name": "Rucksack schwarz",
+   "slot": "bag",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": -10,
+   "tempMax": 45,
+   "rain": 0.3,
+   "conspicuous": 0.2,
+   "price": 45,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_messenger_courier",
+   "name": "Kuriertasche",
+   "slot": "bag",
+   "style": "street",
+   "districts": [
+    "core",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 40,
+   "rain": 0.5,
+   "conspicuous": 0.3,
+   "price": 55,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_briefcase_leather",
+   "name": "Aktentasche Leder",
+   "slot": "bag",
+   "style": "business",
+   "districts": [
+    "core"
+   ],
+   "factions": [
+    "aurelia"
+   ],
+   "tempMin": 0,
+   "tempMax": 35,
+   "rain": 0.2,
+   "conspicuous": 0.2,
+   "price": 160,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_toolbelt",
+   "name": "Werkzeuggürtel",
+   "slot": "bag",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "factions": [
+    "union",
+    "wrenchers"
+   ],
+   "tempMin": -5,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.3,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_duffel_sport",
+   "name": "Sporttasche",
+   "slot": "bag",
+   "style": "sport",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.2,
+   "price": 40,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_satchel_elder",
+   "name": "Umhängetasche Rentner",
+   "slot": "bag",
+   "style": "casual",
+   "districts": [
+    "greenmoor",
+    "core"
+   ],
+   "factions": [],
+   "tempMin": -5,
+   "tempMax": 30,
+   "rain": 0.1,
+   "conspicuous": 0.1,
+   "price": 35,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_backpack_child",
+   "name": "Kinderrucksack",
+   "slot": "bag",
+   "style": "casual",
+   "districts": [],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 40,
+   "rain": 0.3,
+   "conspicuous": 0.3,
+   "price": 20,
+   "gender": "any",
+   "child": true,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_fanny_neon",
+   "name": "Neon-Gürteltasche",
+   "slot": "bag",
+   "style": "street",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 10,
+   "tempMax": 45,
+   "rain": 0.1,
+   "conspicuous": 0.6,
+   "price": 28,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_holster_belt",
+   "name": "Dienstgürtel mit Holster",
+   "slot": "bag",
+   "style": "tactical",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "factions": [
+    "kcg"
+   ],
+   "tempMin": -15,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.7,
+   "price": 0,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "kcg_issue",
+    "not_for_sale"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "bag_deck_case",
+   "name": "Deck-Koffer (Hacker)",
+   "slot": "bag",
+   "style": "underground",
+   "districts": [
+    "lanternhill"
+   ],
+   "factions": [
+    "collective"
+   ],
+   "tempMin": 0,
+   "tempMax": 40,
+   "rain": 0.2,
+   "conspicuous": 0.7,
+   "price": 220,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_vendor_tray",
+   "name": "Verkaufstablett",
+   "slot": "bag",
+   "style": "workwear",
+   "districts": [
+    "saltmarket",
+    "lanternhill",
+    "sunstrip"
+   ],
+   "factions": [],
+   "tempMin": 8,
+   "tempMax": 40,
+   "rain": 0,
+   "conspicuous": 0.3,
+   "price": 25,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [],
+   "mesh": ""
+  },
+  {
+   "id": "bag_umbrella_black",
+   "name": "Regenschirm schwarz",
+   "slot": "bag",
+   "style": "weather",
+   "districts": [
+    "core",
+    "greenmoor",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 0,
+   "tempMax": 25,
+   "rain": 1,
+   "conspicuous": 0.2,
+   "price": 20,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "rain_gear"
+   ],
+   "mesh": ""
+  },
+  {
+   "id": "bag_umbrella_clear",
+   "name": "Regenschirm transparent",
+   "slot": "bag",
+   "style": "weather",
+   "districts": [
+    "sunstrip",
+    "lanternhill"
+   ],
+   "factions": [],
+   "tempMin": 5,
+   "tempMax": 28,
+   "rain": 1,
+   "conspicuous": 0.3,
+   "price": 18,
+   "gender": "any",
+   "child": false,
+   "blocks": [],
+   "tags": [
+    "rain_gear"
+   ],
+   "mesh": ""
+  }
+ ],
+ "presets": [
+  {
+   "id": "fac_aurelia_office",
+   "name": "Aurelia Büro",
+   "faction": "aurelia",
+   "districts": [
+    "core"
+   ],
+   "style": "business",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_shirt_oxford_blue",
+      "top_aurelia_polo",
+      "top_blouse_silk"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_blazer_navy",
+      "jkt_blazer_grey"
+     ],
+     "chance": 0.65
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_gray",
+      "bot_slacks_black",
+      "bot_skirt_pencil"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_oxford_black",
+      "sho_loafer_brown",
+      "sho_heels_black"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_tie_corp_blue",
+      "neck_tie_loose",
+      "neck_lanyard_badge"
+     ],
+     "chance": 0.6
+    },
+    "bag": {
+     "items": [
+      "bag_briefcase_leather",
+      "bag_messenger_courier"
+     ],
+     "chance": 0.45
+    },
+    "glasses": {
+     "items": [
+      "glass_aegis_hud",
+      "glass_heavy_frame"
+     ],
+     "chance": 0.25
+    },
+    "hat": {
+     "items": [
+      "hat_cap_aurelia"
+     ],
+     "chance": 0.05
+    }
+   },
+   "palette": {
+    "top": "corporate",
+    "jacket": "corporate",
+    "bottom": "mono_dark",
+    "shoes": "mono_dark",
+    "neck": "corporate"
+   }
+  },
+  {
+   "id": "fac_aurelia_exec",
+   "name": "Aurelia Vorstand",
+   "faction": "aurelia",
+   "districts": [
+    "core"
+   ],
+   "style": "luxury",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_blouse_silk"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_aurelia_exec_coat",
+      "jkt_suit_black"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_skirt_pencil"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_oxford_black",
+      "sho_heels_black"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_silk"
+     ],
+     "chance": 0.4
+    },
+    "glasses": {
+     "items": [
+      "glass_aegis_hud"
+     ],
+     "chance": 0.4
+    },
+    "bag": {
+     "items": [
+      "bag_briefcase_leather"
+     ],
+     "chance": 0.4
+    }
+   },
+   "palette": {
+    "top": "luxury",
+    "jacket": "luxury",
+    "bottom": "mono_dark",
+    "shoes": "mono_dark"
+   }
+  },
+  {
+   "id": "fac_aurelia_tech",
+   "name": "Aurelia Aegis-Techniker",
+   "faction": "aurelia",
+   "districts": [
+    "core"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_jumpsuit_tech"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_lab_nitrile"
+     ],
+     "chance": 0.4
+    },
+    "glasses": {
+     "items": [
+      "glass_aegis_hud"
+     ],
+     "chance": 0.6
+    },
+    "neck": {
+     "items": [
+      "neck_lanyard_badge"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_toolbelt"
+     ],
+     "chance": 0.7
+    }
+   },
+   "palette": {
+    "fullbody": "corporate",
+    "shoes": "mono_dark"
+   }
+  },
+  {
+   "id": "fac_kcg_patrol",
+   "name": "Civil Guard Streife",
+   "faction": "kcg",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "style": "uniform",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_kcg_uniform_shirt"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_kcg_duty"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_kcg_trousers"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_kcg"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_kcg_cap"
+     ],
+     "chance": 0.8
+    },
+    "gloves": {
+     "items": [
+      "glv_tactical"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_holster_belt"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "kcg_navy",
+    "jacket": "kcg_navy",
+    "bottom": "kcg_navy",
+    "shoes": "tactical_black",
+    "hat": "kcg_navy"
+   }
+  },
+  {
+   "id": "fac_kcg_riot",
+   "name": "Civil Guard Einsatzkraft",
+   "faction": "kcg",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "style": "tactical",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_kcg_riot_suit"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_kcg_helmet"
+     ],
+     "chance": 1
+    },
+    "mask": {
+     "items": [
+      "mask_kcg_visor"
+     ],
+     "chance": 0.6
+    },
+    "gloves": {
+     "items": [
+      "glv_tactical"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_combat",
+      "sho_boots_kcg"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_holster_belt"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_kcg_armor_vest"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "fullbody": "tactical_black",
+    "hat": "tactical_black",
+    "shoes": "tactical_black"
+   }
+  },
+  {
+   "id": "fac_union_dock",
+   "name": "Dockers' Union Schicht",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_undershirt_dock",
+      "top_flannel_check",
+      "top_tee_black",
+      "top_tee_union_print"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_hivis_orange",
+      "jkt_vest_union_quilted"
+     ],
+     "chance": 0.6
+    },
+    "bottom": {
+     "items": [
+      "bot_work_trousers_dock",
+      "bot_cargo_olive"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel",
+      "sho_dock_gumboots"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_hardhat_yellow",
+      "hat_cap_dock"
+     ],
+     "chance": 0.7
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 0.6
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_toolbelt"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "jacket": "workwear_orange",
+    "bottom": "workwear_earth",
+    "hat": "workwear_orange"
+   }
+  },
+  {
+   "id": "fac_union_coverall",
+   "name": "Dockers' Union Overall",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_coverall_orange",
+      "full_coverall_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel",
+      "sho_dock_gumboots"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_hardhat_yellow",
+      "hat_cap_dock"
+     ],
+     "chance": 0.7
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 0.7
+    },
+    "glasses": {
+     "items": [
+      "glass_goggles_welder"
+     ],
+     "chance": 0.15
+    },
+    "mask": {
+     "items": [
+      "mask_respirator_half"
+     ],
+     "chance": 0.1
+    }
+   },
+   "palette": {
+    "fullbody": "workwear_orange",
+    "hat": "workwear_orange"
+   }
+  },
+  {
+   "id": "fac_union_leader",
+   "name": "Union Führung",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_flannel_check",
+      "top_henley_gray",
+      "top_tee_union_print"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_denim",
+      "jkt_vest_union_quilted"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_black",
+      "bot_work_trousers_dock"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel",
+      "sho_chelsea_leather"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_flatcap_tweed"
+     ],
+     "chance": 0.5
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_wool"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "jacket": "denim",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "fac_collective_hacker",
+   "name": "Collective Hackerin",
+   "faction": "collective",
+   "districts": [
+    "lanternhill"
+   ],
+   "style": "underground",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_hackertee_circuit",
+      "top_turtleneck_black",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_cloak_hooded",
+      "jkt_collective_patchwork"
+     ],
+     "chance": 0.7
+    },
+    "bottom": {
+     "items": [
+      "bot_leather_pants",
+      "bot_jeans_black",
+      "bot_cargo_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_platform",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "mask": {
+     "items": [
+      "mask_aegis_blur"
+     ],
+     "chance": 0.3
+    },
+    "glasses": {
+     "items": [
+      "glass_mirror_privacy"
+     ],
+     "chance": 0.35
+    },
+    "bag": {
+     "items": [
+      "bag_deck_case"
+     ],
+     "chance": 0.5
+    },
+    "gloves": {
+     "items": [
+      "glv_fingerless"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "hacker_dark",
+    "jacket": "hacker_dark",
+    "bottom": "hacker_dark",
+    "shoes": "mono_dark"
+   }
+  },
+  {
+   "id": "fac_collective_activist",
+   "name": "Collective Aktivist",
+   "faction": "collective",
+   "districts": [
+    "lanternhill"
+   ],
+   "style": "underground",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_band_print",
+      "top_hoodie_gray",
+      "top_hackertee_circuit"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_collective_patchwork",
+      "jkt_bomber_green"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_ripped",
+      "bot_cargo_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_black",
+      "sho_boots_combat"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beret_wool"
+     ],
+     "chance": 0.3
+    },
+    "mask": {
+     "items": [
+      "mask_bandana"
+     ],
+     "chance": 0.25
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "hacker_dark",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "fac_wrenchers_crew",
+   "name": "Wrenchers Crew",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_band_print",
+      "top_flannel_check",
+      "top_tee_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_leather_biker",
+      "jkt_wrencher_mechanic"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_ripped",
+      "bot_jeans_black",
+      "bot_overalls_bib"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_combat",
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_fingerless"
+     ],
+     "chance": 0.35
+    },
+    "mask": {
+     "items": [
+      "mask_bandana"
+     ],
+     "chance": 0.25
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "rust_leather",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "fac_wrenchers_racer",
+   "name": "Wrenchers Rennanzug",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "sport",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_racing_suit"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_helmet_race_open"
+     ],
+     "chance": 0.5
+    },
+    "gloves": {
+     "items": [
+      "glv_driving_leather"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_driver_race"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_visor_sport"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "fullbody": "racing",
+    "hat": "racing"
+   }
+  },
+  {
+   "id": "fac_wrenchers_mechanic",
+   "name": "Wrenchers Werkstatt",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_black",
+      "top_flannel_check",
+      "top_undershirt_dock"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_wrencher_mechanic"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_overalls_bib",
+      "bot_cargo_olive"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 0.6
+    },
+    "glasses": {
+     "items": [
+      "glass_goggles_welder"
+     ],
+     "chance": 0.2
+    },
+    "bag": {
+     "items": [
+      "bag_toolbelt"
+     ],
+     "chance": 0.5
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "bottom": "workwear_blue"
+   }
+  },
+  {
+   "id": "fac_greenmoor_resident",
+   "name": "Greenmoor Bewohner",
+   "faction": "greenmoor",
+   "districts": [
+    "greenmoor"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_sweater_knit",
+      "top_henley_gray",
+      "top_polo_sunstrip"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_fleece_gray",
+      "jkt_blazer_grey"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_chinos_beige",
+      "bot_jeans_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_chelsea_leather",
+      "sho_loafer_brown"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_round_wire",
+      "glass_reading"
+     ],
+     "chance": 0.2
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "earth_casual",
+    "bottom": "earth_casual"
+   }
+  },
+  {
+   "id": "dist_core_day",
+   "name": "Core Alltag",
+   "faction": "",
+   "districts": [
+    "core"
+   ],
+   "style": "business",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_shirt_oxford_blue",
+      "top_henley_gray",
+      "top_blouse_silk"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_blazer_grey",
+      "jkt_trench_dark"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_gray",
+      "bot_chinos_beige",
+      "bot_jeans_black",
+      "bot_skirt_pencil"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_loafer_brown",
+      "sho_sneaker_white",
+      "sho_chelsea_leather",
+      "sho_heels_black"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_messenger_courier",
+      "bag_backpack_black"
+     ],
+     "chance": 0.5
+    },
+    "glasses": {
+     "items": [
+      "glass_heavy_frame"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "corporate",
+    "jacket": "corporate",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "dist_core_night",
+   "name": "Core Abend",
+   "faction": "",
+   "districts": [
+    "core"
+   ],
+   "style": "formal",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_blouse_silk",
+      "top_bartender_shirt",
+      "top_turtleneck_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_suit_black",
+      "jkt_trench_dark",
+      "jkt_dinner_jacket"
+     ],
+     "chance": 0.25
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_leather_pants"
+     ],
+     "chance": null
+    },
+    "shoes": {
+     "items": [
+      "sho_oxford_black",
+      "sho_heels_black",
+      "sho_chelsea_leather"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_silk"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "luxury",
+    "jacket": "luxury",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "dist_saltmarket_day",
+   "name": "Saltmarket Alltag",
+   "faction": "",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_white",
+      "top_tee_black",
+      "top_flannel_check",
+      "top_undershirt_dock"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_denim",
+      "jkt_fleece_gray",
+      "jkt_bomber_green"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_blue",
+      "bot_cargo_olive",
+      "bot_work_trousers_dock"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel",
+      "sho_sneaker_black",
+      "sho_dock_gumboots"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool",
+      "hat_cap_dock"
+     ],
+     "chance": 0.35
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "denim",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "dist_lanternhill_day",
+   "name": "Lantern Hill Alltag",
+   "faction": "",
+   "districts": [
+    "lanternhill"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_band_print",
+      "top_henley_gray",
+      "top_sweater_knit",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_denim",
+      "jkt_bomber_green",
+      "jkt_fleece_gray"
+     ],
+     "chance": 0.6
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_blue",
+      "bot_jeans_black",
+      "bot_skirt_pleated"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_boots_hiking",
+      "sho_chelsea_leather"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beret_wool"
+     ],
+     "chance": 0.2
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black",
+      "bag_messenger_courier"
+     ],
+     "chance": 0.5
+    },
+    "glasses": {
+     "items": [
+      "glass_round_wire"
+     ],
+     "chance": 0.25
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "dist_lanternhill_night",
+   "name": "Lantern Hill Nachtleben",
+   "faction": "",
+   "districts": [
+    "lanternhill"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_hoodie_neon",
+      "top_crop_neon",
+      "top_corset_leather"
+     ],
+     "chance": null
+    },
+    "jacket": {
+     "items": [
+      "jkt_puffer_neon",
+      "jkt_leather_biker"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_leather_pants",
+      "bot_joggers_neon",
+      "bot_skirt_pleated",
+      "bot_jeans_ripped"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_neon",
+      "sho_boots_platform"
+     ],
+     "chance": 1
+    },
+    "mask": {
+     "items": [
+      "mask_festival_neon"
+     ],
+     "chance": 0.15
+    },
+    "bag": {
+     "items": [
+      "bag_fanny_neon"
+     ],
+     "chance": 0.4
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "jacket": "neon_street",
+    "bottom": "hacker_dark"
+   }
+  },
+  {
+   "id": "dist_greenmoor_day",
+   "name": "Greenmoor Alltag",
+   "faction": "greenmoor",
+   "districts": [
+    "greenmoor"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_polo_sunstrip",
+      "top_sweater_knit",
+      "top_shirt_oxford_white",
+      "top_henley_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_fleece_gray",
+      "jkt_windbreaker_teal"
+     ],
+     "chance": 0.4
+    },
+    "bottom": {
+     "items": [
+      "bot_chinos_beige",
+      "bot_jeans_blue",
+      "bot_shorts_denim"
+     ],
+     "chance": 0.2
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_running",
+      "sho_loafer_brown"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "earth_casual",
+    "bottom": "earth_casual"
+   }
+  },
+  {
+   "id": "dist_rustline_day",
+   "name": "Rustline Alltag",
+   "faction": "",
+   "districts": [
+    "rustline"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_black",
+      "top_tee_band_print",
+      "top_flannel_check",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_bomber_green",
+      "jkt_denim",
+      "jkt_leather_biker"
+     ],
+     "chance": 0.4
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_ripped",
+      "bot_jeans_black",
+      "bot_cargo_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_combat",
+      "sho_sneaker_black",
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": 0.3
+    },
+    "mask": {
+     "items": [
+      "mask_smog_filter"
+     ],
+     "chance": 0.2
+    },
+    "gloves": {
+     "items": [
+      "glv_fingerless"
+     ],
+     "chance": 0.15
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "rust_leather",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "dist_rustline_night",
+   "name": "Rustline Rennnacht",
+   "faction": "",
+   "districts": [
+    "rustline"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_jersey_race",
+      "top_tee_band_print",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_leather_biker",
+      "jkt_windbreaker_teal"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_black",
+      "bot_trackpants",
+      "bot_cargo_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_neon",
+      "sho_boots_combat"
+     ],
+     "chance": 1
+    },
+    "mask": {
+     "items": [
+      "mask_bandana"
+     ],
+     "chance": 0.2
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.15
+    }
+   },
+   "palette": {
+    "top": "racing",
+    "jacket": "rust_leather",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "dist_sunstrip_day",
+   "name": "Sunstrip Strandtag",
+   "faction": "",
+   "districts": [
+    "sunstrip"
+   ],
+   "style": "beach",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tank_beach",
+      "top_polo_sunstrip",
+      "top_shirt_hawaii",
+      "top_crop_neon"
+     ],
+     "chance": 0.3
+    },
+    "bottom": {
+     "items": [
+      "bot_shorts_board",
+      "bot_shorts_denim",
+      "bot_skirt_pleated"
+     ],
+     "chance": 0.3
+    },
+    "shoes": {
+     "items": [
+      "sho_flipflops",
+      "sho_sandals",
+      "sho_sneaker_white"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_bucket_sun",
+      "hat_straw_wide"
+     ],
+     "chance": 0.45
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.6
+    },
+    "bag": {
+     "items": [
+      "bag_fanny_neon"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "beach_bright",
+    "bottom": "beach_bright",
+    "hat": "beach_bright"
+   }
+  },
+  {
+   "id": "dist_sunstrip_night",
+   "name": "Sunstrip Clubnacht",
+   "faction": "",
+   "districts": [
+    "sunstrip"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_crop_neon",
+      "top_hoodie_neon",
+      "top_shirt_hawaii",
+      "top_bartender_shirt"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_puffer_neon"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_joggers_neon",
+      "bot_leather_pants",
+      "bot_skirt_pleated",
+      "bot_jeans_ripped"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_neon",
+      "sho_boots_platform",
+      "sho_sneaker_white"
+     ],
+     "chance": 1
+    },
+    "mask": {
+     "items": [
+      "mask_festival_neon"
+     ],
+     "chance": 0.25
+    },
+    "neck": {
+     "items": [
+      "neck_chain_gold"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_fanny_neon"
+     ],
+     "chance": 0.35
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "jacket": "neon_street",
+    "bottom": "hacker_dark"
+   }
+  },
+  {
+   "id": "gen_child",
+   "name": "Kind",
+   "faction": "",
+   "districts": [],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_child_print",
+      "top_sweater_child"
+     ],
+     "chance": 1
+    },
+    "fullbody": {
+     "items": [
+      "full_dress_child"
+     ],
+     "chance": 0
+    },
+    "jacket": {
+     "items": [
+      "jkt_poncho_child"
+     ],
+     "chance": 0
+    },
+    "bottom": {
+     "items": [
+      "bot_pants_child",
+      "bot_shorts_child"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_child"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_cap_child"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_child"
+     ],
+     "chance": 0.6
+    }
+   },
+   "palette": {
+    "top": "child_bright",
+    "bottom": "denim",
+    "hat": "child_bright"
+   }
+  },
+  {
+   "id": "gen_child_dress",
+   "name": "Kind im Kleid",
+   "faction": "",
+   "districts": [],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_dress_child"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_child"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_cap_child"
+     ],
+     "chance": 0.2
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_child"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "fullbody": "child_bright"
+   }
+  },
+  {
+   "id": "gen_elder",
+   "name": "Rentner",
+   "faction": "",
+   "districts": [
+    "greenmoor",
+    "core",
+    "sunstrip"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_cardigan_elder",
+      "top_shirt_linen_elder",
+      "top_sweater_knit"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_coat_elder_wool"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_trousers_wool_elder",
+      "bot_chinos_beige"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_loafer_brown",
+      "sho_slipper_house"
+     ],
+     "chance": null
+    },
+    "hat": {
+     "items": [
+      "hat_fedora_felt",
+      "hat_flatcap_tweed"
+     ],
+     "chance": 0.35
+    },
+    "glasses": {
+     "items": [
+      "glass_reading"
+     ],
+     "chance": 0.5
+    },
+    "bag": {
+     "items": [
+      "bag_satchel_elder"
+     ],
+     "chance": 0.5
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_wool"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "elder_muted",
+    "jacket": "elder_muted",
+    "bottom": "elder_muted"
+   }
+  },
+  {
+   "id": "arch_bartender",
+   "name": "Barkeeper",
+   "faction": "",
+   "districts": [
+    "sunstrip",
+    "lanternhill",
+    "core"
+   ],
+   "style": "formal",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_bartender_shirt"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_oxford_black",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_hawker_apron"
+     ],
+     "chance": 0.6
+    },
+    "neck": {
+     "items": [
+      "neck_tie_loose"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_musician",
+   "name": "Musikerin",
+   "faction": "",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "style": "underground",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_band_print",
+      "top_crop_neon",
+      "top_corset_leather"
+     ],
+     "chance": 0.3
+    },
+    "jacket": {
+     "items": [
+      "jkt_leather_biker",
+      "jkt_collective_patchwork"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_leather_pants",
+      "bot_jeans_ripped",
+      "bot_skirt_pleated"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_platform",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_duffel_sport"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "jacket": "rust_leather",
+    "bottom": "hacker_dark"
+   }
+  },
+  {
+   "id": "arch_racer",
+   "name": "Rennfahrer",
+   "faction": "",
+   "districts": [
+    "rustline"
+   ],
+   "style": "sport",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_racing_suit"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_helmet_race_open"
+     ],
+     "chance": 0.3
+    },
+    "gloves": {
+     "items": [
+      "glv_driving_leather"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_driver_race"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_visor_sport"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "fullbody": "racing"
+   }
+  },
+  {
+   "id": "arch_courier",
+   "name": "Fahrradkurier",
+   "faction": "",
+   "districts": [
+    "core",
+    "lanternhill"
+   ],
+   "style": "sport",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tank_sport",
+      "top_tee_black",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_windbreaker_teal",
+      "jkt_delivery_vest"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_leggings_black",
+      "bot_shorts_sport",
+      "bot_trackpants"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_running",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_messenger_courier"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_visor_sport"
+     ],
+     "chance": 0.3
+    },
+    "gloves": {
+     "items": [
+      "glv_fingerless"
+     ],
+     "chance": 0.3
+    },
+    "hat": {
+     "items": [
+      "hat_headband_sweat"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "jacket": "weather_bright"
+   }
+  },
+  {
+   "id": "arch_medic",
+   "name": "Pflegekraft",
+   "faction": "",
+   "districts": [
+    "core",
+    "greenmoor"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_scrubs_medic"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_scrubs_trousers"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_lab_coat"
+     ],
+     "chance": null
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_running"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_lab_nitrile"
+     ],
+     "chance": 0.3
+    },
+    "mask": {
+     "items": [
+      "mask_surgical"
+     ],
+     "chance": 0.5
+    },
+    "neck": {
+     "items": [
+      "neck_lanyard_badge"
+     ],
+     "chance": 0.8
+    }
+   },
+   "palette": {
+    "top": "corporate",
+    "bottom": "corporate"
+   }
+  },
+  {
+   "id": "arch_student",
+   "name": "Student",
+   "faction": "",
+   "districts": [
+    "lanternhill",
+    "core"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_hoodie_gray",
+      "top_tee_band_print",
+      "top_sweater_knit",
+      "top_hackertee_circuit"
+     ],
+     "chance": 0.4
+    },
+    "jacket": {
+     "items": [
+      "jkt_denim",
+      "jkt_bomber_green"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_blue",
+      "bot_jeans_ripped",
+      "bot_cargo_black",
+      "bot_skirt_pleated"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_sneaker_black",
+      "sho_boots_combat"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_round_wire"
+     ],
+     "chance": 0.25
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_tourist",
+   "name": "Tourist",
+   "faction": "",
+   "districts": [
+    "sunstrip",
+    "core"
+   ],
+   "style": "beach",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_hawaii",
+      "top_polo_sunstrip",
+      "top_tank_beach",
+      "top_tee_white"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_shorts_denim",
+      "bot_chinos_beige",
+      "bot_shorts_board"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sandals",
+      "sho_sneaker_white",
+      "sho_flipflops"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_straw_wide",
+      "hat_bucket_sun"
+     ],
+     "chance": 0.6
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.7
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black",
+      "bag_fanny_neon"
+     ],
+     "chance": 0.7
+    }
+   },
+   "palette": {
+    "top": "beach_bright",
+    "bottom": "beach_bright"
+   }
+  },
+  {
+   "id": "arch_surfer",
+   "name": "Surfer",
+   "faction": "",
+   "districts": [
+    "sunstrip"
+   ],
+   "style": "beach",
+   "tags": [],
+   "slots": {
+    "fullbody": {
+     "items": [
+      "full_wetsuit_surf"
+     ],
+     "chance": 0.45
+    },
+    "top": {
+     "items": [
+      "top_tank_beach"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_shorts_board"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_flipflops",
+      "sho_sandals"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_bucket_sun"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "fullbody": "mono_dark",
+    "top": "beach_bright",
+    "bottom": "beach_bright"
+   }
+  },
+  {
+   "id": "arch_jogger",
+   "name": "Jogger",
+   "faction": "",
+   "districts": [
+    "greenmoor",
+    "sunstrip",
+    "core"
+   ],
+   "style": "sport",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tank_sport",
+      "top_tee_white",
+      "top_jersey_race"
+     ],
+     "chance": 0.2
+    },
+    "jacket": {
+     "items": [
+      "jkt_windbreaker_teal"
+     ],
+     "chance": 0.25
+    },
+    "bottom": {
+     "items": [
+      "bot_leggings_black",
+      "bot_shorts_sport",
+      "bot_trackpants"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_running"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_headband_sweat"
+     ],
+     "chance": 0.4
+    },
+    "glasses": {
+     "items": [
+      "glass_visor_sport"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_chef",
+   "name": "Koch",
+   "faction": "",
+   "districts": [
+    "saltmarket",
+    "sunstrip",
+    "core"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_chef_whites"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_black",
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "mono_light",
+    "bottom": "mono_dark",
+    "fullbody": "mono_light"
+   }
+  },
+  {
+   "id": "arch_taxi",
+   "name": "Taxifahrer",
+   "faction": "",
+   "districts": [],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_henley_gray",
+      "top_polo_sunstrip"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_bomber_green",
+      "jkt_fleece_gray"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_black",
+      "bot_chinos_beige"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_black",
+      "sho_loafer_brown"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_flatcap_tweed"
+     ],
+     "chance": 0.2
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.3
+    },
+    "gloves": {
+     "items": [
+      "glv_driving_leather"
+     ],
+     "chance": 0.15
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_construction",
+   "name": "Bauarbeiter",
+   "faction": "",
+   "districts": [
+    "saltmarket",
+    "rustline"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_white",
+      "top_flannel_check",
+      "top_undershirt_dock"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_hivis_orange"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_cargo_olive",
+      "bot_overalls_bib",
+      "bot_work_trousers_dock"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_hardhat_yellow"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_goggles_welder"
+     ],
+     "chance": 0.2
+    },
+    "mask": {
+     "items": [
+      "mask_respirator_half"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "jacket": "workwear_orange",
+    "bottom": "workwear_earth",
+    "hat": "workwear_orange"
+   }
+  },
+  {
+   "id": "arch_vagrant",
+   "name": "Obdachlose Person",
+   "faction": "",
+   "districts": [
+    "saltmarket",
+    "rustline",
+    "lanternhill"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_hoodie_gray",
+      "top_flannel_check",
+      "top_tee_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_parka_winter"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_trackpants",
+      "bot_jeans_ripped",
+      "bot_cargo_olive"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_hiking",
+      "sho_sneaker_black",
+      "sho_boots_combat"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": 0.6
+    },
+    "gloves": {
+     "items": [
+      "glv_winter_knit"
+     ],
+     "chance": 0.4
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_wool"
+     ],
+     "chance": 0.4
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.7
+    }
+   },
+   "palette": {
+    "top": "elder_muted",
+    "jacket": "earth_casual",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_vendor",
+   "name": "Straßenhändler",
+   "faction": "",
+   "districts": [
+    "saltmarket",
+    "lanternhill",
+    "sunstrip"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_white",
+      "top_flannel_check",
+      "top_henley_gray",
+      "top_shirt_hawaii"
+     ],
+     "chance": 0.2
+    },
+    "jacket": {
+     "items": [
+      "jkt_hawker_apron"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_blue",
+      "bot_chinos_beige",
+      "bot_cargo_olive"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_black",
+      "sho_sandals"
+     ],
+     "chance": 0.2
+    },
+    "hat": {
+     "items": [
+      "hat_flatcap_tweed",
+      "hat_straw_wide"
+     ],
+     "chance": 0.4
+    },
+    "bag": {
+     "items": [
+      "bag_vendor_tray"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_delivery",
+   "name": "Lieferfahrer",
+   "faction": "",
+   "districts": [
+    "core",
+    "sunstrip"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_black",
+      "top_hoodie_gray",
+      "top_polo_sunstrip"
+     ],
+     "chance": 0.3
+    },
+    "jacket": {
+     "items": [
+      "jkt_delivery_vest"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_black",
+      "bot_cargo_black",
+      "bot_trackpants"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_black",
+      "sho_running"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_messenger_courier",
+      "bag_backpack_black"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_fingerless"
+     ],
+     "chance": 0.15
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "weather_bright"
+   }
+  },
+  {
+   "id": "arch_security_private",
+   "name": "Wachmann (privat)",
+   "faction": "",
+   "districts": [
+    "core",
+    "sunstrip",
+    "lanternhill"
+   ],
+   "style": "uniform",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_tee_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_security_jacket"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_cargo_black",
+      "bot_slacks_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_combat",
+      "sho_oxford_black"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_holster_belt"
+     ],
+     "chance": 0
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.3
+    },
+    "gloves": {
+     "items": [
+      "glv_tactical"
+     ],
+     "chance": 0
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "tactical_black",
+    "bottom": "tactical_black"
+   }
+  },
+  {
+   "id": "arch_cleaner",
+   "name": "Reinigungskraft",
+   "faction": "",
+   "districts": [
+    "core"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_cleaner_tunic"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_scrubs_trousers",
+      "bot_jeans_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_lab_nitrile"
+     ],
+     "chance": 0.4
+    },
+    "mask": {
+     "items": [
+      "mask_surgical"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "corporate",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_artist",
+   "name": "Straßenkünstler",
+   "faction": "",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_band_print",
+      "top_hackertee_circuit",
+      "top_hoodie_neon"
+     ],
+     "chance": 0.3
+    },
+    "jacket": {
+     "items": [
+      "jkt_collective_patchwork",
+      "jkt_denim",
+      "jkt_bomber_green"
+     ],
+     "chance": 0.4
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_ripped",
+      "bot_cargo_olive",
+      "bot_joggers_neon"
+     ],
+     "chance": 0.3
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_neon",
+      "sho_sneaker_black",
+      "sho_boots_combat"
+     ],
+     "chance": 0.3
+    },
+    "hat": {
+     "items": [
+      "hat_beret_wool"
+     ],
+     "chance": 0.4
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "jacket": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_clubgoer",
+   "name": "Nachtschwärmer",
+   "faction": "",
+   "districts": [
+    "sunstrip",
+    "lanternhill",
+    "core"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_crop_neon",
+      "top_hoodie_neon",
+      "top_corset_leather"
+     ],
+     "chance": null
+    },
+    "jacket": {
+     "items": [
+      "jkt_puffer_neon"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_leather_pants",
+      "bot_skirt_pleated",
+      "bot_joggers_neon",
+      "bot_slacks_black"
+     ],
+     "chance": 0.3
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_neon",
+      "sho_boots_platform",
+      "sho_heels_black"
+     ],
+     "chance": 0.3
+    },
+    "mask": {
+     "items": [
+      "mask_festival_neon"
+     ],
+     "chance": 0.3
+    },
+    "glasses": {
+     "items": [
+      "glass_mirror_privacy"
+     ],
+     "chance": 0.1
+    },
+    "bag": {
+     "items": [
+      "bag_fanny_neon"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "jacket": "neon_street",
+    "bottom": "hacker_dark"
+   }
+  },
+  {
+   "id": "arch_bouncer",
+   "name": "Türsteher",
+   "faction": "",
+   "districts": [
+    "sunstrip",
+    "lanternhill",
+    "core"
+   ],
+   "style": "formal",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_turtleneck_black",
+      "top_tee_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_suit_black",
+      "jkt_security_jacket"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_cargo_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_oxford_black",
+      "sho_boots_combat"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.3
+    },
+    "gloves": {
+     "items": [
+      "glv_tactical"
+     ],
+     "chance": 0
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "mono_dark",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_union_activist",
+   "name": "Gewerkschafts-Aktivist",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_union_print"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_hivis_orange"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_work_trousers_dock",
+      "bot_jeans_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_cap_dock"
+     ],
+     "chance": null
+    },
+    "mask": {
+     "items": [
+      "mask_bandana"
+     ],
+     "chance": 0.15
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "workwear_orange",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_smuggler",
+   "name": "Schmuggler",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_black",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_bomber_green",
+      "jkt_parka_winter"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_cargo_black",
+      "bot_cargo_olive"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_combat",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": 0.5
+    },
+    "mask": {
+     "items": [
+      "mask_bandana"
+     ],
+     "chance": 0.2
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black",
+      "bag_duffel_sport"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "earth_casual"
+   }
+  },
+  {
+   "id": "arch_fixer",
+   "name": "Vermittler",
+   "faction": "",
+   "districts": [],
+   "style": "formal",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_turtleneck_black",
+      "top_shirt_oxford_white"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_trench_dark",
+      "jkt_suit_black",
+      "jkt_bomber_green"
+     ],
+     "chance": 0.3
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_chelsea_leather",
+      "sho_oxford_black"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.4
+    },
+    "neck": {
+     "items": [
+      "neck_chain_gold"
+     ],
+     "chance": 0.2
+    },
+    "hat": {
+     "items": [
+      "hat_fedora_felt"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "luxury",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_parent",
+   "name": "Elternteil",
+   "faction": "greenmoor",
+   "districts": [
+    "greenmoor",
+    "core",
+    "sunstrip"
+   ],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_henley_gray",
+      "top_sweater_knit",
+      "top_tee_white",
+      "top_blouse_silk"
+     ],
+     "chance": 0.2
+    },
+    "jacket": {
+     "items": [
+      "jkt_fleece_gray",
+      "jkt_windbreaker_teal"
+     ],
+     "chance": 0.4
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_blue",
+      "bot_chinos_beige"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_white",
+      "sho_chelsea_leather"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_round_wire"
+     ],
+     "chance": 0.2
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_shopkeeper",
+   "name": "Ladenbesitzer",
+   "faction": "",
+   "districts": [],
+   "style": "casual",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white",
+      "top_flannel_check",
+      "top_henley_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_hawker_apron",
+      "jkt_fleece_gray"
+     ],
+     "chance": 0.3
+    },
+    "bottom": {
+     "items": [
+      "bot_chinos_beige",
+      "bot_jeans_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_loafer_brown",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_reading"
+     ],
+     "chance": 0.25
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_teen",
+   "name": "Jugendlicher",
+   "faction": "",
+   "districts": [
+    "lanternhill",
+    "saltmarket",
+    "greenmoor",
+    "sunstrip"
+   ],
+   "style": "street",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_hoodie_neon",
+      "top_tee_band_print",
+      "top_hoodie_gray"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_bomber_green"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_ripped",
+      "bot_joggers_neon",
+      "bot_cargo_black",
+      "bot_skirt_pleated"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_neon",
+      "sho_sneaker_white"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_snapback_neon"
+     ],
+     "chance": 0.4
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black",
+      "bag_fanny_neon"
+     ],
+     "chance": 0.4
+    }
+   },
+   "palette": {
+    "top": "neon_street",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "arch_crane_operator",
+   "name": "Kranführer",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_flannel_check",
+      "top_tee_union_print"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_hivis_orange",
+      "jkt_vest_union_quilted"
+     ],
+     "chance": 0.5
+    },
+    "bottom": {
+     "items": [
+      "bot_work_trousers_dock"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_hardhat_yellow"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 0.5
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.3
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "jacket": "workwear_orange"
+   }
+  },
+  {
+   "id": "arch_mod_artist",
+   "name": "Body-Mod-Künstlerin",
+   "faction": "collective",
+   "districts": [
+    "lanternhill",
+    "sunstrip"
+   ],
+   "style": "underground",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_corset_leather"
+     ],
+     "chance": null
+    },
+    "jacket": {
+     "items": [
+      "jkt_lab_coat"
+     ],
+     "chance": null
+    },
+    "bottom": {
+     "items": [
+      "bot_leather_pants",
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_platform",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_lab_nitrile"
+     ],
+     "chance": 0.4
+    },
+    "glasses": {
+     "items": [
+      "glass_goggles_welder"
+     ],
+     "chance": 0.25
+    }
+   },
+   "palette": {
+    "top": "hacker_dark",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "arch_scrapper",
+   "name": "Schrotthändler",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_flannel_check",
+      "top_undershirt_dock",
+      "top_tee_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_wrencher_mechanic",
+      "jkt_denim"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_overalls_bib",
+      "bot_cargo_olive"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": null
+    },
+    "glasses": {
+     "items": [
+      "glass_goggles_welder"
+     ],
+     "chance": 0.15
+    },
+    "neck": {
+     "items": [
+      "neck_towel_work"
+     ],
+     "chance": 0.4
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "bottom": "workwear_blue"
+   }
+  },
+  {
+   "id": "arch_beachgoer",
+   "name": "Strandgänger",
+   "faction": "",
+   "districts": [
+    "sunstrip"
+   ],
+   "style": "beach",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tank_beach",
+      "top_shirt_hawaii",
+      "top_polo_sunstrip"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_shorts_board",
+      "bot_shorts_denim"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_flipflops",
+      "sho_sandals"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_bucket_sun"
+     ],
+     "chance": 0.4
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "beach_bright",
+    "bottom": "beach_bright"
+   }
+  },
+  {
+   "id": "weather_rain",
+   "name": "Regenschicht",
+   "faction": "",
+   "districts": [],
+   "style": "weather",
+   "tags": [
+    "overlay"
+   ],
+   "slots": {
+    "jacket": {
+     "items": [
+      "jkt_raincoat_yellow",
+      "jkt_rain_poncho_clear",
+      "jkt_trench_dark"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_rain_boots_yellow"
+     ],
+     "chance": 0.3
+    },
+    "bag": {
+     "items": [
+      "bag_umbrella_black",
+      "bag_umbrella_clear"
+     ],
+     "chance": 0.7
+    }
+   },
+   "palette": {
+    "jacket": "weather_bright"
+   }
+  },
+  {
+   "id": "weather_cold",
+   "name": "Kälteschicht",
+   "faction": "",
+   "districts": [],
+   "style": "weather",
+   "tags": [
+    "overlay"
+   ],
+   "slots": {
+    "jacket": {
+     "items": [
+      "jkt_parka_winter",
+      "jkt_puffer_neon"
+     ],
+     "chance": null
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_winter_knit"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_wool"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "jacket": "mono_dark",
+    "hat": "mono_dark"
+   }
+  },
+  {
+   "id": "origin_racer",
+   "name": "Herkunft Rennfahrerin",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "sport",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_black",
+      "top_jersey_race"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_leather_biker"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_driver_race"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_driving_leather"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "racing",
+    "jacket": "rust_leather",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "origin_dockkid",
+   "name": "Herkunft Hafenkind",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_flannel_check",
+      "top_undershirt_dock"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_denim",
+      "jkt_hivis_orange"
+     ],
+     "chance": 0.3
+    },
+    "bottom": {
+     "items": [
+      "bot_cargo_olive",
+      "bot_jeans_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beanie_wool"
+     ],
+     "chance": 0.4
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "jacket": "denim",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "origin_corp_defector",
+   "name": "Herkunft Konzern-Aussteigerin",
+   "faction": "aurelia",
+   "districts": [
+    "core"
+   ],
+   "style": "business",
+   "tags": [],
+   "slots": {
+    "top": {
+     "items": [
+      "top_turtleneck_black",
+      "top_shirt_oxford_white"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_trench_dark",
+      "jkt_blazer_grey"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black",
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_chelsea_leather",
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_messenger_courier"
+     ],
+     "chance": 0.5
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "mono_dark",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "key_mira",
+   "name": "Mira Voss Standard",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "street",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_black"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_leather_biker"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_combat"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_driving_leather"
+     ],
+     "chance": 0
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "rust_leather",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "key_jonas",
+   "name": "Jonas Voss Standard",
+   "faction": "aurelia",
+   "districts": [
+    "core"
+   ],
+   "style": "business",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_blue"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_bomber_green"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_chinos_beige"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_sneaker_black"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_round_wire"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_backpack_black"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "corporate",
+    "jacket": "earth_casual",
+    "bottom": "earth_casual"
+   }
+  },
+  {
+   "id": "key_kandel",
+   "name": "Dr. Idris Kandel",
+   "faction": "aurelia",
+   "districts": [
+    "core"
+   ],
+   "style": "luxury",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_shirt_oxford_white"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_aurelia_exec_coat"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_black"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_oxford_black"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_tie_corp_blue"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_aegis_hud"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "luxury",
+    "jacket": "luxury",
+    "bottom": "mono_dark"
+   }
+  },
+  {
+   "id": "key_okoye",
+   "name": "Cmdr. Ravn Okoye",
+   "faction": "kcg",
+   "districts": [
+    "core"
+   ],
+   "style": "uniform",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_kcg_uniform_shirt"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_kcg_duty"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_kcg_trousers"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_kcg"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_kcg_cap"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_holster_belt"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "kcg_navy",
+    "jacket": "kcg_navy",
+    "bottom": "kcg_navy",
+    "hat": "kcg_navy"
+   }
+  },
+  {
+   "id": "key_brann",
+   "name": "Tomasz \"Brann\" Brandt",
+   "faction": "union",
+   "districts": [
+    "saltmarket"
+   ],
+   "style": "workwear",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_flannel_check"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_vest_union_quilted"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_work_trousers_dock"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_flatcap_tweed"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_work_leather"
+     ],
+     "chance": 0
+    }
+   },
+   "palette": {
+    "top": "workwear_earth",
+    "jacket": "workwear_orange",
+    "bottom": "workwear_earth"
+   }
+  },
+  {
+   "id": "key_nox",
+   "name": "Nox",
+   "faction": "collective",
+   "districts": [
+    "lanternhill"
+   ],
+   "style": "underground",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_hackertee_circuit"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_cloak_hooded"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_leather_pants"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_platform"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_mirror_privacy"
+     ],
+     "chance": 1
+    },
+    "bag": {
+     "items": [
+      "bag_deck_case"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "hacker_dark",
+    "jacket": "hacker_dark",
+    "bottom": "hacker_dark"
+   }
+  },
+  {
+   "id": "key_yara",
+   "name": "Yara Quill",
+   "faction": "collective",
+   "districts": [
+    "lanternhill"
+   ],
+   "style": "casual",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_sweater_knit"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_collective_patchwork"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_jeans_blue"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_hiking"
+     ],
+     "chance": 1
+    },
+    "hat": {
+     "items": [
+      "hat_beret_wool"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_wool"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "earth_casual",
+    "jacket": "earth_casual",
+    "bottom": "denim"
+   }
+  },
+  {
+   "id": "key_dutch",
+   "name": "Odalys \"Dutch\" Halloran",
+   "faction": "wrenchers",
+   "districts": [
+    "rustline"
+   ],
+   "style": "street",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_tee_band_print"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_wrencher_mechanic"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_overalls_bib"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_boots_work_steel"
+     ],
+     "chance": 1
+    },
+    "gloves": {
+     "items": [
+      "glv_fingerless"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_chain_gold"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_sun_aviator"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "mono_dark",
+    "jacket": "rust_leather",
+    "bottom": "workwear_blue"
+   }
+  },
+  {
+   "id": "key_pia",
+   "name": "Pia Sorensen",
+   "faction": "",
+   "districts": [
+    "core"
+   ],
+   "style": "casual",
+   "tags": [
+    "key_character"
+   ],
+   "slots": {
+    "top": {
+     "items": [
+      "top_blouse_silk"
+     ],
+     "chance": 1
+    },
+    "jacket": {
+     "items": [
+      "jkt_blazer_navy"
+     ],
+     "chance": 1
+    },
+    "bottom": {
+     "items": [
+      "bot_slacks_gray"
+     ],
+     "chance": 1
+    },
+    "shoes": {
+     "items": [
+      "sho_chelsea_leather"
+     ],
+     "chance": 1
+    },
+    "glasses": {
+     "items": [
+      "glass_heavy_frame"
+     ],
+     "chance": 1
+    },
+    "neck": {
+     "items": [
+      "neck_scarf_silk"
+     ],
+     "chance": 1
+    }
+   },
+   "palette": {
+    "top": "luxury",
+    "jacket": "corporate",
+    "bottom": "mono_dark"
+   }
+  }
+ ]
+}

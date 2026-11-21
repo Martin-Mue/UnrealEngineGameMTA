@@ -1,0 +1,39 @@
+{
+  "version": 1,
+  "_comment": "Wetterzustaende und Markov-Kette. Werte 0..1 sofern nicht anders angegeben. Dauer in Echtzeit-Sekunden (mit DwellScale im Actor skalierbar). gripFactor multipliziert die Reifenhaftung zusaetzlich zur Nasse (wetGripLoss).",
+  "seed": 4711,
+  "initialState": "Clear",
+  "wetness": { "riseRate": 0.045, "dryRate": 0.004, "wetGripLoss": 0.38, "roughnessDry": 0.85, "roughnessWet": 0.18 },
+  "windDirectionDegrees": 255,
+  "states": {
+    "Clear":        { "name": "Klar",           "rain": 0.0,  "fog": 0.0,  "wind": 0.15, "visibilityM": 8000, "gripFactor": 1.0,  "soundDamping": 0.0,  "traffic": 1.0,  "cloud": 0.1,  "lightning": 0.0, "dust": 0.0, "skyDarkening": 0.0,  "precip": "None", "dwellMin": 240, "dwellMax": 600, "transitionSeconds": 45 },
+    "Cloudy":       { "name": "Bewoelkt",       "rain": 0.0,  "fog": 0.05, "wind": 0.3,  "visibilityM": 6000, "gripFactor": 1.0,  "soundDamping": 0.05, "traffic": 1.0,  "cloud": 0.7,  "lightning": 0.0, "dust": 0.0, "skyDarkening": 0.2,  "precip": "None", "dwellMin": 180, "dwellMax": 480, "transitionSeconds": 40 },
+    "Haze":         { "name": "Dunst",          "rain": 0.0,  "fog": 0.25, "wind": 0.1,  "visibilityM": 2500, "gripFactor": 0.98, "soundDamping": 0.1,  "traffic": 0.95, "cloud": 0.4,  "lightning": 0.0, "dust": 0.05,"skyDarkening": 0.15, "precip": "None", "dwellMin": 150, "dwellMax": 420, "transitionSeconds": 50 },
+    "Rain":         { "name": "Regen",          "rain": 0.65, "fog": 0.2,  "wind": 0.4,  "visibilityM": 1800, "gripFactor": 0.92, "soundDamping": 0.3,  "traffic": 0.8,  "cloud": 0.9,  "lightning": 0.0, "dust": 0.0, "skyDarkening": 0.45, "precip": "Rain", "dwellMin": 150, "dwellMax": 420, "transitionSeconds": 30 },
+    "Thunderstorm": { "name": "Gewitter",       "rain": 1.0,  "fog": 0.3,  "wind": 0.85, "visibilityM": 900,  "gripFactor": 0.85, "soundDamping": 0.45, "traffic": 0.6,  "cloud": 1.0,  "lightning": 1.0, "dust": 0.0, "skyDarkening": 0.7,  "precip": "Rain", "dwellMin": 90,  "dwellMax": 240, "transitionSeconds": 20 },
+    "SmogFog":      { "name": "Smog / Nebel",   "rain": 0.0,  "fog": 0.85, "wind": 0.05, "visibilityM": 220,  "gripFactor": 0.97, "soundDamping": 0.35, "traffic": 0.7,  "cloud": 0.6,  "lightning": 0.0, "dust": 0.1, "skyDarkening": 0.3,  "precip": "None", "dwellMin": 150, "dwellMax": 360, "transitionSeconds": 60 },
+    "DustStorm":    { "name": "Staubsturm",     "rain": 0.0,  "fog": 0.6,  "wind": 0.95, "visibilityM": 120,  "gripFactor": 0.88, "soundDamping": 0.4,  "traffic": 0.5,  "cloud": 0.5,  "lightning": 0.0, "dust": 1.0, "skyDarkening": 0.4,  "precip": "Dust", "dwellMin": 90,  "dwellMax": 200, "transitionSeconds": 25 }
+  },
+  "markov": {
+    "Clear":        { "Clear": 0.0, "Cloudy": 0.55, "Haze": 0.25, "Rain": 0.05, "Thunderstorm": 0.0,  "SmogFog": 0.1,  "DustStorm": 0.05 },
+    "Cloudy":       { "Clear": 0.35, "Cloudy": 0.0, "Haze": 0.15, "Rain": 0.3,  "Thunderstorm": 0.05, "SmogFog": 0.1,  "DustStorm": 0.05 },
+    "Haze":         { "Clear": 0.3, "Cloudy": 0.3, "Haze": 0.0,  "Rain": 0.05, "Thunderstorm": 0.0,  "SmogFog": 0.3,  "DustStorm": 0.05 },
+    "Rain":         { "Clear": 0.1, "Cloudy": 0.5, "Haze": 0.05, "Rain": 0.0,  "Thunderstorm": 0.25, "SmogFog": 0.1,  "DustStorm": 0.0 },
+    "Thunderstorm": { "Clear": 0.05, "Cloudy": 0.35, "Haze": 0.0, "Rain": 0.6,  "Thunderstorm": 0.0,  "SmogFog": 0.0,  "DustStorm": 0.0 },
+    "SmogFog":      { "Clear": 0.3, "Cloudy": 0.25, "Haze": 0.35, "Rain": 0.1,  "Thunderstorm": 0.0,  "SmogFog": 0.0,  "DustStorm": 0.0 },
+    "DustStorm":    { "Clear": 0.35, "Cloudy": 0.3, "Haze": 0.35, "Rain": 0.0,  "Thunderstorm": 0.0,  "SmogFog": 0.0,  "DustStorm": 0.0 }
+  },
+  "hourBias": [
+    { "hourFrom": 22, "hourTo": 7, "weights": { "SmogFog": 1.8, "Haze": 1.3, "Clear": 0.9 } },
+    { "hourFrom": 12, "hourTo": 18, "weights": { "Thunderstorm": 1.6, "DustStorm": 1.3, "SmogFog": 0.5 } }
+  ],
+  "districtBias": {
+    "core":        { "Haze": 1.3, "SmogFog": 0.7 },
+    "saltmarket":  { "SmogFog": 1.6, "Rain": 1.2 },
+    "lanternhill": { "Rain": 1.1, "Cloudy": 1.1 },
+    "greenmoor":   { "Clear": 1.3, "SmogFog": 0.5, "DustStorm": 0.4 },
+    "rustline":    { "SmogFog": 2.5, "DustStorm": 2.0, "Clear": 0.7 },
+    "sunstrip":    { "Clear": 1.6, "Thunderstorm": 1.2, "SmogFog": 0.4 }
+  },
+  "lightning": { "minIntervalSeconds": 4, "maxIntervalSeconds": 18, "thunderDelayPerKm": 2.9, "maxDistanceKm": 4.0 }
+}

@@ -1,0 +1,256 @@
+{
+  "version": 1,
+  "_comment": "Alle Sender, Personen, Songs, Bands, Werbespots und Texte sind frei erfunden. Musik wird per tools/audio synthetisiert. Bedingungen (when): wantedMin/wantedMax (0..5), weather[] (Clear,Cloudy,Haze,Rain,Thunderstorm,SmogFog,DustStorm), district[] (core,saltmarket,lanternhill,greenmoor,rustline,sunstrip), flagsAll[], flagsNone[], hourFrom/hourTo (Spielstunde, darf ueber Mitternacht laufen). Platzhalter: {district} {weather} {hour} {wanted}.",
+  "settings": {
+    "defaultStation": "neon_tide",
+    "audioPath": "/Game/Audio/Generated/",
+    "duckDuringSpeech": 0.35,
+    "wordsPerSecond": 2.6,
+    "jingleEveryTracks": 2,
+    "stationSwitchStaticSeconds": 0.4,
+    "defaultVolume": 0.7
+  },
+  "stations": [
+    {
+      "id": "neon_tide",
+      "name": "Neon Tide FM",
+      "frequency": 98.6,
+      "genre": "Synthwave / Elektro",
+      "tagline": "Die Nacht hat Wellengang.",
+      "hosts": [
+        { "id": "juno", "name": "DJ Juno Marlow", "bio": "Nachtmoderatorin, spricht leise und ein bisschen zu nah am Mikrofon." },
+        { "id": "kite", "name": "Kite Okonkwo-Ray", "bio": "Morgenmoderator, ewig gut gelaunt, ewig unausgeschlafen." }
+      ],
+      "jingles": [
+        "Neon Tide FM, neunundneunzig minus vierzehn Komma vier.",
+        "Du hörst Neon Tide. Der Rest ist Brandung.",
+        "Neon Tide FM: Synthesizer, bis die Sonne aufgibt."
+      ],
+      "tracks": [
+        { "id": "nt_1", "title": "Glasgrün am Pier", "artist": "Violet Parade", "durationSec": 196, "bpm": 100, "key": "Am", "loop": "radio_neon_tide_a" },
+        { "id": "nt_2", "title": "Rotes Riesenrad", "artist": "Halbmond-Kollektiv", "durationSec": 214, "bpm": 108, "key": "Fm", "loop": "radio_neon_tide_b" },
+        { "id": "nt_3", "title": "Kein Handyempfang im Paradies", "artist": "Tauchsieder", "durationSec": 231, "bpm": 116, "key": "Dm", "loop": "radio_neon_tide_c" },
+        { "id": "nt_4", "title": "Salzwasser, Chrom", "artist": "Violet Parade", "durationSec": 188, "bpm": 96, "key": "Em", "loop": "radio_neon_tide_d" }
+      ],
+      "ads": [
+        { "id": "nt_ad1", "sponsor": "Kestrel Wheel", "text": "Kestrel Wheel: Sieh die Stadt von oben, bevor Aegis sie dir von unten erklärt. Zwanzig Minuten Aussicht, zehn Minuten Anstehen." },
+        { "id": "nt_ad2", "sponsor": "Sunbloc", "text": "Sunbloc Lichtschutzfaktor Neunzig. Weil Verantwortung ab Faktor Fünfzig beginnt. Nebenwirkungen: Urlaub." },
+        { "id": "nt_ad3", "sponsor": "Palmgarten Hotel", "text": "Palmgarten Hotel Sunstrip. Wir haben die Aussicht, Sie haben die Rechnung.", "when": { "district": ["sunstrip", "core"] } }
+      ],
+      "scripts": [
+        { "id": "nt_s1", "type": "talk", "host": "juno", "text": "Es ist {hour} Uhr, und {district} glitzert, als hätte jemand die Stadt mit dem Fotofilter der Konzernwerbung überzogen.", "cooldownMin": 40 },
+        { "id": "nt_s2", "type": "weather", "host": "juno", "text": "Draußen regnet es. Perfektes Wetter für Neonreflexe auf dem Asphalt. Fahr vorsichtig, die Straße spiegelt mehr, als sie hält.", "when": { "weather": ["Rain", "Thunderstorm"] }, "cooldownMin": 30 },
+        { "id": "nt_s3", "type": "weather", "host": "kite", "text": "Dichter Smog über der Stadt. Wer die Ampeln nicht mehr sieht, hört einfach auf die Hupen.", "when": { "weather": ["SmogFog"] }, "cooldownMin": 30 },
+        { "id": "nt_s4", "type": "talk", "host": "juno", "text": "Hinweis aus der Hörerpost: Blaue Lichter im Rückspiegel? Dann ist dieser nächste Song dein Fluchtsound. Wir haben nichts gesagt.", "when": { "wantedMin": 2 }, "cooldownMin": 25 },
+        { "id": "nt_s5", "type": "talk", "host": "kite", "text": "Guten Morgen, {district}! Es ist {hour} Uhr. Wer jetzt wach ist, hat entweder Arbeit oder ein Problem.", "when": { "hourFrom": 5, "hourTo": 9 }, "cooldownMin": 60 },
+        { "id": "nt_s6", "type": "talk", "host": "juno", "text": "Staubsturm aus der Salzebene. Wer ihn kommen sieht, parkt. Wer ihn nicht kommen sieht, parkt auch, nur schlechter.", "when": { "weather": ["DustStorm"] }, "cooldownMin": 30 }
+      ],
+      "schedule": [
+        { "from": 5, "to": 10, "show": "Morgenbrandung", "host": "kite", "mix": { "music": 6, "talk": 2, "ad": 1, "jingle": 1 } },
+        { "from": 10, "to": 20, "show": "Tideline Tagesprogramm", "host": "kite", "mix": { "music": 7, "talk": 1, "ad": 2, "jingle": 1 } },
+        { "from": 20, "to": 5, "show": "Nachtflut", "host": "juno", "mix": { "music": 8, "talk": 2, "ad": 1, "jingle": 1 } }
+      ]
+    },
+    {
+      "id": "dockline",
+      "name": "Dockline Radio",
+      "frequency": 91.2,
+      "genre": "Hafen-Rock",
+      "tagline": "Gebaut von Händen, gesendet von Kränen.",
+      "hosts": [
+        { "id": "brann", "name": "Hanno Brannigan", "bio": "Ex-Kranführer, Stimme wie ein Schiffsdiesel." },
+        { "id": "teddy", "name": "Tess \"Teddy\" Ruud", "bio": "Schichtwechsel-Moderatorin, kennt jeden Gabelstaplerfahrer beim Vornamen." }
+      ],
+      "jingles": [
+        "Dockline Radio. Eine Schicht, ein Lied.",
+        "Hier spricht der Hafen. Und der Hafen hat Gitarren.",
+        "Dockline: Lauter als die Sirene, ehrlicher als der Chef."
+      ],
+      "tracks": [
+        { "id": "dl_1", "title": "Dritte Schicht", "artist": "Rostbrüder", "durationSec": 207, "bpm": 108, "key": "Em", "loop": "radio_dockline_a" },
+        { "id": "dl_2", "title": "Kranreihe bei Nacht", "artist": "Die Löschleinen", "durationSec": 224, "bpm": 116, "key": "Am", "loop": "radio_dockline_b" },
+        { "id": "dl_3", "title": "Streikposten-Blues", "artist": "Rostbrüder", "durationSec": 241, "bpm": 100, "key": "Dm", "loop": "radio_dockline_c" },
+        { "id": "dl_4", "title": "Container Nummer Siebzehn", "artist": "Bug & Heck", "durationSec": 193, "bpm": 124, "key": "Gm", "loop": "radio_dockline_d" }
+      ],
+      "ads": [
+        { "id": "dl_ad1", "sponsor": "Gruber Werkzeug", "text": "Gruber Werkzeug in Saltmarket. Wenn es hält, ist es von Gruber. Wenn es nicht hält, haben Sie es falsch benutzt." },
+        { "id": "dl_ad2", "sponsor": "Zum Letzten Anker", "text": "Kneipe Zum Letzten Anker. Bier wird nach Schichtende ausgeschenkt. Und davor. Und währenddessen." },
+        { "id": "dl_ad3", "sponsor": "Union-Kasse", "text": "Dockers' Union Hilfskasse: Heute einzahlen, morgen streiken können. Mitgliedschaft ist keine Meinung, sondern ein Versprechen.", "when": { "district": ["saltmarket", "rustline"] } }
+      ],
+      "scripts": [
+        { "id": "dl_s1", "type": "news", "host": "brann", "text": "Hafenbericht: Der Streik geht in die dritte Woche. Die Arbeitgeberseite nennt es eine Betriebsstörung. Die Kranführer nennen es Mittagspause mit Prinzipien.", "when": { "flagsNone": ["betrayedUnion"] }, "cooldownMin": 90 },
+        { "id": "dl_s2", "type": "news", "host": "brann", "text": "Es heißt, in den Reihen der Union habe jemand geredet, wo geschwiegen werden sollte. Die Docks vergessen so etwas nicht.", "when": { "flagsAll": ["betrayedUnion"] }, "cooldownMin": 90 },
+        { "id": "dl_s3", "type": "weather", "host": "teddy", "text": "Nebel am Kai. Die Schiffshörner reden miteinander, wir reden nur dazwischen. Bleibt bei den Pollern, Leute.", "when": { "weather": ["SmogFog", "Haze"] }, "cooldownMin": 30 },
+        { "id": "dl_s4", "type": "traffic", "host": "teddy", "text": "Verkehr in {district}: Lastwagen vor Tor Drei, Gabelstapler auf der Fahrbahn und ein Streikposten, der keine Kompromisse macht. Fahrt außen herum.", "when": { "district": ["saltmarket", "rustline"] }, "cooldownMin": 40 },
+        { "id": "dl_s5", "type": "talk", "host": "teddy", "text": "Wer hinten die Blaulichter sieht: Ihr wisst, in Saltmarket sind die Gassen eng und die Freunde zahlreich.", "when": { "wantedMin": 2, "district": ["saltmarket"] }, "cooldownMin": 30 },
+        { "id": "dl_s6", "type": "talk", "host": "brann", "text": "Es regnet auf die Container, und trotzdem rollen sie. So läuft das hier seit dreißig Jahren.", "when": { "weather": ["Rain", "Thunderstorm"] }, "cooldownMin": 40 },
+        { "id": "dl_s7", "type": "talk", "host": "teddy", "text": "Schichtwechsel um {hour} Uhr. Wer jetzt heimfährt, grüßt die, die jetzt hinfahren.", "when": { "hourFrom": 5, "hourTo": 7 }, "cooldownMin": 120 }
+      ],
+      "schedule": [
+        { "from": 5, "to": 14, "show": "Frühschicht-Frequenz", "host": "teddy", "mix": { "music": 6, "news": 1, "talk": 2, "ad": 1, "jingle": 1 } },
+        { "from": 14, "to": 22, "show": "Hafenlärm", "host": "brann", "mix": { "music": 7, "news": 1, "talk": 1, "ad": 2, "jingle": 1 } },
+        { "from": 22, "to": 5, "show": "Dritte Schicht", "host": "brann", "mix": { "music": 8, "talk": 1, "ad": 1, "jingle": 1 } }
+      ]
+    },
+    {
+      "id": "velvet_quay",
+      "name": "Velvet Quay Lounge",
+      "frequency": 104.3,
+      "genre": "Jazz-Lounge",
+      "tagline": "Samt für laute Städte.",
+      "hosts": [
+        { "id": "odette", "name": "Odette Lindqvist-Maro", "bio": "Sanfte Moderatorin, die auch Fahndungsmeldungen wie Wetterberichte klingen lässt." }
+      ],
+      "jingles": [
+        "Velvet Quay Lounge. Bitte leise fahren.",
+        "Hundertvier Komma drei. Mit Eiswürfeln.",
+        "Velvet Quay: Weil Stille keine Werbung bucht."
+      ],
+      "tracks": [
+        { "id": "vq_1", "title": "Mitternacht am Lagerhaus", "artist": "Marlowe Quartett Zwei", "durationSec": 248, "bpm": 84, "key": "Dm", "loop": "radio_velvet_quay_a" },
+        { "id": "vq_2", "title": "Regen im Sechsachteltakt", "artist": "Iris Calloway-Venn", "durationSec": 262, "bpm": 76, "key": "Gm", "loop": "radio_velvet_quay_b" },
+        { "id": "vq_3", "title": "Ein Gin für den Kontrolleur", "artist": "Marlowe Quartett Zwei", "durationSec": 219, "bpm": 92, "key": "F", "loop": "radio_velvet_quay_c" },
+        { "id": "vq_4", "title": "Blaue Stunde, ohne Aegis", "artist": "Iris Calloway-Venn", "durationSec": 274, "bpm": 68, "key": "Cm", "loop": "radio_velvet_quay_d" }
+      ],
+      "ads": [
+        { "id": "vq_ad1", "sponsor": "Maison Verre", "text": "Maison Verre, Kestrel Core. Wo das Glas so klar ist, dass man seine eigene Zahlungsmoral darin erkennt." },
+        { "id": "vq_ad2", "sponsor": "Calm+", "text": "Aurelia Calm Plus. Ein Abonnement für innere Ruhe, monatlich kündbar, sofern Sie ruhig genug sind, die Kündigung zu finden.", "when": { "district": ["core", "greenmoor", "sunstrip"] } },
+        { "id": "vq_ad3", "sponsor": "Quay Taxi", "text": "Quay Taxi. Wir fragen nicht, wohin. Wir fragen nur, wie schnell." }
+      ],
+      "scripts": [
+        { "id": "vq_s1", "type": "talk", "host": "odette", "text": "Es ist {hour} Uhr in Kestrel Bay. Lehnen Sie sich zurück. Die Stadt tut es auch, zumindest oberflächlich.", "cooldownMin": 45 },
+        { "id": "vq_s2", "type": "weather", "host": "odette", "text": "Draußen Regen. Das Klavier im nächsten Stück hat ihn schon eingeplant.", "when": { "weather": ["Rain", "Thunderstorm"] }, "cooldownMin": 30 },
+        { "id": "vq_s3", "type": "talk", "host": "odette", "text": "Falls Sie gerade verfolgt werden: Dieses Stück hat vier Minuten. Das reicht für eine elegante Flucht, wenn Sie nicht hupen.", "when": { "wantedMin": 3 }, "cooldownMin": 25 },
+        { "id": "vq_s4", "type": "talk", "host": "odette", "text": "Dunst über {district}. Perfekt, um sich zu verlieren, auch ohne Plan.", "when": { "weather": ["Haze", "SmogFog"] }, "cooldownMin": 35 },
+        { "id": "vq_s5", "type": "talk", "host": "odette", "text": "Ein Gruß an alle, die jetzt noch fahren, obwohl es {hour} Uhr ist. Ihr seid nicht allein, ihr seid nur schlecht beraten.", "when": { "hourFrom": 1, "hourTo": 4 }, "cooldownMin": 60 }
+      ],
+      "schedule": [
+        { "from": 0, "to": 24, "show": "Samtstunde", "host": "odette", "mix": { "music": 9, "talk": 1, "ad": 1, "jingle": 1 } }
+      ]
+    },
+    {
+      "id": "lantern_pirate",
+      "name": "Lantern Pirate Radio",
+      "frequency": 87.9,
+      "genre": "Untergrund-Beats / Sprechgesang",
+      "tagline": "Gesendet aus einem Keller, den es nicht gibt.",
+      "hosts": [
+        { "id": "nox", "name": "MC Nox Valdane", "bio": "Anonyme Stimme des Untergrunds, wechselt wöchentlich den Sendeort." },
+        { "id": "sparrow", "name": "Sparrow Quill", "bio": "Technikerin des Lantern Collective, hält den Sender am Laufen und die Kabel unsichtbar." }
+      ],
+      "jingles": [
+        "Lantern Pirate. Dieses Signal kommt von nirgends.",
+        "Siebenundachtzig Komma neun. Kein Impressum, kein Problem.",
+        "Du hörst das, was Aegis nicht hören soll."
+      ],
+      "tracks": [
+        { "id": "lp_1", "title": "Kennzeichen, bitte vergessen", "artist": "Kellerlicht", "durationSec": 182, "bpm": 86, "key": "Cm", "loop": "radio_lantern_pirate_a" },
+        { "id": "lp_2", "title": "Terrakotta-Treppen", "artist": "Hang & Echo", "durationSec": 197, "bpm": 90, "key": "Gm", "loop": "radio_lantern_pirate_b" },
+        { "id": "lp_3", "title": "Glockenturm-Schicht", "artist": "Kellerlicht", "durationSec": 205, "bpm": 82, "key": "Dm", "loop": "radio_lantern_pirate_c" },
+        { "id": "lp_4", "title": "Blindfleck-Boulevard", "artist": "Hang & Echo", "durationSec": 176, "bpm": 94, "key": "Am", "loop": "radio_lantern_pirate_d" }
+      ],
+      "ads": [
+        { "id": "lp_ad1", "sponsor": "Klebeband-Kollektiv", "text": "Schwarzes Isolierband, jetzt in der Gasse hinter St. Merrin. Perfekt für Kabel, Kameras und moralische Entscheidungen." },
+        { "id": "lp_ad2", "sponsor": "Nachtmarkt Treppe 9", "text": "Nachtmarkt Treppe Neun. Alles, was legal klingt, ist teurer." },
+        { "id": "lp_ad3", "sponsor": "Lantern Collective", "text": "Das Lantern Collective sucht Hände. Keine Gesichter, bitte, wir haben genug davon auf Aegis-Servern.", "when": { "district": ["lanternhill"] } }
+      ],
+      "scripts": [
+        { "id": "lp_s1", "type": "news", "host": "nox", "text": "Abrisskommandos waren heute wieder in Lantern Hill. Wer ein Fenster zur Treppe hat, bitte laut sein.", "when": { "district": ["lanternhill"] }, "cooldownMin": 60 },
+        { "id": "lp_s2", "type": "news", "host": "nox", "text": "Ein Datenträger geistert durch die Stadt. Manche sagen, er enthält Beweise. Andere sagen, er enthält Sprengstoff. Beides stimmt auf seine Art.", "when": { "flagsNone": ["leakedLedger"] }, "cooldownMin": 90 },
+        { "id": "lp_s3", "type": "news", "host": "nox", "text": "Die Beweise sind draußen. Aurelia nennt es Fälschung. Wir nennen es Dienstag.", "when": { "flagsAll": ["leakedLedger"] }, "cooldownMin": 90 },
+        { "id": "lp_s4", "type": "talk", "host": "sparrow", "text": "Kamera am Fuß der Treppe ist wieder blind. Nicht fragen, wie. Nur dankbar sein und weiterfahren.", "when": { "district": ["lanternhill", "rustline"] }, "cooldownMin": 50 },
+        { "id": "lp_s5", "type": "talk", "host": "nox", "text": "Blaulicht hinter dir, {wanted} Sterne im Nacken? Gasse links, dann Treppe. Man hat uns nie die Karte gegeben, aber wir haben sie trotzdem.", "when": { "wantedMin": 2 }, "cooldownMin": 25 },
+        { "id": "lp_s6", "type": "talk", "host": "nox", "text": "Es regnet. Die Gassen glänzen. Die Drohnen bleiben im Trockenen. Nutzt das.", "when": { "weather": ["Rain", "Thunderstorm"] }, "cooldownMin": 40 },
+        { "id": "lp_s7", "type": "talk", "host": "sparrow", "text": "Wer die Wahrheit jetzt nicht erträgt, kann auch einfach den Sender wechseln. Wir sind nicht beleidigt. Nur umgezogen.", "cooldownMin": 90 }
+      ],
+      "schedule": [
+        { "from": 18, "to": 6, "show": "Unterm Glockenturm", "host": "nox", "mix": { "music": 6, "news": 1, "talk": 3, "ad": 1, "jingle": 1 } },
+        { "from": 6, "to": 18, "show": "Wiederholungsschleife", "host": "sparrow", "mix": { "music": 8, "talk": 1, "ad": 1, "jingle": 1 } }
+      ]
+    },
+    {
+      "id": "aurelia_direct",
+      "name": "Aurelia Direct",
+      "frequency": 101.1,
+      "genre": "Konzernnachrichten / Propaganda",
+      "tagline": "Sicherheit. Klarheit. Aegis.",
+      "hosts": [
+        { "id": "vance", "name": "Cassian Vance-Holt", "bio": "Hauptsprecher, lächelt hörbar. Hat noch nie eine Frage unbeantwortet gelassen, indem er sie nicht beantwortet hat." },
+        { "id": "mireille", "name": "Mireille Daunt", "bio": "Verkehrs- und Verbrauchersprecherin des Konzerns." }
+      ],
+      "jingles": [
+        "Aurelia Direct. Wir sehen, was Sie brauchen.",
+        "Aurelia Direct: Gute Nachrichten, rechtzeitig vorsortiert.",
+        "Aegis schützt. Aurelia Direct erklärt, wovor."
+      ],
+      "tracks": [
+        { "id": "ad_1", "title": "Morgenrot im Kontrollraum", "artist": "Aurelia Hausorchester", "durationSec": 150, "bpm": 104, "key": "C", "loop": "radio_aurelia_direct_a" },
+        { "id": "ad_2", "title": "Klare Sicht für alle", "artist": "Aurelia Hausorchester", "durationSec": 160, "bpm": 100, "key": "G", "loop": "radio_aurelia_direct_b" },
+        { "id": "ad_3", "title": "Ordnung ist ein Gefühl", "artist": "Lumen Ensemble", "durationSec": 170, "bpm": 108, "key": "D", "loop": "radio_aurelia_direct_c" },
+        { "id": "ad_4", "title": "Phase Zwei, sanft", "artist": "Lumen Ensemble", "durationSec": 155, "bpm": 96, "key": "F", "loop": "radio_aurelia_direct_d" }
+      ],
+      "ads": [
+        { "id": "ad_ad1", "sponsor": "Aegis Phase Zwei", "text": "Aegis Phase Zwei: Ihr Verhalten, jetzt mit Vorteilen. Je besser Sie sich benehmen, desto weniger müssen Sie darüber nachdenken, wer zuschaut." },
+        { "id": "ad_ad2", "sponsor": "Aurelia Home", "text": "Aurelia Home Kredit: Wohnen Sie nach Ihrem Score. Unser Score liebt Sie, wenn Sie pünktlich sind." },
+        { "id": "ad_ad3", "sponsor": "Calm+", "text": "Calm Plus Premium: Jetzt mit Echtzeit-Beruhigung für Ihre Nachbarn." }
+      ],
+      "scripts": [
+        { "id": "ad_s1", "type": "news", "host": "vance", "text": "Guten Tag aus dem Aurelia Tower. In {district} ist die Lage wie immer unter Kontrolle. Sollte sie es nicht sein, ist das ein Missverständnis, das wir gerade klären.", "cooldownMin": 45 },
+        { "id": "ad_s2", "type": "news", "host": "vance", "text": "Die Kestrel Civil Guard meldet eine Fahndung in {district}. Bürger werden gebeten, Ruhe zu bewahren und Hinweise bitte über die Aegis-App zu übermitteln. Selbstjustiz ist ineffizient.", "when": { "wantedMin": 2 }, "cooldownMin": 20 },
+        { "id": "ad_s3", "type": "news", "host": "vance", "text": "Ein Einzelner sorgt derzeit für Unruhe. Die KCG hat die Lage beobachtet und ist zuversichtlich, dass Aegis den Rest erledigt.", "when": { "wantedMin": 4 }, "cooldownMin": 25 },
+        { "id": "ad_s4", "type": "news", "host": "vance", "text": "Zu angeblich veröffentlichten Dokumenten äußern wir uns nicht. Wir stellen lediglich fest, dass Papier geduldig ist und Aurelia es nicht.", "when": { "flagsAll": ["leakedLedger"] }, "cooldownMin": 60 },
+        { "id": "ad_s5", "type": "news", "host": "vance", "text": "Zwischenfälle mit Zivilisten werden vom Konzern bedauert und als Lernerfahrung für das Gesamtsystem betrachtet.", "when": { "flagsAll": ["killedCivilians"] }, "cooldownMin": 60 },
+        { "id": "ad_s6", "type": "weather", "host": "mireille", "text": "Wetter: Regen über {district}. Aurelia empfiehlt Schirme, Aegis empfiehlt Kennzeichen, die man ablesen kann.", "when": { "weather": ["Rain", "Thunderstorm"] }, "cooldownMin": 40 },
+        { "id": "ad_s7", "type": "weather", "host": "mireille", "text": "Smogwarnung für Rustline und Umgebung. Der Konzern bittet, Atemwege weiterhin als persönliche Entscheidung zu betrachten.", "when": { "weather": ["SmogFog", "DustStorm"] }, "cooldownMin": 40 },
+        { "id": "ad_s8", "type": "traffic", "host": "mireille", "text": "Verkehr: Kestrel Core wie immer flüssig, Rustline wie immer eine Kreatur für sich. Pendler werden gebeten, ihre Routen zu überdenken, am besten durch Core.", "cooldownMin": 40 },
+        { "id": "ad_s9", "type": "news", "host": "vance", "text": "Nullstunde rückt näher. Aegis Phase Zwei wird die Stadt sicherer, effizienter und, so die Umfrage unter Konzernmitarbeitern, deutlich beliebter.", "when": { "flagsNone": ["savedJonas"] }, "cooldownMin": 120 }
+      ],
+      "schedule": [
+        { "from": 0, "to": 24, "show": "Aurelia Direct Live", "host": "vance", "mix": { "music": 3, "news": 4, "talk": 1, "ad": 2, "jingle": 1 } }
+      ]
+    },
+    {
+      "id": "open_line",
+      "name": "Open Line",
+      "frequency": 95.4,
+      "genre": "Talk / Satire",
+      "tagline": "Sagen Sie es laut. Jemand hört immer zu.",
+      "hosts": [
+        { "id": "pia", "name": "Pia Sorensen", "bio": "Moderatorin mit zu guten Quellen. Hat nie bestätigt, woher sie sie hat." },
+        { "id": "gus", "name": "Gus Pellinore", "bio": "Co-Moderator und professioneller Zyniker, liest Hörerpost ohne Gnade vor." }
+      ],
+      "jingles": [
+        "Open Line. Rufen Sie an, wir hören mit. Wir sind nicht die Einzigen.",
+        "Open Line, fünfundneunzig Komma vier. Meinungen, bis die Leitung brennt.",
+        "Sie sind auf Sendung. Und auf Aegis. Aber hier dürfen Sie lachen."
+      ],
+      "tracks": [
+        { "id": "ol_1", "title": "Auflegen, bitte", "artist": "Zwischenruf", "durationSec": 140, "bpm": 116, "key": "Gm", "loop": "radio_open_line_a" },
+        { "id": "ol_2", "title": "Hörerpost im Konjunktiv", "artist": "Zwischenruf", "durationSec": 152, "bpm": 120, "key": "C", "loop": "radio_open_line_b" },
+        { "id": "ol_3", "title": "Konferenzschaltung", "artist": "Die Leitungsstörung", "durationSec": 133, "bpm": 112, "key": "Em", "loop": "radio_open_line_c" },
+        { "id": "ol_4", "title": "Ohne Gewähr", "artist": "Die Leitungsstörung", "durationSec": 147, "bpm": 124, "key": "A", "loop": "radio_open_line_d" }
+      ],
+      "ads": [
+        { "id": "ol_ad1", "sponsor": "Nullwert Bank", "text": "Nullwert Bank: Ihr Konto, unser Vertrauen. Für beides fallen Gebühren an." },
+        { "id": "ol_ad2", "sponsor": "Trusty Drone", "text": "Trusty Drone Lieferservice. Ihr Paket ist in Sichtweite. Sie sind es auch." },
+        { "id": "ol_ad3", "sponsor": "Sicher-Sicher Schlösser", "text": "Sicher-Sicher Schlösser. Gegen alles, außer gegen Aegis." }
+      ],
+      "scripts": [
+        { "id": "ol_s1", "type": "talk", "host": "pia", "text": "Willkommen bei Open Line, es ist {hour} Uhr, und die Leitung ist offen. Wer reden will, redet. Wer schweigen will, wird trotzdem gehört.", "cooldownMin": 60 },
+        { "id": "ol_s2", "type": "talk", "host": "gus", "text": "Anrufer in {district}: Er fährt seit zehn Jahren unfallfrei, weil er seit zehn Jahren nicht fährt. Applaus, wo man ihn hört.", "cooldownMin": 45 },
+        { "id": "ol_s3", "type": "talk", "host": "pia", "text": "Ich habe eine Quelle im Konzern. Sie sagt, Aegis lernt. Ich frage mich nur, ob wir ihm schöne Dinge beibringen.", "cooldownMin": 70 },
+        { "id": "ol_s4", "type": "news", "host": "pia", "text": "Soeben bestätigt: Die Beweise zum Aegis-Ledger sind öffentlich. Ich lese ein paar Auszüge vor. Wenn die Leitung abbricht, wissen Sie, warum.", "when": { "flagsAll": ["leakedLedger"] }, "cooldownMin": 90 },
+        { "id": "ol_s5", "type": "talk", "host": "gus", "text": "Heute kein Unwetter, sagt der Konzern. Draußen sagt der Himmel das Gegenteil. Wem glauben Sie? Wem gehört der Himmel?", "when": { "weather": ["Thunderstorm"] }, "cooldownMin": 40 },
+        { "id": "ol_s6", "type": "talk", "host": "pia", "text": "Hörermeldung: Ein Fahrzeug liefert sich gerade eine Verfolgung durch {district}. Fünf Sterne, sagt die Nachbarin, nur die Sterne am Himmel sind weniger.", "when": { "wantedMin": 4 }, "cooldownMin": 25 },
+        { "id": "ol_s7", "type": "talk", "host": "gus", "text": "Fahndung in {district}, {wanted} Sterne. Der Konzern nennt es Qualitätskontrolle am Menschen.", "when": { "wantedMin": 1, "wantedMax": 3 }, "cooldownMin": 25 },
+        { "id": "ol_s8", "type": "news", "host": "pia", "text": "Jonas Voss gilt nicht mehr als vermisst, sagt eine Quelle. Er sei nur sehr gut versteckt. Ich lasse das so stehen.", "when": { "flagsAll": ["savedJonas"] }, "cooldownMin": 120 },
+        { "id": "ol_s9", "type": "weather", "host": "gus", "text": "Dichter Nebel. Wenigstens sieht Aegis jetzt auch nichts, wir sind im selben Boot.", "when": { "weather": ["SmogFog"] }, "cooldownMin": 40 }
+      ],
+      "schedule": [
+        { "from": 6, "to": 12, "show": "Open Line Frühstück", "host": "gus", "mix": { "music": 2, "talk": 5, "news": 2, "ad": 2, "jingle": 1 } },
+        { "from": 12, "to": 22, "show": "Open Line Live", "host": "pia", "mix": { "music": 2, "talk": 5, "news": 2, "ad": 2, "jingle": 1 } },
+        { "from": 22, "to": 6, "show": "Leitung Offen", "host": "pia", "mix": { "music": 3, "talk": 5, "news": 1, "ad": 1, "jingle": 1 } }
+      ]
+    }
+  ]
+}

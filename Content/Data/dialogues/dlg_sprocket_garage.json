@@ -1,0 +1,33 @@
+{
+  "id": "dlg_sprocket_garage", "npc": "sprocket", "title": "Sprockets Hebebühne", "kind": "trader",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Pssst. Hör mal. Hörst du das? Dein Motor hat Gefühle. Traurige. Was hast du mit ihm gemacht?", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Reparier ihn. Und tuning, wenn du was Gutes hast.", "next": "shop"},
+      {"text": "Ich hab gehört, du hast was gebaut, das Aegis blind macht.", "next": "jammer"},
+      {"text": "Was hört man so in Rustline?", "next": "rumor"},
+      {"text": "Erzähl mir von den Wrenchers.", "next": "wrenchers"},
+      {"text": "Nur vorbeigeschaut.", "next": "bye"}]},
+    "shop": {"type": "trade", "shop": "sprocket_bay", "next": "c1"},
+    "rumor": {"type": "rumor", "who": "@npc", "text": "In Rustline reden die Motoren lauter als die Leute. Aber gut:", "fallback": "Nichts. Nur dass Tess heute wieder Suppe ohne Namen hat.", "next": "c1"},
+    "wrenchers": {"type": "line", "who": "@npc", "text": "Dutch hat uns aus Schrott und Stolz zusammengeschweißt. Wir sind keine Gang, wir sind eine Werkstatt mit Meinungen. Wer schnell ist, gehört dazu. Wer schnell und nett ist, bekommt Kaffee.", "next": "c1"},
+    "jammer": {"type": "check", "cond": {"any": [{"npcTrust": ["@npc", ">=", 2]}, {"standing": ["wrenchers", ">=", 30]}]}, "yes": "jammer_offer", "no": "jammer_test"},
+    "jammer_test": {"type": "line", "who": "@npc", "text": "Gebaut? Ich? Ich baue nur Dinge, die man nicht beweisen kann. Aber gut, zeig mir, dass du fahren kannst. Einmal um den Block, dreißig Sekunden, ohne meine Mülltonnen zu ermorden.", "next": "c_test"},
+    "c_test": {"type": "choice", "options": [
+      {"text": "Gib mir die Schlüssel.", "check": {"skill": "driving", "difficulty": 3, "bonus": [{"when": [{"flag": ["origin", "==", "racer"]}], "value": 1}], "success": "test_ok", "fail": "test_fail"}},
+      {"text": "Ein andermal.", "next": "c1"}]},
+    "test_ok": {"type": "line", "who": "@npc", "text": "Achtundzwanzig Sekunden, und die Tonnen leben. Du fährst wie jemand, der der Straße zuhört. Gut. Dann reden wir.", "effects": [{"npcTrust": ["@npc", 1]}, {"standing": ["wrenchers", 5]}], "next": "jammer_offer"},
+    "test_fail": {"type": "line", "who": "@npc", "text": "Vierzig Sekunden und eine Tonne weniger. Die hieß übrigens Berta. Übung, Freundin, Übung. Komm wieder, wenn du Berta gerächt hast.", "next": "c1"},
+    "jammer_offer": {"type": "line", "who": "@npc", "text": "Vier Sekunden. So lange sieht Aegis dein Kennzeichen nicht. Klingt nach wenig, ist aber genau eine Kreuzung im Core. Dutch will ihn verkaufen. Ich will ihn verschenken. Wir einigen uns gerade.", "next": "c_jam"},
+    "c_jam": {"type": "choice", "options": [
+      {"text": "Ich zahle Dutchs Preis.", "effects": [{"money": -800}, {"flag": ["item.plate_jammer", true]}, {"standing": ["wrenchers", 5]}], "next": "jam_bought"},
+      {"text": "Schenk ihn mir. Gegen Dutch, für die Sache.", "check": {"skill": "persuade", "difficulty": 4, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 2]}], "value": 2}], "success": "jam_gift", "fail": "jam_no"}},
+      {"text": "Zu riskant.", "next": "c1"}]},
+    "jam_bought": {"type": "line", "who": "@npc", "text": "Bezahlt. Dutch lächelt, und das kostet extra. Einbauen dauert eine Nacht.", "next": "c1"},
+    "jam_gift": {"type": "line", "who": "@npc", "text": "Ach, was soll's. Dutch wird schreien, ich werde lächeln, und in einer Woche lachen wir beide. Nimm ihn. Und erzähl keinem, dass ich nett war.", "effects": [{"flag": ["item.plate_jammer", true]}, {"relation": ["@npc", "dutch", "friendship", -5]}], "next": "c1"},
+    "jam_no": {"type": "line", "who": "@npc", "text": "Nein. Ich mag dich, aber Dutch zahlt meine Miete. Und die Miete hat keine Gefühle.", "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Fahr sanft. Motoren erinnern sich.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

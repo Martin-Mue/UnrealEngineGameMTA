@@ -1,0 +1,13014 @@
+{
+ "version": 1,
+ "units": "m",
+ "grid": 0.5,
+ "defaults": {
+  "wallHeight": 3.0,
+  "wallThickness": 0.2,
+  "doorHeight": 2.2,
+  "windowSill": 0.9,
+  "windowTop": 2.2,
+  "slabThickness": 0.2
+ },
+ "districtStyles": {
+  "Core": "corporate",
+  "Saltmarket": "worker",
+  "LanternHill": "bohemian",
+  "Greenmoor": "suburban",
+  "Rustline": "industrial",
+  "Sunstrip": "neon_tourist"
+ },
+ "roomTypes": [
+  {
+   "id": "apartment_small",
+   "label": "Wohnung (klein)",
+   "role": "resident",
+   "activities": [
+    "sleep",
+    "cook",
+    "watch_tv",
+    "wash"
+   ]
+  },
+  {
+   "id": "apartment_large",
+   "label": "Wohnung (gross) / Haus",
+   "role": "resident",
+   "activities": [
+    "sleep",
+    "cook",
+    "watch_tv",
+    "read",
+    "work"
+   ]
+  },
+  {
+   "id": "slum_room",
+   "label": "Slum-Zimmer / Absteige",
+   "role": "resident",
+   "activities": [
+    "sleep",
+    "warm_hands",
+    "smoke",
+    "drink"
+   ]
+  },
+  {
+   "id": "shop_kiosk",
+   "label": "Laden / Kiosk",
+   "role": "shopkeeper",
+   "activities": [
+    "shopkeeper",
+    "browse"
+   ]
+  },
+  {
+   "id": "bar_club",
+   "label": "Bar / Club",
+   "role": "patron",
+   "activities": [
+    "bartender",
+    "drink",
+    "dance",
+    "dj",
+    "play"
+   ]
+  },
+  {
+   "id": "workshop_garage",
+   "label": "Werkstatt / Garage",
+   "role": "worker",
+   "activities": [
+    "repair",
+    "smoke"
+   ]
+  },
+  {
+   "id": "office_lobby",
+   "label": "Buero / Konzernlobby",
+   "role": "worker",
+   "activities": [
+    "reception",
+    "work",
+    "guard",
+    "idle"
+   ]
+  },
+  {
+   "id": "clinic",
+   "label": "Klinik ohne Lizenz",
+   "role": "medic",
+   "activities": [
+    "surgery",
+    "patient",
+    "reception"
+   ]
+  },
+  {
+   "id": "warehouse",
+   "label": "Lagerhalle",
+   "role": "worker",
+   "activities": [
+    "carry",
+    "guard",
+    "work"
+   ]
+  },
+  {
+   "id": "safehouse",
+   "label": "Versteck / Safehouse",
+   "role": "ally",
+   "activities": [
+    "plan",
+    "sleep",
+    "train",
+    "hack"
+   ]
+  },
+  {
+   "id": "diner",
+   "label": "Imbiss",
+   "role": "cook",
+   "activities": [
+    "cook",
+    "eat",
+    "shopkeeper"
+   ]
+  },
+  {
+   "id": "hackerspace",
+   "label": "Hackerspace",
+   "role": "hacker",
+   "activities": [
+    "hack",
+    "repair",
+    "relax"
+   ]
+  },
+  {
+   "id": "community_hall",
+   "label": "Kirche / Gemeinschaftshalle",
+   "role": "member",
+   "activities": [
+    "pray",
+    "preach",
+    "eat"
+   ]
+  },
+  {
+   "id": "police_station",
+   "label": "Polizeiwache (KCG)",
+   "role": "officer",
+   "activities": [
+    "reception",
+    "work",
+    "guard",
+    "prisoner"
+   ]
+  }
+ ],
+ "shops": [
+  {
+   "id": "kiosk_basic",
+   "label": "Eckkiosk",
+   "owner": "npc_kiosk_owner",
+   "open": [
+    6,
+    24
+   ],
+   "category": "food",
+   "wares": [
+    {
+     "item": "water",
+     "label": "Wasser",
+     "price": 3,
+     "stock": 30
+    },
+    {
+     "item": "soda",
+     "label": "Limo",
+     "price": 4,
+     "stock": 30
+    },
+    {
+     "item": "snack_bar",
+     "label": "Riegel",
+     "price": 3,
+     "stock": 40
+    },
+    {
+     "item": "cigarettes",
+     "label": "Zigaretten",
+     "price": 9,
+     "stock": 25
+    },
+    {
+     "item": "newspaper",
+     "label": "Zeitung",
+     "price": 2,
+     "stock": 10
+    },
+    {
+     "item": "phone_card",
+     "label": "Prepaid-Karte",
+     "price": 20,
+     "stock": 8
+    }
+   ]
+  },
+  {
+   "id": "store_247",
+   "label": "24/7-Markt",
+   "owner": "npc_store_clerk",
+   "open": [
+    0,
+    24
+   ],
+   "category": "food",
+   "wares": [
+    {
+     "item": "water",
+     "label": "Wasser",
+     "price": 2,
+     "stock": 50
+    },
+    {
+     "item": "canned_food",
+     "label": "Konserve",
+     "price": 5,
+     "stock": 40
+    },
+    {
+     "item": "medkit_small",
+     "label": "Verbandszeug",
+     "price": 25,
+     "stock": 10
+    },
+    {
+     "item": "energy_drink",
+     "label": "Energydrink",
+     "price": 5,
+     "stock": 30
+    },
+    {
+     "item": "batteries",
+     "label": "Batterien",
+     "price": 6,
+     "stock": 20
+    },
+    {
+     "item": "lighter",
+     "label": "Feuerzeug",
+     "price": 2,
+     "stock": 20
+    }
+   ]
+  },
+  {
+   "id": "boutique_greenmoor",
+   "label": "Boutique Greenmoor",
+   "owner": "npc_boutique_owner",
+   "open": [
+    10,
+    19
+   ],
+   "category": "clothing",
+   "wares": [
+    {
+     "item": "jacket_designer",
+     "label": "Designerjacke",
+     "price": 850,
+     "stock": 4
+    },
+    {
+     "item": "sunglasses",
+     "label": "Sonnenbrille",
+     "price": 220,
+     "stock": 6
+    },
+    {
+     "item": "dress_shoes",
+     "label": "Lederschuhe",
+     "price": 380,
+     "stock": 5
+    },
+    {
+     "item": "scarf_silk",
+     "label": "Seidenschal",
+     "price": 140,
+     "stock": 6
+    }
+   ]
+  },
+  {
+   "id": "records_lantern",
+   "label": "Plattenladen Lantern Hill",
+   "owner": "npc_record_dealer",
+   "open": [
+    11,
+    21
+   ],
+   "category": "media",
+   "wares": [
+    {
+     "item": "vinyl_local",
+     "label": "Platte lokaler Bands",
+     "price": 25,
+     "stock": 12
+    },
+    {
+     "item": "zine",
+     "label": "Untergrund-Zine",
+     "price": 3,
+     "stock": 30
+    },
+    {
+     "item": "radio_mod",
+     "label": "Radio-Umbausatz",
+     "price": 60,
+     "stock": 5
+    },
+    {
+     "item": "poster_rolled",
+     "label": "Plakatrolle",
+     "price": 8,
+     "stock": 20
+    }
+   ]
+  },
+  {
+   "id": "souvenir_sunstrip",
+   "label": "Souvenirladen am Pier",
+   "owner": "npc_souvenir_seller",
+   "open": [
+    9,
+    23
+   ],
+   "category": "clothing",
+   "wares": [
+    {
+     "item": "cap_wheel",
+     "label": "Kappe Kestrel Wheel",
+     "price": 18,
+     "stock": 20
+    },
+    {
+     "item": "shirt_beach",
+     "label": "Strandhemd",
+     "price": 35,
+     "stock": 15
+    },
+    {
+     "item": "sunscreen",
+     "label": "Sonnencreme",
+     "price": 12,
+     "stock": 25
+    },
+    {
+     "item": "keychain",
+     "label": "Schluesselanhaenger",
+     "price": 5,
+     "stock": 50
+    }
+   ]
+  },
+  {
+   "id": "bar_drinks",
+   "label": "Getraenkekarte",
+   "owner": "npc_bartender",
+   "open": [
+    18,
+    4
+   ],
+   "category": "drink",
+   "wares": [
+    {
+     "item": "beer",
+     "label": "Bier",
+     "price": 5,
+     "stock": 99
+    },
+    {
+     "item": "whisky",
+     "label": "Whisky",
+     "price": 12,
+     "stock": 40
+    },
+    {
+     "item": "cocktail_neon",
+     "label": "Neon-Cocktail",
+     "price": 14,
+     "stock": 40
+    },
+    {
+     "item": "water",
+     "label": "Wasser",
+     "price": 2,
+     "stock": 99
+    }
+   ]
+  },
+  {
+   "id": "diner_menu",
+   "label": "Imbisskarte",
+   "owner": "npc_diner_cook",
+   "open": [
+    6,
+    2
+   ],
+   "category": "food",
+   "wares": [
+    {
+     "item": "burger",
+     "label": "Burger",
+     "price": 8,
+     "stock": 99
+    },
+    {
+     "item": "fries",
+     "label": "Pommes",
+     "price": 4,
+     "stock": 99
+    },
+    {
+     "item": "noodles",
+     "label": "Nudelsuppe",
+     "price": 7,
+     "stock": 99
+    },
+    {
+     "item": "fish_roll",
+     "label": "Fischbroetchen",
+     "price": 6,
+     "stock": 60
+    },
+    {
+     "item": "coffee",
+     "label": "Kaffee",
+     "price": 3,
+     "stock": 99
+    }
+   ]
+  },
+  {
+   "id": "garage_parts",
+   "label": "Teiletheke",
+   "owner": "npc_mechanic",
+   "open": [
+    8,
+    20
+   ],
+   "category": "vehicle",
+   "wares": [
+    {
+     "item": "repair_kit",
+     "label": "Reparaturset",
+     "price": 120,
+     "stock": 10
+    },
+    {
+     "item": "tires_sport",
+     "label": "Sportreifen",
+     "price": 480,
+     "stock": 4
+    },
+    {
+     "item": "nitro_can",
+     "label": "Lachgasflasche",
+     "price": 300,
+     "stock": 3
+    },
+    {
+     "item": "plate_fake",
+     "label": "Gefaelschtes Kennzeichen",
+     "price": 900,
+     "stock": 2
+    }
+   ]
+  },
+  {
+   "id": "clinic_meds",
+   "label": "Hinterzimmer-Apotheke",
+   "owner": "npc_street_doc",
+   "open": [
+    0,
+    24
+   ],
+   "category": "medical",
+   "wares": [
+    {
+     "item": "medkit",
+     "label": "Medkit",
+     "price": 60,
+     "stock": 10
+    },
+    {
+     "item": "painkillers",
+     "label": "Schmerzmittel",
+     "price": 20,
+     "stock": 20
+    },
+    {
+     "item": "stim",
+     "label": "Stimulans",
+     "price": 75,
+     "stock": 6
+    },
+    {
+     "item": "implant_cleanup",
+     "label": "Implantat-Reinigung",
+     "price": 400,
+     "stock": 2
+    }
+   ]
+  },
+  {
+   "id": "hacker_gear",
+   "label": "Hardware-Tausch",
+   "owner": "npc_hacker_trader",
+   "open": [
+    14,
+    4
+   ],
+   "category": "electronics",
+   "wares": [
+    {
+     "item": "jammer",
+     "label": "Kamera-Stoersender",
+     "price": 650,
+     "stock": 3
+    },
+    {
+     "item": "burner_phone",
+     "label": "Wegwerfhandy",
+     "price": 40,
+     "stock": 10
+    },
+    {
+     "item": "deck_upgrade",
+     "label": "Hackdeck-Upgrade",
+     "price": 1200,
+     "stock": 2
+    },
+    {
+     "item": "cable_kit",
+     "label": "Kabelset",
+     "price": 15,
+     "stock": 20
+    }
+   ]
+  }
+ ],
+ "templates": [
+  {
+   "id": "core_microflat",
+   "roomType": "apartment_small",
+   "label": "Mikroappartement im Wohnturm",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    7,
+    9
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.8,
+     "rooms": [
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        7.0,
+        5.0
+       ]
+      },
+      {
+       "id": "bed",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        5.0,
+        4.0,
+        4.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        4.0,
+        5.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "living",
+        "bed"
+       ],
+       "at": [
+        1.0,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "bath"
+       ],
+       "at": [
+        5.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        1.5,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "living",
+       "at": [
+        7.0,
+        2.5
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "core_microflat_cache",
+     "floor": 0,
+     "room": "living",
+     "at": [
+      5.5,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "living",
+     "at": [
+      3.5,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_penthouse",
+   "roomType": "apartment_large",
+   "label": "Penthouse mit Dachterrassen-Zugang",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    16,
+    18
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "hall",
+       "rect": [
+        6.5,
+        0.0,
+        3.0,
+        18.0
+       ]
+      },
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        6.5,
+        9.0
+       ]
+      },
+      {
+       "id": "dining",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        9.0,
+        6.5,
+        9.0
+       ]
+      },
+      {
+       "id": "study",
+       "kind": "office",
+       "rect": [
+        9.5,
+        0.0,
+        6.5,
+        9.0
+       ]
+      },
+      {
+       "id": "bath0",
+       "kind": "bath",
+       "rect": [
+        9.5,
+        9.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "utility",
+       "kind": "storage",
+       "rect": [
+        9.5,
+        13.0,
+        6.5,
+        5.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "living"
+       ],
+       "at": [
+        6.5,
+        4.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "dining"
+       ],
+       "at": [
+        6.5,
+        13.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "study"
+       ],
+       "at": [
+        9.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "bath0"
+       ],
+       "at": [
+        9.5,
+        11.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "utility"
+       ],
+       "at": [
+        9.5,
+        15.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "dining"
+       ],
+       "at": [
+        3.0,
+        9.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        18.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "living",
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        13.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        16.0,
+        4.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        13.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "hall",
+       "rect": [
+        7.0,
+        10.0,
+        2.0,
+        4.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 2.9,
+     "rooms": [
+      {
+       "id": "upper_hall",
+       "kind": "hall",
+       "rect": [
+        6.5,
+        0.0,
+        3.0,
+        18.0
+       ]
+      },
+      {
+       "id": "master",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        0.0,
+        6.5,
+        9.0
+       ]
+      },
+      {
+       "id": "child",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        9.0,
+        6.5,
+        9.0
+       ]
+      },
+      {
+       "id": "bath1",
+       "kind": "bath",
+       "rect": [
+        9.5,
+        0.0,
+        6.5,
+        6.5
+       ]
+      },
+      {
+       "id": "guest",
+       "kind": "bedroom",
+       "rect": [
+        9.5,
+        6.5,
+        6.5,
+        11.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_hall",
+        "master"
+       ],
+       "at": [
+        6.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "child"
+       ],
+       "at": [
+        6.5,
+        13.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "bath1"
+       ],
+       "at": [
+        9.5,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "guest"
+       ],
+       "at": [
+        9.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        18.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "master",
+       "at": [
+        0.0,
+        4.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "child",
+       "at": [
+        0.0,
+        13.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "guest",
+       "at": [
+        16.0,
+        12.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bath1",
+       "at": [
+        13.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 2
+   },
+   "interactives": [
+    {
+     "kind": "terminal",
+     "floor": 0,
+     "room": "study",
+     "at": [
+      12.0,
+      4.0
+     ],
+     "rot": 180,
+     "id": "penthouse_pc",
+     "hack": 3,
+     "links": "core_penthouse_safe"
+    }
+   ],
+   "secrets": [
+    {
+     "id": "core_penthouse_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      9.0,
+      14.5
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "core_penthouse_safe",
+     "floor": 0,
+     "room": "study",
+     "at": [
+      13.0,
+      2.0
+     ],
+     "kind": "stash",
+     "hidden": true,
+     "hint": "terminal"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      8.0,
+      9.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_aurelia_lobby",
+   "roomType": "office_lobby",
+   "label": "Aurelia-Holdings-Lobby",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    26,
+    22
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.0,
+     "rooms": [
+      {
+       "id": "lobby",
+       "kind": "lobby",
+       "rect": [
+        0.0,
+        0.0,
+        15.5,
+        13.0
+       ]
+      },
+      {
+       "id": "security",
+       "kind": "booking",
+       "rect": [
+        15.5,
+        0.0,
+        10.5,
+        9.0
+       ]
+      },
+      {
+       "id": "core",
+       "kind": "hall",
+       "rect": [
+        15.5,
+        9.0,
+        10.5,
+        13.0
+       ]
+      },
+      {
+       "id": "meeting",
+       "kind": "meeting",
+       "rect": [
+        0.0,
+        13.0,
+        8.0,
+        9.0
+       ]
+      },
+      {
+       "id": "lounge",
+       "kind": "lounge",
+       "rect": [
+        8.0,
+        13.0,
+        7.5,
+        9.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "lobby",
+        "security"
+       ],
+       "at": [
+        15.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "core"
+       ],
+       "at": [
+        15.5,
+        11.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "meeting"
+       ],
+       "at": [
+        4.0,
+        13.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "lounge"
+       ],
+       "at": [
+        12.0,
+        13.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "core",
+        "lounge"
+       ],
+       "at": [
+        15.5,
+        17.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 3.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "core",
+        "outside"
+       ],
+       "at": [
+        26.0,
+        19.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "lobby",
+       "at": [
+        13.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "lobby",
+       "at": [
+        0.0,
+        6.5
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "meeting",
+       "at": [
+        0.0,
+        17.5
+       ],
+       "width": 2.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "core",
+       "rect": [
+        16.0,
+        9.5,
+        2.0,
+        4.5
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 3.4,
+     "rooms": [
+      {
+       "id": "upper_core",
+       "kind": "hall",
+       "rect": [
+        15.5,
+        0.0,
+        10.5,
+        22.0
+       ]
+      },
+      {
+       "id": "open",
+       "kind": "openoffice",
+       "rect": [
+        0.0,
+        0.0,
+        15.5,
+        13.0
+       ]
+      },
+      {
+       "id": "exec",
+       "kind": "office",
+       "rect": [
+        0.0,
+        13.0,
+        9.5,
+        9.0
+       ]
+      },
+      {
+       "id": "server",
+       "kind": "server",
+       "rect": [
+        9.5,
+        13.0,
+        6.0,
+        9.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_core",
+        "open"
+       ],
+       "at": [
+        15.5,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "open",
+        "exec"
+       ],
+       "at": [
+        5.0,
+        13.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_core",
+        "server"
+       ],
+       "at": [
+        15.5,
+        20.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_server",
+        "hack": 3
+       }
+      },
+      {
+       "rooms": [
+        "upper_core",
+        "outside"
+       ],
+       "at": [
+        21.0,
+        22.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "open",
+       "at": [
+        0.0,
+        6.5
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "open",
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "exec",
+       "at": [
+        0.0,
+        17.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     7,
+     20
+    ],
+    "faction": "aurelia",
+    "minStanding": -20,
+    "hack": 3
+   },
+   "secrets": [
+    {
+     "id": "core_aurelia_lobby_cache",
+     "floor": 0,
+     "room": "lobby",
+     "at": [
+      12.5,
+      10.5
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "core_aurelia_memo",
+     "floor": 1,
+     "room": "server",
+     "at": [
+      15.0,
+      18.0
+     ],
+     "kind": "note"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "lobby",
+     "at": [
+      8.0,
+      6.5
+     ],
+     "rot": 0,
+     "activity": "reception",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_office_annex",
+   "roomType": "office_lobby",
+   "label": "Verwaltungsnebengebaeude",
+   "districts": [
+    "Core",
+    "Saltmarket"
+   ],
+   "footprint": [
+    20,
+    18
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.0,
+     "rooms": [
+      {
+       "id": "lobby",
+       "kind": "lobby",
+       "rect": [
+        0.0,
+        0.0,
+        12.0,
+        11.0
+       ]
+      },
+      {
+       "id": "security",
+       "kind": "booking",
+       "rect": [
+        12.0,
+        0.0,
+        8.0,
+        7.0
+       ]
+      },
+      {
+       "id": "core",
+       "kind": "hall",
+       "rect": [
+        12.0,
+        7.0,
+        8.0,
+        11.0
+       ]
+      },
+      {
+       "id": "meeting",
+       "kind": "meeting",
+       "rect": [
+        0.0,
+        11.0,
+        6.0,
+        7.0
+       ]
+      },
+      {
+       "id": "lounge",
+       "kind": "lounge",
+       "rect": [
+        6.0,
+        11.0,
+        6.0,
+        7.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "lobby",
+        "security"
+       ],
+       "at": [
+        12.0,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "core"
+       ],
+       "at": [
+        12.0,
+        9.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "meeting"
+       ],
+       "at": [
+        3.0,
+        11.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "lounge"
+       ],
+       "at": [
+        9.0,
+        11.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "core",
+        "lounge"
+       ],
+       "at": [
+        12.0,
+        14.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "outside"
+       ],
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 3.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "core",
+        "outside"
+       ],
+       "at": [
+        20.0,
+        16.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "lobby",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "lobby",
+       "at": [
+        0.0,
+        5.5
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "meeting",
+       "at": [
+        0.0,
+        14.5
+       ],
+       "width": 2.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "core",
+       "rect": [
+        12.5,
+        7.5,
+        2.0,
+        4.5
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 3.4,
+     "rooms": [
+      {
+       "id": "upper_core",
+       "kind": "hall",
+       "rect": [
+        12.0,
+        0.0,
+        8.0,
+        18.0
+       ]
+      },
+      {
+       "id": "open",
+       "kind": "openoffice",
+       "rect": [
+        0.0,
+        0.0,
+        12.0,
+        11.0
+       ]
+      },
+      {
+       "id": "exec",
+       "kind": "office",
+       "rect": [
+        0.0,
+        11.0,
+        7.0,
+        7.0
+       ]
+      },
+      {
+       "id": "server",
+       "kind": "server",
+       "rect": [
+        7.0,
+        11.0,
+        5.0,
+        7.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_core",
+        "open"
+       ],
+       "at": [
+        12.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "open",
+        "exec"
+       ],
+       "at": [
+        3.5,
+        11.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_core",
+        "server"
+       ],
+       "at": [
+        12.0,
+        16.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_server",
+        "hack": 3
+       }
+      },
+      {
+       "rooms": [
+        "upper_core",
+        "outside"
+       ],
+       "at": [
+        16.0,
+        18.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "open",
+       "at": [
+        0.0,
+        5.5
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "open",
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "exec",
+       "at": [
+        0.0,
+        14.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "style": "corporate",
+   "access": {
+    "open": [
+     7,
+     20
+    ],
+    "faction": "aurelia",
+    "minStanding": -20,
+    "hack": 3
+   },
+   "secrets": [
+    {
+     "id": "core_office_annex_cache",
+     "floor": 0,
+     "room": "lobby",
+     "at": [
+      9.5,
+      9.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "lobby",
+     "at": [
+      6.0,
+      5.5
+     ],
+     "rot": 0,
+     "activity": "reception",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_backroom_clinic",
+   "roomType": "clinic",
+   "label": "Kellerklinik unter dem Finanzviertel",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    14,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "waiting",
+       "kind": "waiting",
+       "rect": [
+        0.0,
+        0.0,
+        8.5,
+        5.5
+       ]
+      },
+      {
+       "id": "reception",
+       "kind": "counter",
+       "rect": [
+        8.5,
+        0.0,
+        5.5,
+        5.5
+       ]
+      },
+      {
+       "id": "corr",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        5.5,
+        14.0,
+        2.0
+       ]
+      },
+      {
+       "id": "surgery",
+       "kind": "surgery",
+       "rect": [
+        0.0,
+        7.5,
+        5.5,
+        6.5
+       ]
+      },
+      {
+       "id": "ward",
+       "kind": "ward",
+       "rect": [
+        5.5,
+        7.5,
+        5.0,
+        6.5
+       ]
+      },
+      {
+       "id": "meds",
+       "kind": "storage",
+       "rect": [
+        10.5,
+        7.5,
+        3.5,
+        6.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "waiting",
+        "reception"
+       ],
+       "at": [
+        8.5,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "waiting",
+        "corr"
+       ],
+       "at": [
+        4.0,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "surgery"
+       ],
+       "at": [
+        3.0,
+        7.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "ward"
+       ],
+       "at": [
+        8.0,
+        7.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "meds"
+       ],
+       "at": [
+        12.0,
+        7.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_meds",
+        "hack": 2
+       }
+      },
+      {
+       "rooms": [
+        "waiting",
+        "outside"
+       ],
+       "at": [
+        3.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corr",
+        "outside"
+       ],
+       "at": [
+        14.0,
+        6.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "waiting",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "ward",
+       "at": [
+        8.0,
+        14.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "clinic_meds",
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "collective",
+    "minStanding": -40
+   },
+   "secrets": [
+    {
+     "id": "core_backroom_clinic_cache",
+     "floor": 0,
+     "room": "waiting",
+     "at": [
+      7.0,
+      4.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "waiting",
+     "at": [
+      4.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "surgery",
+     "role": "medic",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_kcg_precinct",
+   "roomType": "police_station",
+   "label": "KCG-Revier Core",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    22,
+    16
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "front",
+       "kind": "booking",
+       "rect": [
+        0.0,
+        0.0,
+        22.0,
+        5.5
+       ]
+      },
+      {
+       "id": "corr",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        5.5,
+        22.0,
+        2.0
+       ]
+      },
+      {
+       "id": "brief",
+       "kind": "briefing",
+       "rect": [
+        0.0,
+        7.5,
+        9.0,
+        8.5
+       ]
+      },
+      {
+       "id": "evidence",
+       "kind": "evidence",
+       "rect": [
+        9.0,
+        7.5,
+        4.5,
+        8.5
+       ]
+      },
+      {
+       "id": "cell0",
+       "kind": "cell",
+       "rect": [
+        13.5,
+        7.5,
+        3.0,
+        8.5
+       ]
+      },
+      {
+       "id": "cell1",
+       "kind": "cell",
+       "rect": [
+        16.5,
+        7.5,
+        3.0,
+        8.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "corr",
+        "cell0"
+       ],
+       "at": [
+        15.0,
+        7.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_cells",
+        "hack": 3
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "corr",
+        "cell1"
+       ],
+       "at": [
+        18.0,
+        7.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_cells",
+        "hack": 3
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "front",
+        "corr"
+       ],
+       "at": [
+        6.5,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "brief"
+       ],
+       "at": [
+        4.5,
+        7.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "evidence"
+       ],
+       "at": [
+        11.0,
+        7.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_evidence",
+        "hack": 4
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "front",
+        "outside"
+       ],
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corr",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        6.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "front",
+       "at": [
+        3.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "brief",
+       "at": [
+        0.0,
+        12.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "kcg",
+    "minStanding": -10,
+    "hack": 4
+   },
+   "secrets": [
+    {
+     "id": "core_kcg_precinct_cache",
+     "floor": 0,
+     "room": "front",
+     "at": [
+      17.5,
+      4.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "front",
+     "at": [
+      11.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "reception",
+     "role": "officer",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_noodle_bar",
+   "roomType": "diner",
+   "label": "Nudelbar im Pendlertunnel",
+   "districts": [
+    "Core",
+    "Sunstrip"
+   ],
+   "footprint": [
+    12,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "dining",
+       "kind": "dining",
+       "rect": [
+        0.0,
+        0.0,
+        12.0,
+        6.0
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen_pro",
+       "rect": [
+        0.0,
+        6.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.5,
+        6.0,
+        2.5,
+        4.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        9.0,
+        6.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "dining",
+        "kitchen"
+       ],
+       "at": [
+        3.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "wc"
+       ],
+       "at": [
+        8.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "store"
+       ],
+       "at": [
+        10.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        10.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "dining",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "diner_menu",
+   "access": {
+    "open": [
+     6,
+     2
+    ]
+   },
+   "secrets": [
+    {
+     "id": "core_noodle_bar_cache",
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      9.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      6.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "cook",
+     "role": "cook",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_store_247",
+   "roomType": "shop_kiosk",
+   "label": "24/7-Markt am Tower",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    12,
+    12
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "floor",
+       "kind": "shopfloor",
+       "rect": [
+        4.0,
+        0.0,
+        8.0,
+        8.0
+       ]
+      },
+      {
+       "id": "till",
+       "kind": "counter",
+       "rect": [
+        0.0,
+        0.0,
+        4.0,
+        8.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        0.0,
+        8.0,
+        7.0,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        7.0,
+        8.0,
+        5.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "floor",
+        "till"
+       ],
+       "at": [
+        4.0,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "till",
+        "store"
+       ],
+       "at": [
+        2.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "store",
+        "wc"
+       ],
+       "at": [
+        7.0,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "floor",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "store",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        12.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "floor",
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "floor",
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "store_247",
+   "access": {
+    "open": [
+     7,
+     23
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "core_store_247_cache",
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      10.5,
+      6.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      8.0,
+      4.0
+     ],
+     "rot": 0,
+     "activity": "shopkeeper",
+     "role": "shopkeeper",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_sky_lounge",
+   "roomType": "bar_club",
+   "label": "Sky Lounge",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    20,
+    16
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "bar",
+       "kind": "bar",
+       "rect": [
+        0.0,
+        0.0,
+        20.0,
+        9.0
+       ]
+      },
+      {
+       "id": "floor2",
+       "kind": "lounge",
+       "rect": [
+        0.0,
+        9.0,
+        11.0,
+        7.0
+       ]
+      },
+      {
+       "id": "backhall",
+       "kind": "hall",
+       "rect": [
+        11.0,
+        9.0,
+        2.0,
+        7.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        13.0,
+        9.0,
+        7.0,
+        3.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        13.0,
+        12.0,
+        7.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "bar",
+        "floor2"
+       ],
+       "at": [
+        5.5,
+        9.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "backhall"
+       ],
+       "at": [
+        12.0,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "wc"
+       ],
+       "at": [
+        13.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "office"
+       ],
+       "at": [
+        13.0,
+        14.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "backhall",
+        "outside"
+       ],
+       "at": [
+        12.0,
+        16.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      },
+      {
+       "rooms": [
+        "floor2",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        12.5
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "bar",
+       "at": [
+        15.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bar",
+       "at": [
+        0.0,
+        4.5
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "bar_drinks",
+   "access": {
+    "open": [
+     18,
+     4
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "core_sky_lounge_cache",
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      16.0,
+      7.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      10.0,
+      4.5
+     ],
+     "rot": 0,
+     "activity": "bartender",
+     "role": "patron",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "core_capsule_safehouse",
+   "roomType": "safehouse",
+   "label": "Kapsel-Versteck im Parkhaus",
+   "districts": [
+    "Core"
+   ],
+   "footprint": [
+    9,
+    9
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.7,
+     "rooms": [
+      {
+       "id": "entry",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        0.0,
+        5.0,
+        2.5
+       ]
+      },
+      {
+       "id": "main",
+       "kind": "safe",
+       "rect": [
+        0.0,
+        2.5,
+        5.0,
+        6.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        5.0,
+        0.0,
+        4.0,
+        3.5
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.0,
+        3.5,
+        4.0,
+        2.0
+       ]
+      },
+      {
+       "id": "vault",
+       "kind": "evidence",
+       "rect": [
+        5.0,
+        5.5,
+        4.0,
+        3.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "entry",
+        "main"
+       ],
+       "at": [
+        2.5,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "entry",
+        "kitchen"
+       ],
+       "at": [
+        5.0,
+        1.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "bath"
+       ],
+       "at": [
+        5.0,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "vault"
+       ],
+       "at": [
+        5.0,
+        7.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_safehouse"
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "entry",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vault",
+        "outside"
+       ],
+       "at": [
+        9.0,
+        7.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "main",
+       "at": [
+        0.0,
+        6.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_safehouse"
+   },
+   "secrets": [
+    {
+     "id": "core_capsule_safehouse_cache",
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      4.0,
+      2.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      2.5,
+      1.0
+     ],
+     "rot": 0,
+     "activity": "plan",
+     "role": "ally",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_worker_flat",
+   "roomType": "apartment_small",
+   "label": "Arbeiterwohnung am Kai",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    8,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.8,
+     "rooms": [
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        5.0,
+        5.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        5.0,
+        0.0,
+        3.0,
+        5.5
+       ]
+      },
+      {
+       "id": "bed",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        5.5,
+        5.0,
+        4.5
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.0,
+        5.5,
+        3.0,
+        4.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "living",
+        "kitchen"
+       ],
+       "at": [
+        5.0,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "bed"
+       ],
+       "at": [
+        2.0,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "bath"
+       ],
+       "at": [
+        6.5,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        3.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        0.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        2.5,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "kitchen",
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "salt_worker_flat_cache",
+     "floor": 0,
+     "room": "living",
+     "at": [
+      4.0,
+      4.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "living",
+     "at": [
+      2.5,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_family_house",
+   "roomType": "apartment_large",
+   "label": "Hafenarbeiter-Reihenhaus",
+   "districts": [
+    "Saltmarket",
+    "LanternHill"
+   ],
+   "footprint": [
+    13,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "hall",
+       "rect": [
+        5.0,
+        0.0,
+        3.0,
+        14.0
+       ]
+      },
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        5.0,
+        7.0
+       ]
+      },
+      {
+       "id": "dining",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        7.0,
+        5.0,
+        7.0
+       ]
+      },
+      {
+       "id": "study",
+       "kind": "office",
+       "rect": [
+        8.0,
+        0.0,
+        5.0,
+        7.0
+       ]
+      },
+      {
+       "id": "bath0",
+       "kind": "bath",
+       "rect": [
+        8.0,
+        7.0,
+        5.0,
+        3.0
+       ]
+      },
+      {
+       "id": "utility",
+       "kind": "storage",
+       "rect": [
+        8.0,
+        10.0,
+        5.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "living"
+       ],
+       "at": [
+        5.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "dining"
+       ],
+       "at": [
+        5.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "study"
+       ],
+       "at": [
+        8.0,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "bath0"
+       ],
+       "at": [
+        8.0,
+        8.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "utility"
+       ],
+       "at": [
+        8.0,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "dining"
+       ],
+       "at": [
+        2.5,
+        7.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "living",
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        13.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        10.5,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "hall",
+       "rect": [
+        5.5,
+        7.5,
+        2.0,
+        4.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 2.9,
+     "rooms": [
+      {
+       "id": "upper_hall",
+       "kind": "hall",
+       "rect": [
+        5.0,
+        0.0,
+        3.0,
+        14.0
+       ]
+      },
+      {
+       "id": "master",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        0.0,
+        5.0,
+        7.0
+       ]
+      },
+      {
+       "id": "child",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        7.0,
+        5.0,
+        7.0
+       ]
+      },
+      {
+       "id": "bath1",
+       "kind": "bath",
+       "rect": [
+        8.0,
+        0.0,
+        5.0,
+        5.0
+       ]
+      },
+      {
+       "id": "guest",
+       "kind": "bedroom",
+       "rect": [
+        8.0,
+        5.0,
+        5.0,
+        9.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_hall",
+        "master"
+       ],
+       "at": [
+        5.0,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "child"
+       ],
+       "at": [
+        5.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "bath1"
+       ],
+       "at": [
+        8.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "guest"
+       ],
+       "at": [
+        8.0,
+        9.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "outside"
+       ],
+       "at": [
+        6.5,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "master",
+       "at": [
+        0.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "child",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "guest",
+       "at": [
+        13.0,
+        9.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bath1",
+       "at": [
+        10.5,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "salt_family_house_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      7.5,
+      11.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      6.5,
+      7.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_dock_bunks",
+   "roomType": "slum_room",
+   "label": "Schlafbaracke der Tageloehner",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    14,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.6,
+     "rooms": [
+      {
+       "id": "corridor",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        4.0,
+        14.0,
+        2.0
+       ]
+      },
+      {
+       "id": "cell0",
+       "kind": "slum",
+       "rect": [
+        0.0,
+        0.0,
+        3.5,
+        4.0
+       ]
+      },
+      {
+       "id": "cell1",
+       "kind": "slum",
+       "rect": [
+        3.5,
+        0.0,
+        3.5,
+        4.0
+       ]
+      },
+      {
+       "id": "cell2",
+       "kind": "slum",
+       "rect": [
+        7.0,
+        0.0,
+        3.5,
+        4.0
+       ]
+      },
+      {
+       "id": "cell3",
+       "kind": "slum",
+       "rect": [
+        10.5,
+        0.0,
+        3.5,
+        4.0
+       ]
+      },
+      {
+       "id": "common",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        6.0,
+        8.5,
+        4.0
+       ]
+      },
+      {
+       "id": "wash",
+       "kind": "bath",
+       "rect": [
+        8.5,
+        6.0,
+        5.5,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "corridor",
+        "cell0"
+       ],
+       "at": [
+        2.0,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell1"
+       ],
+       "at": [
+        5.0,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell2"
+       ],
+       "at": [
+        9.0,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell3"
+       ],
+       "at": [
+        12.0,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "common"
+       ],
+       "at": [
+        4.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "wash"
+       ],
+       "at": [
+        11.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        5.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corridor",
+        "outside"
+       ],
+       "at": [
+        14.0,
+        5.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "cell0",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell1",
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell2",
+       "at": [
+        9.0,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell3",
+       "at": [
+        12.0,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "common",
+       "at": [
+        4.0,
+        10.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     0,
+     24
+    ]
+   },
+   "secrets": [
+    {
+     "id": "salt_dock_bunks_cache",
+     "floor": 0,
+     "room": "corridor",
+     "at": [
+      11.0,
+      5.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "corridor",
+     "at": [
+      7.0,
+      5.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_dock_warehouse",
+   "roomType": "warehouse",
+   "label": "Docklager 7",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    28,
+    24
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 6.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "warehouse",
+       "rect": [
+        0.0,
+        0.0,
+        21.0,
+        24.0
+       ]
+      },
+      {
+       "id": "dock",
+       "kind": "garage",
+       "rect": [
+        21.0,
+        0.0,
+        7.0,
+        13.0
+       ]
+      },
+      {
+       "id": "stairs",
+       "kind": "stair",
+       "rect": [
+        21.0,
+        13.0,
+        7.0,
+        11.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "dock"
+       ],
+       "at": [
+        21.0,
+        6.5
+       ],
+       "width": 3.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "stairs"
+       ],
+       "at": [
+        21.0,
+        18.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dock",
+        "outside"
+       ],
+       "at": [
+        24.5,
+        0.0
+       ],
+       "width": 4.0,
+       "entrance": "garage",
+       "vehicles": true
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        4.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        10.5,
+        24.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [],
+     "stairs": [
+      {
+       "room": "stairs",
+       "rect": [
+        21.5,
+        13.5,
+        2.0,
+        5.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "landing",
+       "kind": "stair",
+       "rect": [
+        21.0,
+        13.0,
+        7.0,
+        11.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        21.0,
+        0.0,
+        7.0,
+        13.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "landing",
+        "office"
+       ],
+       "at": [
+        24.5,
+        13.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "landing",
+        "outside"
+       ],
+       "at": [
+        28.0,
+        18.5
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "office",
+       "at": [
+        28.0,
+        6.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "office",
+       "at": [
+        21.0,
+        6.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     6,
+     22
+    ],
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "salt_dock_warehouse_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      17.0,
+      19.0
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "salt_dock_manifest",
+     "floor": 1,
+     "room": "office",
+     "at": [
+      25.0,
+      4.0
+     ],
+     "kind": "note"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      10.5,
+      12.0
+     ],
+     "rot": 0,
+     "activity": "carry",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_dock_bar",
+   "roomType": "bar_club",
+   "label": "Kneipe Zum Ankerkettenriss",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    16,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "bar",
+       "kind": "bar",
+       "rect": [
+        0.0,
+        0.0,
+        16.0,
+        7.5
+       ]
+      },
+      {
+       "id": "floor2",
+       "kind": "lounge",
+       "rect": [
+        0.0,
+        7.5,
+        9.0,
+        6.5
+       ]
+      },
+      {
+       "id": "backhall",
+       "kind": "hall",
+       "rect": [
+        9.0,
+        7.5,
+        2.0,
+        6.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        11.0,
+        7.5,
+        5.0,
+        2.5
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        11.0,
+        10.0,
+        5.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "bar",
+        "floor2"
+       ],
+       "at": [
+        4.5,
+        7.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "backhall"
+       ],
+       "at": [
+        10.0,
+        7.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "wc"
+       ],
+       "at": [
+        11.0,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "office"
+       ],
+       "at": [
+        11.0,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "outside"
+       ],
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "backhall",
+        "outside"
+       ],
+       "at": [
+        10.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      },
+      {
+       "rooms": [
+        "floor2",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        11.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "bar",
+       "at": [
+        12.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bar",
+       "at": [
+        0.0,
+        4.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "bar_drinks",
+   "access": {
+    "open": [
+     18,
+     4
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "salt_dock_bar_cache",
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      13.0,
+      6.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      8.0,
+      4.0
+     ],
+     "rot": 0,
+     "activity": "bartender",
+     "role": "patron",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_fish_imbiss",
+   "roomType": "diner",
+   "label": "Fischimbiss am Markt",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    10,
+    9
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "dining",
+       "kind": "dining",
+       "rect": [
+        0.0,
+        0.0,
+        10.0,
+        5.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen_pro",
+       "rect": [
+        0.0,
+        5.5,
+        5.5,
+        3.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        5.5,
+        5.5,
+        2.0,
+        3.5
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        7.5,
+        5.5,
+        2.5,
+        3.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "dining",
+        "kitchen"
+       ],
+       "at": [
+        3.0,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "wc"
+       ],
+       "at": [
+        6.5,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "store"
+       ],
+       "at": [
+        9.0,
+        5.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        9.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "dining",
+       "at": [
+        1.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        8.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "diner_menu",
+   "access": {
+    "open": [
+     6,
+     2
+    ]
+   },
+   "secrets": [
+    {
+     "id": "salt_fish_imbiss_cache",
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      8.0,
+      4.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      5.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "cook",
+     "role": "cook",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_kiosk",
+   "roomType": "shop_kiosk",
+   "label": "Hafenkiosk",
+   "districts": [
+    "Saltmarket",
+    "Rustline"
+   ],
+   "footprint": [
+    9,
+    8
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "floor",
+       "kind": "shopfloor",
+       "rect": [
+        3.0,
+        0.0,
+        6.0,
+        5.0
+       ]
+      },
+      {
+       "id": "till",
+       "kind": "counter",
+       "rect": [
+        0.0,
+        0.0,
+        3.0,
+        5.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        0.0,
+        5.0,
+        5.5,
+        3.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        5.5,
+        5.0,
+        3.5,
+        3.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "floor",
+        "till"
+       ],
+       "at": [
+        3.0,
+        2.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "till",
+        "store"
+       ],
+       "at": [
+        1.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "store",
+        "wc"
+       ],
+       "at": [
+        5.5,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "floor",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "store",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        8.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "floor",
+       "at": [
+        4.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "floor",
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "kiosk_basic",
+   "access": {
+    "open": [
+     7,
+     23
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "salt_kiosk_cache",
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      8.0,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      6.0,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "shopkeeper",
+     "role": "shopkeeper",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_union_hall",
+   "roomType": "community_hall",
+   "label": "Gewerkschaftshalle der Dockers' Union",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    20,
+    16
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.0,
+     "rooms": [
+      {
+       "id": "nave",
+       "kind": "community",
+       "rect": [
+        0.0,
+        0.0,
+        14.5,
+        16.0
+       ]
+      },
+      {
+       "id": "vestry",
+       "kind": "office",
+       "rect": [
+        14.5,
+        0.0,
+        5.5,
+        5.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        14.5,
+        5.5,
+        5.5,
+        5.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        14.5,
+        11.0,
+        5.5,
+        5.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "nave",
+        "vestry"
+       ],
+       "at": [
+        14.5,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "nave",
+        "kitchen"
+       ],
+       "at": [
+        14.5,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "wc"
+       ],
+       "at": [
+        17.0,
+        11.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "nave",
+        "outside"
+       ],
+       "at": [
+        7.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vestry",
+        "outside"
+       ],
+       "at": [
+        20.0,
+        3.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "nave",
+       "at": [
+        0.0,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "nave",
+       "at": [
+        0.0,
+        12.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "nave",
+       "at": [
+        7.0,
+        16.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     7,
+     22
+    ],
+    "faction": "union",
+    "minStanding": 0
+   },
+   "secrets": [
+    {
+     "id": "salt_union_hall_cache",
+     "floor": 0,
+     "room": "nave",
+     "at": [
+      11.5,
+      13.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "nave",
+     "at": [
+      7.0,
+      8.0
+     ],
+     "rot": 0,
+     "activity": "pray",
+     "role": "member",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_boat_workshop",
+   "roomType": "workshop_garage",
+   "label": "Boots- und Lkw-Werkstatt",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    18,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.5,
+     "rooms": [
+      {
+       "id": "garage",
+       "kind": "garage",
+       "rect": [
+        0.0,
+        0.0,
+        11.5,
+        14.0
+       ]
+      },
+      {
+       "id": "bench",
+       "kind": "workshop",
+       "rect": [
+        11.5,
+        0.0,
+        6.5,
+        7.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        11.5,
+        7.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        11.5,
+        11.0,
+        6.5,
+        3.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "garage",
+        "bench"
+       ],
+       "at": [
+        11.5,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "garage",
+        "office"
+       ],
+       "at": [
+        11.5,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "office",
+        "wc"
+       ],
+       "at": [
+        15.0,
+        11.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "garage",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 4.0,
+       "entrance": "garage",
+       "vehicles": true
+      },
+      {
+       "rooms": [
+        "bench",
+        "outside"
+       ],
+       "at": [
+        15.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "garage",
+        "outside"
+       ],
+       "at": [
+        3.5,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "office",
+       "at": [
+        18.0,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bench",
+       "at": [
+        18.0,
+        3.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "garage_parts",
+   "access": {
+    "open": [
+     8,
+     20
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "salt_boat_workshop_cache",
+     "floor": 0,
+     "room": "garage",
+     "at": [
+      9.0,
+      11.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "garage",
+     "at": [
+      6.0,
+      7.0
+     ],
+     "rot": 0,
+     "activity": "repair",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "salt_container_safehouse",
+   "roomType": "safehouse",
+   "label": "Containerversteck",
+   "districts": [
+    "Saltmarket"
+   ],
+   "footprint": [
+    10,
+    8
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.7,
+     "rooms": [
+      {
+       "id": "entry",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        0.0,
+        5.5,
+        2.5
+       ]
+      },
+      {
+       "id": "main",
+       "kind": "safe",
+       "rect": [
+        0.0,
+        2.5,
+        5.5,
+        5.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        5.5,
+        0.0,
+        4.5,
+        3.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.5,
+        3.0,
+        4.5,
+        2.0
+       ]
+      },
+      {
+       "id": "vault",
+       "kind": "evidence",
+       "rect": [
+        5.5,
+        5.0,
+        4.5,
+        3.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "entry",
+        "main"
+       ],
+       "at": [
+        3.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "entry",
+        "kitchen"
+       ],
+       "at": [
+        5.5,
+        1.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "bath"
+       ],
+       "at": [
+        5.5,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "vault"
+       ],
+       "at": [
+        5.5,
+        6.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_safehouse"
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "entry",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vault",
+        "outside"
+       ],
+       "at": [
+        10.0,
+        6.5
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "main",
+       "at": [
+        0.0,
+        5.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_safehouse"
+   },
+   "secrets": [
+    {
+     "id": "salt_container_safehouse_cache",
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      4.5,
+      2.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      3.0,
+      1.0
+     ],
+     "rot": 0,
+     "activity": "plan",
+     "role": "ally",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_studio",
+   "roomType": "apartment_small",
+   "label": "Atelierwohnung unterm Dach",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    8,
+    9
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.8,
+     "rooms": [
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        8.0,
+        5.0
+       ]
+      },
+      {
+       "id": "bed",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        5.0,
+        5.0,
+        4.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.0,
+        5.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "living",
+        "bed"
+       ],
+       "at": [
+        1.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "bath"
+       ],
+       "at": [
+        6.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        2.0,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "living",
+       "at": [
+        8.0,
+        2.5
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "lantern_studio_cache",
+     "floor": 0,
+     "room": "living",
+     "at": [
+      6.5,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "living",
+     "at": [
+      4.0,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_oldtown_flat",
+   "roomType": "apartment_large",
+   "label": "Altbauwohnung mit Treppenhaus",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    12,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "hall",
+       "rect": [
+        4.5,
+        0.0,
+        3.0,
+        14.0
+       ]
+      },
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        4.5,
+        7.0
+       ]
+      },
+      {
+       "id": "dining",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        7.0,
+        4.5,
+        7.0
+       ]
+      },
+      {
+       "id": "study",
+       "kind": "office",
+       "rect": [
+        7.5,
+        0.0,
+        4.5,
+        7.0
+       ]
+      },
+      {
+       "id": "bath0",
+       "kind": "bath",
+       "rect": [
+        7.5,
+        7.0,
+        4.5,
+        3.0
+       ]
+      },
+      {
+       "id": "utility",
+       "kind": "storage",
+       "rect": [
+        7.5,
+        10.0,
+        4.5,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "living"
+       ],
+       "at": [
+        4.5,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "dining"
+       ],
+       "at": [
+        4.5,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "study"
+       ],
+       "at": [
+        7.5,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "bath0"
+       ],
+       "at": [
+        7.5,
+        8.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "utility"
+       ],
+       "at": [
+        7.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "dining"
+       ],
+       "at": [
+        2.0,
+        7.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "living",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        12.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "hall",
+       "rect": [
+        5.0,
+        7.5,
+        2.0,
+        4.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 2.9,
+     "rooms": [
+      {
+       "id": "upper_hall",
+       "kind": "hall",
+       "rect": [
+        4.5,
+        0.0,
+        3.0,
+        14.0
+       ]
+      },
+      {
+       "id": "master",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        0.0,
+        4.5,
+        7.0
+       ]
+      },
+      {
+       "id": "child",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        7.0,
+        4.5,
+        7.0
+       ]
+      },
+      {
+       "id": "bath1",
+       "kind": "bath",
+       "rect": [
+        7.5,
+        0.0,
+        4.5,
+        5.0
+       ]
+      },
+      {
+       "id": "guest",
+       "kind": "bedroom",
+       "rect": [
+        7.5,
+        5.0,
+        4.5,
+        9.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_hall",
+        "master"
+       ],
+       "at": [
+        4.5,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "child"
+       ],
+       "at": [
+        4.5,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "bath1"
+       ],
+       "at": [
+        7.5,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "guest"
+       ],
+       "at": [
+        7.5,
+        9.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "master",
+       "at": [
+        0.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "child",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "guest",
+       "at": [
+        12.0,
+        9.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bath1",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "lantern_oldtown_flat_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      7.0,
+      11.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      6.0,
+      7.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_underground_club",
+   "roomType": "bar_club",
+   "label": "Club Kellerlicht",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    20,
+    18
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.6,
+     "rooms": [
+      {
+       "id": "bar",
+       "kind": "bar",
+       "rect": [
+        0.0,
+        0.0,
+        20.0,
+        10.0
+       ]
+      },
+      {
+       "id": "floor2",
+       "kind": "dancefloor",
+       "rect": [
+        0.0,
+        10.0,
+        11.0,
+        8.0
+       ]
+      },
+      {
+       "id": "backhall",
+       "kind": "hall",
+       "rect": [
+        11.0,
+        10.0,
+        2.0,
+        8.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        13.0,
+        10.0,
+        7.0,
+        3.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        13.0,
+        13.0,
+        7.0,
+        5.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "bar",
+        "floor2"
+       ],
+       "at": [
+        5.5,
+        10.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "backhall"
+       ],
+       "at": [
+        12.0,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "wc"
+       ],
+       "at": [
+        13.0,
+        11.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "office"
+       ],
+       "at": [
+        13.0,
+        15.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "backhall",
+        "outside"
+       ],
+       "at": [
+        12.0,
+        18.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      },
+      {
+       "rooms": [
+        "floor2",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "bar",
+       "at": [
+        15.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bar",
+       "at": [
+        0.0,
+        5.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "bar_drinks",
+   "access": {
+    "open": [
+     18,
+     4
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "lantern_underground_club_cache",
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      16.0,
+      8.0
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "lantern_club_tape",
+     "floor": 0,
+     "room": "office",
+     "at": [
+      18.5,
+      16.0
+     ],
+     "kind": "note"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      10.0,
+      5.0
+     ],
+     "rot": 0,
+     "activity": "bartender",
+     "role": "patron",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_hackerspace",
+   "roomType": "hackerspace",
+   "label": "Collective-Hackerspace",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    16,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "lab",
+       "kind": "lab",
+       "rect": [
+        0.0,
+        0.0,
+        9.5,
+        14.0
+       ]
+      },
+      {
+       "id": "server",
+       "kind": "server",
+       "rect": [
+        9.5,
+        0.0,
+        6.5,
+        5.0
+       ]
+      },
+      {
+       "id": "bench",
+       "kind": "workshop",
+       "rect": [
+        9.5,
+        5.0,
+        6.5,
+        5.0
+       ]
+      },
+      {
+       "id": "lounge",
+       "kind": "lounge",
+       "rect": [
+        9.5,
+        10.0,
+        6.5,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "lab",
+        "server"
+       ],
+       "at": [
+        9.5,
+        2.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "hack": 2
+       }
+      },
+      {
+       "rooms": [
+        "lab",
+        "bench"
+       ],
+       "at": [
+        9.5,
+        7.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lab",
+        "lounge"
+       ],
+       "at": [
+        9.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bench",
+        "lounge"
+       ],
+       "at": [
+        13.0,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lab",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "lounge",
+        "outside"
+       ],
+       "at": [
+        13.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "lab",
+       "at": [
+        0.0,
+        7.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "hacker_gear",
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "collective",
+    "minStanding": 10,
+    "hack": 2
+   },
+   "interactives": [
+    {
+     "kind": "terminal",
+     "floor": 0,
+     "room": "server",
+     "at": [
+      12.0,
+      2.5
+     ],
+     "rot": 180,
+     "id": "leak_terminal",
+     "hack": 2,
+     "links": "lantern_aegis_leak"
+    }
+   ],
+   "secrets": [
+    {
+     "id": "lantern_hackerspace_cache",
+     "floor": 0,
+     "room": "lab",
+     "at": [
+      7.5,
+      11.0
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "lantern_aegis_leak",
+     "floor": 0,
+     "room": "server",
+     "at": [
+      14.0,
+      2.0
+     ],
+     "kind": "note",
+     "hidden": true
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "lab",
+     "at": [
+      5.0,
+      7.0
+     ],
+     "rot": 0,
+     "activity": "hack",
+     "role": "hacker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_st_merrin",
+   "roomType": "community_hall",
+   "label": "Kirche St. Merrin",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    18,
+    26
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 6.0,
+     "rooms": [
+      {
+       "id": "nave",
+       "kind": "sanctuary",
+       "rect": [
+        0.0,
+        0.0,
+        13.0,
+        26.0
+       ]
+      },
+      {
+       "id": "vestry",
+       "kind": "office",
+       "rect": [
+        13.0,
+        0.0,
+        5.0,
+        9.0
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        13.0,
+        9.0,
+        5.0,
+        9.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        13.0,
+        18.0,
+        5.0,
+        8.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "nave",
+        "vestry"
+       ],
+       "at": [
+        13.0,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "nave",
+        "kitchen"
+       ],
+       "at": [
+        13.0,
+        13.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "wc"
+       ],
+       "at": [
+        15.5,
+        18.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "nave",
+        "outside"
+       ],
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vestry",
+        "outside"
+       ],
+       "at": [
+        18.0,
+        4.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "nave",
+       "at": [
+        0.0,
+        6.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "nave",
+       "at": [
+        0.0,
+        19.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "nave",
+       "at": [
+        6.5,
+        26.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     7,
+     22
+    ]
+   },
+   "secrets": [
+    {
+     "id": "lantern_st_merrin_cache",
+     "floor": 0,
+     "room": "nave",
+     "at": [
+      10.5,
+      21.0
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "lantern_bell_note",
+     "floor": 0,
+     "room": "vestry",
+     "at": [
+      16.0,
+      4.0
+     ],
+     "kind": "note"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "nave",
+     "at": [
+      6.5,
+      13.0
+     ],
+     "rot": 0,
+     "activity": "pray",
+     "role": "member",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_street_clinic",
+   "roomType": "clinic",
+   "label": "Klinik ohne Lizenz",
+   "districts": [
+    "LanternHill",
+    "Rustline"
+   ],
+   "footprint": [
+    14,
+    13
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "waiting",
+       "kind": "waiting",
+       "rect": [
+        0.0,
+        0.0,
+        8.5,
+        5.0
+       ]
+      },
+      {
+       "id": "reception",
+       "kind": "counter",
+       "rect": [
+        8.5,
+        0.0,
+        5.5,
+        5.0
+       ]
+      },
+      {
+       "id": "corr",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        5.0,
+        14.0,
+        2.0
+       ]
+      },
+      {
+       "id": "surgery",
+       "kind": "surgery",
+       "rect": [
+        0.0,
+        7.0,
+        5.5,
+        6.0
+       ]
+      },
+      {
+       "id": "ward",
+       "kind": "ward",
+       "rect": [
+        5.5,
+        7.0,
+        5.0,
+        6.0
+       ]
+      },
+      {
+       "id": "meds",
+       "kind": "storage",
+       "rect": [
+        10.5,
+        7.0,
+        3.5,
+        6.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "waiting",
+        "reception"
+       ],
+       "at": [
+        8.5,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "waiting",
+        "corr"
+       ],
+       "at": [
+        4.0,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "surgery"
+       ],
+       "at": [
+        3.0,
+        7.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "ward"
+       ],
+       "at": [
+        8.0,
+        7.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "meds"
+       ],
+       "at": [
+        12.0,
+        7.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_meds",
+        "hack": 2
+       }
+      },
+      {
+       "rooms": [
+        "waiting",
+        "outside"
+       ],
+       "at": [
+        3.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corr",
+        "outside"
+       ],
+       "at": [
+        14.0,
+        6.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "waiting",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "ward",
+       "at": [
+        8.0,
+        13.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "clinic_meds",
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "collective",
+    "minStanding": -40
+   },
+   "secrets": [
+    {
+     "id": "lantern_street_clinic_cache",
+     "floor": 0,
+     "room": "waiting",
+     "at": [
+      7.0,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "waiting",
+     "at": [
+      4.0,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "surgery",
+     "role": "medic",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_record_shop",
+   "roomType": "shop_kiosk",
+   "label": "Plattenladen",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    10,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "floor",
+       "kind": "shopfloor",
+       "rect": [
+        3.5,
+        0.0,
+        6.5,
+        6.5
+       ]
+      },
+      {
+       "id": "till",
+       "kind": "counter",
+       "rect": [
+        0.0,
+        0.0,
+        3.5,
+        6.5
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        0.0,
+        6.5,
+        6.0,
+        3.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.0,
+        6.5,
+        4.0,
+        3.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "floor",
+        "till"
+       ],
+       "at": [
+        3.5,
+        3.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "till",
+        "store"
+       ],
+       "at": [
+        2.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "store",
+        "wc"
+       ],
+       "at": [
+        6.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "floor",
+        "outside"
+       ],
+       "at": [
+        7.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "store",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        10.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "floor",
+       "at": [
+        4.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "floor",
+       "at": [
+        9.0,
+        0.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "records_lantern",
+   "access": {
+    "open": [
+     7,
+     23
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "lantern_record_shop_cache",
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      8.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      7.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "shopkeeper",
+     "role": "shopkeeper",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_taverna",
+   "roomType": "diner",
+   "label": "Treppen-Taverne",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    12,
+    11
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "dining",
+       "kind": "dining",
+       "rect": [
+        0.0,
+        0.0,
+        12.0,
+        6.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen_pro",
+       "rect": [
+        0.0,
+        6.5,
+        6.5,
+        4.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.5,
+        6.5,
+        2.5,
+        4.5
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        9.0,
+        6.5,
+        3.0,
+        4.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "dining",
+        "kitchen"
+       ],
+       "at": [
+        3.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "wc"
+       ],
+       "at": [
+        8.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "store"
+       ],
+       "at": [
+        10.5,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        11.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "dining",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "diner_menu",
+   "access": {
+    "open": [
+     6,
+     2
+    ]
+   },
+   "secrets": [
+    {
+     "id": "lantern_taverna_cache",
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      9.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      6.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "cook",
+     "role": "cook",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "lantern_rooftop_safehouse",
+   "roomType": "safehouse",
+   "label": "Dachversteck des Collective",
+   "districts": [
+    "LanternHill"
+   ],
+   "footprint": [
+    10,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.7,
+     "rooms": [
+      {
+       "id": "entry",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        0.0,
+        5.5,
+        2.5
+       ]
+      },
+      {
+       "id": "main",
+       "kind": "safe",
+       "rect": [
+        0.0,
+        2.5,
+        5.5,
+        7.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        5.5,
+        0.0,
+        4.5,
+        4.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.5,
+        4.0,
+        4.5,
+        2.5
+       ]
+      },
+      {
+       "id": "vault",
+       "kind": "evidence",
+       "rect": [
+        5.5,
+        6.5,
+        4.5,
+        3.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "entry",
+        "main"
+       ],
+       "at": [
+        3.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "entry",
+        "kitchen"
+       ],
+       "at": [
+        5.5,
+        1.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "bath"
+       ],
+       "at": [
+        5.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "vault"
+       ],
+       "at": [
+        5.5,
+        8.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_safehouse"
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "entry",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vault",
+        "outside"
+       ],
+       "at": [
+        10.0,
+        8.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "main",
+       "at": [
+        0.0,
+        6.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_safehouse"
+   },
+   "secrets": [
+    {
+     "id": "lantern_rooftop_safehouse_cache",
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      4.5,
+      2.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      3.0,
+      1.0
+     ],
+     "rot": 0,
+     "activity": "plan",
+     "role": "ally",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_villa",
+   "roomType": "apartment_large",
+   "label": "Villa mit Doppelgarage",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    18,
+    20
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "hall",
+       "rect": [
+        7.5,
+        0.0,
+        3.0,
+        20.0
+       ]
+      },
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        7.5,
+        10.0
+       ]
+      },
+      {
+       "id": "dining",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        10.0,
+        7.5,
+        10.0
+       ]
+      },
+      {
+       "id": "study",
+       "kind": "office",
+       "rect": [
+        10.5,
+        0.0,
+        7.5,
+        10.0
+       ]
+      },
+      {
+       "id": "bath0",
+       "kind": "bath",
+       "rect": [
+        10.5,
+        10.0,
+        7.5,
+        4.5
+       ]
+      },
+      {
+       "id": "utility",
+       "kind": "garage",
+       "rect": [
+        10.5,
+        14.5,
+        7.5,
+        5.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "living"
+       ],
+       "at": [
+        7.5,
+        5.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "dining"
+       ],
+       "at": [
+        7.5,
+        15.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "study"
+       ],
+       "at": [
+        10.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "bath0"
+       ],
+       "at": [
+        10.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "utility"
+       ],
+       "at": [
+        10.5,
+        17.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "dining"
+       ],
+       "at": [
+        4.0,
+        10.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        9.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        4.0,
+        20.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      },
+      {
+       "rooms": [
+        "utility",
+        "outside"
+       ],
+       "at": [
+        18.0,
+        17.0
+       ],
+       "width": 3.0,
+       "entrance": "garage",
+       "vehicles": true
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "living",
+       "at": [
+        4.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        15.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        18.0,
+        5.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        14.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "hall",
+       "rect": [
+        8.0,
+        11.0,
+        2.0,
+        4.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 2.9,
+     "rooms": [
+      {
+       "id": "upper_hall",
+       "kind": "hall",
+       "rect": [
+        7.5,
+        0.0,
+        3.0,
+        20.0
+       ]
+      },
+      {
+       "id": "master",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        0.0,
+        7.5,
+        10.0
+       ]
+      },
+      {
+       "id": "child",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        10.0,
+        7.5,
+        10.0
+       ]
+      },
+      {
+       "id": "bath1",
+       "kind": "bath",
+       "rect": [
+        10.5,
+        0.0,
+        7.5,
+        7.0
+       ]
+      },
+      {
+       "id": "guest",
+       "kind": "bedroom",
+       "rect": [
+        10.5,
+        7.0,
+        7.5,
+        13.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_hall",
+        "master"
+       ],
+       "at": [
+        7.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "child"
+       ],
+       "at": [
+        7.5,
+        15.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "bath1"
+       ],
+       "at": [
+        10.5,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "guest"
+       ],
+       "at": [
+        10.5,
+        13.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "outside"
+       ],
+       "at": [
+        9.0,
+        20.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "master",
+       "at": [
+        0.0,
+        5.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "child",
+       "at": [
+        0.0,
+        15.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "guest",
+       "at": [
+        18.0,
+        13.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bath1",
+       "at": [
+        14.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 2
+   },
+   "interactives": [
+    {
+     "kind": "terminal",
+     "floor": 0,
+     "room": "study",
+     "at": [
+      14.0,
+      2.5
+     ],
+     "rot": 180,
+     "id": "villa_safe",
+     "hack": 3,
+     "links": "green_villa_ledger"
+    }
+   ],
+   "secrets": [
+    {
+     "id": "green_villa_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      10.0,
+      16.0
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "green_villa_ledger",
+     "floor": 0,
+     "room": "study",
+     "at": [
+      15.5,
+      3.0
+     ],
+     "kind": "stash",
+     "hidden": true
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      9.0,
+      10.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_townhouse",
+   "roomType": "apartment_large",
+   "label": "Reihenhaus im Gated Court",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    12,
+    16
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "hall",
+       "rect": [
+        4.5,
+        0.0,
+        3.0,
+        16.0
+       ]
+      },
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        4.5,
+        8.0
+       ]
+      },
+      {
+       "id": "dining",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        8.0,
+        4.5,
+        8.0
+       ]
+      },
+      {
+       "id": "study",
+       "kind": "office",
+       "rect": [
+        7.5,
+        0.0,
+        4.5,
+        8.0
+       ]
+      },
+      {
+       "id": "bath0",
+       "kind": "bath",
+       "rect": [
+        7.5,
+        8.0,
+        4.5,
+        3.5
+       ]
+      },
+      {
+       "id": "utility",
+       "kind": "storage",
+       "rect": [
+        7.5,
+        11.5,
+        4.5,
+        4.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "living"
+       ],
+       "at": [
+        4.5,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "dining"
+       ],
+       "at": [
+        4.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "study"
+       ],
+       "at": [
+        7.5,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "bath0"
+       ],
+       "at": [
+        7.5,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "utility"
+       ],
+       "at": [
+        7.5,
+        14.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "dining"
+       ],
+       "at": [
+        2.0,
+        8.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        16.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "living",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        12.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        12.0,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "hall",
+       "rect": [
+        5.0,
+        9.0,
+        2.0,
+        4.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 2.9,
+     "rooms": [
+      {
+       "id": "upper_hall",
+       "kind": "hall",
+       "rect": [
+        4.5,
+        0.0,
+        3.0,
+        16.0
+       ]
+      },
+      {
+       "id": "master",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        0.0,
+        4.5,
+        8.0
+       ]
+      },
+      {
+       "id": "child",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        8.0,
+        4.5,
+        8.0
+       ]
+      },
+      {
+       "id": "bath1",
+       "kind": "bath",
+       "rect": [
+        7.5,
+        0.0,
+        4.5,
+        5.5
+       ]
+      },
+      {
+       "id": "guest",
+       "kind": "bedroom",
+       "rect": [
+        7.5,
+        5.5,
+        4.5,
+        10.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_hall",
+        "master"
+       ],
+       "at": [
+        4.5,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "child"
+       ],
+       "at": [
+        4.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "bath1"
+       ],
+       "at": [
+        7.5,
+        3.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "guest"
+       ],
+       "at": [
+        7.5,
+        11.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        16.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "master",
+       "at": [
+        0.0,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "child",
+       "at": [
+        0.0,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "guest",
+       "at": [
+        12.0,
+        11.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bath1",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "green_townhouse_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      7.0,
+      13.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      6.0,
+      8.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_boutique",
+   "roomType": "shop_kiosk",
+   "label": "Boutique",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    12,
+    12
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "floor",
+       "kind": "shopfloor",
+       "rect": [
+        4.0,
+        0.0,
+        8.0,
+        8.0
+       ]
+      },
+      {
+       "id": "till",
+       "kind": "counter",
+       "rect": [
+        0.0,
+        0.0,
+        4.0,
+        8.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        0.0,
+        8.0,
+        7.0,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        7.0,
+        8.0,
+        5.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "floor",
+        "till"
+       ],
+       "at": [
+        4.0,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "till",
+        "store"
+       ],
+       "at": [
+        2.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "store",
+        "wc"
+       ],
+       "at": [
+        7.0,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "floor",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "store",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        12.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "floor",
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "floor",
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "boutique_greenmoor",
+   "access": {
+    "open": [
+     7,
+     23
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "green_boutique_cache",
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      10.5,
+      6.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      8.0,
+      4.0
+     ],
+     "rot": 0,
+     "activity": "shopkeeper",
+     "role": "shopkeeper",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_security_post",
+   "roomType": "police_station",
+   "label": "Private Sicherheitswache",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    16,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "front",
+       "kind": "booking",
+       "rect": [
+        0.0,
+        0.0,
+        16.0,
+        5.0
+       ]
+      },
+      {
+       "id": "corr",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        5.0,
+        16.0,
+        2.0
+       ]
+      },
+      {
+       "id": "brief",
+       "kind": "briefing",
+       "rect": [
+        0.0,
+        7.0,
+        6.5,
+        7.0
+       ]
+      },
+      {
+       "id": "evidence",
+       "kind": "evidence",
+       "rect": [
+        6.5,
+        7.0,
+        3.0,
+        7.0
+       ]
+      },
+      {
+       "id": "cell0",
+       "kind": "cell",
+       "rect": [
+        9.5,
+        7.0,
+        3.0,
+        7.0
+       ]
+      },
+      {
+       "id": "cell1",
+       "kind": "cell",
+       "rect": [
+        12.5,
+        7.0,
+        3.0,
+        7.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "corr",
+        "cell0"
+       ],
+       "at": [
+        11.0,
+        7.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_cells",
+        "hack": 3
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "corr",
+        "cell1"
+       ],
+       "at": [
+        14.0,
+        7.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_cells",
+        "hack": 3
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "front",
+        "corr"
+       ],
+       "at": [
+        5.0,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "brief"
+       ],
+       "at": [
+        3.0,
+        7.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "evidence"
+       ],
+       "at": [
+        8.0,
+        7.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_evidence",
+        "hack": 4
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "front",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corr",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        6.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "front",
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "brief",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "style": "suburban",
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "kcg",
+    "minStanding": -10,
+    "hack": 4
+   },
+   "secrets": [
+    {
+     "id": "green_security_post_cache",
+     "floor": 0,
+     "room": "front",
+     "at": [
+      13.0,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "front",
+     "at": [
+      8.0,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "reception",
+     "role": "officer",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_club_house",
+   "roomType": "office_lobby",
+   "label": "Country-Club-Haus",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    22,
+    18
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.0,
+     "rooms": [
+      {
+       "id": "lobby",
+       "kind": "lobby",
+       "rect": [
+        0.0,
+        0.0,
+        13.0,
+        11.0
+       ]
+      },
+      {
+       "id": "security",
+       "kind": "booking",
+       "rect": [
+        13.0,
+        0.0,
+        9.0,
+        7.0
+       ]
+      },
+      {
+       "id": "core",
+       "kind": "hall",
+       "rect": [
+        13.0,
+        7.0,
+        9.0,
+        11.0
+       ]
+      },
+      {
+       "id": "meeting",
+       "kind": "meeting",
+       "rect": [
+        0.0,
+        11.0,
+        6.5,
+        7.0
+       ]
+      },
+      {
+       "id": "lounge",
+       "kind": "lounge",
+       "rect": [
+        6.5,
+        11.0,
+        6.5,
+        7.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "lobby",
+        "security"
+       ],
+       "at": [
+        13.0,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "core"
+       ],
+       "at": [
+        13.0,
+        9.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "meeting"
+       ],
+       "at": [
+        3.0,
+        11.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "lounge"
+       ],
+       "at": [
+        10.0,
+        11.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "core",
+        "lounge"
+       ],
+       "at": [
+        13.0,
+        14.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lobby",
+        "outside"
+       ],
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 3.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "core",
+        "outside"
+       ],
+       "at": [
+        22.0,
+        16.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "lobby",
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "lobby",
+       "at": [
+        0.0,
+        5.5
+       ],
+       "width": 3.0
+      },
+      {
+       "room": "meeting",
+       "at": [
+        0.0,
+        14.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "style": "suburban",
+   "access": {
+    "open": [
+     7,
+     20
+    ],
+    "faction": "aurelia",
+    "minStanding": -20,
+    "hack": 3
+   },
+   "secrets": [
+    {
+     "id": "green_club_house_cache",
+     "floor": 0,
+     "room": "lobby",
+     "at": [
+      10.5,
+      9.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "lobby",
+     "at": [
+      6.5,
+      5.5
+     ],
+     "rot": 0,
+     "activity": "reception",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_cafe",
+   "roomType": "diner",
+   "label": "Country-Club-Cafe",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    12,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "dining",
+       "kind": "dining",
+       "rect": [
+        0.0,
+        0.0,
+        12.0,
+        6.0
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen_pro",
+       "rect": [
+        0.0,
+        6.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.5,
+        6.0,
+        2.5,
+        4.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        9.0,
+        6.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "dining",
+        "kitchen"
+       ],
+       "at": [
+        3.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "wc"
+       ],
+       "at": [
+        8.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "store"
+       ],
+       "at": [
+        10.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        10.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "dining",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "diner_menu",
+   "access": {
+    "open": [
+     6,
+     2
+    ]
+   },
+   "secrets": [
+    {
+     "id": "green_cafe_cache",
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      9.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      6.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "cook",
+     "role": "cook",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "green_garage_safehouse",
+   "roomType": "safehouse",
+   "label": "Versteck in der Gaertnerhuette",
+   "districts": [
+    "Greenmoor"
+   ],
+   "footprint": [
+    9,
+    8
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.7,
+     "rooms": [
+      {
+       "id": "entry",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        0.0,
+        5.0,
+        2.5
+       ]
+      },
+      {
+       "id": "main",
+       "kind": "safe",
+       "rect": [
+        0.0,
+        2.5,
+        5.0,
+        5.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        5.0,
+        0.0,
+        4.0,
+        3.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.0,
+        3.0,
+        4.0,
+        2.0
+       ]
+      },
+      {
+       "id": "vault",
+       "kind": "evidence",
+       "rect": [
+        5.0,
+        5.0,
+        4.0,
+        3.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "entry",
+        "main"
+       ],
+       "at": [
+        2.5,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "entry",
+        "kitchen"
+       ],
+       "at": [
+        5.0,
+        1.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "bath"
+       ],
+       "at": [
+        5.0,
+        4.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "vault"
+       ],
+       "at": [
+        5.0,
+        6.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_safehouse"
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "entry",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vault",
+        "outside"
+       ],
+       "at": [
+        9.0,
+        6.5
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "main",
+       "at": [
+        0.0,
+        5.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "style": "worker",
+   "access": {
+    "open": null,
+    "key": "key_safehouse"
+   },
+   "secrets": [
+    {
+     "id": "green_garage_safehouse_cache",
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      4.0,
+      2.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      2.5,
+      1.0
+     ],
+     "rot": 0,
+     "activity": "plan",
+     "role": "ally",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_squat",
+   "roomType": "slum_room",
+   "label": "Besetzte Werkhalle",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    9,
+    8
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.6,
+     "rooms": [
+      {
+       "id": "room",
+       "kind": "slum",
+       "rect": [
+        0.0,
+        0.0,
+        7.0,
+        8.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        7.0,
+        0.0,
+        2.0,
+        4.0
+       ]
+      },
+      {
+       "id": "nook",
+       "kind": "storage",
+       "rect": [
+        7.0,
+        4.0,
+        2.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "room",
+        "wc"
+       ],
+       "at": [
+        7.0,
+        2.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "room",
+        "nook"
+       ],
+       "at": [
+        7.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "room",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "nook",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        8.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "room",
+       "at": [
+        0.0,
+        4.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "style": "slum",
+   "access": {
+    "open": [
+     0,
+     24
+    ]
+   },
+   "secrets": [
+    {
+     "id": "rust_squat_cache",
+     "floor": 0,
+     "room": "room",
+     "at": [
+      5.5,
+      6.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "room",
+     "at": [
+      3.5,
+      4.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_flophouse",
+   "roomType": "slum_room",
+   "label": "Absteige an der Bahnlinie",
+   "districts": [
+    "Rustline",
+    "Saltmarket"
+   ],
+   "footprint": [
+    16,
+    11
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.6,
+     "rooms": [
+      {
+       "id": "corridor",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        4.5,
+        16.0,
+        2.0
+       ]
+      },
+      {
+       "id": "cell0",
+       "kind": "slum",
+       "rect": [
+        0.0,
+        0.0,
+        3.0,
+        4.5
+       ]
+      },
+      {
+       "id": "cell1",
+       "kind": "slum",
+       "rect": [
+        3.0,
+        0.0,
+        3.0,
+        4.5
+       ]
+      },
+      {
+       "id": "cell2",
+       "kind": "slum",
+       "rect": [
+        6.0,
+        0.0,
+        3.0,
+        4.5
+       ]
+      },
+      {
+       "id": "cell3",
+       "kind": "slum",
+       "rect": [
+        9.0,
+        0.0,
+        3.0,
+        4.5
+       ]
+      },
+      {
+       "id": "cell4",
+       "kind": "slum",
+       "rect": [
+        12.0,
+        0.0,
+        4.0,
+        4.5
+       ]
+      },
+      {
+       "id": "common",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        6.5,
+        9.5,
+        4.5
+       ]
+      },
+      {
+       "id": "wash",
+       "kind": "bath",
+       "rect": [
+        9.5,
+        6.5,
+        6.5,
+        4.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "corridor",
+        "cell0"
+       ],
+       "at": [
+        1.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell1"
+       ],
+       "at": [
+        4.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell2"
+       ],
+       "at": [
+        7.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell3"
+       ],
+       "at": [
+        10.5,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "cell4"
+       ],
+       "at": [
+        14.0,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "common"
+       ],
+       "at": [
+        5.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "wash"
+       ],
+       "at": [
+        13.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corridor",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        5.5
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corridor",
+        "outside"
+       ],
+       "at": [
+        16.0,
+        5.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "cell0",
+       "at": [
+        1.5,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell1",
+       "at": [
+        4.5,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell2",
+       "at": [
+        7.5,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell3",
+       "at": [
+        10.5,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "cell4",
+       "at": [
+        14.0,
+        0.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "common",
+       "at": [
+        5.0,
+        11.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "style": "slum",
+   "access": {
+    "open": [
+     0,
+     24
+    ]
+   },
+   "secrets": [
+    {
+     "id": "rust_flophouse_cache",
+     "floor": 0,
+     "room": "corridor",
+     "at": [
+      13.0,
+      6.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "corridor",
+     "at": [
+      8.0,
+      5.5
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_chop_shop",
+   "roomType": "workshop_garage",
+   "label": "Chop-Shop der Wrenchers",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    20,
+    16
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.5,
+     "rooms": [
+      {
+       "id": "garage",
+       "kind": "garage",
+       "rect": [
+        0.0,
+        0.0,
+        13.0,
+        16.0
+       ]
+      },
+      {
+       "id": "bench",
+       "kind": "workshop",
+       "rect": [
+        13.0,
+        0.0,
+        7.0,
+        8.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        13.0,
+        8.0,
+        7.0,
+        5.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        13.0,
+        13.0,
+        7.0,
+        3.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "garage",
+        "bench"
+       ],
+       "at": [
+        13.0,
+        4.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "garage",
+        "office"
+       ],
+       "at": [
+        13.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "office",
+        "wc"
+       ],
+       "at": [
+        16.5,
+        13.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "garage",
+        "outside"
+       ],
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 4.0,
+       "entrance": "garage",
+       "vehicles": true
+      },
+      {
+       "rooms": [
+        "bench",
+        "outside"
+       ],
+       "at": [
+        16.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "garage",
+        "outside"
+       ],
+       "at": [
+        4.0,
+        16.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "office",
+       "at": [
+        20.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bench",
+       "at": [
+        20.0,
+        4.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "garage_parts",
+   "access": {
+    "open": [
+     8,
+     20
+    ],
+    "hack": 2,
+    "faction": "wrenchers",
+    "minStanding": 0
+   },
+   "secrets": [
+    {
+     "id": "rust_chop_shop_cache",
+     "floor": 0,
+     "room": "garage",
+     "at": [
+      10.5,
+      13.0
+     ],
+     "kind": "collectible"
+    },
+    {
+     "id": "rust_vin_list",
+     "floor": 0,
+     "room": "office",
+     "at": [
+      18.0,
+      9.0
+     ],
+     "kind": "note"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "garage",
+     "at": [
+      6.5,
+      8.0
+     ],
+     "rot": 0,
+     "activity": "repair",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_race_garage",
+   "roomType": "workshop_garage",
+   "label": "Rennwerkstatt",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    18,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 4.5,
+     "rooms": [
+      {
+       "id": "garage",
+       "kind": "garage",
+       "rect": [
+        0.0,
+        0.0,
+        11.5,
+        14.0
+       ]
+      },
+      {
+       "id": "bench",
+       "kind": "workshop",
+       "rect": [
+        11.5,
+        0.0,
+        6.5,
+        7.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        11.5,
+        7.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        11.5,
+        11.0,
+        6.5,
+        3.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "garage",
+        "bench"
+       ],
+       "at": [
+        11.5,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "garage",
+        "office"
+       ],
+       "at": [
+        11.5,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "office",
+        "wc"
+       ],
+       "at": [
+        15.0,
+        11.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "garage",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 4.0,
+       "entrance": "garage",
+       "vehicles": true
+      },
+      {
+       "rooms": [
+        "bench",
+        "outside"
+       ],
+       "at": [
+        15.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "garage",
+        "outside"
+       ],
+       "at": [
+        3.5,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "office",
+       "at": [
+        18.0,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bench",
+       "at": [
+        18.0,
+        3.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "garage_parts",
+   "access": {
+    "open": [
+     8,
+     20
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "rust_race_garage_cache",
+     "floor": 0,
+     "room": "garage",
+     "at": [
+      9.0,
+      11.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "garage",
+     "at": [
+      6.0,
+      7.0
+     ],
+     "rot": 0,
+     "activity": "repair",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_scrap_hall",
+   "roomType": "warehouse",
+   "label": "Schrotthalle",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    30,
+    24
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 6.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "warehouse",
+       "rect": [
+        0.0,
+        0.0,
+        22.5,
+        24.0
+       ]
+      },
+      {
+       "id": "dock",
+       "kind": "garage",
+       "rect": [
+        22.5,
+        0.0,
+        7.5,
+        13.0
+       ]
+      },
+      {
+       "id": "stairs",
+       "kind": "stair",
+       "rect": [
+        22.5,
+        13.0,
+        7.5,
+        11.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "dock"
+       ],
+       "at": [
+        22.5,
+        6.5
+       ],
+       "width": 3.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "stairs"
+       ],
+       "at": [
+        22.5,
+        18.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dock",
+        "outside"
+       ],
+       "at": [
+        26.0,
+        0.0
+       ],
+       "width": 4.0,
+       "entrance": "garage",
+       "vehicles": true
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        4.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        11.0,
+        24.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [],
+     "stairs": [
+      {
+       "room": "stairs",
+       "rect": [
+        23.0,
+        13.5,
+        2.0,
+        5.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "landing",
+       "kind": "stair",
+       "rect": [
+        22.5,
+        13.0,
+        7.5,
+        11.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        22.5,
+        0.0,
+        7.5,
+        13.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "landing",
+        "office"
+       ],
+       "at": [
+        26.0,
+        13.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "landing",
+        "outside"
+       ],
+       "at": [
+        30.0,
+        18.5
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "office",
+       "at": [
+        30.0,
+        6.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "office",
+       "at": [
+        22.5,
+        6.5
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     6,
+     22
+    ],
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "rust_scrap_hall_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      18.0,
+      19.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      11.0,
+      12.0
+     ],
+     "rot": 0,
+     "activity": "carry",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_backalley_clinic",
+   "roomType": "clinic",
+   "label": "Hinterhof-Klinik",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    12,
+    13
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "waiting",
+       "kind": "waiting",
+       "rect": [
+        0.0,
+        0.0,
+        7.0,
+        5.0
+       ]
+      },
+      {
+       "id": "reception",
+       "kind": "counter",
+       "rect": [
+        7.0,
+        0.0,
+        5.0,
+        5.0
+       ]
+      },
+      {
+       "id": "corr",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        5.0,
+        12.0,
+        2.0
+       ]
+      },
+      {
+       "id": "surgery",
+       "kind": "surgery",
+       "rect": [
+        0.0,
+        7.0,
+        5.0,
+        6.0
+       ]
+      },
+      {
+       "id": "ward",
+       "kind": "ward",
+       "rect": [
+        5.0,
+        7.0,
+        4.0,
+        6.0
+       ]
+      },
+      {
+       "id": "meds",
+       "kind": "storage",
+       "rect": [
+        9.0,
+        7.0,
+        3.0,
+        6.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "waiting",
+        "reception"
+       ],
+       "at": [
+        7.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "waiting",
+        "corr"
+       ],
+       "at": [
+        3.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "surgery"
+       ],
+       "at": [
+        2.5,
+        7.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "ward"
+       ],
+       "at": [
+        7.0,
+        7.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "meds"
+       ],
+       "at": [
+        10.5,
+        7.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_meds",
+        "hack": 2
+       }
+      },
+      {
+       "rooms": [
+        "waiting",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corr",
+        "outside"
+       ],
+       "at": [
+        12.0,
+        6.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "waiting",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "ward",
+       "at": [
+        7.0,
+        13.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "style": "slum",
+   "shop": "clinic_meds",
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "collective",
+    "minStanding": -40
+   },
+   "secrets": [
+    {
+     "id": "rust_backalley_clinic_cache",
+     "floor": 0,
+     "room": "waiting",
+     "at": [
+      5.5,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "waiting",
+     "at": [
+      3.5,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "surgery",
+     "role": "medic",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_scrap_hackerspace",
+   "roomType": "hackerspace",
+   "label": "Schrott-Hackerspace",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    14,
+    12
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "lab",
+       "kind": "lab",
+       "rect": [
+        0.0,
+        0.0,
+        8.5,
+        12.0
+       ]
+      },
+      {
+       "id": "server",
+       "kind": "server",
+       "rect": [
+        8.5,
+        0.0,
+        5.5,
+        4.0
+       ]
+      },
+      {
+       "id": "bench",
+       "kind": "workshop",
+       "rect": [
+        8.5,
+        4.0,
+        5.5,
+        4.0
+       ]
+      },
+      {
+       "id": "lounge",
+       "kind": "lounge",
+       "rect": [
+        8.5,
+        8.0,
+        5.5,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "lab",
+        "server"
+       ],
+       "at": [
+        8.5,
+        2.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "hack": 2
+       }
+      },
+      {
+       "rooms": [
+        "lab",
+        "bench"
+       ],
+       "at": [
+        8.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lab",
+        "lounge"
+       ],
+       "at": [
+        8.5,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bench",
+        "lounge"
+       ],
+       "at": [
+        11.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lab",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "lounge",
+        "outside"
+       ],
+       "at": [
+        11.0,
+        12.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "lab",
+       "at": [
+        0.0,
+        6.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "hacker_gear",
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "collective",
+    "minStanding": 10,
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "rust_scrap_hackerspace_cache",
+     "floor": 0,
+     "room": "lab",
+     "at": [
+      7.0,
+      9.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "lab",
+     "at": [
+      4.0,
+      6.0
+     ],
+     "rot": 0,
+     "activity": "hack",
+     "role": "hacker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_biker_bar",
+   "roomType": "bar_club",
+   "label": "Bikerbar Rostfrei",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    16,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "bar",
+       "kind": "bar",
+       "rect": [
+        0.0,
+        0.0,
+        16.0,
+        7.5
+       ]
+      },
+      {
+       "id": "floor2",
+       "kind": "lounge",
+       "rect": [
+        0.0,
+        7.5,
+        9.0,
+        6.5
+       ]
+      },
+      {
+       "id": "backhall",
+       "kind": "hall",
+       "rect": [
+        9.0,
+        7.5,
+        2.0,
+        6.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        11.0,
+        7.5,
+        5.0,
+        2.5
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        11.0,
+        10.0,
+        5.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "bar",
+        "floor2"
+       ],
+       "at": [
+        4.5,
+        7.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "backhall"
+       ],
+       "at": [
+        10.0,
+        7.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "wc"
+       ],
+       "at": [
+        11.0,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "office"
+       ],
+       "at": [
+        11.0,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "outside"
+       ],
+       "at": [
+        5.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "backhall",
+        "outside"
+       ],
+       "at": [
+        10.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      },
+      {
+       "rooms": [
+        "floor2",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        11.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "bar",
+       "at": [
+        12.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bar",
+       "at": [
+        0.0,
+        4.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "bar_drinks",
+   "access": {
+    "open": [
+     18,
+     4
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "rust_biker_bar_cache",
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      13.0,
+      6.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      8.0,
+      4.0
+     ],
+     "rot": 0,
+     "activity": "bartender",
+     "role": "patron",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_bunker_safehouse",
+   "roomType": "safehouse",
+   "label": "Bunker unter der Raffinerie",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    11,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.7,
+     "rooms": [
+      {
+       "id": "entry",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        0.0,
+        6.0,
+        2.5
+       ]
+      },
+      {
+       "id": "main",
+       "kind": "safe",
+       "rect": [
+        0.0,
+        2.5,
+        6.0,
+        7.5
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        6.0,
+        0.0,
+        5.0,
+        4.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        6.0,
+        4.0,
+        5.0,
+        2.5
+       ]
+      },
+      {
+       "id": "vault",
+       "kind": "evidence",
+       "rect": [
+        6.0,
+        6.5,
+        5.0,
+        3.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "entry",
+        "main"
+       ],
+       "at": [
+        3.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "entry",
+        "kitchen"
+       ],
+       "at": [
+        6.0,
+        1.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "bath"
+       ],
+       "at": [
+        6.0,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "main",
+        "vault"
+       ],
+       "at": [
+        6.0,
+        8.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_safehouse"
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "entry",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "vault",
+        "outside"
+       ],
+       "at": [
+        11.0,
+        8.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "main",
+       "at": [
+        0.0,
+        6.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_safehouse"
+   },
+   "secrets": [
+    {
+     "id": "rust_bunker_safehouse_cache",
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      5.0,
+      2.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "entry",
+     "at": [
+      3.0,
+      1.0
+     ],
+     "rot": 0,
+     "activity": "plan",
+     "role": "ally",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_worker_flat",
+   "roomType": "apartment_small",
+   "label": "Werkswohnung",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    8,
+    9
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.8,
+     "rooms": [
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        5.0,
+        5.0
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen",
+       "rect": [
+        5.0,
+        0.0,
+        3.0,
+        5.0
+       ]
+      },
+      {
+       "id": "bed",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        5.0,
+        5.0,
+        4.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        5.0,
+        5.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "living",
+        "kitchen"
+       ],
+       "at": [
+        5.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "bed"
+       ],
+       "at": [
+        2.0,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "bath"
+       ],
+       "at": [
+        6.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        2.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        0.0,
+        7.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        2.5,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "kitchen",
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "rust_worker_flat_cache",
+     "floor": 0,
+     "room": "living",
+     "at": [
+      4.0,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "living",
+     "at": [
+      2.5,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "rust_truck_stop",
+   "roomType": "diner",
+   "label": "Fernfahrer-Imbiss",
+   "districts": [
+    "Rustline"
+   ],
+   "footprint": [
+    13,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "dining",
+       "kind": "dining",
+       "rect": [
+        0.0,
+        0.0,
+        13.0,
+        6.0
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen_pro",
+       "rect": [
+        0.0,
+        6.0,
+        7.0,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        7.0,
+        6.0,
+        2.5,
+        4.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        10.0,
+        6.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "dining",
+        "kitchen"
+       ],
+       "at": [
+        3.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "wc"
+       ],
+       "at": [
+        8.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "store"
+       ],
+       "at": [
+        11.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        3.5,
+        10.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "dining",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "diner_menu",
+   "access": {
+    "open": [
+     6,
+     2
+    ]
+   },
+   "secrets": [
+    {
+     "id": "rust_truck_stop_cache",
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      10.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      6.5,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "cook",
+     "role": "cook",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_motel_room",
+   "roomType": "apartment_small",
+   "label": "Motelzimmer am Boulevard",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    7,
+    9
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.8,
+     "rooms": [
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        7.0,
+        5.0
+       ]
+      },
+      {
+       "id": "bed",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        5.0,
+        4.0,
+        4.0
+       ]
+      },
+      {
+       "id": "bath",
+       "kind": "bath",
+       "rect": [
+        4.0,
+        5.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "living",
+        "bed"
+       ],
+       "at": [
+        1.0,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "bath"
+       ],
+       "at": [
+        5.5,
+        5.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "bed",
+       "at": [
+        1.5,
+        9.0
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "living",
+       "at": [
+        7.0,
+        2.5
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "sun_motel_room_cache",
+     "floor": 0,
+     "room": "living",
+     "at": [
+      5.5,
+      4.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "living",
+     "at": [
+      3.5,
+      2.5
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_neon_club",
+   "roomType": "bar_club",
+   "label": "Club Wheelhouse",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    22,
+    18
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.6,
+     "rooms": [
+      {
+       "id": "bar",
+       "kind": "bar",
+       "rect": [
+        0.0,
+        0.0,
+        22.0,
+        10.0
+       ]
+      },
+      {
+       "id": "floor2",
+       "kind": "dancefloor",
+       "rect": [
+        0.0,
+        10.0,
+        12.0,
+        8.0
+       ]
+      },
+      {
+       "id": "backhall",
+       "kind": "hall",
+       "rect": [
+        12.0,
+        10.0,
+        2.0,
+        8.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        14.0,
+        10.0,
+        8.0,
+        3.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        14.0,
+        13.0,
+        8.0,
+        5.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "bar",
+        "floor2"
+       ],
+       "at": [
+        6.0,
+        10.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "backhall"
+       ],
+       "at": [
+        13.0,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "wc"
+       ],
+       "at": [
+        14.0,
+        11.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "backhall",
+        "office"
+       ],
+       "at": [
+        14.0,
+        15.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bar",
+        "outside"
+       ],
+       "at": [
+        6.5,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "backhall",
+        "outside"
+       ],
+       "at": [
+        13.0,
+        18.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      },
+      {
+       "rooms": [
+        "floor2",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "bar",
+       "at": [
+        16.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bar",
+       "at": [
+        0.0,
+        5.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "shop": "bar_drinks",
+   "access": {
+    "open": [
+     18,
+     4
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "sun_neon_club_cache",
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      17.5,
+      8.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "bar",
+     "at": [
+      11.0,
+      5.0
+     ],
+     "rot": 0,
+     "activity": "bartender",
+     "role": "patron",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_souvenir",
+   "roomType": "shop_kiosk",
+   "label": "Souvenirladen",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    10,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "floor",
+       "kind": "shopfloor",
+       "rect": [
+        3.5,
+        0.0,
+        6.5,
+        6.5
+       ]
+      },
+      {
+       "id": "till",
+       "kind": "counter",
+       "rect": [
+        0.0,
+        0.0,
+        3.5,
+        6.5
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        0.0,
+        6.5,
+        6.0,
+        3.5
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.0,
+        6.5,
+        4.0,
+        3.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "floor",
+        "till"
+       ],
+       "at": [
+        3.5,
+        3.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "till",
+        "store"
+       ],
+       "at": [
+        2.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "store",
+        "wc"
+       ],
+       "at": [
+        6.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "floor",
+        "outside"
+       ],
+       "at": [
+        7.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "store",
+        "outside"
+       ],
+       "at": [
+        2.5,
+        10.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "floor",
+       "at": [
+        4.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "floor",
+       "at": [
+        9.0,
+        0.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "souvenir_sunstrip",
+   "access": {
+    "open": [
+     7,
+     23
+    ],
+    "hack": 1
+   },
+   "secrets": [
+    {
+     "id": "sun_souvenir_cache",
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      8.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "floor",
+     "at": [
+      7.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "shopkeeper",
+     "role": "shopkeeper",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_burger",
+   "roomType": "diner",
+   "label": "Burgerbude am Pier",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    12,
+    10
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "dining",
+       "kind": "dining",
+       "rect": [
+        0.0,
+        0.0,
+        12.0,
+        6.0
+       ]
+      },
+      {
+       "id": "kitchen",
+       "kind": "kitchen_pro",
+       "rect": [
+        0.0,
+        6.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.5,
+        6.0,
+        2.5,
+        4.0
+       ]
+      },
+      {
+       "id": "store",
+       "kind": "storage",
+       "rect": [
+        9.0,
+        6.0,
+        3.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "dining",
+        "kitchen"
+       ],
+       "at": [
+        3.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "wc"
+       ],
+       "at": [
+        8.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "store"
+       ],
+       "at": [
+        10.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        6.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "kitchen",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        10.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "dining",
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        10.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        3.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "shop": "diner_menu",
+   "access": {
+    "open": [
+     6,
+     2
+    ]
+   },
+   "secrets": [
+    {
+     "id": "sun_burger_cache",
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      9.5,
+      5.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "dining",
+     "at": [
+      6.0,
+      3.0
+     ],
+     "rot": 0,
+     "activity": "cook",
+     "role": "cook",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_beach_house",
+   "roomType": "apartment_large",
+   "label": "Strandhaus",
+   "districts": [
+    "Sunstrip",
+    "Greenmoor"
+   ],
+   "footprint": [
+    14,
+    14
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "hall",
+       "rect": [
+        5.5,
+        0.0,
+        3.0,
+        14.0
+       ]
+      },
+      {
+       "id": "living",
+       "kind": "living",
+       "rect": [
+        0.0,
+        0.0,
+        5.5,
+        7.0
+       ]
+      },
+      {
+       "id": "dining",
+       "kind": "kitchen",
+       "rect": [
+        0.0,
+        7.0,
+        5.5,
+        7.0
+       ]
+      },
+      {
+       "id": "study",
+       "kind": "office",
+       "rect": [
+        8.5,
+        0.0,
+        5.5,
+        7.0
+       ]
+      },
+      {
+       "id": "bath0",
+       "kind": "bath",
+       "rect": [
+        8.5,
+        7.0,
+        5.5,
+        3.0
+       ]
+      },
+      {
+       "id": "utility",
+       "kind": "storage",
+       "rect": [
+        8.5,
+        10.0,
+        5.5,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "living"
+       ],
+       "at": [
+        5.5,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "dining"
+       ],
+       "at": [
+        5.5,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "study"
+       ],
+       "at": [
+        8.5,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "bath0"
+       ],
+       "at": [
+        8.5,
+        8.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "utility"
+       ],
+       "at": [
+        8.5,
+        12.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "living",
+        "dining"
+       ],
+       "at": [
+        3.0,
+        7.0
+       ],
+       "width": 2.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        7.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "dining",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "living",
+       "at": [
+        0.0,
+        2.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "living",
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "dining",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        14.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "study",
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ],
+     "stairs": [
+      {
+       "room": "hall",
+       "rect": [
+        6.0,
+        7.5,
+        2.0,
+        4.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 2.9,
+     "rooms": [
+      {
+       "id": "upper_hall",
+       "kind": "hall",
+       "rect": [
+        5.5,
+        0.0,
+        3.0,
+        14.0
+       ]
+      },
+      {
+       "id": "master",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        0.0,
+        5.5,
+        7.0
+       ]
+      },
+      {
+       "id": "child",
+       "kind": "bedroom",
+       "rect": [
+        0.0,
+        7.0,
+        5.5,
+        7.0
+       ]
+      },
+      {
+       "id": "bath1",
+       "kind": "bath",
+       "rect": [
+        8.5,
+        0.0,
+        5.5,
+        5.0
+       ]
+      },
+      {
+       "id": "guest",
+       "kind": "bedroom",
+       "rect": [
+        8.5,
+        5.0,
+        5.5,
+        9.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "upper_hall",
+        "master"
+       ],
+       "at": [
+        5.5,
+        3.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "child"
+       ],
+       "at": [
+        5.5,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "bath1"
+       ],
+       "at": [
+        8.5,
+        2.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "guest"
+       ],
+       "at": [
+        8.5,
+        9.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "upper_hall",
+        "outside"
+       ],
+       "at": [
+        7.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "master",
+       "at": [
+        0.0,
+        3.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "child",
+       "at": [
+        0.0,
+        10.5
+       ],
+       "width": 1.0
+      },
+      {
+       "room": "guest",
+       "at": [
+        14.0,
+        9.5
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "bath1",
+       "at": [
+        11.0,
+        0.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": null,
+    "key": "key_home",
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "sun_beach_house_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      8.0,
+      11.0
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      7.0,
+      7.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_hinterland_room",
+   "roomType": "slum_room",
+   "label": "Hinterland-Zimmer",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    8,
+    8
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 2.6,
+     "rooms": [
+      {
+       "id": "room",
+       "kind": "slum",
+       "rect": [
+        0.0,
+        0.0,
+        6.0,
+        8.0
+       ]
+      },
+      {
+       "id": "wc",
+       "kind": "bath",
+       "rect": [
+        6.0,
+        0.0,
+        2.0,
+        4.0
+       ]
+      },
+      {
+       "id": "nook",
+       "kind": "storage",
+       "rect": [
+        6.0,
+        4.0,
+        2.0,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "room",
+        "wc"
+       ],
+       "at": [
+        6.0,
+        2.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "room",
+        "nook"
+       ],
+       "at": [
+        6.0,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "room",
+        "outside"
+       ],
+       "at": [
+        2.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "nook",
+        "outside"
+       ],
+       "at": [
+        7.0,
+        8.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [
+      {
+       "room": "room",
+       "at": [
+        0.0,
+        4.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "style": "slum",
+   "access": {
+    "open": [
+     0,
+     24
+    ]
+   },
+   "secrets": [
+    {
+     "id": "sun_hinterland_room_cache",
+     "floor": 0,
+     "room": "room",
+     "at": [
+      5.0,
+      6.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "room",
+     "at": [
+      3.0,
+      4.0
+     ],
+     "rot": 0,
+     "activity": "sleep",
+     "role": "resident",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_arcade_backroom",
+   "roomType": "hackerspace",
+   "label": "Spielhalle mit Hinterzimmer",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    16,
+    12
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "lab",
+       "kind": "lab",
+       "rect": [
+        0.0,
+        0.0,
+        9.5,
+        12.0
+       ]
+      },
+      {
+       "id": "server",
+       "kind": "server",
+       "rect": [
+        9.5,
+        0.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "bench",
+       "kind": "workshop",
+       "rect": [
+        9.5,
+        4.0,
+        6.5,
+        4.0
+       ]
+      },
+      {
+       "id": "lounge",
+       "kind": "lounge",
+       "rect": [
+        9.5,
+        8.0,
+        6.5,
+        4.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "lab",
+        "server"
+       ],
+       "at": [
+        9.5,
+        2.0
+       ],
+       "width": 1.0,
+       "lock": {
+        "hack": 2
+       }
+      },
+      {
+       "rooms": [
+        "lab",
+        "bench"
+       ],
+       "at": [
+        9.5,
+        6.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lab",
+        "lounge"
+       ],
+       "at": [
+        9.5,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "bench",
+        "lounge"
+       ],
+       "at": [
+        13.0,
+        8.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "lab",
+        "outside"
+       ],
+       "at": [
+        3.0,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "lounge",
+        "outside"
+       ],
+       "at": [
+        13.0,
+        12.0
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "lab",
+       "at": [
+        0.0,
+        6.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "collective",
+    "minStanding": 10,
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "sun_arcade_backroom_cache",
+     "floor": 0,
+     "room": "lab",
+     "at": [
+      7.5,
+      9.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "lab",
+     "at": [
+      5.0,
+      6.0
+     ],
+     "rot": 0,
+     "activity": "hack",
+     "role": "hacker",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_beach_patrol",
+   "roomType": "police_station",
+   "label": "Strandwache",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    16,
+    13
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 3.2,
+     "rooms": [
+      {
+       "id": "front",
+       "kind": "booking",
+       "rect": [
+        0.0,
+        0.0,
+        16.0,
+        4.5
+       ]
+      },
+      {
+       "id": "corr",
+       "kind": "hall",
+       "rect": [
+        0.0,
+        4.5,
+        16.0,
+        2.0
+       ]
+      },
+      {
+       "id": "brief",
+       "kind": "briefing",
+       "rect": [
+        0.0,
+        6.5,
+        6.5,
+        6.5
+       ]
+      },
+      {
+       "id": "evidence",
+       "kind": "evidence",
+       "rect": [
+        6.5,
+        6.5,
+        3.0,
+        6.5
+       ]
+      },
+      {
+       "id": "cell0",
+       "kind": "cell",
+       "rect": [
+        9.5,
+        6.5,
+        3.0,
+        6.5
+       ]
+      },
+      {
+       "id": "cell1",
+       "kind": "cell",
+       "rect": [
+        12.5,
+        6.5,
+        3.0,
+        6.5
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "corr",
+        "cell0"
+       ],
+       "at": [
+        11.0,
+        6.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_cells",
+        "hack": 3
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "corr",
+        "cell1"
+       ],
+       "at": [
+        14.0,
+        6.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_cells",
+        "hack": 3
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "front",
+        "corr"
+       ],
+       "at": [
+        5.0,
+        4.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "brief"
+       ],
+       "at": [
+        3.0,
+        6.5
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "corr",
+        "evidence"
+       ],
+       "at": [
+        8.0,
+        6.5
+       ],
+       "width": 1.0,
+       "lock": {
+        "key": "key_evidence",
+        "hack": 4
+       },
+       "panel": true
+      },
+      {
+       "rooms": [
+        "front",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        0.0
+       ],
+       "width": 2.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "corr",
+        "outside"
+       ],
+       "at": [
+        0.0,
+        5.5
+       ],
+       "width": 1.0,
+       "entrance": "back"
+      }
+     ],
+     "windows": [
+      {
+       "room": "front",
+       "at": [
+        2.5,
+        0.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "brief",
+       "at": [
+        0.0,
+        10.0
+       ],
+       "width": 1.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     0,
+     24
+    ],
+    "faction": "kcg",
+    "minStanding": -10,
+    "hack": 4
+   },
+   "secrets": [
+    {
+     "id": "sun_beach_patrol_cache",
+     "floor": 0,
+     "room": "front",
+     "at": [
+      13.0,
+      3.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "front",
+     "at": [
+      8.0,
+      2.0
+     ],
+     "rot": 0,
+     "activity": "reception",
+     "role": "officer",
+     "chance": 0.9
+    }
+   ]
+  },
+  {
+   "id": "sun_storage_hall",
+   "roomType": "warehouse",
+   "label": "Lager der Promenadenbetriebe",
+   "districts": [
+    "Sunstrip"
+   ],
+   "footprint": [
+    22,
+    18
+   ],
+   "floors": [
+    {
+     "level": 0,
+     "height": 6.0,
+     "rooms": [
+      {
+       "id": "hall",
+       "kind": "warehouse",
+       "rect": [
+        0.0,
+        0.0,
+        16.5,
+        18.0
+       ]
+      },
+      {
+       "id": "dock",
+       "kind": "garage",
+       "rect": [
+        16.5,
+        0.0,
+        5.5,
+        10.0
+       ]
+      },
+      {
+       "id": "stairs",
+       "kind": "stair",
+       "rect": [
+        16.5,
+        10.0,
+        5.5,
+        8.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "hall",
+        "dock"
+       ],
+       "at": [
+        16.5,
+        5.0
+       ],
+       "width": 3.0
+      },
+      {
+       "rooms": [
+        "hall",
+        "stairs"
+       ],
+       "at": [
+        16.5,
+        14.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "dock",
+        "outside"
+       ],
+       "at": [
+        19.0,
+        0.0
+       ],
+       "width": 4.0,
+       "entrance": "garage",
+       "vehicles": true
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        3.5,
+        0.0
+       ],
+       "width": 1.0,
+       "entrance": "front"
+      },
+      {
+       "rooms": [
+        "hall",
+        "outside"
+       ],
+       "at": [
+        8.0,
+        18.0
+       ],
+       "width": 1.0,
+       "entrance": "emergency"
+      }
+     ],
+     "windows": [],
+     "stairs": [
+      {
+       "room": "stairs",
+       "rect": [
+        17.0,
+        10.5,
+        2.0,
+        5.0
+       ],
+       "toLevel": 1,
+       "axis": "y"
+      }
+     ]
+    },
+    {
+     "level": 1,
+     "height": 3.0,
+     "rooms": [
+      {
+       "id": "landing",
+       "kind": "stair",
+       "rect": [
+        16.5,
+        10.0,
+        5.5,
+        8.0
+       ]
+      },
+      {
+       "id": "office",
+       "kind": "office",
+       "rect": [
+        16.5,
+        0.0,
+        5.5,
+        10.0
+       ]
+      }
+     ],
+     "doors": [
+      {
+       "rooms": [
+        "landing",
+        "office"
+       ],
+       "at": [
+        19.0,
+        10.0
+       ],
+       "width": 1.0
+      },
+      {
+       "rooms": [
+        "landing",
+        "outside"
+       ],
+       "at": [
+        22.0,
+        14.0
+       ],
+       "width": 1.0,
+       "entrance": "roof"
+      }
+     ],
+     "windows": [
+      {
+       "room": "office",
+       "at": [
+        22.0,
+        5.0
+       ],
+       "width": 2.0
+      },
+      {
+       "room": "office",
+       "at": [
+        16.5,
+        5.0
+       ],
+       "width": 2.0
+      }
+     ]
+    }
+   ],
+   "access": {
+    "open": [
+     6,
+     22
+    ],
+    "hack": 2
+   },
+   "secrets": [
+    {
+     "id": "sun_storage_hall_cache",
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      13.0,
+      14.5
+     ],
+     "kind": "collectible"
+    }
+   ],
+   "npcSlots": [
+    {
+     "floor": 0,
+     "room": "hall",
+     "at": [
+      8.0,
+      9.0
+     ],
+     "rot": 0,
+     "activity": "carry",
+     "role": "worker",
+     "chance": 0.9
+    }
+   ]
+  }
+ ]
+}

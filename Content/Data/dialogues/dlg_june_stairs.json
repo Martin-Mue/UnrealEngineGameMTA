@@ -1,0 +1,29 @@
+{
+  "id": "dlg_june_stairs", "npc": "june_abara", "title": "Lieder auf der Treppe", "kind": "friendship",
+  "start": "open",
+  "entries": [
+    {"when": [{"npcTrust": ["@npc", ">=", 2]}], "node": "friend"}
+  ],
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Wünsch dir was. Ich spiel es falsch, aber mit Gefühl.", "next": "c1"},
+    "friend": {"type": "line", "who": "@npc", "text": "Da ist ja meine Lieblingsfahrerin! Ich hab eine Strophe über dich. Sie reimt sich auf Auspuff, das war nicht leicht.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Spiel was über die Stadt.", "next": "song"},
+      {"text": "Warum hat die Gitarre nur fünf Saiten?", "next": "strings"},
+      {"text": "Ich hab gehört, du hattest Ärger am Sunstrip.", "next": "trouble"},
+      {"text": "Kennst du hier oben jeden?", "when": [{"npcTrust": ["@npc", ">=", 1]}], "next": "know"},
+      {"text": "Hier, für die sechste Saite.", "effects": [{"money": -20}, {"npcTrust": ["@npc", 1]}], "next": "tip"},
+      {"text": "Ich muss weiter.", "next": "bye"}]},
+    "song": {"type": "line", "who": "@npc", "text": "„Die Kamera am Turm hat ein Auge aus Glas, sie sieht jeden Abend, wie ich den Mietzins vergass.“ Das ist kein Reim, das ist Protest. Hat Kit gesagt.", "effects": [{"mood": 0.1}], "next": "c1"},
+    "strings": {"type": "line", "who": "@npc", "text": "Die sechste ist gesellschaftlich überholt. Und gerissen. Aber gesellschaftlich überholt klingt besser, wenn Touristen fragen.", "next": "c1"},
+    "trouble": {"type": "line", "who": "@npc", "text": "Officer Hask hat mich dreimal von der Promenade geschickt. Sie hat mir jedes Mal ein Eis gekauft. Ich weiß nicht, ob ich sie hassen soll. Es war Pistazie.", "next": "c_trouble"},
+    "c_trouble": {"type": "choice", "options": [
+      {"text": "Soll ich mit ihr reden?", "next": "offer_help"},
+      {"text": "Spiel einfach woanders.", "effects": [{"npcTrust": ["@npc", -1]}], "next": "c1"}]},
+    "offer_help": {"type": "line", "who": "@npc", "text": "Würdest du? Sie ist nicht böse, nur müde. Sag ihr, dass eine Promenade ohne Musik nur ein langer Parkplatz ist.", "effects": [{"flag": ["dlg.june.help_lena", true]}, {"npcTrust": ["@npc", 1]}], "next": "c1"},
+    "know": {"type": "line", "who": "@npc", "text": "Jeden, der die Treppe nimmt. Der Hausmeister zählt Besucher, Yara zählt Seelen, ich zähle Schritte. Seit gestern geht hier nachts ein Mann mit Analystenbrille hoch. Er geht wie jemand, der ein Lied vergessen hat.", "effects": [{"flag": ["dlg.clue.jonas_stairs", true]}], "next": "c1"},
+    "tip": {"type": "line", "who": "@npc", "text": "Zwanzig! Damit kann ich die sechste Saite kaufen und sie trotzdem weglassen. Das ist künstlerische Freiheit mit Budget.", "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Komm wieder, dann bekommst du die Strophe mit dem Auspuff.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

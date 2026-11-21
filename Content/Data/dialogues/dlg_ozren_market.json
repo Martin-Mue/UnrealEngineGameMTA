@@ -1,0 +1,30 @@
+{
+  "id": "dlg_ozren_market", "npc": "ozren_petrak", "title": "Unter der Brücke", "kind": "trader",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Willkommen auf dem ehrlichsten Markt der Stadt. Hier lügt jeder, und alle wissen es. Tee?", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Zeig mir die Ware.", "next": "shop"},
+      {"text": "Ich kaufe Informationen.", "next": "info"},
+      {"text": "Wie viel kriege ich für einen heißen Wagen?", "next": "fence"},
+      {"text": "Tee, gern.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "tea"},
+      {"text": "Ich schau nur.", "next": "bye"}]},
+    "shop": {"type": "trade", "shop": "black_market", "next": "c1"},
+    "tea": {"type": "line", "who": "@npc", "text": "Wer Tee trinkt, verhandelt langsamer. Langsam ist gut für mich. Aber du bist höflich, das notiere ich. Im Kopf. Bücher führe ich keine.", "next": "c1"},
+    "fence": {"type": "line", "who": "@npc", "text": "Hängt davon ab, wie heiß. Lauwarm: ein Drittel. Heiß: ein Viertel. Kennzeichen in den Nachrichten: ein Tee und mein Mitleid.", "next": "c1"},
+    "info": {"type": "line", "who": "@npc", "text": "Informationen sind wie Reifen: Gebraucht sind sie billiger, aber man weiß nie, wo sie schon überall waren. Was willst du?", "next": "c_info"},
+    "c_info": {"type": "choice", "options": [
+      {"text": "Wer im Hafen redet mit der Civil Guard?", "effects": [{"money": -150}, {"flag": ["dlg.clue.piet_informant", true]}], "next": "i_piet"},
+      {"text": "Wer schickt Geld aus Greenmoor nach Rustline?", "effects": [{"money": -100}, {"flag": ["dlg.clue.constance_brother", true]}], "next": "i_constance"},
+      {"text": "Gratis. Weil ich nett gefragt habe.", "check": {"skill": "persuade", "difficulty": 4, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 1]}], "value": 1}], "success": "i_free", "fail": "i_no"}},
+      {"text": "Gratis. Oder Mallory erfährt, woher deine KCG-Ware kommt.", "check": {"skill": "intimidate", "difficulty": 3, "bonus": [{"when": [{"standing": ["wrenchers", ">=", 30]}], "value": 1}], "success": "i_forced", "fail": "i_no"}},
+      {"text": "Zu teuer.", "next": "c1"}]},
+    "i_piet": {"type": "line", "who": "@npc", "text": "Halvorsen. Der Mann mit den Feuerzeugen. Er raucht nicht, weißt du. Er verschenkt sie an Leute, deren Namen er später verkauft.", "next": "c1"},
+    "i_constance": {"type": "line", "who": "@npc", "text": "Jeden Monat ein Umschlag ohne Absender, an den alten Malachy. Duftet nach Rosen. In Rustline duftet sonst nichts nach Rosen.", "next": "c1"},
+    "i_free": {"type": "line", "who": "@npc", "text": "Gratis. Pah. Na gut, ein Hinweis, weil du Tee getrunken hast: Halvorsen redet zu viel mit Leuten in Uniform. Mehr gibt's für Geld.", "effects": [{"flag": ["dlg.clue.piet_informant", true]}], "next": "c1"},
+    "i_forced": {"type": "line", "who": "@npc", "text": "...Mallory. Du kennst Namen. Gut. Halvorsen redet mit Vesna Koll. Und jetzt kauf etwas, damit es aussieht, als wären wir Freunde.", "effects": [{"flag": ["dlg.clue.piet_informant", true]}, {"npcTrust": ["@npc", -2]}, {"relation": ["@npc", "greer_mallory", "rivalry", 10]}], "next": "c1"},
+    "i_no": {"type": "line", "who": "@npc", "text": "Nein. Moral ist bei mir ausverkauft, aber Rabatte auch.", "next": "c1"},
+    "bye": {"type": "line", "who": "@npc", "text": "Schauen ist gratis. Vergessen, was du gesehen hast, kostet extra.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

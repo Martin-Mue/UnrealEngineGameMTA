@@ -43,3 +43,31 @@ Geprüft per Simulation: keine Konsolenfehler, Fahren/Lenken, Verkehr, Polizei b
 - `game.js` in ES-Module aufteilen (world, vehicles, ai, police, missions, ui, audio)
 - Streaming/LOD für größere Welt vorbereiten
 - Done: Struktur wie im Weltkonzept, Spiel läuft unverändert
+
+## Gesamtplan / Backlog (Stand 20.11.2026, Unreal Engine 5.8.4)
+Engine: UE 5.8.4 liegt unter `F:\UnrealEngine\UE_5.8`. Das Godot-Projekt (`godot/`) bleibt als Referenz-Prototyp und Testfeld (Story-Simulator).
+
+Wünsche des Nutzers (verbindlich für alle Bereiche):
+- extremer Realismus und Liebe zum Detail, dystopische, lebendige Open World, später MMO
+- ausgereifte Story mit spielerabhängigen Wendungen, viele Missionen und Nebenaufträge, Speichern und Laden
+- eigene Spielfiguren, Gespräche (Dialogsystem), begehbare Häuser, Interaktionen zwischen NPCs, richtig lebendige Welt
+- Überraschungen je Stadtbezirk (Geheimnisse, Ereignisse); später Wald/Dschungel mit Wasserfall und geheimem Eingang dahinter
+- Orientierung an den Stärken von The Witcher, Cyberpunk und GTA (nur allgemeine Prinzipien, nichts kopieren)
+
+Arbeitspakete (jeweils eigener Fach-Agent, getrennte Dateien):
+| Paket | Inhalt | Status |
+|---|---|---|
+| A Fahrzeug/HUD/Spielfluss | `MTAVehiclePawn`, `MTA6GameMode`, `MTAHUD`, `MTASaveGame`, `MTAMissionComponent` | in Arbeit |
+| B Stadt/Welt | `MTACityGenerator`, `MTATimeOfDay`, `tools/ue/*.py`, Render-Einstellungen | in Arbeit |
+| C KI | `MTAWorldAI*`, `MTAHeatSubsystem`, Polizei | in Arbeit |
+| D Story/Missionen | `Content/Data/story.json`, `docs/STORY.md`, `docs/MISSIONSTYPEN.md` | in Arbeit |
+| E Fortschritt/Wirtschaft | Skills, Herkunft, Fahrzeugkatalog, Garage, Inventar | in Arbeit |
+| F Zu Fuß/Systemik | `MTACharacter`, Interaktion, Ein-/Aussteigen, Zeugen, Aegis-Kameras | in Arbeit |
+| G Audio/Radio/Wetter | Sender, Musik-Synthese, Ambience, Wetter | in Arbeit |
+| H Menüs/Optionen | Hauptmenü, Einstellungen, Karte, Tutorial, Fotomodus, Lokalisierung | in Arbeit |
+| I NPC-Leben | 60 Schlüsselfiguren, Dialoge, Tagesabläufe, Beziehungen, Gerüchte | in Arbeit |
+| J Innenräume | begehbare Häuser, Läden, Möbel, Eingänge | in Arbeit |
+| K Entdeckungen/Wildnis | 90 Geheimnisse, Weltereignisse, Wald/Wasserfall (Design + Gerüst) | in Arbeit |
+| L Spielfiguren | Aussehen, Garderobe, Charaktererstellung, MetaHuman-Pipeline | in Arbeit |
+| M Mehrspieler/MMO | Server, Replikation, Persistenz | später (nach stabiler Einzelspieler-Basis) |
+| N Integration | Bauen, Fehler beheben, Level erzeugen, spielbare Version | nach den Berichten |

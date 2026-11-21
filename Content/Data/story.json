@@ -1,0 +1,1283 @@
+{
+  "schema": 1,
+  "title": "Nullstunde",
+  "start": {
+    "standing": {"aurelia": 0, "union": 0, "collective": 0, "wrenchers": 0, "kcg": 0},
+    "npcTrust": {"jonas": 0, "brann": 0, "nox": 0, "ravn": 0, "dutch": 0, "kandel": 0, "pia": 0},
+    "aegis": 50
+  },
+  "registry": {
+    "districts": ["core", "saltmarket", "lantern", "greenmoor", "rustline", "sunstrip", "route9", "ashridge", "coastroad", "saltflats"],
+    "npcs": {
+      "jonas": "Jonas Voss, Miras Bruder, Ex-Datenanalyst bei Aurelia",
+      "brann": "Tomasz »Brann« Brandt, Anführer der Dockers' Union",
+      "nox": "Nox, Hacker:in des Lantern Collective",
+      "yara": "Yara Quill, Sprecherin des Collective am Glockenturm",
+      "ravn": "Cmdr. Ravn Okoye, Leiter der Kestrel Civil Guard",
+      "dutch": "Odalys »Dutch« Halloran, Chefin der Rustline Wrenchers",
+      "kandel": "Dr. Idris Kandel, Vorstand Aurelia Holdings, Architekt von Aegis",
+      "pia": "Pia Sorensen, Moderatorin von Open Line",
+      "edda": "Edda Marsh, Kranführerin in Saltmarket",
+      "spindel": "Spindel, Gig-Vermittler mit sieben Telefonen",
+      "hanne": "Hanne Lark, Witwe eines Truckfahrers",
+      "silberfisch": "Silberfisch, Kennzeichenfälscher",
+      "aegis": "Aegis, das Überwachungsnetz (Systemstimme)"
+    },
+    "flags": {
+      "checkpointScanned": "Prolog: Kennzeichen am Checkpoint freiwillig gescannt",
+      "calledOpenLine": "Prolog: live bei Open Line angerufen",
+      "usedBackdoor": "A1: Hintertür statt Pass genommen",
+      "cargoDestroyed": "A1: Streikbrecher-Ladung zerstört",
+      "spareDriver": "A1: Streikbrecher-Fahrer verschont",
+      "killedCivilians": "TAT: Unbeteiligte sind durch Miras Handeln gestorben (Schwelle 1)",
+      "massacre": "TAT: gewaltsame Räumung mit vielen Opfern (Schwelle 2)",
+      "dirtyDriver": "C1: unfair gefahren",
+      "hackModule": "B1: Kamera-Hack-Modul eingebaut",
+      "bribedGuard": "Routinekontrolle: KCG bestochen",
+      "ledgerFound": "W1: Ledger-Kern gefunden",
+      "ally_union": "W1: Fund der Union gezeigt",
+      "ally_collective": "W1: Fund dem Collective gezeigt",
+      "ally_corp": "W1: Fund Aurelia gezeigt",
+      "jonasConfronted": "Akt II: Jonas zur Rede gestellt",
+      "brannCovered": "A4: Brann gedeckt",
+      "brannExposed": "A4/W2: Brann bloßgestellt",
+      "brannBlackmailed": "A4: Brann erpresst",
+      "ledgerOriginal": "B2: Original-Datenträger gestohlen (Beweis für E5)",
+      "greenmoorPanic": "B3: Kamera-Kaskade nach Greenmoor ausgelöst",
+      "witnessesDelivered": "Konzern: Zeugen ausgeliefert",
+      "witnessesFreed": "Konzern: Zeugen heimlich freigelassen",
+      "sourceBurned": "Konzern: Pias Quelle verraten",
+      "sourceWarned": "Konzern: Pias Quelle gewarnt",
+      "kandelInfo": "Wissen über Kandels Beweggründe",
+      "w2_done": "W2 abgehandelt (Variantensperre)",
+      "betrayedByBrann": "W2: Brann hat verraten",
+      "betrayedByNox": "W2: Nox hat verraten",
+      "ambushed": "W2: KCG-Hinterhalt",
+      "kandelOnAir": "W2-Variante: Kandel ruft live an",
+      "brannArrested": "W2: Brann an die KCG ausgeliefert",
+      "noxArrested": "W2: Nox an Aurelia gemeldet",
+      "interrogated": "W2: Mira hat sich verhören lassen",
+      "soldOut": "W3: Angebot angenommen",
+      "refused": "W3: Angebot abgelehnt",
+      "doublePlay": "W3: Doppelspiel",
+      "kandelDoubts": "W3: Kandel hat Zweifel gezeigt (Zeuge für E5)",
+      "betrayedUnion": "TAT: Union verraten",
+      "betrayedCollective": "TAT: Collective verraten",
+      "warnedResidents": "Akt III: Bewohner vor Räumung gewarnt",
+      "hasUplinkKeys": "Akt III: Aegis-Schlüssel kopiert (Verkauf möglich)",
+      "backdoorPlanted": "Akt III: Hintertür für Collective gelegt",
+      "ravnTurned": "Akt III: Ravn wechselt die Seite",
+      "portHeld": "Akt III: Hafen gesichert",
+      "brannDead": "Akt III: Brann tot",
+      "brannFled": "Akt III: Brann geflohen",
+      "jammerReady": "Akt III: Störsender am Mast bereit",
+      "yaraArrested": "Akt III: Yara verhaftet",
+      "escapeRoute": "Akt III: Fluchtroute Route 9 vorbereitet",
+      "uplinkAccess": "Akt III: Konzernzugang zum Uplink",
+      "w4_done": "W4 abgehandelt (Variantensperre)",
+      "savedJonas": "W4: Jonas gerettet",
+      "jonasWithMira": "W4: Jonas (Doppelagent) begleitet Mira",
+      "jonasLost": "W4: Jonas an Kandel übergeben",
+      "jonasGone": "W4: Jonas allein fortgegangen",
+      "jonasDead": "W4: Jonas tot",
+      "vowRevenge": "W4: Rache geschworen",
+      "endTakeOver": "W5: Aegis übernommen",
+      "endSell": "W5: Aegis verkauft",
+      "endHoldPort": "W5: Hafen halten",
+      "endShutDown": "W5: Uplink zerstört",
+      "endOpenBooks": "W5: Bücher geöffnet (E5)",
+      "endFlee": "W5: Flucht",
+      "ending": "Info-Flag (String) für Debug-Ausgabe, wird nie verglichen",
+      "eddaExposed": "Nebenquest: Eddas Geheimnis verraten",
+      "eddaPaid": "Nebenquest: Eddas Schulden bezahlt",
+      "towerPass": "Nebenquest: Hintereingang in den Aurelia Tower",
+      "confessedKill": "Nebenquest: Tat gegenüber der Witwe gestanden",
+      "strikeSold": "Event: Streikplan an Aurelia verkauft",
+      "soldSilberfisch": "Vertrag: Fälscher an KCG verkauft",
+      "demolitionLeaked": "Nebenquest: Abrissdaten veröffentlicht",
+      "aegisErrorsLeaked": "Nebenquest: Ravns Fehlfestnahmen-Akte geleakt",
+      "ravnFile": "Nebenquest: Ravns Akte als Faustpfand behalten",
+      "leakedLedger": "Nebenquest: Ledger-Kopie an Open Line (Beweis für E5)",
+      "looted": "Event: im Stromausfall geplündert",
+      "noxSisterFreed": "Nebenquest: Nox' Schwester befreit"
+    }
+  },
+  "missions": [
+    {
+      "id": "p1", "title": "Rückkehr", "main": true, "act": 0, "cell": [8, 4],
+      "type": "courier", "district": "route9", "giver": "aegis",
+      "params": {"from": "route9_checkpoint", "to": "saltmarket_pension", "time_limit": 300, "checkpoints": ["route9_checkpoint"]},
+      "reward": "$200, Zimmer in Saltmarket",
+      "requires": [],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Sieben Jahre war Mira Voss weg. Jetzt rollt sie mit leerem Tank und einem Kofferraum voller alter Schuld auf den Checkpoint der Route 9 zu. Ihr Bruder Jonas, Datenanalyst bei Aurelia Holdings, antwortet seit elf Tagen nicht. Über der Schranke blinkt das Aegis-Logo: »Willkommen zurück. Wir haben Sie vermisst.« In vierzehn Tagen geht Aegis »Phase Zwei« live. Die Stadt nennt den Termin nur: Nullstunde.",
+      "choices": [{
+        "id": "p1_checkpoint", "text": "Die Schranke wartet. Wie kommst du in die Stadt?",
+        "options": [
+          {"id": "scan", "text": "Kennzeichen scannen lassen und in die Kamera lächeln", "effects": [{"aegis": 10}, {"standing": ["kcg", 5]}, {"flag": ["checkpointScanned", true]}]},
+          {"id": "dodge", "text": "Über die Baustellenausfahrt nach Rustline ausweichen", "effects": [{"aegis": 3}, {"heat": 1}, {"standing": ["wrenchers", 5]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 200}],
+      "outro": "Pension in Saltmarket, Zimmer 4, Blick auf die Kranreihe. Aegis führt sie jetzt als »Rückkehrerin, Motivation unklar«."
+    },
+    {
+      "id": "p2", "title": "Erste Loyalität", "main": true, "act": 0, "cell": [1, 4],
+      "type": "courier", "district": "saltmarket",
+      "params": {"from": "saltmarket_pension", "to": "variable", "time_limit": 240},
+      "reward": "+20 Stand bei der gewählten Fraktion",
+      "requires": [{"done": "p1"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Jonas hat Schulden hinterlassen, und zwar bei den falschen Leuten. Brann von der Dockers' Union will die geliehenen Lohnkassen zurück, Dutch von den Rustline Wrenchers den Wagen, den Jonas nie bezahlt hat. Beide bieten an, die Schuld abzuarbeiten. Beide behaupten, sie wüssten, wo Jonas zuletzt war.",
+      "choices": [{
+        "id": "p2_first", "text": "Bei wem arbeitest du Jonas' Schuld zuerst ab?",
+        "options": [
+          {"id": "union", "text": "Bei Brann und der Dockers' Union in Saltmarket", "effects": [{"standing": ["union", 20]}, {"npcTrust": ["brann", 1]}]},
+          {"id": "wrench", "text": "Bei Dutch und den Rustline Wrenchers", "effects": [{"standing": ["wrenchers", 20]}, {"npcTrust": ["dutch", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 100}],
+      "outro": "Die andere Seite hat zugesehen. In Kestrel Bay ist auch Nichtstun eine Antwort."
+    },
+    {
+      "id": "p3", "title": "Open Line", "main": true, "act": 0, "cell": [1, 1],
+      "type": "event", "district": "sunstrip", "giver": "pia",
+      "params": {"trigger": "radio_night", "duration_min": 6, "location": "sunstrip_pier_studio"},
+      "reward": "Erste Spur zu Jonas",
+      "requires": [{"done": "p1"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Nachts auf Open Line: Pia Sorensen nimmt Hörerrufe an, zwischen zwei Werbespots für Aurelia Calm™ (»Ihre Stadt, optimiert«). Ein Anrufer nennt sich »Kranich«, so hieß Jonas' Spitzname, als sie Kinder waren, und liest Zahlenkolonnen vor. Pia lacht nervös und blendet ihn aus. Die Zahlen sind Koordinaten.",
+      "choices": [{
+        "id": "p3_call", "text": "Wie reagierst du auf den »Kranich«?",
+        "options": [
+          {"id": "call", "text": "Live anrufen und mit dem alten Codewort antworten", "effects": [{"aegis": 5}, {"npcTrust": ["pia", 1]}, {"npcTrust": ["jonas", 1]}, {"flag": ["calledOpenLine", true]}]},
+          {"id": "silent", "text": "Mitschreiben, schweigen, Radio aus", "effects": [{"aegis": -3}]}
+        ]
+      }],
+      "onSuccess": [{"money": 50}],
+      "outro": "Am Ende der Sendung sagt Pia: »Kranich, wer immer du bist: Pass auf dich auf.« Die Sendung läuft mit sieben Sekunden Verzögerung. Aegis hört mit, ohne jede Verzögerung."
+    },
+    {
+      "id": "a1u_fruehschicht", "title": "Frühschicht", "main": true, "act": 1, "cell": [2, 4],
+      "type": "courier", "district": "saltmarket", "giver": "brann",
+      "params": {"from": "saltmarket_dock3", "to": "core_tower_plaza", "cargo": "crate", "fragile": false, "time_limit": 360, "checkpoints": ["core_checkpoint_n"], "heat_start": 0},
+      "reward": "$400, Union +10",
+      "requires": [{"done": "p2"}, {"standing": ["union", ">=", 10]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Eine Kiste ohne Papiere muss vor sechs Uhr in den Core, bevor die Konzernwache die Kais abriegelt. Brann sagt nicht, was drin ist. »Medizin«, sagt er, und dann: »Für Leute, deren Score zu niedrig für Medizin ist.«",
+      "choices": [{
+        "id": "a1u_route", "text": "Der Checkpoint Nord prüft jedes Kennzeichen. Welche Route?",
+        "options": [
+          {"id": "pass", "text": "Mit Konzernpass durch die Schranke, sauber und gesehen", "effects": [{"aegis": 5}, {"standing": ["union", -3]}]},
+          {"id": "back", "text": "Durch die Hintertür unter der Hochstraße", "effects": [{"aegis": -5}, {"heat": 1}, {"standing": ["union", 5]}, {"flag": ["usedBackdoor", true]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["union", 10]}, {"money": 400}],
+      "outro": "Brann zahlt bar und zählt zweimal nach. »Jonas hat für uns gearbeitet«, sagt er beiläufig. »Er wollte wissen, wer im Hafen Scores verkauft.«"
+    },
+    {
+      "id": "a1u_streikbrecher", "title": "Der Streikbrecher", "main": true, "act": 1, "cell": [0, 5],
+      "type": "chase", "district": "saltmarket", "giver": "brann",
+      "params": {"target": "aurelia_labor_truck", "route_profile": "harbor_to_route9", "escape_skill": 0.5, "capture_mode": "ram_or_block", "reinforcements": 1},
+      "reward": "$600, Union +15, KCG −10",
+      "requires": [{"done": "a1u_fruehschicht"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Aurelia schickt einen Lastwagen voller »Flexibilitätspartner«, Ersatzarbeiter mit Tagesvertrag und Leih-Score. Wenn er die Kais erreicht, ist der Streik vorbei, bevor er anfängt. Mira soll ihn stoppen. Wie, sagt niemand laut.",
+      "choices": [{
+        "id": "a1u_truck", "text": "Der Truck steht quer an der Kaimauer. Was tust du?",
+        "options": [
+          {"id": "spare", "text": "Den Fahrer aussteigen lassen, nur die Reifen", "effects": [{"standing": ["union", 5]}, {"standing": ["kcg", -5]}, {"flag": ["spareDriver", true]}]},
+          {"id": "cargo", "text": "Die Ladung anzünden und den Fahrer laufen lassen", "effects": [{"standing": ["union", 15]}, {"standing": ["kcg", -10]}, {"tag": ["saltmarket", "add", "strike"]}, {"flag": ["cargoDestroyed", true]}]},
+          {"id": "wall", "text": "Den Truck über die Kaimauer drängen", "effects": [{"standing": ["union", 10]}, {"standing": ["kcg", -15]}, {"heat": 2}, {"tag": ["saltmarket", "add", "strike"]}, {"flag": ["killedCivilians", true]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["union", 5]}, {"money": 600}],
+      "outro": "Am Abend meldet Clearwave FM einen »bedauerlichen Logistikvorfall«. Die Union nennt es Arbeitskampf. Die Möwen nennen es Frühstück."
+    },
+    {
+      "id": "a1w_probefahrt", "title": "Probefahrt", "main": true, "act": 1, "cell": [1, 7],
+      "type": "race", "district": "rustline", "giver": "dutch",
+      "params": {"route": "rustline_loop_a", "laps": 2, "opponents": 3, "weather": "overcast", "time_of_day": "dusk", "traffic_density": 0.3, "rules": {"ramming": true}, "stake": 100},
+      "reward": "$300, Wrenchers +10",
+      "requires": [{"done": "p2"}, {"standing": ["wrenchers", ">=", 10]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Dutch lässt niemanden für sich fahren, den sie nicht fahren gesehen hat. Drei Runden um die Raffinerie, die Fackel als Startsignal. »Jonas ist hier auch gefahren«, sagt sie. »Schlecht. Aber mit Herz.«",
+      "choices": [{
+        "id": "a1w_style", "text": "Letzte Kurve, der Favorit vor dir. Wie fährst du?",
+        "options": [
+          {"id": "fair", "text": "Sauber außen herum, ohne Kontakt", "effects": [{"npcTrust": ["dutch", 1]}, {"standing": ["wrenchers", 5]}]},
+          {"id": "dirty", "text": "Den Favoriten in die Leitplanke schieben", "effects": [{"npcTrust": ["dutch", -1]}, {"standing": ["wrenchers", 10]}, {"flag": ["dirtyDriver", true]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["wrenchers", 10]}, {"money": 300}],
+      "outro": "Dutch nickt einmal. Das ist bei ihr ein Arbeitsvertrag."
+    },
+    {
+      "id": "a1w_ersatzteile", "title": "Ersatzteile", "main": true, "act": 1, "cell": [2, 6],
+      "type": "chase", "district": "rustline", "giver": "dutch",
+      "params": {"target": "kcg_impound_truck", "route_profile": "saltmarket_to_rustline", "escape_skill": 0.4, "capture_mode": "block", "time_limit": 420},
+      "reward": "$500, Stand je nach Wahl",
+      "requires": [{"done": "a1w_probefahrt"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Die KCG hat einen Container voller Motorenteile beschlagnahmt: »Sicherstellung zur Fahrzeug-Sicherheit«. Der Abschleppzug fährt durch Saltmarket. Wer ihn zuerst erwischt, hat die Teile. Am Kai warten auch Branns Leute.",
+      "choices": [{
+        "id": "a1w_share", "text": "Die Teile sind gesichert. Wer bekommt sie?",
+        "options": [
+          {"id": "share", "text": "Mit der Union teilen, die Kräne brauchen auch Ersatzteile", "effects": [{"standing": ["union", 10]}, {"standing": ["wrenchers", 5]}, {"npcTrust": ["brann", 1]}]},
+          {"id": "keep", "text": "Alles nach Rustline", "effects": [{"standing": ["wrenchers", 15]}, {"standing": ["union", -5]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 500}],
+      "outro": "In einem Kofferraum der Teile liegt ein Parkticket aus Jonas' Wagen, abgestempelt am Ashridge-Tunnel."
+    },
+    {
+      "id": "a1_blinde_flecken", "title": "Blinde Flecken", "main": true, "act": 1, "cell": [4, 1],
+      "type": "race", "district": "lantern", "giver": "nox",
+      "params": {"route": "lantern_camera_slalom", "laps": 1, "opponents": 0, "rules": {"camera_detection_fails": true}, "max_detections": 0},
+      "reward": "$250, Collective +10, Kamera-Hack freigeschaltet",
+      "requires": [{"done": "p2"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Lantern Hill, Treppengassen, Ocker und Graffiti. Nox wartet unter dem Glockenturm und zeigt Mira, wo Aegis blind ist. »Die Kameras sehen alles«, sagt Nox, »außer, wer sie bezahlt.« Wer den Slalom ohne Erfassung schafft, bekommt ein Angebot.",
+      "choices": [{
+        "id": "a1_module", "text": "Nox bietet ein Kamera-Hack-Modul an. Gebraucht, ohne Garantie.",
+        "options": [
+          {"id": "install", "text": "Einbauen lassen", "effects": [{"aegis": -10}, {"npcTrust": ["nox", 1]}, {"flag": ["hackModule", true]}]},
+          {"id": "decline", "text": "Ablehnen, lieber eigene Augen", "effects": [{"standing": ["collective", 5]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["collective", 10]}, {"money": 250}],
+      "outro": "Nox fragt nebenbei nach Jonas, für eine Fremde ein bisschen zu genau."
+    },
+    {
+      "id": "a1_kontrolle", "title": "Routinekontrolle", "main": true, "act": 1, "cell": [5, 4],
+      "type": "escape", "district": "core", "giver": "ravn",
+      "params": {"heat_level": 2, "pursuers": 2, "safe_zone": "rustline", "time_limit": 300},
+      "reward": "Kontakt zu Cmdr. Okoye",
+      "requires": [{"done": "p2"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Auf der Hochstraße im Core zieht eine KCG-Streife Mira heraus. Commander Ravn Okoye persönlich, was ungewöhnlich ist. »Ihr Bruder ist eine Person von Interesse«, sagt er höflich. »Sie sind eine Person von Interesse an einer Person von Interesse.«",
+      "choices": [{
+        "id": "a1_stop", "text": "Okoye wartet auf eine Antwort.",
+        "options": [
+          {"id": "coop", "text": "Kooperieren und ehrlich sagen, dass du Jonas suchst", "effects": [{"npcTrust": ["ravn", 1]}, {"standing": ["kcg", 5]}, {"aegis": 5}]},
+          {"id": "bribe", "text": "Ein Kuvert mit 300 Dollar auf das Armaturenbrett legen", "effects": [{"money": -300}, {"npcTrust": ["ravn", -1]}, {"standing": ["kcg", 5]}, {"flag": ["bribedGuard", true]}]},
+          {"id": "flee", "text": "Gas geben, die Rampe runter Richtung Rustline", "effects": [{"heat": 2}, {"npcTrust": ["ravn", -1]}, {"standing": ["kcg", -10]}, {"standing": ["wrenchers", 5]}, {"aegis": 5}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Okoye notiert etwas mit einem echten Stift auf echtem Papier. In dieser Stadt ist das die verdächtigste Geste überhaupt."
+    },
+    {
+      "id": "w1_find", "title": "Der Fund", "main": true, "act": 1, "cell": [7, 2],
+      "type": "courier", "district": "ashridge", "giver": "jonas",
+      "params": {"from": "any", "to": "ashridge_tube_service_bay", "time_limit": 420, "heat_start": 1},
+      "reward": "Ledger-Kern, Hauptallianz",
+      "requires": [{"any": [{"done": "a1u_streikbrecher"}, {"done": "a1w_ersatzteile"}]}, {"done": "a1_blinde_flecken"}, {"done": "a1_kontrolle"}, {"done": "p3"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Die Koordinaten vom Radio, das Parkticket, Branns Andeutungen: Alles führt in eine Wartungsnische der Ashridge Tube. Dort liegt in einer Thermoskanne ein Datenträger, der Ledger-Kern: interne Aegis-Protokolle, Fehlfestnahmen, Tote, mit »Vorgang abgeschlossen« markiert. Daneben ein Zettel in Jonas' Schrift: »Lebe noch. Trau keinem, der dir das hier abnehmen will.« Alleine kann Mira den Kern weder lesen noch schützen.",
+      "choices": [{
+        "id": "w1_show", "text": "Wem zeigst du den Ledger-Kern?",
+        "options": [
+          {"id": "union", "text": "Brann und der Union: Muskeln, Verstecke, Hafen", "effects": [{"standing": ["union", 25]}, {"flag": ["ally_union", true]}, {"npcTrust": ["jonas", 1]}, {"npcTrust": ["brann", 1]}]},
+          {"id": "collective", "text": "Nox und dem Lantern Collective, die können ihn entschlüsseln", "effects": [{"standing": ["collective", 25]}, {"flag": ["ally_collective", true]}, {"npcTrust": ["jonas", 1]}, {"npcTrust": ["nox", 1]}]},
+          {"id": "corp", "text": "Aurelia Holdings, gegen Jonas' Sicherheit", "effects": [{"standing": ["aurelia", 25]}, {"flag": ["ally_corp", true]}, {"npcTrust": ["jonas", -1]}, {"npcTrust": ["kandel", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["ledgerFound", true]}, {"aegis": 5}, {"money": 300}],
+      "outro": "Jonas lebt. Und jemand weiß jetzt, dass Mira etwas hat, das Aurelia gehört."
+    },
+    {
+      "id": "a2_postfach", "title": "Totes Postfach", "main": true, "act": 2, "cell": [2, 1],
+      "type": "hack", "district": "sunstrip", "giver": "jonas",
+      "params": {"target": "pier_ad_screen", "hack_time": 45, "detection_radius": 30, "cameras": 4, "time_limit": 300},
+      "reward": "Kontakt zu Jonas",
+      "requires": [{"done": "w1_find"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Jonas meldet sich über eine Werbetafel am Pier. Zwischen »Aegis, wir sehen, was Sie brauchen« flackert für drei Sekunden ein Treffpunkt. Unter dem Riesenrad steht er, dünner, mit fremdem Gesicht-Filter auf der Brille. Er gesteht: Bevor er floh, hat er einen Teil der Daten verkauft. An wen, sagt er nicht.",
+      "choices": [{
+        "id": "a2_jonas", "text": "Jonas wartet auf dein Urteil.",
+        "options": [
+          {"id": "forgive", "text": "»Du bist mein Bruder. Den Rest klären wir später.«", "effects": [{"npcTrust": ["jonas", 1]}]},
+          {"id": "confront", "text": "Ihn hart zur Rede stellen: An wen?", "effects": [{"npcTrust": ["jonas", -1]}, {"flag": ["jonasConfronted", true]}, {"flag": ["kandelInfo", true]}]},
+          {"id": "money", "text": "Ihm dein Fluchtgeld geben, damit er nicht noch mehr verkauft", "effects": [{"money": -800}, {"npcTrust": ["jonas", 2]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Das Riesenrad dreht sich weiter. Auf jeder Gondel klebt eine Kamera, die für Werbung Gesichter zählt."
+    },
+    {
+      "id": "a2u_lohn", "title": "Der Preis des Lohns", "main": true, "act": 2, "cell": [1, 3],
+      "type": "chase", "district": "saltmarket", "giver": "brann",
+      "params": {"target": "brann_car", "route_profile": "night_tail", "capture_mode": "observe", "max_distance": 120, "min_distance": 25},
+      "reward": "Union +10, Wahl bestimmt Branns Vertrauen",
+      "requires": [{"done": "w1_find"}, {"flag": ["ally_union", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Brann verlässt nachts den Hafen ohne Leibwächter. Mira folgt ihm mit ausgeschalteten Scheinwerfern bis zu einem Parkhaus in Greenmoor. Dort wartet ein Aurelia-Anzug mit einem Vertrag: hundert sichere Jobs für hundert Namen von Streikführern. Brann hat noch nicht unterschrieben. Er hat aber auch nicht Nein gesagt.",
+      "choices": [{
+        "id": "a2u_brann", "text": "Brann bemerkt dich im Rückspiegel. Was nun?",
+        "options": [
+          {"id": "cover", "text": "Ihn decken: »Ich habe nichts gesehen. Unterschreib nicht.«", "effects": [{"npcTrust": ["brann", 2]}, {"flag": ["brannCovered", true]}]},
+          {"id": "expose", "text": "Ihn vor der Versammlung bloßstellen", "effects": [{"npcTrust": ["brann", -2]}, {"standing": ["union", 10]}, {"flag": ["brannExposed", true]}]},
+          {"id": "blackmail", "text": "Ihn erpressen, für 800 Dollar Schweigen", "effects": [{"npcTrust": ["brann", -1]}, {"money": 800}, {"flag": ["brannBlackmailed", true]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["union", 10]}],
+      "outro": "Dockline spielt am nächsten Morgen ein altes Arbeiterlied. Niemand im Hafen weiß, warum es heute so leise klingt."
+    },
+    {
+      "id": "a2u_blockade", "title": "Blockade", "main": true, "act": 2, "cell": [0, 3],
+      "type": "event", "district": "saltmarket", "giver": "brann",
+      "params": {"trigger": "kcg_port_sweep", "duration_min": 15, "barricades": 5, "world_tags": ["blockade"]},
+      "reward": "$1000, Union +10, Tag »blockade«",
+      "requires": [{"done": "a2u_lohn"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Die KCG will den Hafen räumen, offiziell zur »Wiederherstellung der Lieferkettenharmonie«. Die Union baut Barrikaden aus Containern. Mira fährt Material, Leute, Funkgeräte, Hauptsache schneller als die Räumpanzer.",
+      "choices": [{
+        "id": "a2u_tactic", "text": "Die Räumpanzer rollen an. Welche Taktik?",
+        "options": [
+          {"id": "fire", "text": "Barrikaden anzünden, frontal blockieren", "effects": [{"heat": 3}, {"standing": ["union", 15]}, {"standing": ["kcg", -20]}, {"flag": ["killedCivilians", true]}]},
+          {"id": "chain", "text": "Menschenketten bilden und aussitzen", "effects": [{"standing": ["union", 10]}, {"npcTrust": ["brann", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["union", 10]}, {"money": 1000}, {"tag": ["saltmarket", "add", "blockade"]}],
+      "outro": "Der Hafen hält. Clearwave FM spricht von »spontaner Logistikpause«. Auf den Containern stehen jetzt Namen: die, die nicht nach Hause kamen, und die, die es noch wollen."
+    },
+    {
+      "id": "a2c_archiv", "title": "Das Archiv", "main": true, "act": 2, "cell": [4, 3],
+      "type": "hack", "district": "core", "giver": "nox",
+      "params": {"target": "aurelia_archive_skybridge", "hack_time": 60, "cameras": 8, "detection_radius": 40, "escape_after": true, "heat_after": 3},
+      "reward": "$800, Collective +20",
+      "requires": [{"done": "w1_find"}, {"flag": ["ally_collective", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Der Ledger-Kern ist verschlüsselt, der Schlüssel liegt in einem Konzernarchiv auf der Skybridge zwischen Tower und Gericht. Nox hackt die Kameras, Mira fährt die Hochstraße hoch, holt den Datenträger und fährt wieder runter. Man könnte sagen: ein klassischer Bibliotheksbesuch.",
+      "choices": [{
+        "id": "a2c_copy", "text": "Der Datenträger liegt vor dir. Kopie oder Original?",
+        "options": [
+          {"id": "copy", "text": "Schnell kopieren, niemand merkt etwas", "effects": [{"aegis": 5}]},
+          {"id": "original", "text": "Das Original mitnehmen, mehr Beweise, mehr Alarm", "effects": [{"aegis": 15}, {"heat": 2}, {"flag": ["ledgerOriginal", true]}, {"npcTrust": ["nox", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["collective", 20]}, {"money": 800}],
+      "outro": "Im Archiv bleibt ein leerer Platz. Auf dem Schild darüber steht: »Transparenzinitiative 2031«."
+    },
+    {
+      "id": "a2c_kaskade", "title": "Kaskade", "main": true, "act": 2, "cell": [3, 1],
+      "type": "hack", "district": "lantern", "giver": "nox",
+      "params": {"targets": 4, "hack_time": 30, "time_limit": 480, "route": "lantern_node_ring"},
+      "reward": "$500, Collective +10",
+      "requires": [{"done": "a2c_archiv"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Mit dem Archivschlüssel kann Nox die Aegis-Knoten in Lantern Hill abschalten. Mira fährt das Hackerteam von Knoten zu Knoten, bevor die Wartungsdrohnen kommen. Am letzten Knoten zeigt Nox auf eine Leitung: »Wenn wir die mitnehmen, fällt auch Greenmoor. Dann wissen die da oben mal, wie sich ›unsichtbar‹ anfühlt.«",
+      "choices": [{
+        "id": "a2c_scope", "text": "Wie weit soll der Ausfall reichen?",
+        "options": [
+          {"id": "local", "text": "Nur Lantern Hill", "effects": [{"standing": ["collective", 10]}, {"aegis": -10}, {"tag": ["lantern", "add", "blind"]}]},
+          {"id": "cascade", "text": "Die Kaskade bis nach Greenmoor auslösen", "effects": [{"aegis": -20}, {"standing": ["kcg", -15]}, {"standing": ["collective", 5]}, {"tag": ["greenmoor", "add", "lockdown"]}, {"tag": ["lantern", "add", "blind"]}, {"flag": ["greenmoorPanic", true]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["collective", 10]}, {"money": 500}],
+      "outro": "Lantern Hill ist eine Nacht lang blind und tanzt. Die Kirchenglocke schlägt dreizehn, weil jemand sie gehackt hat, einfach weil es ging."
+    },
+    {
+      "id": "a2k_angebot", "title": "Das Angebot", "main": true, "act": 2, "cell": [4, 5],
+      "type": "courier", "district": "core", "giver": "kandel",
+      "params": {"from": "aurelia_tower_garage", "to": "route9_relocation_center", "cargo": "passengers", "passengers": 2, "time_limit": 480, "checkpoints": ["ashridge_tube"]},
+      "reward": "$700, Aurelia +10",
+      "requires": [{"done": "w1_find"}, {"flag": ["ally_corp", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Dr. Idris Kandel empfängt Mira im 80. Stock, barfuß, mit Blick über eine Stadt, die er »optimierungsbedürftig« nennt. Sein Angebot: Jonas' Sicherheit gegen Gefälligkeiten. Die erste: zwei Krankenpflegerinnen aus Saltmarket in ein »Relokationsprogramm« außerhalb der Stadt fahren. Sie haben eine Fehlfestnahme mit Todesfolge gesehen.",
+      "choices": [{
+        "id": "a2k_witness", "text": "Am Ende der Ashridge Tube teilt sich die Straße.",
+        "options": [
+          {"id": "deliver", "text": "Abliefern, Fragen stellen andere", "effects": [{"standing": ["aurelia", 15]}, {"npcTrust": ["kandel", 1]}, {"flag": ["witnessesDelivered", true]}]},
+          {"id": "free", "text": "Abbiegen und sie an der Küstenstraße aussteigen lassen", "effects": [{"standing": ["aurelia", -10]}, {"npcTrust": ["kandel", -1]}, {"standing": ["collective", 10]}, {"standing": ["union", 5]}, {"aegis": 10}, {"flag": ["witnessesFreed", true]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["aurelia", 10]}, {"money": 700}],
+      "outro": "Das Relokationszentrum hat einen Springbrunnen und keine Fenster."
+    },
+    {
+      "id": "a2k_saeuberung", "title": "Säuberung", "main": true, "act": 2, "cell": [6, 2],
+      "type": "hunt", "district": "greenmoor", "giver": "kandel",
+      "params": {"target_profile": "die_lerche", "investigation_nodes": 3, "prep_slots": 2, "heat_cap": 3},
+      "reward": "$900, Aurelia +5",
+      "requires": [{"done": "a2k_angebot"}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Jemand im Konzern füttert Pia Sorensens Sendung mit Interna. Kandel nennt die Quelle »die Lerche« und will sie finden lassen, »diskret, wir sind ja keine Unmenschen«. Drei Spuren: ein Parkausweis, ein Golfclub, eine Tochter mit zu hohem Score für ihr Gehalt. Am Ende steht Mira vor einer Buchhalterin mit Gartenschere.",
+      "choices": [{
+        "id": "a2k_lark", "text": "Die Lerche bittet um zehn Minuten Vorsprung.",
+        "options": [
+          {"id": "hand", "text": "Sie Kandel übergeben", "effects": [{"standing": ["aurelia", 20]}, {"npcTrust": ["pia", -2]}, {"flag": ["sourceBurned", true]}]},
+          {"id": "warn", "text": "Ihr die zehn Minuten geben und Kandel anlügen", "effects": [{"npcTrust": ["kandel", -1]}, {"npcTrust": ["pia", 2]}, {"flag": ["sourceWarned", true]}]},
+          {"id": "squeeze", "text": "Sie ausquetschen und das Wissen behalten", "effects": [{"flag": ["kandelInfo", true]}, {"money": 500}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["aurelia", 5]}, {"money": 900}],
+      "outro": "Die Lerche hat Kandel gekannt, bevor er Kandel wurde. »Seine Tochter«, sagt sie, »ist an einem Ort gestorben, an dem keine Kamera hing.«"
+    },
+    {
+      "id": "w2_treue", "title": "Stille Leitung", "main": true, "act": 2, "cell": [3, 4],
+      "type": "event", "district": "core", "giver": "kandel",
+      "params": {"trigger": "open_line_live_call", "duration_min": 8},
+      "reward": "Kein Verrat, aber Kandel kennt jetzt Miras Stimme",
+      "requires": [
+        {"done": "a2_postfach"},
+        {"any": [{"done": "a2u_blockade"}, {"done": "a2c_kaskade"}, {"done": "a2k_saeuberung"}]},
+        {"npcTrust": ["brann", ">=", 1]}, {"npcTrust": ["nox", ">=", 1]}, {"npcTrust": ["jonas", ">=", 1]}, {"npcTrust": ["ravn", ">=", 0]}
+      ],
+      "excludes": [{"flag": ["w2_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Die KCG-Razzia, die Mira erwartet, kommt nicht. Keiner hat sie verkauft, nicht Brann, nicht Nox, nicht Jonas. Stattdessen klingelt live auf Open Line das Telefon, und Pia stellt mit zitternder Stimme durch: Dr. Idris Kandel. »Frau Voss, Ihre Freunde sind loyal. Bemerkenswert. Loyalität ist so schwer zu messen.« Er lädt sie ein, vor der ganzen Stadt.",
+      "choices": [{
+        "id": "w2_air", "text": "Die ganze Stadt hört zu.",
+        "options": [
+          {"id": "answer", "text": "Live antworten: »Ich komme. Aber nicht allein.«", "effects": [{"npcTrust": ["kandel", 1]}, {"npcTrust": ["pia", 1]}, {"aegis": 5}]},
+          {"id": "hang", "text": "Auflegen und die Verbündeten warnen", "effects": [{"standing": ["union", 5]}, {"standing": ["collective", 5]}, {"aegis": -5}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w2_done", true]}, {"flag": ["kandelOnAir", true]}],
+      "outro": "Treue hat in Kestrel Bay keinen Score. Deshalb macht sie Kandel nervös."
+    },
+    {
+      "id": "w2_brann", "title": "Hafengeld", "main": true, "act": 2, "cell": [0, 4],
+      "type": "escape", "district": "saltmarket", "giver": "brann",
+      "params": {"heat_level": 4, "pursuers": 5, "safe_zone": "rustline", "hide_spots": 3, "weather": "rain"},
+      "reward": "Überleben",
+      "requires": [
+        {"done": "a2_postfach"},
+        {"any": [{"done": "a2u_blockade"}, {"done": "a2c_kaskade"}, {"done": "a2k_saeuberung"}]},
+        {"not": {"all": [{"npcTrust": ["brann", ">=", 1]}, {"npcTrust": ["nox", ">=", 1]}, {"npcTrust": ["jonas", ">=", 1]}, {"npcTrust": ["ravn", ">=", 0]}]}},
+        {"npcTrust": ["brann", ">=", 2]}
+      ],
+      "excludes": [{"flag": ["w2_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Ausgerechnet Brann. Der Mann, den Mira gedeckt hat, hat das Versteck im Kühlhaus an die KCG verkauft, für hundert Jobs, die er seinen Leuten nicht anders beschaffen konnte. Als die Scheinwerfer durch die Lamellen fallen, steht er draußen im Regen und kann ihr nicht in die Augen sehen.",
+      "choices": [{
+        "id": "w2_brann_fate", "text": "Du bist entkommen. Brann sitzt im Union-Büro und wartet.",
+        "options": [
+          {"id": "forgive", "text": "Ihn gehen lassen, er hat für seine Leute verkauft", "effects": [{"npcTrust": ["brann", -1]}, {"standing": ["union", -5]}]},
+          {"id": "expose", "text": "Vor der Versammlung bloßstellen", "effects": [{"npcTrust": ["brann", -3]}, {"standing": ["union", 10]}, {"flag": ["brannExposed", true]}]},
+          {"id": "arrest", "text": "Ihn mit seinem eigenen Deal der KCG ausliefern", "effects": [{"standing": ["union", -20]}, {"standing": ["kcg", 15]}, {"npcTrust": ["ravn", 1]}, {"npcTrust": ["brann", -3]}, {"flag": ["brannArrested", true]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w2_done", true]}, {"flag": ["betrayedByBrann", true]}],
+      "outro": "Der Verrat trifft am härtesten dort, wo man vertraut hat. Das ist keine Weisheit, das ist Statik."
+    },
+    {
+      "id": "w2_nox", "title": "Glockenschlag", "main": true, "act": 2, "cell": [4, 0],
+      "type": "chase", "district": "lantern", "giver": "nox",
+      "params": {"target": "nox_scooter", "route_profile": "lantern_stairs", "escape_skill": 0.8, "capture_mode": "block", "time_limit": 360},
+      "reward": "Wahrheit über Nox und Jonas",
+      "requires": [
+        {"done": "a2_postfach"},
+        {"any": [{"done": "a2u_blockade"}, {"done": "a2c_kaskade"}, {"done": "a2k_saeuberung"}]},
+        {"not": {"all": [{"npcTrust": ["brann", ">=", 1]}, {"npcTrust": ["nox", ">=", 1]}, {"npcTrust": ["jonas", ">=", 1]}, {"npcTrust": ["ravn", ">=", 0]}]}},
+        {"npcTrust": ["brann", "<", 2]},
+        {"npcTrust": ["nox", ">=", 2]}
+      ],
+      "excludes": [{"flag": ["w2_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Nox hat Jonas gekannt, lange bevor Mira kam. Nox war der Käufer der Daten, die Jonas verkauft hat, und hat sie an Aurelia weitergereicht, im Tausch gegen die Freilassung der eigenen Schwester aus einem »Wohlverhaltenszentrum«. Jetzt flieht Nox auf einem Roller die Treppen hinab, und Mira hängt dran.",
+      "choices": [{
+        "id": "w2_nox_fate", "text": "Nox sitzt in einer Sackgasse fest, der Roller qualmt.",
+        "options": [
+          {"id": "confront", "text": "Stellen, zuhören, verzeihen, aber nichts mehr erzählen", "effects": [{"npcTrust": ["nox", -1]}, {"standing": ["collective", 5]}]},
+          {"id": "letgo", "text": "Laufen lassen", "effects": [{"npcTrust": ["nox", -2]}, {"standing": ["collective", -5]}]},
+          {"id": "report", "text": "Nox an Aurelia melden", "effects": [{"standing": ["collective", -30]}, {"standing": ["aurelia", 15]}, {"npcTrust": ["nox", -3]}, {"flag": ["noxArrested", true]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w2_done", true]}, {"flag": ["betrayedByNox", true]}],
+      "outro": "Die Glocke von St. Merrin schlägt. Diesmal hat sie niemand gehackt."
+    },
+    {
+      "id": "w2_hinterhalt", "title": "Hinterhalt", "main": true, "act": 2, "cell": [5, 5],
+      "type": "escape", "district": "core", "giver": "ravn",
+      "params": {"heat_level": 4, "pursuers": 6, "safe_zone": "ashridge_tube", "helicopter": true},
+      "reward": "Überleben",
+      "requires": [
+        {"done": "a2_postfach"},
+        {"any": [{"done": "a2u_blockade"}, {"done": "a2c_kaskade"}, {"done": "a2k_saeuberung"}]},
+        {"not": {"all": [{"npcTrust": ["brann", ">=", 1]}, {"npcTrust": ["nox", ">=", 1]}, {"npcTrust": ["jonas", ">=", 1]}, {"npcTrust": ["ravn", ">=", 0]}]}},
+        {"npcTrust": ["brann", "<", 2]},
+        {"npcTrust": ["nox", "<", 2]}
+      ],
+      "excludes": [{"flag": ["w2_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Niemand hat Mira wirklich vertraut, also hat auch niemand lange gezögert. Irgendwer hat geredet, früh und billig. Okoyes KCG riegelt die Hochstraße an beiden Enden ab. Über Lautsprecher: »Frau Voss, Ihr Fluchtverhalten wurde als wahrscheinlich eingestuft. Bitte entsprechen Sie nicht der Prognose.«",
+      "choices": [{
+        "id": "w2_ambush", "text": "Beide Rampen gesperrt. Was jetzt?",
+        "options": [
+          {"id": "tube", "text": "Über die Gegenfahrbahn in die Ashridge Tube", "effects": [{"heat": 2}, {"npcTrust": ["ravn", -1]}]},
+          {"id": "surrender", "text": "Aussteigen und mit Okoye reden", "effects": [{"npcTrust": ["ravn", 2]}, {"aegis": 10}, {"flag": ["interrogated", true]}]},
+          {"id": "market", "text": "Durch den Nachtmarkt unter der Rampe brechen", "effects": [{"heat": 3}, {"npcTrust": ["ravn", -2]}, {"flag": ["killedCivilians", true]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w2_done", true]}, {"flag": ["ambushed", true]}],
+      "outro": "Okoye schreibt in seinen Bericht: »Zielperson entkommen.« Dann streicht er das Wort »entkommen« durch und schreibt »entlassen«."
+    },
+    {
+      "id": "w3_price", "title": "Der Preis", "main": true, "act": 2, "cell": [4, 4],
+      "type": "event", "district": "core", "giver": "kandel",
+      "params": {"location": "aurelia_tower_80", "dialog": "w3_offer"},
+      "reward": "Je nach Antwort",
+      "requires": [{"flag": ["w2_done", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Aurelia Tower, 80. Stock. Kandel schenkt Wasser ein, das nach nichts schmeckt, sehr teuer. Er bietet Jonas' Freiheit, die Löschung von Miras Kennzeichen und einen Posten: »Leiterin Mobilitätssicherheit«. Der Preis: die Namen, Verstecke und Pläne ihrer Verbündeten. »Phase Zwei kommt ohnehin«, sagt er. »Die Frage ist nur, ob Sie dabei sitzen oder darunter liegen.«",
+      "choices": [{
+        "id": "w3_offer", "text": "Wie antwortest du Kandel?",
+        "options": [
+          {"id": "accept", "text": "Annehmen", "effects": [{"standing": ["aurelia", 40]}, {"standing": ["union", -30]}, {"standing": ["collective", -20]}, {"aegis": -20}, {"flag": ["soldOut", true]}]},
+          {"id": "refuse", "text": "Ablehnen und das Wasser stehen lassen", "effects": [{"standing": ["aurelia", -20]}, {"npcTrust": ["jonas", 1]}, {"aegis": 15}, {"flag": ["refused", true]}]},
+          {"id": "fake", "text": "Zum Schein annehmen", "when": [{"any": [{"all": [{"npcTrust": ["jonas", ">=", 1]}, {"aegis": ["<=", 45]}]}, {"flag": ["towerPass", "==", true]}]}], "effects": [{"standing": ["aurelia", 25]}, {"aegis": -15}, {"flag": ["doublePlay", true]}]},
+          {"id": "why", "text": "»Erzählen Sie mir von Ihrer Tochter.«", "when": [{"any": [{"npcTrust": ["kandel", ">=", 2]}, {"flag": ["kandelInfo", "==", true]}]}], "effects": [{"npcTrust": ["kandel", 1]}, {"flag": ["kandelDoubts", true]}, {"flag": ["refused", true]}, {"standing": ["aurelia", -10]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Im Aufzug nach unten läuft Aurelia-Calm-Musik. Sie ist so komponiert, dass man sich danach an nichts erinnert. Mira erinnert sich an alles."
+    },
+    {
+      "id": "a3_raeumung_hafen", "title": "Räumungsbefehl: Kai 7", "main": true, "act": 3, "cell": [1, 5],
+      "type": "event", "district": "saltmarket", "giver": "kandel",
+      "params": {"trigger": "eviction_order", "duration_min": 15, "convoy_size": 6, "world_tags": ["evicted"]},
+      "reward": "Aurelia-Gunst",
+      "requires": [{"done": "w3_price"}, {"flag": ["soldOut", "==", true]}, {"flag": ["ally_union", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Die erste Aufgabe der neuen Leiterin Mobilitätssicherheit: den Räumungskonvoy zum Kai 7 führen, dorthin, wo Branns Leute schlafen. Mira kennt jede Abkürzung. Genau deshalb hat man sie geschickt.",
+      "choices": [{
+        "id": "a3_rh", "text": "Der Konvoy wartet auf dein Signal.",
+        "options": [
+          {"id": "force", "text": "Mit voller Härte durch die Barrikaden", "effects": [{"standing": ["aurelia", 15]}, {"standing": ["union", -30]}, {"flag": ["killedCivilians", true]}, {"flag": ["massacre", true]}, {"flag": ["betrayedUnion", true]}]},
+          {"id": "warn", "text": "Den Konvoy eine Stunde im Kreis führen und vorher warnen", "effects": [{"standing": ["aurelia", -10]}, {"npcTrust": ["kandel", -1]}, {"standing": ["union", 10]}, {"flag": ["warnedResidents", true]}]}
+        ]
+      }],
+      "onSuccess": [{"tag": ["saltmarket", "add", "evicted"]}, {"money": 1500}],
+      "outro": "Die Kräne stehen still. Einer trägt ein Transparent, das niemand mehr abnimmt: »Wir waren hier.«"
+    },
+    {
+      "id": "a3_raeumung_altstadt", "title": "Räumungsbefehl: St. Merrin", "main": true, "act": 3, "cell": [3, 0],
+      "type": "event", "district": "lantern", "giver": "kandel",
+      "params": {"trigger": "eviction_order", "duration_min": 15, "convoy_size": 6, "world_tags": ["gentrified"]},
+      "reward": "Aurelia-Gunst",
+      "requires": [{"done": "w3_price"}, {"flag": ["soldOut", "==", true]}, {"flag": ["ally_union", "!=", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Lantern Hill ist jetzt offiziell »Sanierungsgebiet«. Mira soll die Abrisskolonne die Treppengassen hinaufführen, bis zum Glockenturm, in dem Yara Quill predigt und Nox' Server summen. Das Ausschreibungsdokument nennt die Bewohner »Bestandsnutzer«.",
+      "choices": [{
+        "id": "a3_ra", "text": "Die Kolonne wartet auf dein Signal.",
+        "options": [
+          {"id": "force", "text": "Mit voller Härte hinauf zum Turm", "effects": [{"standing": ["aurelia", 15]}, {"standing": ["collective", -30]}, {"flag": ["killedCivilians", true]}, {"flag": ["massacre", true]}, {"flag": ["betrayedCollective", true]}]},
+          {"id": "warn", "text": "Die Kolonne in den Sackgassen verheddern und vorher warnen", "effects": [{"standing": ["aurelia", -10]}, {"npcTrust": ["kandel", -1]}, {"standing": ["collective", 10]}, {"flag": ["warnedResidents", true]}]}
+        ]
+      }],
+      "onSuccess": [{"tag": ["lantern", "add", "gentrified"]}, {"money": 1500}],
+      "outro": "Wo der Nachtmarkt war, eröffnet ein »Erlebnisquartier Altstadt«. Die Kameras sind ganz neu, und die Glocke ist jetzt ein Lautsprecher."
+    },
+    {
+      "id": "a3_freiwild", "title": "Freiwild", "main": true, "act": 3, "cell": [6, 5],
+      "type": "escape", "district": "route9", "giver": "aegis",
+      "params": {"heat_level": 5, "pursuers": 8, "safe_zone": "chosen_ally", "time_limit": 600, "civilian_reporters": true},
+      "reward": "Unterschlupf",
+      "requires": [{"done": "w3_price"}, {"flag": ["refused", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Eine Stunde nach dem Nein setzt Aegis Mira auf die »Sichtbarkeitsliste«. Jeder Bürger, der sie meldet, bekommt zwanzig Scorepunkte. Plötzlich filmen Taxifahrer, Jogger, Rentner. Kestrel Bay wird zur Meute, freundlich und gamifiziert.",
+      "choices": [{
+        "id": "a3_hide", "text": "Wo tauchst du unter?",
+        "options": [
+          {"id": "wrench", "text": "In Dutchs Schrottpresse, da sieht keine Kamera rein", "effects": [{"npcTrust": ["dutch", 1]}, {"standing": ["wrenchers", 10]}]},
+          {"id": "collective", "text": "In Lantern Hill unter dem Glockenturm", "effects": [{"npcTrust": ["nox", 1]}, {"standing": ["collective", 10]}]},
+          {"id": "union", "text": "Im Bauch eines Frachters in Saltmarket", "when": [{"flag": ["brannArrested", "!=", true]}], "effects": [{"npcTrust": ["brann", 1]}, {"standing": ["union", 10]}]}
+        ]
+      }],
+      "onSuccess": [{"aegis": 10}],
+      "outro": "Auf Open Line liest Pia die Bonuspunkte vor, die für Mira ausgelobt sind. Dann sagt sie: »Ich melde mich nicht.« Drei Hörer rufen an und sagen dasselbe."
+    },
+    {
+      "id": "a3_zwei_gesichter", "title": "Zwei Gesichter", "main": true, "act": 3, "cell": [5, 3],
+      "type": "hack", "district": "core", "giver": "kandel",
+      "params": {"target": "aurelia_tower_core_room", "hack_time": 90, "cameras": 12, "disguise": "aurelia_badge", "escape_after": true},
+      "reward": "Zugriff auf den Kern von Aegis",
+      "requires": [{"done": "w3_price"}, {"flag": ["doublePlay", "==", true]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Mit Firmenausweis, Firmenlächeln und Firmenwagen fährt Mira jeden Morgen in die Tiefgarage des Towers. Sie lernt die Sprache: »Synergien heben«, »Sichtbarkeit leben«. In der dritten Nacht steht sie im Kernraum von Aegis. Ein USB-Port. Zwei Möglichkeiten.",
+      "choices": [{
+        "id": "a3_core", "text": "Was steckst du in den Port?",
+        "options": [
+          {"id": "keys", "text": "Die Phase-Zwei-Schlüssel kopieren, für dich", "effects": [{"flag": ["hasUplinkKeys", true]}, {"standing": ["aurelia", 10]}]},
+          {"id": "backdoor", "text": "Eine Hintertür für das Collective legen", "effects": [{"flag": ["backdoorPlanted", true]}, {"standing": ["collective", 15]}, {"npcTrust": ["nox", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 1200}, {"aegis": -5}],
+      "outro": "Am nächsten Morgen bekommt Mira eine Mail: »Herzlichen Glückwunsch zu Ihrem ersten Monat bei Aurelia!« Angehängt ist ein Gutschein für Achtsamkeit."
+    },
+    {
+      "id": "a3_uniform", "title": "Die Uniform", "main": true, "act": 3, "cell": [5, 4],
+      "type": "courier", "district": "core", "giver": "ravn",
+      "params": {"from": "kcg_hq_garage", "to": "rustline_scrapyard", "cargo": "kcg_raid_plans", "time_limit": 300},
+      "reward": "Ravn als Verbündeter",
+      "requires": [{"done": "w3_price"}, {"npcTrust": ["ravn", ">=", 2]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Okoye steht ohne Uniform an einer Tankstelle und trinkt Automatenkaffee. »Phase Zwei koppelt meine Leute an denselben Score wie alle anderen. Wer zögert, verliert Punkte. Wer Punkte verliert, verliert die Wohnung.« Er hält Mira einen Stick hin: alle Razzia-Pläne der Nullstunde.",
+      "choices": [{
+        "id": "a3_ravn", "text": "Nimmst du Okoyes Hilfe an?",
+        "options": [
+          {"id": "accept", "text": "Annehmen, ein Commander auf deiner Seite ist ein Commander nicht gegen dich", "effects": [{"flag": ["ravnTurned", true]}, {"standing": ["kcg", -10]}]},
+          {"id": "decline", "text": "Ablehnen, zu gefährlich für ihn", "effects": [{"npcTrust": ["ravn", -1]}, {"standing": ["kcg", 5]}]}
+        ]
+      }],
+      "onSuccess": [{"aegis": -5}],
+      "outro": "»Wenn das schiefgeht«, sagt Okoye, »war ich nie hier.« Dann bezahlt er beide Kaffees, mit Bargeld."
+    },
+    {
+      "id": "a3_hafen_brann", "title": "Hafen dicht", "main": true, "act": 3, "cell": [0, 4],
+      "type": "event", "district": "saltmarket", "giver": "brann",
+      "params": {"trigger": "nullstunde_minus_2", "duration_min": 20, "barricades": 8, "world_tags": ["free_port"]},
+      "reward": "Hafen gehalten, Tag »free_port«",
+      "requires": [{"done": "w3_price"}, {"standing": ["union", ">=", 30]}, {"npcTrust": ["brann", ">=", 0]}],
+      "excludes": [{"flag": ["portHeld", "==", true]}, {"done": "w5_finale"}],
+      "text": "Zwei Tage vor der Nullstunde legt Brann drei Frachter quer in die Hafeneinfahrt und erklärt die Kais für »aegisfreie Zone«. Mira fährt Strom-Aggregate, Funker und Großmütter mit Thermoskannen auf die Kais. Brann steht vorn auf dem Kran und hält eine Rede, die er sich offensichtlich von Jonas hat schreiben lassen.",
+      "onSuccess": [{"flag": ["portHeld", true]}, {"tag": ["saltmarket", "add", "free_port"]}, {"standing": ["union", 10]}, {"money": 800}],
+      "outro": "Auf Dockline läuft rund um die Uhr dasselbe Lied. Der Hafen singt mit."
+    },
+    {
+      "id": "a3_hafen_ohne", "title": "Hafen dicht ohne Brann", "main": true, "act": 3, "cell": [0, 3],
+      "type": "chase", "district": "saltmarket", "giver": "edda",
+      "params": {"target": "brann_kcg_convoy", "route_profile": "harbor_entry", "capture_mode": "block", "reinforcements": 3},
+      "reward": "Hafen gehalten, Tag »free_port«",
+      "requires": [{"done": "w3_price"}, {"standing": ["union", ">=", 30]}, {"npcTrust": ["brann", "<", 0]}],
+      "excludes": [{"flag": ["portHeld", "==", true]}, {"done": "w5_finale"}],
+      "text": "Die Union hält den Hafen, nur Brann nicht mehr. Er fährt vorneweg in einem KCG-Konvoy. Er kennt die Barrikaden, weil er sie gebaut hat. Edda Marsh übernimmt das Funkgerät: »Mira, er darf nicht durch.«",
+      "choices": [{
+        "id": "a3_brann_end", "text": "Branns Wagen hängt an der Kaimauer.",
+        "options": [
+          {"id": "ram", "text": "Rammen, das Wasser entscheidet", "effects": [{"flag": ["brannDead", true]}, {"standing": ["union", 5]}]},
+          {"id": "pass", "text": "Ihn rückwärts durch die Lücke entkommen lassen", "effects": [{"standing": ["union", -10]}, {"flag": ["brannFled", true]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["portHeld", true]}, {"tag": ["saltmarket", "add", "free_port"]}, {"money": 800}],
+      "outro": "Die Union wählt Edda zur Sprecherin. Ihre erste Amtshandlung: Sie lässt Branns Namen nicht von der Containerwand streichen."
+    },
+    {
+      "id": "a3_probe_nox", "title": "Uplink-Probe", "main": true, "act": 3, "cell": [8, 1],
+      "type": "hack", "district": "ashridge", "giver": "nox",
+      "params": {"target": "ashridge_mast_relay", "hack_time": 75, "carry": "jammer", "from": "lantern_bell_tower", "time_limit": 540},
+      "reward": "Störsender am Mast",
+      "requires": [{"done": "w3_price"}, {"standing": ["collective", ">=", 20]}, {"npcTrust": ["nox", ">=", 1]}],
+      "excludes": [{"flag": ["jammerReady", "==", true]}, {"done": "w5_finale"}],
+      "text": "Ein Störsender in einer Fischkiste, die Serpentinen hinauf zum Sendemast. Nox sitzt daneben und redet die ganze Fahrt über Jonas, über die Schwester, über das, was man verkauft, wenn man Angst hat. Oben bleibt eine Frage: den Test fahren, einen kurzen Blackout im Core, oder unsichtbar bleiben bis zur Nullstunde?",
+      "choices": [{
+        "id": "a3_test_n", "text": "Den Test durchführen?",
+        "options": [
+          {"id": "test", "text": "Testen, für dreißig Sekunden Dunkelheit im Core", "effects": [{"tag": ["core", "add", "blackout"]}, {"aegis": -10}]},
+          {"id": "abort", "text": "Abbrechen und nicht verraten, was wir können", "effects": [{"npcTrust": ["nox", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["jammerReady", true]}, {"standing": ["collective", 15]}, {"money": 700}],
+      "outro": "Dreißig Sekunden ohne Werbung im Core. Einige Menschen bleiben stehen und sehen zum ersten Mal den Himmel über dem Tower."
+    },
+    {
+      "id": "a3_probe_yara", "title": "Uplink-Probe ohne Nox", "main": true, "act": 3, "cell": [8, 2],
+      "type": "hack", "district": "ashridge", "giver": "yara",
+      "params": {"target": "ashridge_mast_relay", "hack_time": 120, "carry": "jammer", "pursuers": 3},
+      "reward": "Störsender am Mast",
+      "requires": [{"done": "w3_price"}, {"standing": ["collective", ">=", 20]}, {"npcTrust": ["nox", "<", 1]}],
+      "excludes": [{"flag": ["jammerReady", "==", true]}, {"done": "w5_finale"}],
+      "text": "Ohne Nox muss Yara Quill den Störsender selbst verkabeln. Sie predigt sonst am Glockenturm, Löten hat sie aus einem Video gelernt. Es dauert zu lange. Unten auf der Serpentine tauchen Blaulichter auf.",
+      "choices": [{
+        "id": "a3_yara", "text": "Die KCG ist zwei Kurven entfernt. Yara ist noch nicht fertig.",
+        "options": [
+          {"id": "leave", "text": "Losfahren und Yara den Rest machen lassen", "effects": [{"flag": ["yaraArrested", true]}, {"standing": ["collective", -5]}]},
+          {"id": "back", "text": "Die Blaulichter ablenken, bis sie fertig ist", "effects": [{"heat": 3}, {"aegis": 10}, {"standing": ["collective", 10]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["jammerReady", true]}, {"tag": ["core", "add", "blackout"]}, {"money": 700}],
+      "outro": "Lantern Pirate Radio sendet eine Predigt vom Band. Yaras Stimme, aufgenommen vor Wochen: »Sie können uns zählen. Sie können uns nicht ausrechnen.«"
+    },
+    {
+      "id": "a3_route9", "title": "Fluchtroute Route 9", "main": true, "act": 3, "cell": [7, 5],
+      "type": "escape", "district": "route9", "giver": "dutch",
+      "params": {"heat_level": 3, "pursuers": 4, "safe_zone": "saltflats_depot", "roadblocks": 3, "helicopter": true, "test_run": true},
+      "reward": "Fluchtroute vorbereitet",
+      "requires": [{"done": "w3_price"}, {"any": [{"standing": ["wrenchers", ">=", 20]}, {"npcTrust": ["dutch", ">=", 1]}]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Dutch zeigt Mira eine Route, die es offiziell nicht gibt: von der Route 9 über eine stillgelegte Bahntrasse in die Salzebene. Drei Straßensperren, ein Hubschrauber und ein Tunnel, der eigentlich ein Abflusskanal ist. »Eine Generalprobe«, sagt Dutch. »Wer sie nicht übersteht, braucht keine Premiere.«",
+      "onSuccess": [{"flag": ["escapeRoute", true]}, {"standing": ["wrenchers", 10]}, {"npcTrust": ["dutch", 1]}, {"money": 1500}],
+      "outro": "Am Depot steht ein Wagen mit vollem Tank und zwei Kennzeichen, die es nicht gibt. Dutch hat auf alle Seiten gewettet, aber diesmal auf Mira zuerst."
+    },
+    {
+      "id": "a3_phase2", "title": "Phase Zwei", "main": true, "act": 3, "cell": [4, 2],
+      "type": "courier", "district": "core", "giver": "kandel",
+      "params": {"from": "aurelia_tower_garage", "to": "ashridge_mast", "cargo": "vip_convoy", "time_limit": 600, "escort": 3},
+      "reward": "Konzernzugang zum Uplink",
+      "requires": [{"done": "w3_price"}, {"standing": ["aurelia", ">=", 30]}],
+      "excludes": [{"done": "w5_finale"}],
+      "text": "Die Präsentation von Phase Zwei: Kandel fährt im Konvoy zum Sendemast, Mira am Steuer des Führungsfahrzeugs. Auf den Werbetafeln entlang der Strecke steht: »Phase Zwei. Weil Vertrauen messbar ist.« Auf dem Beifahrersitz liegt Kandels Zugangskarte.",
+      "choices": [{
+        "id": "a3_card", "text": "Kandel telefoniert hinten. Die Karte liegt neben dir.",
+        "options": [
+          {"id": "drive", "text": "Einfach fahren", "effects": [{"standing": ["aurelia", 10]}, {"npcTrust": ["kandel", 1]}]},
+          {"id": "copy", "text": "An der Ampel die Karte kopieren", "effects": [{"flag": ["hasUplinkKeys", true]}, {"npcTrust": ["kandel", -1]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["uplinkAccess", true]}, {"money": 1000}],
+      "outro": "Am Mast sagt Kandel in die Kameras: »Niemand muss sich mehr fürchten, außer vor sich selbst.« Applaus vom Band."
+    },
+    {
+      "id": "w4_rettung", "title": "Der Vorabend: Rettung", "main": true, "act": 3, "cell": [8, 3],
+      "type": "escape", "district": "ashridge", "giver": "jonas",
+      "params": {"heat_level": 5, "pursuers": 6, "safe_zone": "variable", "location": "ashridge_tube", "passenger": "jonas"},
+      "reward": "Jonas gerettet",
+      "requires": [
+        {"done": "w3_price"},
+        {"any": [{"done": "a3_raeumung_hafen"}, {"done": "a3_raeumung_altstadt"}, {"done": "a3_freiwild"}, {"done": "a3_zwei_gesichter"}]},
+        {"flag": ["soldOut", "!=", true]},
+        {"npcTrust": ["jonas", ">=", 2]}
+      ],
+      "excludes": [{"flag": ["w4_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Die Nacht vor der Nullstunde. Aurelia hat Jonas gefunden, in einem Wartungsraum der Ashridge Tube, und die KCG riegelt beide Tunnelenden ab. Jonas funkt nur: »Ich hab dir vertraut, Schwester. Bitte mach, dass sich das gelohnt hat.«",
+      "choices": [{
+        "id": "w4_how", "text": "Wie holst du Jonas raus?",
+        "options": [
+          {"id": "ravn", "text": "Okoye öffnet eine Sperre, die offiziell defekt ist", "when": [{"flag": ["ravnTurned", "==", true]}], "effects": [{"aegis": -10}]},
+          {"id": "dutch", "text": "Durch Dutchs Abflusskanal in die Salzebene", "when": [{"any": [{"flag": ["escapeRoute", "==", true]}, {"npcTrust": ["dutch", ">=", 1]}]}], "effects": [{"heat": 1}, {"standing": ["wrenchers", 5]}]},
+          {"id": "alone", "text": "Allein, mit Vollgas durch die Sperre", "effects": [{"heat": 3}, {"aegis": 10}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w4_done", true]}, {"flag": ["savedJonas", true]}],
+      "outro": "Jonas schläft auf dem Rücksitz, den Ledger-Kern im Arm wie ein Kuscheltier. Zum ersten Mal seit sieben Jahren sind sie im selben Auto."
+    },
+    {
+      "id": "w4_doppelagent", "title": "Der Vorabend: Zwei Herren", "main": true, "act": 3, "cell": [5, 5],
+      "type": "chase", "district": "core", "giver": "jonas",
+      "params": {"target": "jonas_car", "route_profile": "core_to_ashridge", "capture_mode": "stop", "escape_skill": 0.6},
+      "reward": "Wahrheit über Jonas",
+      "requires": [
+        {"done": "w3_price"},
+        {"any": [{"done": "a3_raeumung_hafen"}, {"done": "a3_raeumung_altstadt"}, {"done": "a3_freiwild"}, {"done": "a3_zwei_gesichter"}]},
+        {"any": [{"flag": ["soldOut", "==", true]}, {"npcTrust": ["jonas", "<", 2]}]},
+        {"npcTrust": ["jonas", ">=", 0]}
+      ],
+      "excludes": [{"flag": ["w4_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Mira folgt Jonas' Wagen durch den leeren Core, und er fährt nicht zu ihr. Er fährt zum Tower. Als sie ihn an einer Ladesäule stellt, gibt er es zu: Seit Wochen liefert er Kandel Berichte über sie. »Er hat gesagt, wenn ich kooperiere, kommst du da raus. Ich wollte dich nur einmal beschützen.«",
+      "choices": [{
+        "id": "w4_double", "text": "Was wird aus Jonas?",
+        "options": [
+          {"id": "take", "text": "Ihn trotzdem mitnehmen, er bleibt dein Bruder", "effects": [{"flag": ["jonasWithMira", true]}]},
+          {"id": "hand", "text": "Ihn Kandel überlassen, er hat es sich ausgesucht", "effects": [{"flag": ["jonasLost", true]}, {"standing": ["aurelia", 15]}]},
+          {"id": "go", "text": "Ihm die Schlüssel geben: »Fahr. Irgendwohin.«", "effects": [{"flag": ["jonasGone", true]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w4_done", true]}],
+      "outro": "Die Ladesäule piept: »Vielen Dank für Ihre Loyalität.«"
+    },
+    {
+      "id": "w4_verlust", "title": "Der Vorabend: Tunnelende", "main": true, "act": 3, "cell": [7, 3],
+      "type": "chase", "district": "ashridge", "giver": "ravn",
+      "params": {"target": "kcg_transport", "route_profile": "ashridge_tube", "capture_mode": "ram", "time_limit": 240},
+      "reward": "Ledger-Schlüssel",
+      "requires": [
+        {"done": "w3_price"},
+        {"any": [{"done": "a3_raeumung_hafen"}, {"done": "a3_raeumung_altstadt"}, {"done": "a3_freiwild"}, {"done": "a3_zwei_gesichter"}]},
+        {"any": [{"flag": ["soldOut", "==", true]}, {"npcTrust": ["jonas", "<", 2]}]},
+        {"npcTrust": ["jonas", "<", 0]}
+      ],
+      "excludes": [{"flag": ["w4_done", "==", true]}, {"done": "w5_finale"}],
+      "text": "Jonas hat Mira nie wieder angerufen. Er wollte alleine raus, ohne die Schwester, die ihm nicht glaubte. Der KCG-Transport, in den man ihn gesetzt hat, überschlägt sich am Tunnelende. Als Mira ankommt, lebt er noch zwei Minuten. Lang genug, um ihr einen Schlüsselanhänger in die Hand zu drücken.",
+      "choices": [{
+        "id": "w4_grief", "text": "Was bleibt dir?",
+        "options": [
+          {"id": "revenge", "text": "Rache an Kandel schwören", "effects": [{"npcTrust": ["kandel", -3]}, {"heat": 2}, {"flag": ["vowRevenge", true]}]},
+          {"id": "key", "text": "Den Schlüssel nehmen und weiterfahren, Trauer später", "effects": [{"flag": ["ledgerOriginal", true]}]}
+        ]
+      }],
+      "onSuccess": [{"flag": ["w4_done", true]}, {"flag": ["jonasDead", true]}],
+      "outro": "Clearwave FM meldet einen »Verkehrsunfall ohne Fremdeinwirkung«. Open Line spielt eine Minute Stille. Es ist die meistgehörte Minute des Jahres."
+    },
+    {
+      "id": "w5_finale", "title": "Uplink", "main": true, "act": 3, "cell": [8, 0], "finale": true,
+      "type": "escape", "district": "ashridge", "giver": "aegis",
+      "params": {"heat_level": 5, "pursuers": 10, "route": "route9_to_ashridge_mast", "helicopter": true, "countdown": "nullstunde"},
+      "reward": "Ende",
+      "requires": [{"flag": ["w4_done", "==", true]}],
+      "text": "Nullstunde minus vierzig Minuten. Über die Route 9, durch die Serpentinen, hinauf zum Ashridge-Sendemast, mit allem, was die KCG noch hat, im Rückspiegel. Oben, im Kontrollhaus, liegt der Schlüssel zu Aegis. Wenn Phase Zwei live geht, gehört die Stadt dem Netz. Miras Entscheidung gehört ihr allein, und doch jeder Seite, die ihr bis hier geholfen hat.",
+      "choices": [{
+        "id": "w5_decision", "text": "Was tust du mit Aegis?",
+        "options": [
+          {"id": "open_books", "text": "Die Bücher öffnen: Ledger, Zeugen, alles live auf Open Line", "when": [
+            {"standing": ["union", ">=", 25]}, {"standing": ["collective", ">=", 25]}, {"standing": ["wrenchers", ">=", 25]},
+            {"flag": ["savedJonas", "==", true]}, {"flag": ["killedCivilians", "!=", true]},
+            {"any": [{"flag": ["ledgerOriginal", "==", true]}, {"flag": ["leakedLedger", "==", true]}, {"flag": ["kandelDoubts", "==", true]}]}
+          ], "effects": [{"flag": ["endOpenBooks", true]}, {"flag": ["ending", "open_books"]}]},
+          {"id": "take_over", "text": "Aegis übernehmen", "when": [{"standing": ["aurelia", ">=", 30]}, {"any": [{"flag": ["uplinkAccess", "==", true]}, {"flag": ["soldOut", "==", true]}]}], "effects": [{"flag": ["endTakeOver", true]}, {"flag": ["ending", "take_over"]}]},
+          {"id": "sell", "text": "Die Schlüssel an den Meistbietenden verkaufen", "when": [{"flag": ["hasUplinkKeys", "==", true]}], "effects": [{"flag": ["endSell", true]}, {"flag": ["ending", "sell"]}, {"money": 50000}]},
+          {"id": "hold_port", "text": "Den Hafen halten und Aegis aussperren", "when": [{"standing": ["union", ">=", 30]}, {"flag": ["portHeld", "==", true]}, {"flag": ["betrayedUnion", "!=", true]}], "effects": [{"flag": ["endHoldPort", true]}, {"flag": ["ending", "hold_port"]}]},
+          {"id": "shut_down", "text": "Den Uplink zerstören", "when": [{"any": [{"all": [{"standing": ["collective", ">=", 20]}, {"flag": ["jammerReady", "==", true]}]}, {"flag": ["backdoorPlanted", "==", true]}]}], "effects": [{"flag": ["endShutDown", true]}, {"flag": ["ending", "shut_down"]}]},
+          {"id": "flee", "text": "Umdrehen und über die Route 9 die Stadt verlassen", "effects": [{"flag": ["endFlee", true]}, {"flag": ["ending", "flee"]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}]
+    },
+
+    {
+      "id": "g_kistentanz", "title": "Kistentanz", "main": false, "act": 0, "cell": [2, 3],
+      "type": "gig", "district": "saltmarket", "giver": "spindel",
+      "params": {"template": "delivery", "tier": 1, "time_limit": 300, "cooldown_h": 6, "cargo": "crates", "fragile": true},
+      "reward": "$250, Union +5",
+      "requires": [{"done": "p2"}],
+      "text": "Spindel hat sieben Telefone und für jedes eine andere Stimme. »Sechs Kisten Gläser, Kai 2 nach Kai 9. Wenn eine bricht, zahlst du. Wenn keine bricht, war es Glück.«",
+      "onSuccess": [{"standing": ["union", 5]}, {"money": 250}],
+      "outro": "Eine Kiste klirrt verdächtig. Spindel sagt, Gläser klirren eben."
+    },
+    {
+      "id": "g_abschlepp", "title": "Abschleppdienst", "main": false, "act": 0, "cell": [3, 7],
+      "type": "gig", "district": "rustline", "giver": "dutch",
+      "params": {"template": "tow", "tier": 1, "time_limit": 360, "cooldown_h": 4},
+      "reward": "$200, Wrenchers +5",
+      "requires": [{"done": "p2"}],
+      "text": "Ein Konzernwagen ist in Rustline liegengeblieben, mitten in einer Gegend, die laut seinem Navi »nicht existiert«. Die Wrenchers schleppen ihn ab. Wohin genau, entscheidet der Kurs für Ersatzteile.",
+      "onSuccess": [{"standing": ["wrenchers", 5]}, {"money": 200}],
+      "outro": "Zwei Stunden später ist der Wagen ein Teilelager. Das Navi läuft noch und sucht verzweifelt nach Empfang."
+    },
+    {
+      "id": "g_kleber", "title": "Kameras überkleben", "main": false, "act": 1, "cell": [5, 1],
+      "type": "gig", "district": "lantern", "giver": "nox",
+      "params": {"template": "sticker_run", "tier": 1, "targets": 8, "time_limit": 420, "cooldown_h": 12},
+      "reward": "$150, Collective +5, Aegis −5",
+      "requires": [{"done": "a1_blinde_flecken"}],
+      "text": "Acht Kameras, acht Aufkleber mit einem lächelnden Auge und dem Text »Wir sehen zurück«. Wer erwischt wird, ist Vandale. Wer nicht erwischt wird, ist Kunst.",
+      "onSuccess": [{"standing": ["collective", 5]}, {"aegis": -5}, {"money": 150}],
+      "outro": "Am nächsten Tag tauchen die Aufkleber als Merchandise im Aurelia-Shop auf. Neun Dollar das Stück."
+    },
+    {
+      "id": "g_kurier_core", "title": "Kurier mit Kameraroute", "main": false, "act": 1, "cell": [3, 4],
+      "type": "gig", "district": "core", "giver": "spindel",
+      "params": {"template": "camera_courier", "tier": 2, "time_limit": 240, "max_detections": 2, "cooldown_h": 8},
+      "reward": "$450, Aurelia +5",
+      "requires": [{"done": "a1_kontrolle"}],
+      "text": "Ein Umschlag für eine Kanzlei im Core. Der Kunde will, dass er unterwegs genau zweimal von Aegis gesehen wird, nicht öfter, nicht seltener. »Alibi-Logistik«, sagt Spindel. »Wachstumsmarkt.«",
+      "onSuccess": [{"standing": ["aurelia", 5]}, {"aegis": 5}, {"money": 450}],
+      "outro": "Der Umschlag war leer. Bezahlt wurde für die Kamerabilder."
+    },
+    {
+      "id": "g_drohnenausfall", "title": "Drohnenausfall", "main": false, "act": 2, "cell": [7, 1],
+      "type": "gig", "district": "greenmoor", "giver": "spindel",
+      "params": {"template": "delivery", "tier": 2, "time_limit": 300, "stops": 5, "gate_checks": true},
+      "reward": "$380, Aurelia +3, KCG +3",
+      "requires": [{"done": "w1_find"}],
+      "text": "In Greenmoor sind die Lieferdrohnen ausgefallen und die Anwohner stehen kurz vor einer Krise: Bio-Hafermilch, Nahrungsergänzung für Hunde, ein Paket mit der Aufschrift »Notfall-Kaschmir«. Die Tore lassen Mira durch, aber nur mit Begleitschreiben.",
+      "onSuccess": [{"standing": ["aurelia", 3]}, {"standing": ["kcg", 3]}, {"money": 380}],
+      "outro": "Eine Kundin gibt Trinkgeld in Form eines Gutscheins für ihre eigene Yogaschule."
+    },
+    {
+      "id": "g_influencer_taxi", "title": "Influencer-Taxi", "main": false, "act": 0, "cell": [0, 1],
+      "type": "gig", "district": "sunstrip", "giver": "spindel",
+      "params": {"template": "taxi", "tier": 1, "mood": "spektakulär", "tip_rules": "airtime_and_drifts", "time_limit": 360},
+      "reward": "$300",
+      "requires": [{"done": "p3"}],
+      "text": "Ein Influencer mit Kamera am Helm will eine »authentische Fahrt durch das echte Kestrel Bay«. Echt heißt für ihn: möglichst viele Sprünge, möglichst wenig Armut im Bild.",
+      "onSuccess": [{"money": 300}],
+      "outro": "Das Video heißt »Ich habe ÜBERLEBT (Rustline Edition)«. Rustline kommt nicht darin vor."
+    },
+    {
+      "id": "g_checkpointlotse", "title": "Checkpoint-Lotse", "main": false, "act": 0, "cell": [7, 4],
+      "type": "gig", "district": "route9", "giver": "spindel",
+      "params": {"template": "smuggle_passengers", "tier": 2, "passengers": 3, "checkpoints": ["route9_checkpoint"], "time_limit": 420},
+      "reward": "$350, Union +3, Wrenchers +3",
+      "requires": [{"done": "p2"}],
+      "text": "Drei Pendler mit zu niedrigem Score dürfen nicht über den Checkpoint zur Arbeit, die sie für ihren Score brauchen. Mira kennt die Baustellenausfahrt.",
+      "onSuccess": [{"aegis": -5}, {"standing": ["union", 3]}, {"standing": ["wrenchers", 3]}, {"standing": ["kcg", -5]}, {"money": 350}],
+      "outro": "Einer der Pendler arbeitet bei Aurelia. In der Kantine, an der Kamera-Kasse."
+    },
+    {
+      "id": "g_ampelchor", "title": "Ampelchor", "main": false, "act": 1, "cell": [4, 2],
+      "type": "hack", "district": "lantern", "giver": "nox",
+      "params": {"template": "traffic_light_hack", "tier": 1, "targets": 5, "hack_time": 15, "time_limit": 300},
+      "reward": "$300, Collective +5",
+      "requires": [{"done": "a1_blinde_flecken"}],
+      "text": "Fünf Ampeln in Lantern Hill sollen gleichzeitig grün zeigen, damit ein Krankenwagen ohne Score-Priorität durchkommt. Offiziell hält Aegis die grüne Welle für Premiumkunden frei.",
+      "onSuccess": [{"standing": ["collective", 5]}, {"aegis": -3}, {"money": 300}],
+      "outro": "Der Krankenwagen kommt durch. Die Ampeln singen danach eine Woche lang Rot."
+    },
+    {
+      "id": "sq_frachtbrief", "title": "Donnerstagsfahrten", "main": false, "act": 1, "cell": [1, 5],
+      "type": "side", "district": "saltmarket", "giver": "edda",
+      "params": {"beats": 3, "from": "saltmarket_crane_row", "to": "greenmoor_clinic", "repeat_days": 3},
+      "reward": "$600, Union +3",
+      "requires": [{"done": "p2"}],
+      "text": "Edda Marsh, Kranführerin, bittet Mira um Fahrten nach Greenmoor, jeden Donnerstag, keine Fragen. Beim dritten Mal folgt Mira ihr in die Klinik. Edda verkauft ihre eigenen Aegis-Verhaltensdaten an ein Forschungslabor, um die Behandlung ihres Sohnes zu bezahlen. Die Union hat Datenverkauf für Verrat erklärt.",
+      "choices": [{
+        "id": "sq_edda", "text": "Was machst du mit Eddas Geheimnis?",
+        "options": [
+          {"id": "union", "text": "Der Union melden, Regeln gelten für alle", "effects": [{"standing": ["union", 5]}, {"flag": ["eddaExposed", true]}]},
+          {"id": "silent", "text": "Schweigen und weiterfahren", "effects": [{"aegis": 3}]},
+          {"id": "pay", "text": "Ihre Rechnung bezahlen, damit sie nicht mehr verkaufen muss", "effects": [{"money": -1200}, {"flag": ["eddaPaid", true]}, {"standing": ["union", 5]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["union", 3]}, {"money": 600}],
+      "outro": "Eddas Sohn malt ein Bild von einem Auto, das schneller als Kameras ist."
+    },
+    {
+      "id": "sq_frachtbrief_2", "title": "Der Hintereingang", "main": false, "act": 2, "cell": [3, 5],
+      "type": "side", "district": "core", "giver": "edda",
+      "params": {"beats": 2, "delayed_from": "sq_frachtbrief"},
+      "reward": "Zugang zum Aurelia Tower",
+      "requires": [{"done": "sq_frachtbrief"}, {"done": "w1_find"}, {"flag": ["eddaExposed", "!=", true]}],
+      "text": "Wochen später ruft Edda an. Ihr Sohn ist auf dem Weg der Besserung, und das Labor, das ihre Daten kauft, sitzt im Aurelia Tower. Sie hat einen Lieferanteneingang gesehen, den keine Kamera erfasst, weil dort die Kameras gewartet werden.",
+      "onSuccess": [{"flag": ["towerPass", true]}, {"standing": ["union", 3]}],
+      "outro": "Eine verzögerte Folge in Form eines Gefallens. In Saltmarket nennen sie das Zinsen."
+    },
+    {
+      "id": "sq_witwe", "title": "Die Witwe von Kai 7", "main": false, "act": 1, "cell": [0, 6],
+      "type": "side", "district": "saltmarket", "giver": "hanne",
+      "params": {"beats": 3, "requires_deed": "killedCivilians"},
+      "reward": "Je nach Wahl",
+      "requires": [{"flag": ["killedCivilians", "==", true]}],
+      "text": "Hanne Lark sucht eine Fahrerin. Ihr Mann ist gestorben, ein Unfall, sagt die Versicherung, die nicht zahlt, weil sein Score »risikobehaftet« war. Sie will nur zum Friedhof, jeden Tag. Auf dem Grabstein steht ein Datum. Mira kennt das Datum.",
+      "choices": [{
+        "id": "sq_hanne", "text": "Am Friedhofstor fragt Hanne, ob du ihn gekannt hast.",
+        "options": [
+          {"id": "pay", "text": "Schweigen und ihr anonym 1000 Dollar zukommen lassen", "effects": [{"money": -1000}, {"standing": ["union", 10]}]},
+          {"id": "confess", "text": "Gestehen", "effects": [{"standing": ["union", -10]}, {"npcTrust": ["pia", 1]}, {"flag": ["confessedKill", true]}]},
+          {"id": "deny", "text": "»Nein. Tut mir leid.«", "effects": [{"standing": ["union", -5]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Auf Open Line ruft eine Frau an und sagt nur einen Namen. Pia lässt die Leitung zehn Sekunden offen."
+    },
+    {
+      "id": "ev_hafenstreik", "title": "Hafenstreik", "main": false, "act": 1, "cell": [2, 5],
+      "type": "event", "district": "saltmarket", "giver": "brann",
+      "params": {"trigger": "tag_strike", "duration_days": 3, "world_tags": ["strike"], "supply_runs": 4},
+      "reward": "$500, Union +10",
+      "requires": [{"tag": ["saltmarket", "has", "strike"]}],
+      "text": "Der Hafen streikt in den dritten Tag. LKW stauen sich bis zur Route 9, Clearwave FM nennt es »Mobilitätsstau durch Partikularinteressen«. Die Streikenden brauchen Essen, Decken, Medikamente. Ein Aurelia-Mann bietet Mira 3000 Dollar für den Schichtplan der Streikposten.",
+      "choices": [{
+        "id": "ev_strike", "text": "Was tust du im Streik?",
+        "options": [
+          {"id": "supply", "text": "Versorgungsfahrten für die Streikposten", "effects": [{"standing": ["union", 10]}, {"heat": 1}]},
+          {"id": "sell", "text": "Den Schichtplan an Aurelia verkaufen", "effects": [{"money": 3000}, {"standing": ["aurelia", 15]}, {"standing": ["union", -15]}, {"flag": ["strikeSold", true]}, {"flag": ["betrayedUnion", true]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 500}],
+      "outro": "Der Streik hält oder bricht, und die Möwen bekommen in beiden Fällen Brot."
+    },
+    {
+      "id": "race_salzebene", "title": "Salzebene-Sprint", "main": false, "act": 1, "cell": [7, 8],
+      "type": "race", "district": "saltflats", "giver": "dutch",
+      "params": {"route": "saltflats_straight_and_back", "laps": 1, "opponents": 5, "weather": "clear", "time_of_day": "noon", "rules": {"ramming": false}, "stake": 300},
+      "reward": "$600, Wrenchers +10",
+      "requires": [{"any": [{"done": "a1w_probefahrt"}, {"standing": ["wrenchers", ">=", 12]}]}],
+      "text": "Weiß bis zum Horizont, und mittendrin sechs Autos, die einander nichts schenken. Auf der Salzebene gibt es keine Kameras, nur Hitze und Dutchs Stoppuhr.",
+      "onSuccess": [{"standing": ["wrenchers", 10]}, {"npcTrust": ["dutch", 1]}, {"money": 600}],
+      "outro": "Die Reifenspuren bleiben drei Tage sichtbar. Aegis-Satelliten werten sie als »unbekannte Glyphen« aus."
+    },
+    {
+      "id": "ev_rennnacht", "title": "Die Revanche", "main": false, "act": 2, "cell": [0, 0],
+      "type": "race", "district": "coastroad", "giver": "dutch",
+      "params": {"route": "coast_road_full", "laps": 1, "opponents": 1, "weather": "rain", "time_of_day": "night", "stake": 1000, "rival": "aurelia_sponsored_driver"},
+      "reward": "$1200 oder Informationen",
+      "requires": [{"standing": ["wrenchers", ">=", 20]}, {"done": "w1_find"}],
+      "text": "Aurelia sponsert einen Fahrer mit perfektem Score und einem Auto, das sich selbst lenkt, wenn er zu emotional wird. Revanche auf der Küstenstraße, im Regen. Sein Teamchef bietet Mira etwas an: Verlier, und du erfährst, warum Kandel Aegis wirklich gebaut hat.",
+      "choices": [{
+        "id": "ev_rematch", "text": "Ziellinie in Sicht.",
+        "options": [
+          {"id": "win", "text": "Gewinnen", "effects": [{"money": 1200}, {"standing": ["wrenchers", 10]}]},
+          {"id": "lose", "text": "Absichtlich verlieren", "effects": [{"flag": ["kandelInfo", true]}, {"standing": ["wrenchers", -5]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Was man über Kandel erfährt: ein Unfall, eine Tochter, eine Straße ohne Kamera. Was man über sich erfährt: dass man es wissen wollte."
+    },
+    {
+      "id": "sq_dutch_wette", "title": "Dutchs Wette", "main": false, "act": 1, "cell": [4, 7],
+      "type": "side", "district": "rustline", "giver": "dutch",
+      "params": {"beats": 3, "investigation_nodes": 2},
+      "reward": "Je nach Wahl",
+      "requires": [{"npcTrust": ["dutch", ">=", 1]}],
+      "text": "In Dutchs Werkstatt liegt ein Wettbuch. Sie hat auf jede Seite gewettet, auf die Union, auf das Collective und auf Aurelia, und sogar auf Miras Scheitern, mit guter Quote. Ihre Leute wissen nichts davon.",
+      "choices": [{
+        "id": "sq_bet", "text": "Was machst du mit dem Wettbuch?",
+        "options": [
+          {"id": "cover", "text": "Zurücklegen, jeder sichert sich ab", "effects": [{"npcTrust": ["dutch", 2]}]},
+          {"id": "expose", "text": "Den Wrenchers zeigen", "effects": [{"standing": ["wrenchers", 10]}, {"npcTrust": ["dutch", -2]}]},
+          {"id": "bet", "text": "Mitwetten, auf dich selbst", "effects": [{"money": 900}, {"npcTrust": ["dutch", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["wrenchers", 3]}],
+      "outro": "Dutch ändert eine Quote. Auf Mira steht jetzt 3 zu 1, für das Überleben."
+    },
+    {
+      "id": "hunt_silberfisch", "title": "Der Kennzeichenfälscher", "main": false, "act": 2, "cell": [5, 7],
+      "type": "hunt", "district": "rustline", "giver": "dutch",
+      "params": {"target_profile": "silberfisch", "investigation_nodes": 3, "prep_slots": 2, "heat_cap": 2, "routine": "changes_daily"},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "w1_find"}, {"any": [{"standing": ["wrenchers", ">=", 10]}, {"standing": ["union", ">=", 10]}]}],
+      "text": "Silberfisch fälscht Kennzeichen, so gut, dass Aegis sich bei ihnen entschuldigt. Er hat einen Wrencher an die KCG verkauft und wechselt täglich die Route. Drei Spuren: ein Lackierer, eine Tankstelle mit defekter Kamera, eine Mutter, die er sonntags besucht.",
+      "choices": [{
+        "id": "hunt_sf", "text": "Silberfisch sitzt in der Falle.",
+        "options": [
+          {"id": "wrench", "text": "Den Wrenchers übergeben", "effects": [{"standing": ["wrenchers", 10]}]},
+          {"id": "deal", "text": "Laufen lassen, gegen neue Kennzeichen", "effects": [{"aegis": -15}]},
+          {"id": "kcg", "text": "An die KCG verkaufen", "effects": [{"standing": ["kcg", 15]}, {"money": 1500}, {"npcTrust": ["ravn", 1]}, {"standing": ["wrenchers", -10]}, {"flag": ["soldSilberfisch", true]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 800}],
+      "outro": "In Rustline erzählt man sich jetzt, dass Mira jeden findet. Das ist ein Ruf, der Türen öffnet und Fenster verriegelt."
+    },
+    {
+      "id": "sq_glockenturm", "title": "Glockenturm", "main": false, "act": 2, "cell": [3, 2],
+      "type": "side", "district": "lantern", "giver": "yara",
+      "params": {"beats": 3, "location": "st_merrin_bell_tower"},
+      "reward": "Collective-Stand",
+      "requires": [{"done": "w1_find"}, {"standing": ["collective", ">=", 10]}],
+      "text": "Yara Quill predigt jeden Abend gegen den Abriss. Mira findet in ihrem Turm eine Mappe: die Abrisspläne, seit Monaten bekannt. Yara hat sie zurückgehalten, weil sie Panik fürchtete. Oder weil der Abriss ihre Predigten lauter macht.",
+      "choices": [{
+        "id": "sq_yara", "text": "Was tust du mit der Mappe?",
+        "options": [
+          {"id": "publish", "text": "Veröffentlichen, die Leute haben ein Recht darauf", "effects": [{"standing": ["collective", 10]}, {"tag": ["lantern", "add", "protest"]}, {"flag": ["demolitionLeaked", true]}, {"aegis": 5}]},
+          {"id": "private", "text": "Yara unter vier Augen stellen", "effects": [{"standing": ["collective", 5]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 400}],
+      "outro": "Am Sonntag predigt Yara über Wahrheit. Sie sieht dabei zu Mira, als wäre sie die Gemeinde."
+    },
+    {
+      "id": "ev_razzia", "title": "Razzia", "main": false, "act": 2, "cell": [5, 0],
+      "type": "event", "district": "lantern", "giver": "aegis",
+      "params": {"trigger": "aegis_profile_high", "duration_h": 24, "roadblocks": 4, "heat_increase": 2},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "w1_find"}, {"aegis": [">=", 55]}],
+      "text": "Miras Aegis-Profil ist so hoch, dass die KCG in Lantern Hill eine »präventive Nachbarschaftsbegehung« ansetzt. Sperren an jeder Treppe. Wer Mira kennt, wird befragt.",
+      "choices": [{
+        "id": "ev_raid", "text": "Was tust du während der Razzia?",
+        "options": [
+          {"id": "warn", "text": "Informanten warnen, Haus für Haus", "effects": [{"standing": ["collective", 10]}, {"heat": 2}]},
+          {"id": "hide", "text": "Untertauchen, bis es vorbei ist", "effects": [{"aegis": -5}, {"standing": ["collective", -5]}]}
+        ]
+      }],
+      "onSuccess": [{"aegis": -5}],
+      "outro": "Die KCG findet nichts außer einem Hund ohne Score. Der Hund wird verwarnt."
+    },
+    {
+      "id": "sq_nox_schwester", "title": "Nox' Schwester", "main": false, "act": 2, "cell": [6, 3],
+      "type": "side", "district": "greenmoor", "giver": "nox",
+      "params": {"beats": 3, "location": "greenmoor_wellbeing_center"},
+      "reward": "Nox' Vertrauen",
+      "requires": [{"done": "w1_find"}, {"npcTrust": ["nox", ">=", 1]}],
+      "text": "Nox' Schwester sitzt in einem »Wohlverhaltenszentrum« in Greenmoor: Yoga, Bildschirme, kein Ausgang, bis der Score stimmt. Nox will sie rausholen und braucht eine Fahrerin.",
+      "choices": [{
+        "id": "sq_sister", "text": "Wie hilfst du?",
+        "options": [
+          {"id": "break", "text": "Rausholen, durch den Lieferanteneingang", "effects": [{"npcTrust": ["nox", 2]}, {"heat": 2}, {"standing": ["kcg", -10]}, {"flag": ["noxSisterFreed", true]}]},
+          {"id": "bribe", "text": "Ihren Score freikaufen, 1500 Dollar", "effects": [{"money": -1500}, {"npcTrust": ["nox", 1]}, {"flag": ["noxSisterFreed", true]}]},
+          {"id": "refuse", "text": "Ablehnen, zu riskant", "effects": [{"npcTrust": ["nox", -1]}]}
+        ]
+      }],
+      "onSuccess": [{"standing": ["collective", 5]}],
+      "outro": "Wer Nox hilft, bindet Nox an sich. In Kestrel Bay ist das auch eine Schuld."
+    },
+    {
+      "id": "sq_score_beratung", "title": "Score-Beratung", "main": false, "act": 1, "cell": [3, 3],
+      "type": "side", "district": "core", "giver": "spindel",
+      "params": {"beats": 2, "passengers": 4},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "p3"}],
+      "text": "Eine Familie aus Saltmarket hat einen Termin bei einem »zertifizierten Score-Coach« im Core: 400 Dollar für Tipps wie »Gehen Sie öfter an Kameras vorbei und lächeln Sie dabei«. Der Coach arbeitet auf Provision für Aurelia.",
+      "choices": [{
+        "id": "sq_coach", "text": "Was machst du?",
+        "options": [
+          {"id": "expose", "text": "Den Schwindel vor der Familie auffliegen lassen", "effects": [{"standing": ["collective", 5]}, {"standing": ["aurelia", -5]}]},
+          {"id": "game", "text": "Der Familie echte Tricks verkaufen, um den Score zu drücken", "effects": [{"money": 700}, {"standing": ["aurelia", 5]}, {"aegis": 5}]}
+        ]
+      }],
+      "onSuccess": [{"money": 200}],
+      "outro": "Der Coach hat eine neue Werbetafel: »Ihr Score. Ihre Verantwortung. Unsere Gebühr.«"
+    },
+    {
+      "id": "hunt_deserteur", "title": "Der Deserteur", "main": false, "act": 2, "cell": [6, 4],
+      "type": "hunt", "district": "route9", "giver": "ravn",
+      "params": {"target_profile": "kcg_deserter", "investigation_nodes": 3, "prep_slots": 1, "heat_cap": 1},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "a1_kontrolle"}, {"done": "w1_find"}],
+      "text": "Ein junger KCG-Wachmann ist desertiert, mit einer Bodycam voller Aufnahmen aus einem Wohlverhaltenszentrum. Okoye bittet Mira, ihn zu finden, bevor es andere tun. Er sagt nicht, was er mit ihm vorhat.",
+      "choices": [{
+        "id": "hunt_des", "text": "Der Deserteur kauert hinter einer Tankstelle.",
+        "options": [
+          {"id": "hand", "text": "Okoye übergeben", "effects": [{"standing": ["kcg", 15]}, {"npcTrust": ["ravn", 1]}, {"standing": ["collective", -5]}]},
+          {"id": "escape", "text": "Ihn über die Küstenstraße aus der Stadt bringen", "effects": [{"npcTrust": ["ravn", 1]}, {"standing": ["kcg", -10]}, {"standing": ["collective", 10]}]},
+          {"id": "sell", "text": "Die Bodycam an den Meistbietenden verkaufen", "effects": [{"money": 1500}, {"npcTrust": ["ravn", -1]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 600}],
+      "outro": "Okoye sagt bei beiden ersten Wegen dasselbe: »Danke.« Er meint es nur bei einem."
+    },
+    {
+      "id": "sq_ravn_akte", "title": "Ravns Akte", "main": false, "act": 2, "cell": [5, 2],
+      "type": "side", "district": "core", "giver": "ravn",
+      "params": {"beats": 2, "location": "kcg_hq_archive"},
+      "reward": "Ravns Vertrauen oder ein Skandal",
+      "requires": [{"done": "w1_find"}, {"npcTrust": ["ravn", ">=", 1]}],
+      "text": "Okoye hat eine Akte: dreiundvierzig Fehlfestnahmen durch Aegis-Algorithmen, sieben davon tödlich. Er weiß nicht, was er damit tun soll, und gibt sie Mira »zur Aufbewahrung«. Ein Test, oder ein Hilferuf.",
+      "choices": [{
+        "id": "sq_file", "text": "Was tust du mit der Akte?",
+        "options": [
+          {"id": "pia", "text": "An Open Line geben", "effects": [{"npcTrust": ["pia", 1]}, {"npcTrust": ["ravn", -1]}, {"standing": ["aurelia", -10]}, {"flag": ["aegisErrorsLeaked", true]}]},
+          {"id": "return", "text": "Zurückgeben: »Das ist deine Entscheidung.«", "effects": [{"npcTrust": ["ravn", 1]}]},
+          {"id": "keep", "text": "Behalten, als Faustpfand", "effects": [{"flag": ["ravnFile", true]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Okoye sieht danach anders aus, als hätte er eine Uniform eine Nummer zu klein getragen und es erst jetzt bemerkt."
+    },
+    {
+      "id": "sq_wache", "title": "Nachbarschaftswache", "main": false, "act": 2, "cell": [7, 0],
+      "type": "side", "district": "greenmoor", "giver": "spindel",
+      "params": {"beats": 2, "passenger": "gardener"},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "w1_find"}],
+      "text": "Die Nachbarschaftswache von Greenmoor bezahlt Mira dafür, einen »auffälligen Mann« vor die Tore zu fahren. Er hat einen Rechen in der Hand und einen Score unter 400. Er ist der Gärtner. Seit elf Jahren.",
+      "choices": [{
+        "id": "sq_watch", "text": "Der Gärtner steigt ein.",
+        "options": [
+          {"id": "comply", "text": "Vor die Tore fahren, Auftrag ist Auftrag", "effects": [{"standing": ["aurelia", 5]}, {"standing": ["kcg", 5]}, {"money": 400}]},
+          {"id": "home", "text": "Ihn nach Hause fahren und das Geld trotzdem kassieren", "effects": [{"standing": ["collective", 5]}, {"money": 400}, {"aegis": 3}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Die Wache bewertet Mira mit fünf Sternen: »Sehr diskret, würde wieder abschieben lassen.«"
+    },
+    {
+      "id": "ev_torsperre", "title": "Torsperre", "main": false, "act": 2, "cell": [6, 1],
+      "type": "event", "district": "greenmoor", "giver": "aegis",
+      "params": {"trigger": "tag_lockdown", "duration_h": 12, "world_tags": ["lockdown"], "gate_count": 4},
+      "reward": "Je nach Wahl",
+      "requires": [{"tag": ["greenmoor", "has", "lockdown"]}],
+      "text": "Seit der Kamera-Kaskade ist Greenmoor im Lockdown. Die Tore sind zu und das Personal sitzt fest: Putzkräfte, Pflegekräfte, Gärtner. Die Anwohner bemerken es, als sich die Wäsche stapelt.",
+      "choices": [{
+        "id": "ev_gate", "text": "Was tust du an den Toren?",
+        "options": [
+          {"id": "smuggle", "text": "Das Personal rausschmuggeln", "effects": [{"standing": ["collective", 5]}, {"standing": ["kcg", -5]}]},
+          {"id": "sell", "text": "Passierscheine an die Anwohner verkaufen", "effects": [{"money": 800}, {"standing": ["aurelia", 3]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 300}],
+      "outro": "Im Greenmoor-Newsletter heißt es: »Die Krise hat uns als Gemeinschaft zusammengeschweißt.« Das Personal wird nicht erwähnt."
+    },
+    {
+      "id": "sq_pia_quelle", "title": "Die Quelle", "main": false, "act": 2, "cell": [1, 0],
+      "type": "side", "district": "sunstrip", "giver": "pia",
+      "params": {"beats": 3, "location": "open_line_studio"},
+      "reward": "Ein Skandal",
+      "requires": [{"done": "w1_find"}],
+      "text": "Pia Sorensen weiß, dass Mira etwas hat. »Ich brauche einen Beweis, keine Geschichte. Geschichten hat Aurelia mehr als ich.« Wer den Ledger öffentlich macht, macht sich selbst sichtbar.",
+      "choices": [{
+        "id": "sq_leak", "text": "Gibst du Pia eine Kopie des Ledger-Kerns?",
+        "options": [
+          {"id": "give", "text": "Ja, live auf Sendung", "effects": [{"flag": ["leakedLedger", true]}, {"aegis": 10}, {"standing": ["aurelia", -15]}, {"npcTrust": ["pia", 1]}]},
+          {"id": "refuse", "text": "Nein, noch nicht", "effects": [{"npcTrust": ["pia", -1]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Clearwave FM bringt direkt danach eine Sondersendung: »Fakten sind auch nur Meinungen mit Daten.«"
+    },
+    {
+      "id": "race_coastroad", "title": "Coast Road", "main": false, "act": 0, "cell": [0, 2],
+      "type": "race", "district": "coastroad", "giver": "spindel",
+      "params": {"route": "coast_road_cliffs", "laps": 1, "opponents": 4, "weather": "fog", "time_of_day": "dawn", "stake": 200},
+      "reward": "$500, Wrenchers +5",
+      "requires": [{"done": "p3"}],
+      "text": "Zwölf Kilometer Klippen, Tunnel und Nebel. Das Rennen hat kein Startsignal: Wer als Erstes den Leuchtturm sieht, fährt los.",
+      "onSuccess": [{"money": 500}, {"standing": ["wrenchers", 5]}],
+      "outro": "Am Leuchtturm hängt ein Schild: »Diese Küste wird präsentiert von Aurelia.« Jemand hat »präsentiert« durchgestrichen und »verkauft« darübergeschrieben."
+    },
+    {
+      "id": "ev_nachtmarkt", "title": "Nachtmarkt", "main": false, "act": 1, "cell": [2, 0],
+      "type": "event", "district": "sunstrip", "giver": "pia",
+      "params": {"trigger": "weekend_evening", "duration_h": 4, "photo_targets": 3},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "p3"}],
+      "text": "Nachtmarkt am Pier: Neon, Garküchen, Musik, KCG-Streifen, die »Wegweisungen« verteilen. Pia sucht Fotos für die Sendung, ein Aurelia-Marketing-Team sucht Fotos für eine Kampagne. Beide zahlen.",
+      "choices": [{
+        "id": "ev_photo", "text": "Wen fotografierst du?",
+        "options": [
+          {"id": "kcg", "text": "Die Wegweisungen, für Pia", "effects": [{"standing": ["collective", 5]}, {"standing": ["kcg", -5]}, {"npcTrust": ["pia", 1]}]},
+          {"id": "ad", "text": "Glückliche Gesichter, für Aurelia", "effects": [{"money": 600}, {"standing": ["aurelia", 5]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 200}],
+      "outro": "Ein Foto geht viral. Welches, hängt davon ab, wer die Algorithmen bezahlt."
+    },
+    {
+      "id": "sq_jonas_wohnung", "title": "Jonas' Wohnung", "main": false, "act": 2, "cell": [6, 0],
+      "type": "side", "district": "greenmoor", "giver": "jonas",
+      "params": {"beats": 3, "location": "greenmoor_sealed_flat", "gate_checks": true},
+      "reward": "Erinnerungen, Vertrauen",
+      "requires": [{"done": "w1_find"}],
+      "text": "Jonas' Wohnung in Greenmoor ist versiegelt, »aus Gründen der Datenhygiene«. Mira steigt über die Garage ein. Auf dem Kühlschrank hängt ein Foto von ihnen beiden auf der Rennstrecke vor sieben Jahren, an dem Tag, an dem sie das Rennen verkauft hat. Daneben Notizen, die zeigen, wie viel Jonas damals verloren hat.",
+      "choices": [{
+        "id": "sq_flat", "text": "Was nimmst du mit?",
+        "options": [
+          {"id": "photo", "text": "Nur das Foto", "effects": [{"npcTrust": ["jonas", 1]}]},
+          {"id": "notes", "text": "Die Notizen verbrennen, die Vergangenheit soll ruhen", "effects": [{"npcTrust": ["jonas", 1]}, {"aegis": -5}]},
+          {"id": "pia", "text": "Alles einpacken und Pia geben", "effects": [{"npcTrust": ["jonas", -2]}, {"npcTrust": ["pia", 1]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Die Wohnung riecht nach Kaffee und nach jemandem, der jeden Abend gehofft hat, angerufen zu werden."
+    },
+    {
+      "id": "ev_stromausfall", "title": "Stromausfall", "main": false, "act": 3, "cell": [4, 5],
+      "type": "event", "district": "core", "giver": "aegis",
+      "params": {"trigger": "tag_blackout", "duration_h": 6, "world_tags": ["blackout"], "traffic_lights": "off"},
+      "reward": "Je nach Wahl",
+      "requires": [{"tag": ["core", "has", "blackout"]}],
+      "text": "Der Test am Mast hatte Folgen. Im Core fallen nachts Ampeln aus, Aufzüge bleiben stecken, und die Konzernkantine verliert ihre Kühlung. Im Dunkeln sieht der Core zum ersten Mal aus wie der Rest der Stadt.",
+      "choices": [{
+        "id": "ev_dark", "text": "Was tust du in der Dunkelheit?",
+        "options": [
+          {"id": "protect", "text": "Kreuzungen sichern und Menschen aus Aufzügen holen", "effects": [{"standing": ["collective", 5]}, {"standing": ["union", 5]}]},
+          {"id": "loot", "text": "Den Flagship-Store von Aurelia Calm™ ausräumen", "effects": [{"money": 900}, {"heat": 1}, {"flag": ["looted", true]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 0}],
+      "outro": "Am nächsten Morgen sagt die Konzernsprecherin: »Wir haben gelernt, dass Licht ein Privileg ist.« Sie meint es als Drohung."
+    },
+    {
+      "id": "sq_kranfuehrer", "title": "Der letzte Kranführer", "main": false, "act": 1, "cell": [1, 6],
+      "type": "side", "district": "saltmarket", "giver": "edda",
+      "params": {"beats": 2, "target": "autokran_control_box"},
+      "reward": "Je nach Wahl",
+      "requires": [{"done": "p2"}, {"standing": ["union", ">=", 10]}],
+      "text": "Aurelia ersetzt die Kranführer durch AutoKran™, der Kisten schneller stapelt und keine Gewerkschaft kennt. Der älteste Kranführer, Opa Fenn, soll am Freitag seinen Nachfolger einweisen, einen Schaltkasten. Edda fragt, ob Mira den Schaltkasten vorher »verlegen« kann.",
+      "choices": [{
+        "id": "sq_crane", "text": "Was wird aus dem AutoKran™?",
+        "options": [
+          {"id": "sabotage", "text": "Den Schaltkasten in den Hafen fahren", "effects": [{"standing": ["union", 10]}, {"standing": ["aurelia", -5]}, {"heat": 1}]},
+          {"id": "coach", "text": "Opa Fenn zum »KranCoach«-Abo überreden, gegen Provision", "effects": [{"money": 400}, {"standing": ["union", -3]}]}
+        ]
+      }],
+      "onSuccess": [{"money": 300}],
+      "outro": "Opa Fenn sitzt am Freitag trotzdem im Kran. Niemand weiß, wie er da hochgekommen ist. Niemand will ihn runterholen."
+    }
+  ],
+  "endings": [
+    {"id": "E5", "title": "Offene Bücher", "priority": 60, "when": [{"flag": ["endOpenBooks", "==", true]}],
+     "epilogue": "Um 23:59 liest Pia Sorensen auf Open Line den Ledger vor, Zeile für Zeile, mit Jonas am zweiten Mikrofon. Die Union hält den Hafen, das Collective die Server, die Wrenchers die Straßen offen. Ein Gericht stoppt Phase Zwei, vorläufig. Kandel tritt zurück und bekommt eine Abfindung. Nichts ist gelöst, aber zum ersten Mal steht es öffentlich im Protokoll. Kestrel Bay hat jetzt eine fragile Reform und keine Ausreden mehr."},
+    {"id": "E1_verkauf", "title": "Goldener Käfig: Ausverkauf", "priority": 42, "when": [{"flag": ["endSell", "==", true]}],
+     "epilogue": "Ein Konsortium aus dem Ausland kauft die Aegis-Schlüssel für eine Summe mit zu vielen Nullen. Phase Zwei geht pünktlich live, nur das Logo ist neu. Mira sieht die Nachrichten in einem Hotel ohne Kameras, die sie selbst bezahlt hat. Die Stadt hat den Besitzer gewechselt, nicht die Ketten."},
+    {"id": "E1_blut", "title": "Goldener Käfig: Eiserne Krone", "priority": 41, "when": [{"flag": ["endTakeOver", "==", true]}, {"flag": ["massacre", "==", true]}],
+     "epilogue": "Aegis geht live, und Mira sitzt im 80. Stock. Wer sich an die Räumungen erinnert, hat einen niedrigen Score, und wer einen niedrigen Score hat, erinnert sich bald an nichts mehr. Kandel ist längst weg. Mira hat seinen Stuhl behalten und auch seine Schlaflosigkeit."},
+    {"id": "E1", "title": "Goldener Käfig", "priority": 40, "when": [{"flag": ["endTakeOver", "==", true]}],
+     "epilogue": "Aegis geht live, und Mira hält die Schlüssel. Sie verspricht sich selbst, das Netz »menschlicher« zu machen, und unterschreibt am ersten Tag elf Ausnahmen. Kestrel Bay wird sicherer, sauberer und stiller. Nachts sieht Mira vom Tower auf die Kranreihe und zählt die Lichter, die ausgehen."},
+    {"id": "E2_ohne", "title": "Hafenrepublik: Ein Kran weniger", "priority": 31, "when": [{"flag": ["endHoldPort", "==", true]}, {"flag": ["brannDead", "==", true]}],
+     "epilogue": "Die Docks erklären sich für unabhängig, unter Edda Marsh und ohne Brann. Seinen Namen trägt jetzt ein Kran, den niemand bedienen will. Aegis endet am Hafentor. Dahinter bleibt Kestrel Core unter Aurelia, und vor dem Tor erzählt man sich, dass Mira ihn ins Wasser geschoben hat. Es stimmt."},
+    {"id": "E2", "title": "Hafenrepublik", "priority": 30, "when": [{"flag": ["endHoldPort", "==", true]}],
+     "epilogue": "Die Docks erklären sich für unabhängig. Aegis kommt nicht in den Hafen, Löhne werden auf Tafeln geschrieben, Konflikte auf Versammlungen ausgetragen, und das dauert. Hinter den Kränen bleibt Kestrel Core unter Aurelia. Die Stadt ist geteilt, aber eine Hälfte gehört wieder denen, die darin arbeiten."},
+    {"id": "E3_nacht", "title": "Blackout: Schwarze Nacht", "priority": 31, "when": [{"flag": ["endShutDown", "==", true]}, {"flag": ["killedCivilians", "==", true]}],
+     "epilogue": "Der Uplink fällt, und mit ihm jede Ampel, jeder Aufzug, jede Kühlkette. In der Dunkelheit zählen manche die Toten, die Mira auf dem Weg hierher hinterlassen hat, und nicht alle nennen sie Befreierin. Kestrel Bay ist frei von Aegis. Ob es frei ist, entscheidet sich jede Nacht neu."},
+    {"id": "E3", "title": "Blackout", "priority": 30, "when": [{"flag": ["endShutDown", "==", true]}],
+     "epilogue": "Der Uplink fällt, das Netz stirbt, die Stadt wird dunkel. Nachbarn regeln Kreuzungen mit Taschenlampen, Lantern Pirate Radio sendet auf Kurbelradios. Es ist Anarchie und Hoffnung zugleich, und keiner weiß, wie lange das Gleichgewicht hält."},
+    {"id": "E4_zu_zweit", "title": "Exil zu zweit", "priority": 5, "when": [{"flag": ["endFlee", "==", true]}, {"flag": ["savedJonas", "==", true]}],
+     "epilogue": "Mira und Jonas fahren in der Nacht über die Route 9 aus der Stadt, im Wagen von Dutch, mit Kennzeichen, die es nicht gibt. Hinter ihnen geht Phase Zwei live. Vor ihnen liegt die Salzebene, weiß und leer. Zum ersten Mal seit sieben Jahren hat Mira niemandem etwas zu verkaufen."},
+    {"id": "E4_allein", "title": "Exil allein", "priority": 4, "when": [{"flag": ["endFlee", "==", true]}, {"flag": ["jonasDead", "==", true]}],
+     "epilogue": "Mira fährt allein über die Route 9, Jonas' Schlüsselanhänger am Rückspiegel. Kestrel Bay bleibt, wie es ist. Sie dreht das Radio auf, bis Open Line im Rauschen verschwindet, und dann noch ein bisschen lauter."},
+    {"id": "E4_fremder", "title": "Exil mit einem Fremden", "priority": 3, "when": [{"flag": ["endFlee", "==", true]}, {"flag": ["jonasWithMira", "==", true]}],
+     "epilogue": "Jonas sitzt auf dem Beifahrersitz und schweigt seit hundert Kilometern. Sie sind Geschwister, aber sie kennen einander nicht mehr. Hinter ihnen geht Phase Zwei live, vor ihnen liegt eine lange Fahrt, in der sie lernen müssen, wer sie sind."},
+    {"id": "E4", "title": "Exil", "priority": 0, "when": [],
+     "epilogue": "Mira fährt in der Nacht über die Route 9 aus der Stadt. Kestrel Bay bleibt, wie es ist: hell im Core, dunkel am Rand und überall gezählt. Irgendwo in Aegis schließt ein Prozess eine Akte: »Rückkehrerin, Motivation erloschen.«"}
+  ]
+}

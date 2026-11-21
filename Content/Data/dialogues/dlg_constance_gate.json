@@ -1,0 +1,24 @@
+{
+  "id": "dlg_constance_gate", "npc": "constance_whitlow", "title": "Die Vorsitzende", "kind": "witness",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Entschuldigung. Ihr Fahrzeug steht seit vier Minuten vor Hausnummer 12. Das ist hier ungewöhnlich lang. Ich habe es fotografiert. Rein vorsorglich.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ich liefere für die Familie in Nummer 12.", "check": {"skill": "persuade", "difficulty": 3, "bonus": [{"when": [{"aegis": ["<", 40]}], "value": 1}], "success": "believed", "fail": "doubt"}},
+      {"text": "Löschen Sie das Foto. Sofort.", "check": {"skill": "intimidate", "difficulty": 4, "success": "deleted", "fail": "report"}},
+      {"text": "Ihre Rosen sind wunderschön. Sind das Teehybriden?", "next": "roses"},
+      {"text": "Ich wollte gerade fahren.", "next": "leave"}]},
+    "roses": {"type": "line", "who": "@npc", "text": "...Ja. Teehybriden. Niemand fragt nach den Rosen. Alle fragen nach der Hecke. Die Rosen gieße ich nach Kameraplan, damit man sieht, dass ich mich kümmere.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "c2"},
+    "c2": {"type": "choice", "options": [
+      {"text": "Sie kümmern sich auch um andere, oder? Jemanden außerhalb von Greenmoor.", "when": [{"flag": ["dlg.clue.constance_brother", "==", true]}], "check": {"skill": "persuade", "difficulty": 2, "success": "brother", "fail": "doubt"}},
+      {"text": "Ich lass Sie in Ruhe.", "next": "leave"}]},
+    "brother": {"type": "line", "who": "@npc", "text": "Woher... Sie kennen Malachy? Er ist mein Bruder. Er hat keinen Score, weil er keinen will. Ich schicke ihm Geld in Briefumschlägen ohne Absender. Bitte sagen Sie es nicht dem Rat. Agnes Pell wartet nur auf so etwas.", "effects": [{"npcTrust": ["@npc", 2]}, {"flag": ["dlg.constance.ally", true]}], "next": "ally"},
+    "ally": {"type": "line", "who": "@npc", "text": "Ihr Foto ist gelöscht. Und wenn Sie wieder hier liefern, parken Sie hinter dem Wasserturm. Die Kamera dort hat ein Bienenproblem.", "effects": [{"heat": ["greenmoor", -1]}], "next": "end"},
+    "believed": {"type": "line", "who": "@npc", "text": "Ach so. Die Familie in Nummer 12 bestellt immer Ungewöhnliches. Dann notiere ich: Lieferung. Bitte fahren Sie vorsichtig, die Kinder spielen hier in Echtzeit.", "next": "end"},
+    "doubt": {"type": "line", "who": "@npc", "text": "Nummer 12 ist verreist. Ich weiß das, weil ich ihre Post sortiere. Ich gebe Ihnen zwei Minuten, dann ruft der Rat die Wache.", "effects": [{"heat": ["greenmoor", 1]}], "next": "end"},
+    "deleted": {"type": "line", "who": "@npc", "text": "Gelöscht. Sehen Sie? Gelöscht. Aber ich habe ein sehr gutes Gedächtnis, und der Nachbarschaftsrat trifft sich donnerstags.", "effects": [{"npcTrust": ["@npc", -2]}, {"rumor": {"type": "violence", "subject": "player", "severity": 0.2}}], "next": "end"},
+    "report": {"type": "line", "who": "@npc", "text": "Bedrohung einer Ratsvorsitzenden. Das hat Folgen. Sergeant Vale ist bereits informiert, er ist sehr pünktlich.", "effects": [{"heat": ["greenmoor", 2]}, {"npcTrust": ["@npc", -2]}, {"rumor": {"type": "violence", "subject": "player", "severity": 0.4}}], "next": "end"},
+    "leave": {"type": "line", "who": "@npc", "text": "Sehr gut. Einen angenehmen Tag außerhalb von Greenmoor.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

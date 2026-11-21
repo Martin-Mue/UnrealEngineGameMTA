@@ -1,0 +1,36 @@
+{
+  "id": "dlg_witness_crane", "npc": "hedda_marlow", "title": "Die Zeugin am Kran", "kind": "witness",
+  "start": "open",
+  "entries": [
+    {"when": [{"rumor": ["player", "hit_pedestrian"]}], "node": "open_crime"}
+  ],
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Ich hab Pause. Zehn Minuten. Wenn du was willst, sag es in neun.", "next": "c1"},
+    "open_crime": {"type": "line", "who": "@npc", "text": "Du. Ich hab dich gesehen, am Kai. Vierzig Meter hoch, aber meine Augen sind gut. Du hast den Mann am Tor erwischt und bist weitergefahren.", "next": "c_crime"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Du siehst von da oben doch alles. Was ist letzte Nacht an Pier 7 passiert?", "next": "pier"},
+      {"text": "Schöne Mütze. Selbst gestrickt?", "effects": [{"npcTrust": ["@npc", 1]}], "next": "hat"},
+      {"text": "Schon gut. Ich lass dich in Ruhe.", "next": "end"}]},
+    "hat": {"type": "line", "who": "@npc", "text": "Für die Frühschicht. Wer um fünf am Kai steht, braucht etwas, das ihn an Menschen erinnert. Du kannst eine haben, wenn du dich nicht blöd anstellst.", "next": "c1"},
+    "pier": {"type": "check", "cond": {"npcTrust": ["@npc", ">=", 1]}, "yes": "pier_tell", "no": "pier_hesitate"},
+    "pier_hesitate": {"type": "choice", "options": [
+      {"text": "Ich bin nicht von der Civil Guard. Ich suche meinen Bruder.", "check": {"skill": "persuade", "difficulty": 3, "bonus": [{"when": [{"standing": ["union", ">=", 20]}], "value": 1}, {"when": [{"flag": ["dlg.brann.job_taken", "==", true]}], "value": 1}], "success": "pier_tell", "fail": "pier_refuse"}},
+      {"text": "Hier sind fünfzig. Für die Streikkasse.", "effects": [{"money": -50}, {"standing": ["union", 2]}], "next": "pier_tell"},
+      {"text": "Rede, oder dein Sohn erfährt, dass du von seiner Bewerbung weißt.", "when": [{"flag": ["dlg.clue.hedda_son", "==", true]}], "check": {"skill": "intimidate", "difficulty": 2, "success": "pier_forced", "fail": "pier_refuse"}},
+      {"text": "Vergiss es.", "next": "end"}]},
+    "pier_tell": {"type": "line", "who": "@npc", "text": "Zwei Wagen ohne Licht, einer davon mit Konzernplakette. Sie haben einen Mann in Hostel-Latschen gesucht. Er war schneller. Er ist Richtung Rustline gelaufen, mit einer Tasche, die er festhielt wie ein Kind.", "effects": [{"flag": ["dlg.clue.jonas_pier", true]}, {"npcTrust": ["@npc", 1]}], "next": "end_warm"},
+    "pier_forced": {"type": "line", "who": "@npc", "text": "...Zwei Wagen. Konzernplakette. Ein Mann ist nach Rustline gerannt. Und jetzt geh mir aus den Augen. Ich vergesse Gesichter nicht, deins schon gar nicht.", "effects": [{"flag": ["dlg.clue.jonas_pier", true]}, {"npcTrust": ["@npc", -2]}, {"rumor": {"type": "betrayal", "subject": "player", "severity": 0.4}}], "next": "end"},
+    "pier_refuse": {"type": "line", "who": "@npc", "text": "Ich hab von da oben gelernt, dass Leute, die fragen, selten zuhören. Meine Pause ist um.", "next": "end"},
+    "c_crime": {"type": "choice", "options": [
+      {"text": "Es war ein Unfall. Ich bring das in Ordnung.", "check": {"skill": "persuade", "difficulty": 3, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 1]}], "value": 2}], "success": "crime_spare", "fail": "crime_report"}},
+      {"text": "Du hast nichts gesehen. Verstanden?", "check": {"skill": "intimidate", "difficulty": 4, "success": "crime_silent", "fail": "crime_report"}},
+      {"text": "Was willst du dafür, dass du schweigst?", "effects": [{"money": -200}], "next": "crime_paid"},
+      {"text": "Du hast recht. Ich hätte anhalten müssen.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "crime_spare"}]},
+    "crime_spare": {"type": "line", "who": "@npc", "text": "Der Mann heißt Edgar und liegt bei Maren am Hang. Bring ihm was. Wenn du das tust, hab ich heute nur Kräne gesehen.", "effects": [{"flag": ["dlg.hedda.edgar_task", true]}], "next": "end"},
+    "crime_silent": {"type": "line", "who": "@npc", "text": "Ich schweige. Nicht wegen dir. Wegen der Civil Guard, die ich noch weniger mag. Aber der Hafen wird es trotzdem wissen.", "effects": [{"npcTrust": ["@npc", -2]}], "next": "end"},
+    "crime_paid": {"type": "line", "who": "@npc", "text": "Das Geld geht an Edgar, nicht an mich. Und jetzt fahr langsam vom Kai, damit es alle sehen.", "effects": [{"rumor": {"type": "generosity", "subject": "player", "severity": 0.3}}], "next": "end"},
+    "crime_report": {"type": "line", "who": "@npc", "text": "Nein. Ich geh nicht zur Civil Guard. Aber ich sag es Brann. Und Brann ist schlimmer.", "effects": [{"standing": ["union", -10]}, {"rumor": {"type": "hit_pedestrian", "subject": "player", "severity": 0.6}}], "next": "end"},
+    "end_warm": {"type": "line", "who": "@npc", "text": "Und nimm die Mütze. Grau. Passt zu allem, was in dieser Stadt passiert.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

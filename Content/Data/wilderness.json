@@ -1,0 +1,203 @@
+{
+  "schema": 1,
+  "about": "Wildnisregion Verdanta (Arbeitsname). Gelesen von UMTADiscoverySubsystem (region, chains, collections, discoveries) und als Planungsgrundlage fuer AMTAWildernessRegion / Landscape / PCG. Koordinaten in Metern relativ zum Regionsursprung (Forsttor am Suedwestrand, Talboden): X = Nord, Y = Ost, Z = Hoehe ueber Ursprung.",
+  "region": {
+    "id": "verdanta",
+    "name": "Verdanta",
+    "workingTitle": true,
+    "sizeM": [2400, 1800],
+    "placement": {"relativeToCityCenterM": [380, 420, 12], "note": "Nordöstlich hinter Greenmoor am Fuß der Ashridge-Berge. Die Stadt ist im Generator 640 x 640 m groß (Halbausdehnung 320 m); der Regionsursprung liegt 60 m hinter der nordöstlichen Stadtkante."},
+    "access": [
+      {"id": "acc_forestry_road", "kind": "vehicle", "from": "greenmoor, letzter Cul-de-sac bu 7 / bv 7", "text": "Alte Forststraße hinter einem verrosteten Schlagbaum: Projekt Wurzelwerk – Zutritt nur mit Kennung."},
+      {"id": "acc_route9_exit", "kind": "vehicle", "from": "Route 9, stillgelegte Ausfahrt Ost", "text": "Gesperrte Ausfahrt mit Betonblöcken; mit Geländewagen über die Böschung."},
+      {"id": "acc_lye_channel", "kind": "foot", "from": "rustline, Laugenkanal (Entdeckung rust_lye_channel)", "text": "Später: Fußweg vom Salzebenen-Ausgang am Fluss entlang (Ausbaustufe 2)."}
+    ],
+    "boundaries": "Nord/Ost: Ashridge-Kamm (Felswände, nicht begehbar). West: Zaun Greenmoor. Süd: Route 9 auf Stelzen. Umkehr-Aufforderung: Nebelwand und Wildwechsel-Warnschild, kein unsichtbarer Wall."
+  },
+  "landscape": {
+    "unreal": {"overallResolution": [2017, 2017], "sectionSizeQuads": 63, "sectionsPerComponent": 2, "componentCount": [16, 16], "quadSizeM": 1.2, "zScaleCm": 100, "materialLayers": ["Waldboden", "Moos", "Flusskies", "Fels", "Schlamm", "Ruinenbeton"], "worldPartition": {"cellSizeM": 128, "loadingRangeM": 512}},
+    "heightProfile": {
+      "unit": "m",
+      "baseZ": 0,
+      "controlPoints": [
+        {"x": 0, "y": 0, "z": 0, "label": "Forsttor"},
+        {"x": 300, "y": 400, "z": 14, "label": "Auwald, Flussaue"},
+        {"x": 700, "y": 900, "z": 36, "label": "Gewächshausruinen"},
+        {"x": 1000, "y": 600, "z": 48, "label": "Thermalquellen"},
+        {"x": 1250, "y": 1150, "z": 78, "label": "Feldstation 3"},
+        {"x": 1500, "y": 1100, "z": 90, "label": "Becken unter dem Schleierfall"},
+        {"x": 1530, "y": 1110, "z": 128, "label": "Fallkante"},
+        {"x": 1800, "y": 1300, "z": 150, "label": "Hängebrücke über die Klamm"},
+        {"x": 2100, "y": 1500, "z": 185, "label": "Schleuse"},
+        {"x": 2350, "y": 1700, "z": 215, "label": "Quellsee am Kamm"}
+      ],
+      "transectSouthNorth": [[0, 0], [400, 16], [800, 38], [1200, 70], [1500, 90], [1530, 128], [1800, 150], [2100, 185], [2400, 220]],
+      "notes": "Talboden steigt sanft (Fahrbarkeit), Klamm und Fallkante sind die einzige harte Stufe. Seitenhänge 25–40 Grad mit Felsbändern als natürliche Wegführung."
+    }
+  },
+  "biomes": [
+    {"id": "auwald", "name": "Auwald", "area": "Flussaue x 0–700", "foliage": {"treesPerHa": 220, "undergrowth": 0.6, "rocks": 0.1}, "species": ["Erlen", "Weiden", "Farne"], "mood": "Licht durch Laub, Mücken über dem Wasser, ruhig."},
+    {"id": "nebelwald", "name": "Nebelwald", "area": "x 700–1600 um die Thermalquellen", "foliage": {"treesPerHa": 420, "undergrowth": 0.95, "rocks": 0.25, "lianas": 0.7, "epiphytes": 0.8}, "species": ["entkommene Baumfarne", "Würgefeigen aus den Gewächshäusern", "Moose", "Bromelien"], "mood": "Dschungel, wo keiner sein dürfte: Die warmen Quellen und die ausgebrochenen Pflanzen des Forschungsprojekts haben ein Mikroklima geschaffen. Dampf, Tropfen, gedämpftes Licht."},
+    {"id": "klamm", "name": "Klamm", "area": "x 1500–2100 entlang des Flusses", "foliage": {"treesPerHa": 80, "undergrowth": 0.3, "rocks": 0.9}, "species": ["Felsmoos", "Kiefern"], "mood": "Laut, nass, eng. Der Wasserfall ist schon von weitem zu hören."},
+    {"id": "kammwald", "name": "Kammwald", "area": "x > 2100", "foliage": {"treesPerHa": 150, "undergrowth": 0.4, "rocks": 0.6}, "species": ["Kiefern", "Heide"], "mood": "Kühl, Wind, Blick über die Stadt und den Aurelia Tower."}
+  ],
+  "river": {
+    "id": "verdanta_river",
+    "name": "Die Grüne Ader",
+    "points": [[2350, 1700, 212], [2100, 1500, 182], [1800, 1300, 147], [1530, 1110, 128], [1500, 1100, 90], [1200, 900, 66], [900, 700, 44], [500, 450, 20], [150, 150, 4], [0, -200, 0]],
+    "widthM": [4, 14], "depthM": [0.4, 3.5], "flowMS": [0.6, 2.8],
+    "unreal": "Water-Plugin optional; bis dahin Spline-Mesh mit Flussmaterial. Fließrichtung aus der Punktreihenfolge."
+  },
+  "waterfall": {
+    "id": "schleierfall",
+    "name": "Der Schleierfall",
+    "topM": [1530, 1110, 128], "bottomM": [1500, 1100, 90], "heightM": 38, "widthM": 14, "plungePoolDepthM": 6,
+    "cave": {"entranceM": [1508, 1104, 92], "depthM": 22, "note": "Hinter dem Wasservorhang, 2 m über dem Becken, über nasse Felsstufen erreichbar."},
+    "secretDoorM": [1512, 1086, 93],
+    "fx": {"niagaraSystem": "/Game/FX/Waterfall/NS_Schleierfall (Platzhalter, noch nicht vorhanden)", "mist": true, "rainbowHours": [7, 9.5], "sound": "/Game/Audio/Ambience/A_Waterfall_Loop (Platzhalter)"}
+  },
+  "secretEntrance": {
+    "id": "verdanta_seed_door",
+    "stateKey": "verdanta.entrance",
+    "states": [
+      {"value": 0, "id": "hidden", "text": "Hinter dem Wasservorhang nur Fels. Der Spieler sieht nichts Besonderes."},
+      {"value": 1, "id": "hinted", "text": "Morgens bricht sich das Licht im Sprühnebel, und hinter dem Vorhang blitzt eine gerade Kante auf: Metall. Die Höhle ist jetzt als Entdeckung sichtbar."},
+      {"value": 2, "id": "open", "text": "Die Stahltür im Fels öffnet sich mit einem Zischen. Dahinter: warme, trockene Luft und ein Summen."}
+    ],
+    "transitions": [
+      {"from": 0, "to": 1, "when": [{"any": [{"discovered": "verd_field_station"}, {"all": [{"item": "echo_coordinates"}, {"hour": [7, 9.5]}]}]}], "trigger": "auto_in_radius", "radiusM": 60},
+      {"from": 1, "to": 2, "when": [{"item": "station_access_card"}, {"any": [{"regionState": ["verdanta.sluice", ">=", 1]}, {"not": {"weather": ["rain", "storm"]}}]}], "trigger": "interact"}
+    ],
+    "design": "Der Weg hinter den Wasservorhang ist der Wow-Moment: Kamera bleibt beim Spieler, Ton fällt auf das Rauschen zurück, Licht wechselt von grün nach warm-orange (Server-LEDs). Bei Regen ist der Vorhang zu stark, außer man schließt oben die Schleuse."
+  },
+  "sluice": {"id": "verdanta_sluice", "stateKey": "verdanta.sluice", "positionM": [2100, 1500, 185], "text": "Eine alte Schleuse des Forschungsprojekts. Geschlossen (1) halbiert die Wassermenge des Falls für 30 Spielminuten."},
+  "paths": [
+    {"id": "p_forestry_road", "kind": "vehicle", "surface": "Schotter, Schlaglöcher", "points": [[0, 0, 0], [300, 350, 13], [650, 820, 34], [1000, 650, 48], [1230, 1120, 77]], "speedKmh": 35, "note": "Für alle Fahrzeuge bis Feldstation 3; bei Regen schlammig (Grip 0,6)."},
+    {"id": "p_offroad_ridge", "kind": "offroad", "surface": "Fels, Wurzeln", "points": [[1230, 1120, 77], [1650, 1350, 140], [2100, 1500, 185]], "speedKmh": 15, "note": "Nur Geländewagen und Motorräder; Kuppe mit Sprung über einen Bachlauf."},
+    {"id": "p_river_trail", "kind": "foot", "surface": "Pfad, Stege", "points": [[150, 150, 4], [500, 450, 20], [900, 700, 44], [1200, 900, 66], [1490, 1095, 90]], "note": "Hauptpfad zum Becken; Stege über sumpfige Stellen."},
+    {"id": "p_waterfall_ledge", "kind": "foot", "surface": "nasser Fels", "points": [[1490, 1095, 90], [1500, 1092, 91], [1508, 1104, 92]], "note": "Schmaler Felsband-Weg hinter den Vorhang; rutschig, Gehen statt Rennen."},
+    {"id": "p_canopy_walk", "kind": "foot", "surface": "Hängestege", "points": [[650, 820, 34], [720, 900, 58], [820, 960, 60]], "note": "Baumkronenpfad der Forscher, 22 m über Grund."},
+    {"id": "p_gorge_bridge", "kind": "foot", "surface": "Seilbrücke", "points": [[1780, 1250, 150], [1820, 1350, 150]], "note": "Hängebrücke über die Klamm; auch per Motorrad befahrbar (Stunt)."}
+  ],
+  "navigation": {
+    "foot": "NavMesh nur entlang der Pfade und Lichtungen generieren (Nav-Modifier-Volumen für dichte Vegetation: hohe Kosten statt gesperrt).",
+    "vehicles": "KI-Fahrzeuge (Ranger, KCG-Patrouille ab Story-Akt 3) folgen den Splines p_forestry_road und p_offroad_ridge; keine freie Wegfindung im Wald.",
+    "wildlife": "Tiere nutzen eigene Wildwechsel-Splines und meiden Pfade tagsüber.",
+    "orientation": "Ohne Karte: Rauschen des Falls (hörbar ab 400 m), Dampfsäule der Quellen (sichtbar ab 600 m), Aurelia Tower im Südwesten über den Wipfeln, Fluss als Leitlinie bergauf."
+  },
+  "wildlife": [
+    {"id": "otter", "name": "Fischotter", "where": "Flussaue, Becken", "when": "Dämmerung", "behavior": "Scheu; flüchtet bei Motorlärm ins Wasser."},
+    {"id": "firefly", "name": "Glühwürmchen", "where": "Schlucht bei den Gewächshäusern", "when": "21–1 Uhr, nicht bei Regen", "behavior": "Schwärme als Partikelsystem; reagieren auf Taschenlampe (gehen aus)."},
+    {"id": "deer", "name": "Rothirsch", "where": "Lichtungen", "when": "früh morgens", "behavior": "Wildwechsel über die Forststraße, Unfallrisiko."},
+    {"id": "tagged_fox", "name": "Fuchs mit Halsband", "where": "Ruinen", "when": "nachts", "behavior": "Trägt noch ein Peilhalsband des Projekts; blinkt rot alle 10 s."},
+    {"id": "escaped_parrots", "name": "Verwilderte Sittiche", "where": "Nebelwald", "when": "tagsüber", "behavior": "Laut, bunt; Nachkommen der Versuchsvögel. Lustiger Kontrast zum Ernst der Ruinen."},
+    {"id": "eagle_owl", "name": "Uhu", "where": "Klamm", "when": "Nacht", "behavior": "Ruft; bei Annäherung lautloser Abflug als Gänsehautmoment."}
+  ],
+  "weatherAndTime": [
+    {"condition": "Morgen 7–9.5 Uhr, klar", "effect": "Regenbogen im Sprühnebel des Falls; Lichtkante verrät den Geheimeingang (Hinweis-Zustand)."},
+    {"condition": "Regen/Sturm", "effect": "Fluss steigt (+0,8 m), Forststraße rutschig, Wasserfall doppelt so breit: Höhle nicht passierbar, außer Schleuse geschlossen."},
+    {"condition": "Nebel", "effect": "Nebelwald nahezu ohne Sicht; Sittiche verstummen; Fuchs-Halsband als einziges Licht. Laternenhund-Erscheinung möglich (Easter Egg)."},
+    {"condition": "Nacht", "effect": "Glühwürmchen, Server-LEDs hinter dem Fall schimmern orange durch den Vorhang (nur wenn Eingang angedeutet)."},
+    {"condition": "Hitzewelle (ev_heatwave)", "effect": "Thermalquellen dampfen weniger, Fluss niedrig: Becken flacher, Stufen hinter dem Fall trocken."}
+  ],
+  "ruins": [
+    {"id": "r_greenhouses", "name": "Gewächshäuser von Projekt Wurzelwerk", "positionM": [700, 900, 36], "text": "Sieben geborstene Glashäuser, aus denen tropische Pflanzen in den Wald gewachsen sind."},
+    {"id": "r_field_station", "name": "Feldstation 3", "positionM": [1250, 1150, 78], "text": "Zweistöckiger Betonbau mit Funkmast, Laboren, Schlafsaal. Strom aus einem Mikrowasserkraftwerk am Fall."},
+    {"id": "r_bus", "name": "Werksbus", "positionM": [420, 520, 18], "text": "Zugewachsener Bus des Projekts, Fahrtziel noch lesbar."},
+    {"id": "r_seed_vault", "name": "Der Keim", "positionM": [1512, 1070, 93], "text": "Serverraum im Fels hinter dem Wasserfall."}
+  ],
+  "story": {
+    "secret": "Projekt Wurzelwerk war Aurelias erster Versuch, Verhalten vorherzusagen: nicht an Menschen, sondern an Tieren mit Peilhalsbändern im abgeschlossenen Tal. Leiterin war Dr. Selin Kandel, die Schwester von Idris Kandel. Als das Modell anfing, auch die Forscher vorherzusagen, wollte sie es abschalten. Sie verschwand bei einem Unwetter. Das Projekt wurde in die Stadt verlegt und hieß fortan Aegis.",
+    "seed": "Hinter dem Wasserfall läuft, vom Wasser gespeist, noch der erste Aegis-Kern, der Keim. Er ist nicht mit dem Stadtnetz verbunden, aber er sendet: Die Echos um drei Uhr nachts sind seine Erinnerungen, die durch alte Wartungskanäle sickern.",
+    "hooks": [
+      {"id": "hook_kandel_trust", "text": "Selins letzte Aufnahme erklärt Idris Kandels Beweggründe (Weltkonzept 6.8: Tragödie in der Familie). Vorschlag für Paket D: Fund setzt npcTrust kandel +1 und erlaubt eine zusätzliche Dialogoption in W3."},
+      {"id": "hook_seed_choice", "text": "Der Keim kann in W5 eine vierte Option liefern: Aegis mit den Originaldaten vor Gericht bringen (stützt Ende E5 Offene Bücher). Vorschlag: Fund setzt Flag verdanta_seed_found (muss in die Flag-Registry)."},
+      {"id": "hook_echo_chain", "text": "Die Stadtkette aegis_echo (6 Echos) gibt echo_coordinates und macht den Ort erst auffindbar; ohne sie führt nur die Forststraße hierher."}
+    ]
+  },
+  "chains": [
+    {"id": "verdanta_wurzelwerk", "title": "Projekt Wurzelwerk", "district": "verdanta", "steps": 5, "description": "Was im Tal gewachsen ist, bevor Aegis in die Stadt kam.", "finalRewards": [{"type": "lore", "id": "lore_wurzelwerk_complete", "text": "Der Keim zählt noch. Er zählt Otter, Hirsche, Glühwürmchen. Und seit heute dich."}, {"type": "aegis", "amount": -20}, {"type": "skillPoint", "id": "tech", "amount": 2}]}
+  ],
+  "collections": [
+    {"id": "col_verdanta_survey_markers", "district": "verdanta", "title": "Vermessungspflöcke", "count": 8, "description": "Rot-weiße Messpflöcke des Projekts, jeder mit einer Nummer und einem Tiernamen.", "rewards": [{"type": "cosmetic", "id": "jacket_wurzelwerk"}, {"type": "money", "amount": 800}]}
+  ],
+  "discoveries": [
+    {"id": "verd_greenhouses", "district": "verdanta", "type": "ruin", "title": "Die geborstenen Gewächshäuser", "chain": {"id": "verdanta_wurzelwerk", "step": 1},
+     "pos": {"localM": [700, 900, 36], "radiusM": 25}, "discover": "dwell", "dwellSeconds": 5,
+     "hints": [{"kind": "visual", "text": "Über den Wipfeln des Nebelwaldes glitzert Glas."}, {"kind": "sound", "cue": "sfx_parrots", "radiusM": 200, "text": "Papageienkreischen, wo keine Papageien sein dürften."}],
+     "rewards": [{"type": "lore", "id": "lore_verd_greenhouses"}],
+     "lore": "Sieben Glashäuser, alle geborsten, aus denen ein Dschungel ins Tal gewachsen ist. An einer Tür das Projektlogo: eine Wurzel, die zu einem Auge wird.",
+     "accent": {"color": "#BFFFD8", "light": "glass_glint", "sightline": "Glasreflex über den Baumkronen von der Forststraße"}},
+    {"id": "verd_collar_tree", "district": "verdanta", "type": "memorial", "title": "Der Halsbandbaum", "chain": {"id": "verdanta_wurzelwerk", "step": 2},
+     "pos": {"localM": [980, 760, 46], "radiusM": 6}, "discover": "interact",
+     "hints": [{"kind": "visual", "text": "Nachts blinkt an einer alten Eiche ein Dutzend roter Lämpchen im Takt."}],
+     "rewards": [{"type": "lore", "id": "lore_verd_collars"}],
+     "lore": "An die Eiche genagelt: Peilhalsbänder, jedes mit einem Namen. Fuchs 4. Hirsch 11. Otter 2. Ganz unten eines ohne Tiernamen, nur mit Initialen: S. K.",
+     "accent": {"color": "#FF3030", "light": "blinking_leds", "sightline": "Rote Blinklichter im dunklen Wald"}},
+    {"id": "verd_field_station", "district": "verdanta", "type": "abandoned_station", "title": "Feldstation 3", "chain": {"id": "verdanta_wurzelwerk", "step": 3},
+     "pos": {"localM": [1250, 1150, 78], "radiusM": 5}, "discover": "interact",
+     "hints": [{"kind": "sound", "cue": "sfx_radio_static", "radiusM": 120, "text": "Aus einem Betonbau rauscht ein Funkgerät, das niemand abgeschaltet hat."}],
+     "rewards": [{"type": "item", "id": "station_access_card"}, {"type": "lore", "id": "lore_verd_station"}],
+     "lore": "Das Labor ist geräumt, der Schlafsaal nicht. Auf Dr. Selin Kandels Tisch eine Zugangskarte und eine Notiz: Es sagt uns voraus. Nicht die Tiere. Uns. Ich schalte es ab, bevor Idris kommt. Der Schlüssel liegt dort, wo das Wasser fällt.",
+     "accent": {"color": "#FFD9A0", "light": "desk_lamp", "sightline": "Funkmast mit rotem Licht über dem Nebelwald"}},
+    {"id": "verd_waterfall_cave", "district": "verdanta", "type": "cave", "title": "Hinter dem Schleier", "chain": {"id": "verdanta_wurzelwerk", "step": 4},
+     "pos": {"localM": [1508, 1104, 92], "radiusM": 5}, "discover": "proximity",
+     "visibleWhen": [{"regionState": ["verdanta.entrance", ">=", 1]}],
+     "hints": [{"kind": "visual", "text": "Morgens bricht sich das Licht im Sprühnebel, und dahinter blitzt eine gerade Kante auf."}],
+     "rewards": [{"type": "lore", "id": "lore_verd_cave"}],
+     "lore": "Hinter dem Wasservorhang eine Höhle, trocken und warm. An der Rückwand eine Stahltür mit Kartenleser, umrankt von Wurzeln, die sich um die Kabel gelegt haben, als wollten sie zuhören.",
+     "accent": {"color": "#FF9B4A", "light": "server_glow", "sightline": "Orangefarbenes Glimmen durch den Wasservorhang bei Nacht"}},
+    {"id": "verd_seed_vault", "district": "verdanta", "type": "cave", "title": "Der Keim", "chain": {"id": "verdanta_wurzelwerk", "step": 5},
+     "pos": {"localM": [1512, 1070, 93], "radiusM": 6}, "discover": "dwell", "dwellSeconds": 6,
+     "visibleWhen": [{"regionState": ["verdanta.entrance", ">=", 2]}],
+     "hints": [{"kind": "sound", "cue": "sfx_server_hum", "radiusM": 25, "text": "Hinter der Stahltür summt es, als würde jemand sehr leise denken."}],
+     "rewards": [{"type": "item", "id": "seed_core_data"}, {"type": "money", "amount": 2500}, {"type": "lore", "id": "lore_verd_seed"}],
+     "lore": "Ein Serverraum im Fels, gekühlt vom Wasser, gespeist vom Fall. Auf dem einzigen Bildschirm läuft seit Jahren dieselbe Zeile: Beobachte. Lerne. Warte auf Selin. Daneben eine Aufnahme, die Idris Kandel nie gehört hat.",
+     "accent": {"color": "#FF9B4A", "light": "server_glow", "sightline": "Lichtreihe aus Status-LEDs, die sich im Wasser spiegelt"}},
+    {"id": "verd_waterfall_view", "district": "verdanta", "type": "waterfall", "title": "Der Schleierfall",
+     "pos": {"localM": [1470, 1080, 90], "radiusM": 20}, "discover": "dwell", "dwellSeconds": 6,
+     "hints": [{"kind": "sound", "cue": "sfx_waterfall_far", "radiusM": 400, "text": "Ein Rauschen, das lauter wird, je weiter man dem Fluss bergauf folgt."}],
+     "rewards": [{"type": "money", "amount": 300}, {"type": "lore", "id": "lore_verd_waterfall"}],
+     "lore": "Achtunddreißig Meter Wasser, das in Schleiern fällt. Wer am Beckenrand steht, wird nass, egal wo. Es ist der erste Ort seit Langem, an dem einen nichts beobachtet. Fast nichts.",
+     "accent": {"color": "#BFE6FF", "light": "mist_rainbow", "sightline": "Dampf- und Gischtsäule über der Klamm, vom Gewächshaus aus sichtbar"}},
+    {"id": "verd_hot_springs", "district": "verdanta", "type": "oddity", "title": "Die warmen Quellen",
+     "pos": {"localM": [1000, 600, 48], "radiusM": 15}, "discover": "dwell", "dwellSeconds": 8,
+     "hints": [{"kind": "visual", "text": "Über dem Wald steigt Dampf auf, auch wenn es nicht regnet."}],
+     "rewards": [{"type": "lore", "id": "lore_verd_springs"}, {"type": "cosmetic", "id": "towel_springs"}],
+     "lore": "Terrassen aus Kalksinter, Wasser so warm wie ein Bad. Die Forscher haben hier Stufen hineingehauen und ein Schild aufgestellt: Badezeit nach Dienstschluss, Messgeräte bitte draußen lassen.",
+     "accent": {"color": "#E8FFF4", "light": "steam", "sightline": "Dampfsäule, sichtbar ab 600 m"}},
+    {"id": "verd_firefly_gorge", "district": "verdanta", "type": "animal", "title": "Die Glühwürmchenschlucht",
+     "pos": {"localM": [760, 1010, 30], "radiusM": 20}, "discover": "dwell", "dwellSeconds": 8,
+     "visibleWhen": [{"hour": [21, 1]}, {"not": {"weather": ["rain", "storm"]}}],
+     "hints": [{"kind": "rumor", "text": "Die Ranger sagen: Mach das Licht aus, dann geht es an."}],
+     "rewards": [{"type": "money", "amount": 200}, {"type": "lore", "id": "lore_verd_fireflies"}],
+     "lore": "Wer die Lampe ausschaltet und wartet, sieht die Schlucht aufleuchten, tausendfach, ohne Muster und ohne Zweck. Nach der Stadt ist es fast unerträglich schön.",
+     "accent": {"color": "#D9FF5E", "light": "fireflies", "sightline": "Grünlicher Schimmer in der Schlucht unter dem Kronenpfad"}},
+    {"id": "verd_otters", "district": "verdanta", "type": "animal", "title": "Die Otter am Becken",
+     "pos": {"localM": [1480, 1120, 89], "radiusM": 60}, "discover": "photo",
+     "visibleWhen": [{"any": [{"hour": [5.5, 8]}, {"hour": [18.5, 21]}]}],
+     "hints": [{"kind": "visual", "text": "Am Beckenrand liegen aufgebrochene Muschelschalen in ordentlichen Häufchen."}],
+     "rewards": [{"type": "money", "amount": 250}, {"type": "lore", "id": "lore_verd_otters"}],
+     "lore": "Eine Otterfamilie spielt im Becken unter dem Fall. Eines der Tiere trägt die Ohrmarke Otter 2. Es ist zu jung, um das Original zu sein. Vielleicht ist die Marke einfach weitergegeben worden.",
+     "accent": {"color": "#8FB8A0", "light": "none", "sightline": "Glatte Rutschspuren am Beckenufer"}},
+    {"id": "verd_gorge_bridge", "district": "verdanta", "type": "stunt", "title": "Die Hängebrücke der Vermesser",
+     "pos": {"localM": [1820, 1350, 150], "radiusM": 8}, "discover": "proximity",
+     "hints": [{"kind": "visual", "text": "Über der Klamm hängt eine Seilbrücke. Auf der anderen Seite Reifenspuren."}],
+     "rewards": [{"type": "money", "amount": 600}, {"type": "standing", "id": "wrenchers", "amount": 4}],
+     "lore": "Die Brücke trägt einen Menschen, zwei, wenn sie sich mögen. Ein Motorrad trägt sie, wenn man nicht bremst. Darunter fünfzig Meter Luft und das Rauschen des Falls.",
+     "accent": {"color": "#E8C547", "light": "none", "sightline": "Gelbe Signalfahnen an den Brückenpfosten"}},
+    {"id": "verd_canopy_platform", "district": "verdanta", "type": "viewpoint", "title": "Die Kronenplattform",
+     "pos": {"localM": [820, 960, 60], "radiusM": 8}, "discover": "dwell", "dwellSeconds": 8,
+     "visibleWhen": [{"hour": [5.5, 8.5]}],
+     "hints": [{"kind": "visual", "text": "Zwischen den Baumkronen hängen Stege, morgens über einem Nebelmeer."}],
+     "rewards": [{"type": "money", "amount": 250}, {"type": "lore", "id": "lore_verd_canopy"}],
+     "lore": "Bei Sonnenaufgang liegt das Tal unter einem Nebelmeer, aus dem nur die Glashäuser und ganz hinten der Aurelia Tower ragen. Von hier aus sieht der Turm aus wie ein Baum, der zu schnell gewachsen ist.",
+     "accent": {"color": "#FFC86B", "light": "sunrise", "sightline": "Seilstege zwischen Baumriesen"}},
+    {"id": "verd_overgrown_bus", "district": "verdanta", "type": "oddity", "title": "Der letzte Werksbus",
+     "pos": {"localM": [420, 520, 18], "radiusM": 6}, "discover": "interact",
+     "hints": [{"kind": "visual", "text": "Ein Farn wächst aus einem Busdach am Rand der Forststraße."}],
+     "rewards": [{"type": "lore", "id": "lore_verd_bus"}, {"type": "money", "amount": 150}],
+     "lore": "Fahrtziel: Feldstation 3. Auf den Sitzen Brotdosen, eine vergessene Strickjacke, ein Kinderbild mit einem Otter. Der Bus fuhr am Tag des Unwetters ab und kam nie an. Die Fahrgäste schon, zu Fuß, sagt das Fahrtenbuch. Bis auf eine.",
+     "accent": {"color": "#E8C547", "light": "none", "sightline": "Gelber Lack zwischen Grün"}}
+  ]
+}

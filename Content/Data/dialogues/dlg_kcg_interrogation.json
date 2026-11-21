@@ -1,0 +1,33 @@
+{
+  "id": "dlg_kcg_interrogation", "npc": "vesna_koll", "title": "Verhör in der Hauptwache", "kind": "interrogation",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Setzen Sie sich. Kaffee? Er ist schlecht, aber er ist ehrlich. Mehr kann ich Ihnen heute nicht versprechen.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ich nehme den Kaffee.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "q1"},
+      {"text": "Ich will einen Anwalt.", "next": "lawyer"},
+      {"text": "Kommen Sie zur Sache.", "next": "q1"}]},
+    "lawyer": {"type": "line", "who": "@npc", "text": "Selbstverständlich. Der nächste freie Anwalt mit ausreichendem Score hat am Donnerstag in drei Wochen Zeit. Wir können warten. Ich warte sehr gern.", "next": "q1"},
+    "q1": {"type": "line", "who": "@npc", "text": "Ihr Kennzeichen wurde gestern an Tor 4 erfasst. Um 5:52 Uhr. Acht Minuten vor der Abriegelung. Was hatten Sie geladen?", "next": "c2"},
+    "c2": {"type": "choice", "options": [
+      {"text": "Fisch. Fragen Sie Grete Mahn.", "check": {"skill": "persuade", "difficulty": 3, "bonus": [{"when": [{"aegis": ["<", 40]}], "value": 1}], "success": "fish_ok", "fail": "fish_fail"}},
+      {"text": "Nichts. Ich bin leer gefahren.", "check": {"skill": "persuade", "difficulty": 4, "success": "fish_ok", "fail": "fish_fail"}},
+      {"text": "Ich sage ohne Anwalt nichts.", "next": "silent"},
+      {"text": "Fragen Sie doch Ihren Informanten im Hafen. Halvorsen, oder?", "when": [{"flag": ["dlg.clue.piet_informant", "==", true]}], "check": {"skill": "intimidate", "difficulty": 3, "success": "leverage_ok", "fail": "leverage_fail"}}]},
+    "fish_ok": {"type": "line", "who": "@npc", "text": "Fisch. Natürlich. Sie riechen auch danach. Gut, ich notiere Fisch. Ich notiere auch, dass Sie beim Lügen nicht blinzeln. Das ist eine seltene Begabung.", "next": "q2"},
+    "fish_fail": {"type": "line", "who": "@npc", "text": "Grete Mahn hat gestern nicht verkauft. Sie hatte Rücken. Ich weiß das, weil ich bei ihr kaufe. Versuchen wir es noch einmal, in einer Woche.", "effects": [{"heat": ["saltmarket", 1]}, {"flag": ["dlg.vesna.suspects", true]}], "next": "q2"},
+    "silent": {"type": "line", "who": "@npc", "text": "Schweigen ist auch eine Antwort. Meistens die ausführlichste.", "effects": [{"flag": ["dlg.vesna.suspects", true]}], "next": "q2"},
+    "leverage_ok": {"type": "line", "who": "@npc", "text": "...Interessant. Sie wissen Dinge, die in keiner Akte stehen. Dann machen wir es kurz: Sie haben heute nichts gesagt, und ich habe heute nichts gehört. Gehen Sie.", "effects": [{"npcTrust": ["@npc", -1]}, {"flag": ["dlg.vesna.leverage", true]}], "next": "release"},
+    "leverage_fail": {"type": "line", "who": "@npc", "text": "Namen werfen ist ein Sport für Leute, die nicht wissen, wo sie landen. Halvorsen ist ein Fischer. Sie sind eine Fahrerin. Ich bin müde. Bleiben wir dabei.", "effects": [{"heat": ["saltmarket", 1]}], "next": "q2"},
+    "q2": {"type": "line", "who": "@npc", "text": "Letzte Frage. Ihr Bruder. Jonas Voss. Wann haben Sie ihn zuletzt gesprochen?", "next": "c3"},
+    "c3": {"type": "choice", "options": [
+      {"text": "Vor sieben Jahren. Das ist die Wahrheit.", "effects": [{"npcTrust": ["@npc", 1]}], "next": "truth"},
+      {"text": "Ich suche ihn selbst. Helfen Sie mir, dann helfe ich Ihnen.", "check": {"skill": "persuade", "difficulty": 4, "bonus": [{"when": [{"npcTrust": ["@npc", ">=", 1]}], "value": 1}, {"when": [{"npcTrust": ["ravn", ">=", 1]}], "value": 1}], "success": "deal", "fail": "truth"}},
+      {"text": "Kein Kommentar.", "next": "release"}]},
+    "truth": {"type": "line", "who": "@npc", "text": "Ich glaube Ihnen. Das ist das Schlimmste, was ich heute tun musste. Sie können gehen. Fahren Sie langsam, die Kameras haben heute schlechte Laune.", "next": "release"},
+    "deal": {"type": "line", "who": "@npc", "text": "Ich helfe niemandem. Aber ich erzähle Ihnen, dass die Civil Guard nicht die Einzige ist, die ihn sucht. Leute aus dem Turm fahren nachts ohne Licht durch den Hafen. Das ist keine Hilfe. Das ist Wetterbericht.", "effects": [{"flag": ["dlg.clue.corp_hunters", true]}], "next": "release"},
+    "release": {"type": "effect", "effects": [{"flag": ["dlg.vesna.interrogated", true]}, {"aegis": 3}], "next": "bye"},
+    "bye": {"type": "line", "who": "@npc", "text": "Wir sehen uns. Das sage ich zu allen. Bei Ihnen meine ich es.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}

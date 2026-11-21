@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "_comment": "Ambience-Layer, Bezirk x Tageszeit x Wetter. Gewichte 0..1 (Linear). weatherMods: mul = Faktor, add = Zuschlag (vor Begrenzung auf 0..1). Alle Texte erfunden.",
+  "audioPath": "/Game/Audio/Generated/",
+  "smoothingSeconds": 3.0,
+  "layers": {
+    "city":       { "file": "amb_city",       "loop": true,  "baseGainDb": -6,  "dampedByWeather": true },
+    "rain":       { "file": "amb_rain",       "loop": true,  "baseGainDb": -4,  "dampedByWeather": false },
+    "wind":       { "file": "amb_wind",       "loop": true,  "baseGainDb": -8,  "dampedByWeather": false },
+    "harbor":     { "file": "amb_harbor",     "loop": true,  "baseGainDb": -6,  "dampedByWeather": true },
+    "night_city": { "file": "amb_night_city", "loop": true,  "baseGainDb": -8,  "dampedByWeather": true },
+    "siren_far":  { "file": "amb_siren_far",  "loop": true,  "baseGainDb": -10, "dampedByWeather": true },
+    "industry":   { "file": "amb_industry",   "loop": true,  "baseGainDb": -6,  "dampedByWeather": true },
+    "surf":       { "file": "amb_surf",       "loop": true,  "baseGainDb": -6,  "dampedByWeather": true },
+    "garden":     { "file": "amb_garden",     "loop": true,  "baseGainDb": -9,  "dampedByWeather": true },
+    "drones":     { "file": "amb_drones",     "loop": true,  "baseGainDb": -12, "dampedByWeather": true },
+    "thunder":    { "file": "amb_thunder",    "loop": false, "baseGainDb": -2,  "dampedByWeather": false }
+  },
+  "timeBands": {
+    "dawn":  { "from": 5,  "to": 8 },
+    "day":   { "from": 8,  "to": 17 },
+    "dusk":  { "from": 17, "to": 21 },
+    "night": { "from": 21, "to": 5 }
+  },
+  "districts": {
+    "core": {
+      "dawn":  { "city": 0.5, "drones": 0.4 },
+      "day":   { "city": 0.8, "drones": 0.5, "siren_far": 0.15 },
+      "dusk":  { "city": 0.6, "drones": 0.5, "night_city": 0.2 },
+      "night": { "city": 0.25, "drones": 0.6, "night_city": 0.4, "siren_far": 0.1 }
+    },
+    "saltmarket": {
+      "dawn":  { "harbor": 0.8, "city": 0.2, "industry": 0.3 },
+      "day":   { "harbor": 0.9, "city": 0.35, "industry": 0.4 },
+      "dusk":  { "harbor": 0.7, "city": 0.25 },
+      "night": { "harbor": 0.6, "night_city": 0.2, "siren_far": 0.1 }
+    },
+    "lanternhill": {
+      "dawn":  { "city": 0.2, "garden": 0.2 },
+      "day":   { "city": 0.45, "garden": 0.1 },
+      "dusk":  { "city": 0.5, "night_city": 0.3 },
+      "night": { "night_city": 0.7, "city": 0.2, "siren_far": 0.15 }
+    },
+    "greenmoor": {
+      "dawn":  { "garden": 0.9, "wind": 0.1 },
+      "day":   { "garden": 0.7, "city": 0.08 },
+      "dusk":  { "garden": 0.4, "night_city": 0.1 },
+      "night": { "night_city": 0.15, "garden": 0.1, "drones": 0.15 }
+    },
+    "rustline": {
+      "dawn":  { "industry": 0.7, "city": 0.15 },
+      "day":   { "industry": 0.9, "city": 0.2 },
+      "dusk":  { "industry": 0.7, "night_city": 0.15 },
+      "night": { "industry": 0.5, "night_city": 0.2, "siren_far": 0.1, "wind": 0.1 }
+    },
+    "sunstrip": {
+      "dawn":  { "surf": 0.7, "city": 0.1 },
+      "day":   { "surf": 0.8, "city": 0.35 },
+      "dusk":  { "surf": 0.7, "city": 0.35, "night_city": 0.2 },
+      "night": { "surf": 0.5, "night_city": 0.5, "city": 0.2 }
+    }
+  },
+  "weatherMods": {
+    "Clear":        { },
+    "Cloudy":       { "wind": { "add": 0.1 } },
+    "Haze":         { "city": { "mul": 0.9 } },
+    "Rain":         { "rain": { "add": 0.6 }, "wind": { "add": 0.15 }, "garden": { "mul": 0.3 }, "surf": { "mul": 0.8 } },
+    "Thunderstorm": { "rain": { "add": 1.0 }, "wind": { "add": 0.5 }, "garden": { "mul": 0.1 }, "siren_far": { "mul": 0.5 } },
+    "SmogFog":      { "wind": { "add": 0.02 }, "harbor": { "mul": 1.2 }, "drones": { "mul": 1.2 } },
+    "DustStorm":    { "wind": { "add": 0.9 }, "garden": { "mul": 0.0 }, "surf": { "mul": 0.6 } }
+  },
+  "reverb": {
+    "_comment": "Hall nach Strassenbreite (Meter, Gehweg zu Gehweg). Interpolation linear; Tunnel/Haeuserschlucht ueber Flags.",
+    "byStreetWidth": [
+      { "widthM": 4,   "decaySeconds": 1.3, "wet": 0.38, "preDelayMs": 8,  "reflectionGain": 0.7, "highCutHz": 7000 },
+      { "widthM": 8,   "decaySeconds": 1.8, "wet": 0.30, "preDelayMs": 18, "reflectionGain": 0.6, "highCutHz": 8000 },
+      { "widthM": 16,  "decaySeconds": 1.9, "wet": 0.22, "preDelayMs": 35, "reflectionGain": 0.4, "highCutHz": 9000 },
+      { "widthM": 32,  "decaySeconds": 1.4, "wet": 0.14, "preDelayMs": 60, "reflectionGain": 0.25, "highCutHz": 11000 },
+      { "widthM": 60,  "decaySeconds": 0.9, "wet": 0.08, "preDelayMs": 90, "reflectionGain": 0.12, "highCutHz": 14000 }
+    ],
+    "tunnel":  { "decaySeconds": 4.2, "wet": 0.5, "preDelayMs": 12, "reflectionGain": 0.9, "highCutHz": 5000 },
+    "openField": { "decaySeconds": 0.5, "wet": 0.03, "preDelayMs": 120, "reflectionGain": 0.05, "highCutHz": 16000 },
+    "districtOffset": {
+      "core": { "wetMul": 1.1 }, "saltmarket": { "wetMul": 1.15 }, "lanternhill": { "wetMul": 1.25 },
+      "greenmoor": { "wetMul": 0.7 }, "rustline": { "wetMul": 1.2 }, "sunstrip": { "wetMul": 0.85 }
+    }
+  },
+  "aegis": {
+    "_comment": "Durchsagen des Ueberwachungsnetzes Aegis und Polizeifunk (alles Fiktion). aegisDensity steuert die Haeufigkeit je Bezirk.",
+    "aegisDensity": { "core": 1.0, "saltmarket": 0.5, "lanternhill": 0.2, "greenmoor": 0.8, "rustline": 0.1, "sunstrip": 0.7 },
+    "minIntervalSeconds": 45,
+    "maxIntervalSeconds": 140,
+    "policeIntervalSeconds": 12,
+    "announcements": [
+      { "id": "ae1", "speaker": "Aegis", "category": "Announcement", "text": "Aegis-Hinweis: Dieser Bereich wird zu Ihrer Sicherheit beobachtet. Ihre Sicherheit ist uns wichtig. Ihr Verhalten ebenfalls.", "when": { "districtMinDensity": 0.5 } },
+      { "id": "ae2", "speaker": "Aegis", "category": "Announcement", "text": "Bitte halten Sie Ihr Kennzeichen sichtbar. Unlesbare Kennzeichen werden als Interesse an Aufmerksamkeit gewertet." },
+      { "id": "ae3", "speaker": "Aegis", "category": "Announcement", "text": "Aegis Phase Zwei startet bald. Jetzt Profil prüfen und Vorteile sichern.", "when": { "flagsNone": ["leakedLedger"] } },
+      { "id": "ae4", "speaker": "Aegis", "category": "Announcement", "text": "Zum Wetter: {weather}. Aegis empfiehlt angepasste Fahrweise. Abweichungen werden registriert.", "when": { "weather": ["Rain", "Thunderstorm", "SmogFog", "DustStorm"] } },
+      { "id": "ae5", "speaker": "Aegis", "category": "Drone", "text": "Drohnenkontrolle aktiv. Bitte bleiben Sie ruhig. Bewegen Sie sich normal.", "when": { "district": ["core", "greenmoor"] } },
+      { "id": "ae6", "speaker": "Aegis", "category": "Announcement", "text": "Sunstrip empfiehlt: Lächeln Sie. Aegis erkennt Freude zuverlässiger als Skepsis.", "when": { "district": ["sunstrip"] } },
+      { "id": "ae7", "speaker": "Aegis", "category": "Announcement", "text": "Ausgangssperre für Profile unter Wertstufe Zwei beginnt in Kürze.", "when": { "district": ["core"], "hourFrom": 21, "hourTo": 5 } }
+    ],
+    "police": [
+      { "id": "pf1", "speaker": "KCG-Leitstelle", "category": "PoliceRadio", "text": "Alle Einheiten, Fahndung in {district}. Verdächtiges Fahrzeug, Kennzeichen von Aegis erfasst.", "when": { "wantedMin": 1 } },
+      { "id": "pf2", "speaker": "KCG-Leitstelle", "category": "PoliceRadio", "text": "Einheit Fünf, Verfolgung aufnehmen. Zivile Fahrzeuge nicht gefährden, soweit es das Protokoll erlaubt.", "when": { "wantedMin": 2 } },
+      { "id": "pf3", "speaker": "KCG-Streife", "category": "PoliceRadio", "text": "Wir haben ihn im Blick, Leitstelle. Er fährt wie jemand, der nichts zu verlieren hat.", "when": { "wantedMin": 3 } },
+      { "id": "pf4", "speaker": "KCG-Leitstelle", "category": "PoliceRadio", "text": "Hubschrauber angefordert. Straßensperre an der nächsten Kreuzung vorbereiten.", "when": { "wantedMin": 4 } },
+      { "id": "pf5", "speaker": "KCG-Leitstelle", "category": "PoliceRadio", "text": "Alle Einheiten, Priorität Eins. Zielperson darf Core nicht erreichen.", "when": { "wantedMin": 5 } },
+      { "id": "pf6", "speaker": "KCG-Streife", "category": "PoliceRadio", "text": "Sicht verloren, Leitstelle. Smog zu dicht, wir stellen auf Aegis-Verfolgung um.", "when": { "wantedMin": 2, "weather": ["SmogFog", "DustStorm"] } },
+      { "id": "pf7", "speaker": "KCG-Leitstelle", "category": "PoliceRadio", "text": "Rustline: keine Kameradaten. Einheiten rücken nur auf Befehl ein.", "when": { "wantedMin": 1, "district": ["rustline"] } }
+    ]
+  }
+}

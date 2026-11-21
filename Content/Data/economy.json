@@ -1,0 +1,171 @@
+{
+  "schema": 1,
+  "currency": "$",
+  "startMoney": 1000,
+  "history": { "transactionRingSize": 256, "balanceRingSize": 512, "balanceSampleHours": 6 },
+
+  "districts": {
+    "core":        { "name": "Kestrel Core", "priceFactor": 1.30, "rewardFactor": 1.30, "fineFactor": 1.50, "bribeFactor": 1.70, "repairFactor": 1.35, "fuelFactor": 1.20, "rentFactor": 1.60, "aegisDensity": 0.95, "blackMarket": false, "faction": "aurelia" },
+    "saltmarket":  { "name": "Saltmarket",   "priceFactor": 0.85, "rewardFactor": 0.80, "fineFactor": 0.90, "bribeFactor": 0.80, "repairFactor": 0.85, "fuelFactor": 0.95, "rentFactor": 0.75, "aegisDensity": 0.45, "blackMarket": true,  "faction": "union" },
+    "lanternhill": { "name": "Lantern Hill", "priceFactor": 0.95, "rewardFactor": 0.90, "fineFactor": 1.00, "bribeFactor": 0.90, "repairFactor": 0.95, "fuelFactor": 1.05, "rentFactor": 0.90, "aegisDensity": 0.35, "blackMarket": true,  "faction": "collective" },
+    "greenmoor":   { "name": "Greenmoor",    "priceFactor": 1.20, "rewardFactor": 1.20, "fineFactor": 1.40, "bribeFactor": 1.50, "repairFactor": 1.25, "fuelFactor": 1.10, "rentFactor": 1.45, "aegisDensity": 0.80, "blackMarket": false, "faction": "kcg" },
+    "rustline":    { "name": "Rustline",     "priceFactor": 0.75, "rewardFactor": 0.70, "fineFactor": 0.70, "bribeFactor": 0.60, "repairFactor": 0.70, "fuelFactor": 0.90, "rentFactor": 0.60, "aegisDensity": 0.10, "blackMarket": true,  "faction": "wrenchers" },
+    "sunstrip":    { "name": "Sunstrip",     "priceFactor": 1.10, "rewardFactor": 1.10, "fineFactor": 1.10, "bribeFactor": 1.10, "repairFactor": 1.10, "fuelFactor": 1.15, "rentFactor": 1.25, "aegisDensity": 0.70, "blackMarket": false, "faction": "" }
+  },
+
+  "timeOfDay": [
+    { "from": 0,  "to": 5,  "label": "Nacht",       "price": 1.15, "blackMarket": 0.90, "repair": 1.25 },
+    { "from": 5,  "to": 9,  "label": "Fruehschicht", "price": 0.95, "blackMarket": 1.05, "repair": 1.00 },
+    { "from": 9,  "to": 17, "label": "Tag",         "price": 1.00, "blackMarket": 1.10, "repair": 1.00 },
+    { "from": 17, "to": 21, "label": "Feierabend",  "price": 1.08, "blackMarket": 1.00, "repair": 1.05 },
+    { "from": 21, "to": 24, "label": "Spaet",       "price": 1.10, "blackMarket": 0.92, "repair": 1.15 }
+  ],
+
+  "scarcity": {
+    "fuel":        { "volatility": 0.05, "meanReversion": 0.12, "min": 0.75, "max": 1.60 },
+    "parts":       { "volatility": 0.04, "meanReversion": 0.10, "min": 0.80, "max": 1.50 },
+    "electronics": { "volatility": 0.06, "meanReversion": 0.10, "min": 0.80, "max": 1.70 },
+    "goods":       { "volatility": 0.03, "meanReversion": 0.15, "min": 0.85, "max": 1.35 },
+    "vehicles":    { "volatility": 0.02, "meanReversion": 0.08, "min": 0.90, "max": 1.25 }
+  },
+  "scarcityEvents": [
+    { "id": "strike",   "category": "goods",       "shock": 0.25, "chancePerDay": 0.04 },
+    { "id": "blackout", "category": "electronics", "shock": 0.35, "chancePerDay": 0.02 },
+    { "id": "refinery", "category": "fuel",        "shock": 0.30, "chancePerDay": 0.03 }
+  ],
+
+  "prices": {
+    "fuelPerLiter": 2.4,
+    "repairBase": 50,
+    "repairPerDamagePct": 3.2,
+    "repairValuePct": 0.006,
+    "towBase": 180,
+    "towPerKm": 14,
+    "impoundRelease": 450,
+    "impoundPerDay": 60,
+    "plateSwapLegal": 450,
+    "plateSwapBlack": 1400,
+    "insuranceDailyPct": [0.0035, 0.0055, 0.0085],
+    "insuranceCoverage": [0.50, 0.80, 1.00],
+    "insuranceDeductible": [400, 250, 0],
+    "vehicleResalePct": 0.55,
+    "stolenResalePct": 0.22,
+    "respecBase": 750,
+    "respecPerPoint": 120
+  },
+
+  "fines": {
+    "speeding": 120, "redLight": 90, "reckless": 250, "propertyDamage": 180, "hitAndRun": 700,
+    "evading": 600, "assault": 1200, "illegalTuning": 350, "fakePlate": 900, "trespass": 300,
+    "arrestBase": 300, "arrestPerStar": 250, "arrestMoneyPct": 0.06,
+    "aegisSurchargePerPoint": 0.008,
+    "unpaidToDebt": true
+  },
+
+  "bribe": {
+    "basePerStar": 320, "exponent": 1.55,
+    "successBase": 0.90, "successPerStar": -0.13, "successMin": 0.10, "successMax": 0.97,
+    "kcgStandingPerPoint": 0.003, "aegisPenaltyPerPoint": 0.002,
+    "failHeat": 1.0, "failFineMul": 1.5,
+    "maxStars": 4
+  },
+
+  "blackMarket": {
+    "sellSpread": 0.78,
+    "aegisRiskPerDeal": 0.8,
+    "goods": {
+      "contraband_chips":  { "base": 900,  "volatility": 0.08, "min": 0.5, "max": 2.2, "category": "electronics" },
+      "contraband_fuel":   { "base": 160,  "volatility": 0.06, "min": 0.6, "max": 1.8, "category": "fuel" },
+      "contraband_meds":   { "base": 420,  "volatility": 0.07, "min": 0.5, "max": 2.0, "category": "goods" },
+      "contraband_parts":  { "base": 650,  "volatility": 0.05, "min": 0.6, "max": 1.7, "category": "parts" },
+      "contraband_ledger": { "base": 2400, "volatility": 0.10, "min": 0.4, "max": 2.5, "category": "electronics" }
+    }
+  },
+
+  "loan": {
+    "lender": "aurelia",
+    "maxBase": 5000, "maxPerLevel": 1500, "maxStandingFactor": 60,
+    "baseDailyRate": 0.010,
+    "aegisRatePerPoint": 0.00025,
+    "aegisPivot": 50,
+    "standingRatePerPoint": -0.00006,
+    "minDailyRate": 0.004, "maxDailyRate": 0.045,
+    "minDailyPaymentPct": 0.05,
+    "graceDays": 3,
+    "defaultAfterMissedDays": 5,
+    "defaultAegis": 8,
+    "defaultStanding": -10,
+    "collectionPct": 0.30
+  },
+
+  "garages": {
+    "levels": [
+      { "capacity": 2,  "price": 8000,  "rentPerDay": 40 },
+      { "capacity": 4,  "price": 14000, "rentPerDay": 70 },
+      { "capacity": 8,  "price": 24000, "rentPerDay": 120 },
+      { "capacity": 16, "price": 40000, "rentPerDay": 200 }
+    ],
+    "streetParkingStolenChancePerDay": { "core": 0.01, "saltmarket": 0.04, "lanternhill": 0.03, "greenmoor": 0.005, "rustline": 0.08, "sunstrip": 0.03 }
+  },
+
+  "inventory": {
+    "personalSlots": 12, "personalKg": 25,
+    "slotUpgrades": [12, 20, 30],
+    "confiscation": { "baseChance": 0.35, "perStar": 0.12, "trunkMul": 1.25, "evidenceProtected": true, "fineOnContrabandPct": 0.5 }
+  },
+
+  "items": {
+    "tool_wrench":        { "name": "Ratschenkasten",        "category": "tool",       "kg": 3.0, "stack": 1,  "price": 180,  "legal": true,  "scarcity": "parts" },
+    "tool_slimjim":       { "name": "Tuerhaken",              "category": "tool",       "kg": 0.4, "stack": 1,  "price": 120,  "legal": false, "risk": 0.6, "scarcity": "parts" },
+    "tool_tow_rope":      { "name": "Abschleppseil",          "category": "tool",       "kg": 2.0, "stack": 1,  "price": 90,   "legal": true,  "scarcity": "parts" },
+    "dongle_basic":       { "name": "Lantern-Dongle Mk1",     "category": "hackdongle", "kg": 0.2, "stack": 3,  "price": 400,  "legal": false, "risk": 0.7, "charges": 3, "use": { "tag": "hack.camera", "treeXp": ["tech", 40] }, "scarcity": "electronics" },
+    "dongle_pro":         { "name": "Spiegelkapsel",          "category": "hackdongle", "kg": 0.2, "stack": 3,  "price": 1600, "legal": false, "risk": 0.8, "charges": 6, "use": { "tag": "hack.traffic", "treeXp": ["tech", 80] }, "scarcity": "electronics" },
+    "plate_blank":        { "name": "Rohling-Kennzeichen",    "category": "plate",      "kg": 0.5, "stack": 5,  "price": 300,  "legal": false, "risk": 0.5, "use": { "plateSwap": true }, "scarcity": "parts" },
+    "plate_cloned":       { "name": "Geklontes Kennzeichen",  "category": "plate",      "kg": 0.5, "stack": 5,  "price": 900,  "legal": false, "risk": 0.9, "use": { "plateSwap": true, "aegisExtra": -4 }, "scarcity": "electronics" },
+    "evidence_ledger":    { "name": "Ledger-Kern",            "category": "evidence",   "kg": 0.1, "stack": 1,  "price": 0,    "legal": true,  "story": true },
+    "evidence_footage":   { "name": "Kamera-Mitschnitt",      "category": "evidence",   "kg": 0.1, "stack": 10, "price": 0,    "legal": false, "risk": 0.4 },
+    "contraband_chips":   { "name": "Aegis-Chips (Schmuggel)", "category": "contraband", "kg": 1.0, "stack": 10, "price": 900,  "legal": false, "risk": 1.0 },
+    "contraband_fuel":    { "name": "Raffinerie-Kanister",    "category": "contraband", "kg": 12.0, "stack": 4, "price": 160,  "legal": false, "risk": 0.6 },
+    "contraband_meds":    { "name": "Klinik-Ampullen",        "category": "contraband", "kg": 0.5, "stack": 20, "price": 420,  "legal": false, "risk": 0.8 },
+    "contraband_parts":   { "name": "Gestohlene Steuergeraete", "category": "contraband", "kg": 4.0, "stack": 6, "price": 650, "legal": false, "risk": 0.7 },
+    "contraband_ledger":  { "name": "Kopierte Kontodaten",    "category": "contraband", "kg": 0.1, "stack": 5,  "price": 2400, "legal": false, "risk": 1.0 },
+    "repair_kit":         { "name": "Reparaturset",           "category": "repairkit",  "kg": 4.0, "stack": 3,  "price": 220,  "legal": true,  "use": { "repair": 0.25 }, "scarcity": "parts" },
+    "repair_kit_pro":     { "name": "Werkstattkoffer",        "category": "repairkit",  "kg": 7.0, "stack": 2,  "price": 600,  "legal": true,  "use": { "repair": 0.6 }, "scarcity": "parts" },
+    "fuel_can":           { "name": "Reservekanister",        "category": "consumable", "kg": 6.0, "stack": 2,  "price": 70,   "legal": true,  "use": { "fuel": 0.3 }, "scarcity": "fuel" },
+    "key_union_yard":     { "name": "Schluessel Union-Hof",   "category": "key",        "kg": 0.05, "stack": 1, "price": 0,    "legal": true,  "story": true }
+  },
+
+  "income": {
+    "gigTiers": [150, 350, 700],
+    "race": [200, 1500],
+    "chase": [400, 1000],
+    "contract": [1500, 4000],
+    "side": [600, 1500],
+    "main": [500, 2000],
+    "event": [500, 1200],
+    "failPenaltyPct": 0.25
+  },
+
+  "balancing": {
+    "targetHourlyIncome": [4000, 6000],
+    "targetMidCarHours": [3, 4],
+    "midCarPrice": 18000,
+    "inflationWarnPriceIndex": 1.25,
+    "deflationWarnPriceIndex": 0.80,
+    "wealthGrowthWarnPerHour": 9000,
+    "brokeWarnShare": 0.10
+  },
+
+  "simulation": {
+    "hours": 1000, "seed": 1337,
+    "weights":   { "gig": 40, "race": 10, "chase": 8, "contract": 4, "side": 6, "main": 4, "event": 4, "blackMarket": 8, "idleDrive": 16 },
+    "minutes":   { "gig": 6,  "race": 8,  "chase": 9, "contract": 30, "side": 20, "main": 22, "event": 15, "blackMarket": 10, "idleDrive": 8 },
+    "caps":      { "main": 30, "side": 12, "contract": 6 },
+    "gigTierHours": [0, 8, 30],
+    "vehicleLadder": [9000, 18000, 32000, 60000, 110000],
+    "maxFleet": 8,
+    "partsPerVehicle": 8,
+    "crashChance": 0.22, "crimeChance": 0.12, "arrestChance": 0.025, "bribeShare": 0.4,
+    "tuningShare": 0.25, "loanWhenBroke": true, "reserve": 1500
+  }
+}

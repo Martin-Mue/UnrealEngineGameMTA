@@ -1,0 +1,160 @@
+{
+ "schema": 1,
+ "comment": "Hinweise: trigger = Ausloeser (FireTrigger), textKey -> text.<lang>.json (.kb/.pad), condition = Kontextwerte, once = nur einmal",
+ "hints": [
+  {
+   "id": "drive_hint",
+   "trigger": "game_start",
+   "textKey": "tut.drive",
+   "category": "driving",
+   "priority": 10,
+   "delay": 1.5,
+   "duration": 10,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "map_hint",
+   "trigger": "first_drive_100m",
+   "textKey": "tut.map",
+   "category": "navigation",
+   "priority": 5,
+   "delay": 0,
+   "duration": 9,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "heat_hint",
+   "trigger": "first_heat",
+   "textKey": "tut.heat",
+   "category": "law",
+   "priority": 9,
+   "delay": 0.5,
+   "duration": 10,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "aegis_hint",
+   "trigger": "enter_core",
+   "textKey": "tut.aegis",
+   "category": "law",
+   "priority": 6,
+   "delay": 1,
+   "duration": 10,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "garage_hint",
+   "trigger": "enter_garage",
+   "textKey": "tut.garage",
+   "category": "vehicle",
+   "priority": 5,
+   "delay": 0.5,
+   "duration": 9,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "mission_hint",
+   "trigger": "first_mission",
+   "textKey": "tut.mission",
+   "category": "story",
+   "priority": 8,
+   "delay": 1,
+   "duration": 10,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "choice_hint",
+   "trigger": "first_choice",
+   "textKey": "tut.choice",
+   "category": "story",
+   "priority": 9,
+   "delay": 0,
+   "duration": 10,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "save_hint",
+   "trigger": "after_first_mission",
+   "textKey": "tut.save",
+   "category": "system",
+   "priority": 4,
+   "delay": 2,
+   "duration": 9,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "photo_hint",
+   "trigger": "first_scenic_view",
+   "textKey": "tut.photo",
+   "category": "system",
+   "priority": 2,
+   "delay": 0,
+   "duration": 9,
+   "condition": "speed<30",
+   "once": true
+  },
+  {
+   "id": "reset_hint",
+   "trigger": "vehicle_flipped",
+   "textKey": "tut.reset",
+   "category": "driving",
+   "priority": 7,
+   "delay": 1,
+   "duration": 8,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "radio_hint",
+   "trigger": "enter_vehicle",
+   "textKey": "tut.radio",
+   "category": "audio",
+   "priority": 3,
+   "delay": 4,
+   "duration": 9,
+   "condition": "",
+   "once": true
+  },
+  {
+   "id": "drift_hint",
+   "trigger": "first_corner_fast",
+   "textKey": "tut.drift",
+   "category": "driving",
+   "priority": 2,
+   "delay": 0,
+   "duration": 8,
+   "condition": "speed>40",
+   "once": true
+  },
+  {
+   "id": "night_hint",
+   "trigger": "night_falls",
+   "textKey": "tut.night",
+   "category": "driving",
+   "priority": 2,
+   "delay": 2,
+   "duration": 8,
+   "condition": "!in_mission",
+   "once": true
+  },
+  {
+   "id": "access_hint",
+   "trigger": "game_start",
+   "textKey": "tut.access",
+   "category": "system",
+   "priority": 1,
+   "delay": 12,
+   "duration": 10,
+   "condition": "",
+   "once": true
+  }
+ ]
+}

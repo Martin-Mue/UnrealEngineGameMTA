@@ -1,0 +1,30 @@
+{
+  "id": "dlg_raya_challenge", "npc": "raya_quist", "title": "Herausforderung an der Geraden", "kind": "argument",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "@npc", "text": "Du stehst auf meiner Startlinie. Entweder du fährst, oder du bist Dekoration.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ich fahre.", "next": "race"},
+      {"text": "Ich such Graf Null. Man sagt, er hat dich beschissen.", "next": "null"},
+      {"text": "Ich bin nur Dekoration.", "next": "deco"}]},
+    "deco": {"type": "line", "who": "@npc", "text": "Dann stell dich dahinten zu den Mülltonnen. Die sind wenigstens ehrlich verbeult.", "next": "end"},
+    "race": {"type": "line", "who": "@npc", "text": "Einsatz: zweihundert. Bis zur Raffineriefackel und zurück. Keine Kameras, keine Regeln, keine Ausreden.", "next": "c_race"},
+    "c_race": {"type": "choice", "options": [
+      {"text": "Abgemacht. Ich fahre sauber.", "effects": [{"flag": ["dlg.raya.race_clean", true]}, {"money": -200}], "next": "race_start"},
+      {"text": "Abgemacht. Und ich ramme, wenn's sein muss.", "effects": [{"flag": ["dlg.raya.race_dirty", true]}, {"money": -200}], "next": "race_start"},
+      {"text": "Ohne Einsatz. Nur um zu sehen, wer schneller ist.", "check": {"skill": "driving", "difficulty": 3, "success": "respect", "fail": "mock"}},
+      {"text": "Zu viel Geld.", "next": "mock"}]},
+    "race_start": {"type": "line", "who": "@npc", "text": "Wenn die Fackel zweimal zuckt, geht's los. Und spuck auf den linken Vorderreifen. Bringt Glück, oder zumindest Schleim.", "next": "end"},
+    "respect": {"type": "line", "who": "@npc", "text": "Du hast den Blick. Den Blick von Leuten, die gewinnen wollen, nicht Geld. Okay. Freundschaftsrennen. Wenn du verlierst, zahlst du trotzdem das Bier.", "effects": [{"npcTrust": ["@npc", 1]}, {"standing": ["wrenchers", 3]}], "next": "race_start"},
+    "mock": {"type": "line", "who": "@npc", "text": "Dann bist du doch Dekoration. Schick. Aber Dekoration.", "effects": [{"npcTrust": ["@npc", -1]}], "next": "end"},
+    "null": {"type": "line", "who": "@npc", "text": "Graf Null. Ein Erbe aus Greenmoor mit abgeklebtem Kennzeichen und einem Wagen, der mehr kostet als mein Leben. Er hat beim Start Öl auf meine Spur gekippt. Weißt du, wer er ist?", "next": "c_null"},
+    "c_null": {"type": "choice", "options": [
+      {"text": "Felix Ashgrove. Er wohnt im Villenring.", "when": [{"flag": ["dlg.clue.felix_alias", "==", true]}], "effects": [{"relation": ["@npc", "felix_ashgrove", "rivalry", 20]}, {"npcTrust": ["@npc", 2]}, {"rumor": {"type": "npc_secret", "subject": "felix_ashgrove", "secret": "felix_alias", "severity": 0.5}}], "next": "null_named"},
+      {"text": "Lass es gut sein. Rache lohnt sich nicht.", "check": {"skill": "persuade", "difficulty": 4, "success": "null_calm", "fail": "null_angry"}},
+      {"text": "Keine Ahnung.", "next": "c1"}]},
+    "null_named": {"type": "line", "who": "@npc", "text": "Ashgrove. Ich hab's gewusst. Seine Bremsscheiben glänzen wie Greenmoor. Danke. Ich schulde dir was. Ein Rennen, oder einen Gefallen, du suchst es dir aus.", "effects": [{"flag": ["dlg.raya.owes_favor", true]}], "next": "c1"},
+    "null_calm": {"type": "line", "who": "@npc", "text": "...Vielleicht. Rache ist wie Nitro. Macht Spaß, bis der Motor platzt. Ich denk drüber nach. Langsam. Das ist neu für mich.", "effects": [{"relation": ["@npc", "felix_ashgrove", "rivalry", -15]}, {"npcTrust": ["@npc", 1]}], "next": "c1"},
+    "null_angry": {"type": "line", "who": "@npc", "text": "Lohnt sich nicht? Erzähl das meinem Getriebe.", "next": "c1"},
+    "end": {"type": "end"}
+  }
+}

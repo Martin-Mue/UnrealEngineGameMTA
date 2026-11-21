@@ -1,0 +1,31 @@
+{
+  "id": "dlg_bar_ballast_brawl", "npc": "roz_kettle", "title": "Streit im Ballast", "kind": "argument",
+  "start": "open",
+  "nodes": {
+    "open": {"type": "line", "who": "bo_lindahl", "text": "Du hast meinen Platz. Da sitzt seit elf Jahren nur einer, und das bin ich, wenn ich verloren hab.", "next": "c1"},
+    "c1": {"type": "choice", "options": [
+      {"text": "Ist ja gut, ich rück rüber.", "effects": [{"relation": ["bo_lindahl", "roz_kettle", "friendship", 2]}], "next": "calm"},
+      {"text": "Steht hier nirgends dein Name.", "next": "escalate"},
+      {"text": "Du hast heute verloren? Gegen wen?", "check": {"skill": "persuade", "difficulty": 2, "success": "talk", "fail": "escalate"}}]},
+    "calm": {"type": "line", "who": "bo_lindahl", "text": "Danke. Du bist höflich. Das ist hier selten. Roz, gib ihr was. Auf meine Rechnung, die an der Wand hängt.", "effects": [{"npcTrust": ["bo_lindahl", 1]}], "next": "roz_end"},
+    "talk": {"type": "line", "who": "bo_lindahl", "text": "Gegen Raya Quist aus Rustline. Sie hat meinen Stapler zersägt, um an ein Getriebe zu kommen. Und jetzt sitzt sie da drüben und lacht.", "next": "c2"},
+    "c2": {"type": "choice", "options": [
+      {"text": "Lass mich mit ihr reden. Vielleicht zahlt sie.", "next": "mediate"},
+      {"text": "Dann geh rüber und regel das.", "effects": [{"relation": ["bo_lindahl", "raya_quist", "rivalry", 15]}, {"rumor": {"type": "npc_feud", "subject": "bo_lindahl", "severity": 0.4}}], "next": "fight"},
+      {"text": "Nicht mein Problem.", "next": "roz_end"}]},
+    "mediate": {"type": "check", "cond": {"any": [{"npcTrust": ["raya_quist", ">=", 1]}, {"standing": ["wrenchers", ">=", 20]}]}, "yes": "mediate_ok", "no": "mediate_try"},
+    "mediate_try": {"type": "choice", "options": [
+      {"text": "Raya, du schuldest ihm ein Getriebe. Oder ein Bier pro Gang.", "check": {"skill": "persuade", "difficulty": 3, "bonus": [{"when": [{"skill": ["driving", ">=", 3]}], "value": 1}], "success": "mediate_ok", "fail": "fight"}},
+      {"text": "Ich zahl das Bier für beide.", "effects": [{"money": -30}], "next": "mediate_ok"},
+      {"text": "Ach, macht doch, was ihr wollt.", "next": "fight"}]},
+    "mediate_ok": {"type": "line", "who": "raya_quist", "text": "Fünf Gänge, fünf Bier. Und ein Rückwärtsgang als Entschuldigung. Aber nur, weil die hier nicht so tut, als wär sie was Besseres.", "effects": [{"relation": ["bo_lindahl", "raya_quist", "rivalry", -20]}, {"relation": ["bo_lindahl", "raya_quist", "friendship", 10]}, {"npcTrust": ["bo_lindahl", 1]}, {"npcTrust": ["raya_quist", 1]}, {"rumor": {"type": "helped_someone", "subject": "player", "severity": 0.3}}], "next": "roz_end"},
+    "escalate": {"type": "line", "who": "bo_lindahl", "text": "Entschuldigung im Voraus. Wirklich. Es tut mir jetzt schon leid.", "next": "c_escalate"},
+    "c_escalate": {"type": "choice", "options": [
+      {"text": "Bo. Setz dich. Du willst das nicht.", "check": {"skill": "intimidate", "difficulty": 4, "success": "stand_down", "fail": "fight"}},
+      {"text": "Okay, okay. Ich geh.", "effects": [{"npcTrust": ["bo_lindahl", -1]}], "next": "roz_end"}]},
+    "stand_down": {"type": "line", "who": "bo_lindahl", "text": "...Du hast recht. Ich will das nicht. Ich will nur, dass jemand merkt, dass ich verloren hab.", "effects": [{"npcTrust": ["bo_lindahl", 1]}], "next": "roz_end"},
+    "fight": {"type": "line", "who": "@npc", "text": "RAUS! Alle beide! Wer sich prügelt, prügelt sich auf der Straße, und wer blutet, wischt hinterher!", "effects": [{"rumor": {"type": "violence", "subject": "player", "severity": 0.3}}, {"npcTrust": ["@npc", -1]}], "next": "end"},
+    "roz_end": {"type": "line", "who": "@npc", "text": "So. Jetzt ist Frieden, und Frieden kostet hier vier fünfzig. Prost.", "next": "end"},
+    "end": {"type": "end"}
+  }
+}
