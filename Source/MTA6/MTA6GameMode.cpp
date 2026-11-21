@@ -3,6 +3,10 @@
 #include "MTACharacter.h"
 #include "MTAHeatSubsystem.h"
 #include "MTAHUD.h"
+#include "MTAMenuController.h"
+#include "MTAMenuMap.h"
+#include "MTAWorldAIManager.h"
+#include "Kismet/KismetSystemLibrary.h"
 #include "MTAMissionComponent.h"
 #include "MTASaveGame.h"
 #include "MTAStorySubsystem.h"
@@ -32,6 +36,108 @@ void AMTA6GameMode::InitGame(const FString& MapName, const FString& Options, FSt
 {
 	Super::InitGame(MapName, Options, ErrorMessage);
 
+}
+
+void AMTA6GameMode::SpawnWorldAI()
+{
+	UWorld* World = GetWorld();
+	if (!World || WorldAI)
+	{
+		return;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	WorldAI = World->SpawnActor<AMTAWorldAIManager>(AMTAWorldAIManager::StaticClass(), FTransform::Identity, Params);
+	if (!WorldAI)
+	{
+		return;
+	}
+	WorldAI->OnPlayerHitByAI.AddDynamic(this, &AMTA6GameMode::HandlePlayerHitByAI);
+	WorldAI->OnArrested.AddDynamic(this, &AMTA6GameMode::HandleArrested);
+	OnGatherMinimapBlips.AddUObject(this, &AMTA6GameMode::GatherAIBlips);
+}
+
+void AMTA6GameMode::SpawnMenu()
+{
+	UWorld* World = GetWorld();
+	if (!World || Menu)
+	{
+		return;
+	}
+	FActorSpawnParameters Params;
+	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+	Menu = World->SpawnActor<AMTAMenuController>(AMTAMenuController::StaticClass(), FTransform::Identity, Params);
+	if (!Menu)
+	{
+		return;
+	}
+	Menu->OnSaveRequested.AddUObject(this, &AMTA6GameMode::HandleMenuSave);
+	Menu->OnLoadRequested.AddUObject(this, &AMTA6GameMode::HandleMenuLoad);
+	Menu->OnNewGameRequested.AddUObject(this, &AMTA6GameMode::HandleMenuNew);
+	Menu->OnQuitRequested.AddUObject(this, &AMTA6GameMode::HandleMenuQuit);
+	Menu->QuerySlots.BindUObject(this, &AMTA6GameMode::FillSlotInfos);
+	MapStore = NewObject<UMTAMapDataStore>(this);
+	Menu->SetMapDataProvider(MapStore);
+}
+
+void AMTA6GameMode::HandleMenuSave(FString Slot)
+{
+	SaveGameToSlot(false);
+}
+
+void AMTA6GameMode::HandleMenuLoad(FString Slot)
+{
+	LoadGameFromSlot();
+}
+
+void AMTA6GameMode::HandleMenuNew()
+{
+	UGameplayStatics::OpenLevel(this, FName(TEXT("Kestrel_Bay")));
+}
+
+void AMTA6GameMode::HandleMenuQuit()
+{
+	UKismetSystemLibrary::QuitGame(this, UGameplayStatics::GetPlayerController(this, 0), EQuitPreference::Quit, false);
+}
+
+void AMTA6GameMode::FillSlotInfos(TArray<FMTASaveSlotInfo>& OutSlots)
+{
+	// Ein Speicherplatz (UMTASaveGame::SlotName); weitere Slots folgen mit dem SaveManager.
+	FMTASaveSlotInfo Info;
+	Info.SlotName = UMTASaveGame::SlotName();
+	Info.bExists = UGameplayStatics::DoesSaveGameExist(UMTASaveGame::SlotName(), UMTASaveGame::UserIndex);
+	Info.PlaytimeSeconds = GameTime;
+	Info.SavedAt = FDateTime::Now();
+	OutSlots.Add(Info);
+}
+
+void AMTA6GameMode::HandlePlayerHitByAI(float Damage, float Impulse, FVector Dir)
+{
+	if (AMTAVehiclePawn* Vehicle = GetPlayerVehicle())
+	{
+		Vehicle->ApplyVehicleDamage(Damage);
+		Vehicle->AddCameraShake(FMath::Clamp(Impulse / 150000.f, 0.2f, 1.f));
+	}
+}
+
+void AMTA6GameMode::HandleArrested()
+{
+	Bust();
+}
+
+void AMTA6GameMode::GatherAIBlips(TArray<FMTAMinimapBlip>& OutBlips)
+{
+	if (!WorldAI)
+	{
+		return;
+	}
+	TArray<FMTAMinimapAgent> Agents;
+	WorldAI->GetMinimapAgents(Agents, false);
+	for (const FMTAMinimapAgent& A : Agents)
+	{
+		const EMTAMinimapBlipKind Kind = A.Kind == EMTAAgentKind::Police ? EMTAMinimapBlipKind::Police : EMTAMinimapBlipKind::Traffic;
+		OutBlips.Emplace(FVector2D(A.Location.X, A.Location.Y), Kind);
+	}
 }
 
 void AMTA6GameMode::SpawnStartVehicle()
@@ -66,6 +172,8 @@ void AMTA6GameMode::BeginPlay()
 {
 	Super::BeginPlay();
 	SpawnStartVehicle();
+	SpawnWorldAI();
+	SpawnMenu();
 	Money = StartMoney;
 	Hour = FMath::Fmod(StartHour, 24.f);
 	GameTime = 0.f;
@@ -221,6 +329,15 @@ void AMTA6GameMode::Tick(float DeltaSeconds)
 
 	GatherMinimapBlips();
 
+	// Karte im Menue: Spielerposition und Blickrichtung nachfuehren
+	if (MapStore)
+	{
+		if (const APawn* P = UGameplayStatics::GetPlayerPawn(this, 0))
+		{
+			MapStore->SetPlayerWorld(FVector2D(P->GetActorLocation().X, P->GetActorLocation().Y), P->GetActorRotation().Yaw);
+		}
+	}
+
 	// Waehrend eines Dialogs ruht die Spiellogik (Godot: _update_game nur ohne Dialog)
 	if (IsDialogOpen())
 	{
@@ -234,6 +351,11 @@ void AMTA6GameMode::Tick(float DeltaSeconds)
 
 void AMTA6GameMode::UpdateLaw(float DeltaSeconds)
 {
+	// Mit aktiver Welt-KI uebernimmt der Manager Abkuehlung und Festnahme (OnArrested -> Bust).
+	if (WorldAI)
+	{
+		return;
+	}
 	const AMTAVehiclePawn* Vehicle = GetPlayerVehicle();
 	const APawn* PlayerPawn = Vehicle ? Vehicle : UGameplayStatics::GetPlayerPawn(this, 0);
 	if (!PlayerPawn)

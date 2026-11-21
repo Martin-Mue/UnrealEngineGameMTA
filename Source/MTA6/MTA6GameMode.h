@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "MTAMenuTypes.h"
 #include "MTAMinimapTypes.h"
 #include "MTA6GameMode.generated.h"
 
@@ -33,6 +34,36 @@ public:
 
 	/** Erzeugt das Startauto neben der Startposition. */
 	void SpawnStartVehicle();
+
+	/** Verkehr, Fussgaenger und Polizei (Simulation und Darstellung). */
+	UPROPERTY(BlueprintReadOnly, Category = "MTA6|AI")
+	TObjectPtr<class AMTAWorldAIManager> WorldAI;
+
+	/** Startet die Welt-KI und bindet Treffer, Festnahme und Minimap an. */
+	void SpawnWorldAI();
+
+	UFUNCTION()
+	void HandlePlayerHitByAI(float Damage, float Impulse, FVector Dir);
+
+	UFUNCTION()
+	void HandleArrested();
+
+	/** Liefert die KI-Agenten als Minimap-Punkte. */
+	void GatherAIBlips(TArray<FMTAMinimapBlip>& OutBlips);
+
+	/** Menue (Esc = Pause, M = Karte, J = Journal, F6 = Fotomodus) und Datenspeicher der Karte. */
+	UPROPERTY(BlueprintReadOnly, Category = "MTA6|UI")
+	TObjectPtr<class AMTAMenuController> Menu;
+
+	UPROPERTY()
+	TObjectPtr<class UMTAMapDataStore> MapStore;
+
+	void SpawnMenu();
+	void HandleMenuSave(FString Slot);
+	void HandleMenuLoad(FString Slot);
+	void HandleMenuNew();
+	void HandleMenuQuit();
+	void FillSlotInfos(TArray<FMTASaveSlotInfo>& OutSlots);
 	virtual void RestartPlayer(AController* NewPlayer) override;
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaSeconds) override;
