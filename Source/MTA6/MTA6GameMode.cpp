@@ -4,6 +4,14 @@
 #include "MTAHeatSubsystem.h"
 #include "MTAHUD.h"
 #include "EngineUtils.h"
+#include "MTAAudioAmbienceSubsystem.h"
+#include "MTAInteriorSubsystem.h"
+#include "MTABuildingEntry.h"
+#include "MTADiscoverySubsystem.h"
+#include "MTAEconomySubsystem.h"
+#include "MTAProgressionTypes.h"
+#include "MTARadioSubsystem.h"
+#include "MTAWeatherManager.h"
 #include "HAL/PlatformMisc.h"
 #include "Misc/CommandLine.h"
 #include "Misc/Parse.h"
@@ -153,6 +161,129 @@ void AMTA6GameMode::SpawnDialogueNPCs()
 	UE_LOG(LogTemp, Display, TEXT("MTA6: %d ansprechbare NPCs erzeugt"), Spawned);
 }
 
+void AMTA6GameMode::SetupWorldSystems()
+{
+	UGameInstance* GI = GetGameInstance();
+	Weather = AMTAWeatherManager::GetOrSpawn(this);
+	if (GI)
+	{
+		if (UMTARadioSubsystem* Radio = GI->GetSubsystem<UMTARadioSubsystem>())
+		{
+			Radio->TurnOn();
+		}
+	}
+}
+
+void AMTA6GameMode::TickWorldSystems(float DeltaSeconds)
+{
+	UGameInstance* GI = GetGameInstance();
+	UWorld* World = GetWorld();
+	if (!GI || !World)
+	{
+		return;
+	}
+	const float HoursPassed = DeltaSeconds / FMath::Max(0.1f, SecondsPerGameHour);
+	if (UMTAEconomySubsystem* Econ = GI->GetSubsystem<UMTAEconomySubsystem>())
+	{
+		Econ->AdvanceTime(HoursPassed);
+	}
+
+	// Die uebrigen Systeme muessen nicht in jedem Frame aktualisiert werden.
+	WorldSystemsTimer += DeltaSeconds;
+	if (WorldSystemsTimer < 0.5f)
+	{
+		return;
+	}
+	const float Dt = WorldSystemsTimer;
+	WorldSystemsTimer = 0.f;
+
+	const APawn* Player = UGameplayStatics::GetPlayerPawn(this, 0);
+	const FVector Loc = Player ? Player->GetActorLocation() : StartLocation;
+	const int32 Day = FMath::FloorToInt(GameTime / (24.f * FMath::Max(0.1f, SecondsPerGameHour)));
+	const AMTACityGenerator* City = AMTACityGenerator::FindCityGenerator(this);
+	const EMTADistrict District = City ? City->GetDistrictAtLocation(Loc) : EMTADistrict::Core;
+	const FName DistrictId = MTAProgression::DistrictToId(District);
+
+	if (Weather)
+	{
+		Weather->SetGameHour(Hour);
+		Weather->SetDistrict(DistrictId);
+	}
+	if (UMTARadioSubsystem* Radio = GI->GetSubsystem<UMTARadioSubsystem>())
+	{
+		Radio->SetGameHour(Hour);
+		Radio->SetDistrict(DistrictId);
+		Radio->SetWantedLevel(GetWantedStars());
+	}
+	if (UMTAAmbienceSubsystem* Ambience = World->GetSubsystem<UMTAAmbienceSubsystem>())
+	{
+		Ambience->SetListenerContext(District, Hour, 16.f, false);
+	}
+	if (UMTANPCSubsystem* Npcs = GI->GetSubsystem<UMTANPCSubsystem>())
+	{
+		Npcs->SetGameTime(Day, Hour);
+		Npcs->SetPlayerDistrict(DistrictId);
+	}
+	if (UMTADiscoverySubsystem* Disc = GI->GetSubsystem<UMTADiscoverySubsystem>())
+	{
+		Disc->SetEnvironment(Hour, Day, FName("clear"));
+		Disc->UpdatePlayer(Loc, Dt);
+		const int32 Reward = Disc->ConsumeMoney();
+		if (Reward != 0)
+		{
+			AddMoney(Reward);
+			ShowToast(FString::Printf(TEXT("Entdeckung! +$%d"), Reward));
+		}
+		const FString Effects = Disc->ConsumeStoryEffectsJson();
+		if (!Effects.IsEmpty() && Effects != TEXT("[]"))
+		{
+			if (UMTAStorySubsystem* Story = GI->GetSubsystem<UMTAStorySubsystem>())
+			{
+				Story->ApplyEffectsJson(Effects);
+			}
+		}
+	}
+}
+
+void AMTA6GameMode::SpawnEnterableBuildings()
+{
+	UWorld* World = GetWorld();
+	const AMTACityGenerator* City = AMTACityGenerator::FindCityGenerator(this);
+	if (!World || !City)
+	{
+		return;
+	}
+	// Naechste Kreuzung zum Startpunkt
+	const int32 IX = FMath::Clamp(MTACity::NearestLine(StartLocation.X), 0, MTACity::Blocks);
+	const int32 IY = FMath::Clamp(MTACity::NearestLine(StartLocation.Y), 0, MTACity::Blocks);
+	const FVector Crossing = City->GetIntersectionLocation(IX, IY);
+
+	int32 Count = 0;
+	for (int32 DX = -1; DX <= 0; ++DX)
+	{
+		for (int32 DY = -1; DY <= 0; ++DY)
+		{
+			const int32 BX = IX + DX;
+			const int32 BY = IY + DY;
+			if (BX < 0 || BY < 0 || BX >= MTACity::Blocks || BY >= MTACity::Blocks)
+			{
+				continue;
+			}
+			const FVector BlockCenter = City->GetBlockCenterLocation(BX, BY);
+			FVector ToCrossing = Crossing - BlockCenter;
+			ToCrossing.Z = 0.f;
+			const FVector Street = ToCrossing.GetSafeNormal();
+			const FVector LotCenter = BlockCenter + Street * 1600.f;
+			if (AMTABuildingEntry::SpawnForLot(World, FVector(LotCenter.X, LotCenter.Y, 30.f), FVector2D(2400.f, 2400.f), 1500.f,
+				Street, City->GetBlockDistrict(BX, BY), 100 + BX * 10 + BY))
+			{
+				++Count;
+			}
+		}
+	}
+	UE_LOG(LogTemp, Display, TEXT("MTA6: %d begehbare Gebaeude erzeugt"), Count);
+}
+
 void AMTA6GameMode::RunSelfTest()
 {
 	UWorld* World = GetWorld();
@@ -199,6 +330,22 @@ void AMTA6GameMode::RunSelfTest()
 		}
 		UE_LOG(LogTemp, Display, TEXT("SELFTEST Gespraech: %d Schritte bis zum Ende"), Steps);
 		Check(TEXT("Gespraech endet"), !Dialog->IsInConversation());
+	}
+
+	// 2b) Weltsysteme und begehbare Gebaeude
+	Check(TEXT("Wetter-Manager"), Weather != nullptr);
+	Check(TEXT("Radio-Subsystem"), GI && GI->GetSubsystem<UMTARadioSubsystem>() != nullptr);
+	Check(TEXT("Entdeckungs-Subsystem"), GI && GI->GetSubsystem<UMTADiscoverySubsystem>() != nullptr);
+	Check(TEXT("Wirtschafts-Subsystem"), GI && GI->GetSubsystem<UMTAEconomySubsystem>() != nullptr);
+	TArray<AMTABuildingEntry*> Entries;
+	for (TActorIterator<AMTABuildingEntry> It(World); It; ++It) { Entries.Add(*It); }
+	Check(TEXT("begehbare Gebaeude vorhanden"), Entries.Num() >= 1);
+	UMTAInteriorSubsystem* Interiors = UMTAInteriorSubsystem::Get(this);
+	Check(TEXT("Innenraum-Subsystem"), Interiors != nullptr);
+	if (Hero && Interiors && Entries.Num() > 0)
+	{
+		const bool bEntered = Interiors->EnterInterior(Cast<APawn>(Hero), Entries[0], 0);
+		UE_LOG(LogTemp, Display, TEXT("SELFTEST Betreten (Gebaeude %s): %s"), *Entries[0]->GetName(), bEntered ? TEXT("ja") : TEXT("nein (z. B. verschlossen)"));
 	}
 
 	// 3) Speichern und Laden
@@ -335,6 +482,8 @@ void AMTA6GameMode::BeginPlay()
 	SpawnStartVehicle();
 	SpawnWorldAI();
 	SpawnDialogueNPCs();
+	SpawnEnterableBuildings();
+	SetupWorldSystems();
 	SpawnMenu();
 	if (FParse::Param(FCommandLine::Get(), TEXT("MTA6SelfTest")))
 	{
@@ -511,6 +660,7 @@ void AMTA6GameMode::Tick(float DeltaSeconds)
 	}
 
 	GameTime += DeltaSeconds;
+	TickWorldSystems(DeltaSeconds);
 	UpdateLaw(DeltaSeconds);
 	UpdateWreck(DeltaSeconds);
 }

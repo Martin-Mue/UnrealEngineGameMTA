@@ -61,6 +61,18 @@ public:
 	/** Erzeugt die ansprechbaren Schluessel-NPCs (nur Figuren mit Dialog) in ihren Bezirken. */
 	void SpawnDialogueNPCs();
 
+	/** Wetter, Radio, Wirtschaft, Entdeckungen, NPC-Zeit und Umgebungsklang laufen mit der Spielzeit. */
+	void SetupWorldSystems();
+	void TickWorldSystems(float DeltaSeconds);
+
+	/** Einige begehbare Gebaeude (Innenraeume) rund um den Startpunkt. */
+	void SpawnEnterableBuildings();
+
+	UPROPERTY(BlueprintReadOnly, Category = "MTA6|World")
+	TObjectPtr<class AMTAWeatherManager> Weather;
+
+	float WorldSystemsTimer = 0.f;
+
 	/** Automatischer Selbsttest (Start mit Parameter -MTA6SelfTest): prueft Kernfunktionen und beendet das Spiel. */
 	void RunSelfTest();
 	FTimerHandle SelfTestHandle;
