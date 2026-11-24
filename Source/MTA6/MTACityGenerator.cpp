@@ -36,6 +36,37 @@ namespace
 	const TCHAR* const DefaultMetalMaterial    = TEXT("/Game/MTA6/Materials/M_MTA_Metal.M_MTA_Metal");
 	const TCHAR* const DefaultTrunkMaterial    = TEXT("/Game/MTA6/Materials/M_MTA_TreeTrunk.M_MTA_TreeTrunk");
 	const TCHAR* const DefaultFoliageMaterial  = TEXT("/Game/MTA6/Materials/M_MTA_Foliage.M_MTA_Foliage");
+	const TCHAR* const DefaultRoofMaterial     = TEXT("/Game/MTA6/Materials/M_MTA_Roof.M_MTA_Roof");
+
+	/** Wurzel aus 2 (Dachprismen: Wuerfel um 45 Grad gerollt). */
+	constexpr float Sqrt2 = 1.41421356f;
+
+	/** Weiche Landzungen-Funktion: 0 bis Start, danach etwa linear mit Slope (ohne Knick). */
+	float HeadlandOffset(float AbsX, float Start, float Slope)
+	{
+		const float D = FMath::Max(0.f, AbsX - Start);
+		return Slope * D * D / (D + 10000.f);
+	}
+
+	/** Gemeinsame Custom-Data eines Gebaeudeteils (MTABuildingData). */
+	void FillBuildingData(float* Data, const FLinearColor& Tint, float HeightCm, float WindowSeed, float Wear, float Lit,
+		EMTABuildingStyle Style, EMTADistrict District, float Neon, float Detail, const FLinearColor& Accent)
+	{
+		Data[MTABuildingData::TintR] = Tint.R;
+		Data[MTABuildingData::TintG] = Tint.G;
+		Data[MTABuildingData::TintB] = Tint.B;
+		Data[MTABuildingData::HeightMeters] = HeightCm / 100.f;
+		Data[MTABuildingData::WindowSeed] = WindowSeed;
+		Data[MTABuildingData::Wear] = Wear;
+		Data[MTABuildingData::LitRatio] = Lit;
+		Data[MTABuildingData::Style] = static_cast<float>(static_cast<uint8>(Style));
+		Data[MTABuildingData::District] = static_cast<float>(static_cast<uint8>(District));
+		Data[MTABuildingData::Neon] = Neon;
+		Data[MTABuildingData::Detail] = Detail;
+		Data[MTABuildingData::AccentR] = Accent.R;
+		Data[MTABuildingData::AccentG] = Accent.G;
+		Data[MTABuildingData::AccentB] = Accent.B;
+	}
 
 	/** Engine-Grundkoerper sind 100 cm gross und mittig gepivotet. */
 	constexpr float ShapeSize = 100.f;
@@ -127,6 +158,9 @@ AMTACityGenerator::AMTACityGenerator()
 	LampHeads   = MakeHISM(TEXT("LampHeads"));
 	TreeTrunks  = MakeHISM(TEXT("TreeTrunks"));
 	TreeCrowns  = MakeHISM(TEXT("TreeCrowns"));
+	PitchedRoofs = MakeHISM(TEXT("PitchedRoofs"));
+
+	PlazaDistricts = { EMTADistrict::LanternHill, EMTADistrict::Greenmoor };
 
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CubeFinder(TEXT("/Engine/BasicShapes/Cube.Cube"));
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderFinder(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
@@ -172,7 +206,7 @@ void AMTACityGenerator::EndPlay(const EEndPlayReason::Type EndPlayReason)
 void AMTACityGenerator::Clear()
 {
 	for (UHierarchicalInstancedStaticMeshComponent* Comp : { GroundTiles.Get(), Sidewalks.Get(), ParkLawns.Get(), Buildings.Get(), RoofDetails.Get(),
-		Antennas.Get(), Chimneys.Get(), LampPoles.Get(), LampHeads.Get(), TreeTrunks.Get(), TreeCrowns.Get() })
+		Antennas.Get(), Chimneys.Get(), LampPoles.Get(), LampHeads.Get(), TreeTrunks.Get(), TreeCrowns.Get(), PitchedRoofs.Get() })
 	{
 		if (Comp)
 		{
@@ -183,6 +217,9 @@ void AMTACityGenerator::Clear()
 	BlockDistricts.Reset();
 	LampPositions.Reset();
 	LampColors.Reset();
+	CityLots.Reset();
+	DistrictPlazaBlocks.Reset();
+	LandmarkBlockIndex = INDEX_NONE;
 	GeneratedBuildingCount = 0;
 	LastLampViewLocation = FVector(TNumericLimits<float>::Max());
 	LastNightAlpha = -1.f;
@@ -213,6 +250,7 @@ void AMTACityGenerator::Generate()
 	Ctx.Building.NumCustom = MTABuildingData::Num;
 	Ctx.Head.NumCustom = MTAPropData::Num;
 	Ctx.Crown.NumCustom = MTAPropData::Num;
+	Ctx.Pitched.NumCustom = MTAPropData::Num;
 
 	if (bGenerateGround)
 	{
@@ -220,6 +258,8 @@ void AMTACityGenerator::Generate()
 	}
 
 	const int32 LandmarkBlock = bSpawnLandmarks ? FindLandmarkBlock() : INDEX_NONE;
+	LandmarkBlockIndex = LandmarkBlock;
+	ComputePlazaBlocks();
 	for (int32 BY = 0; BY < BlocksY; ++BY)
 	{
 		for (int32 BX = 0; BX < BlocksX; ++BX)
@@ -245,6 +285,8 @@ void AMTACityGenerator::Generate()
 	ConfigureComponent(LampHeads, CubeMesh, ResolveMaterial(LampMaterial, DefaultLampMaterial), false, false, LampCullDistance * 2, MTAPropData::Num, false);
 	ConfigureComponent(TreeTrunks, CylinderMesh, ResolveMaterial(TreeTrunkMaterial, DefaultTrunkMaterial), true, PropShadow, TreeCullDistance, 0, false);
 	ConfigureComponent(TreeCrowns, SphereMesh, ResolveMaterial(FoliageMaterial, DefaultFoliageMaterial), false, true, TreeCullDistance, MTAPropData::Num, false);
+	// Daecher gehoeren zur Silhouette: keine Sichtweitengrenze, Schatten an, keine Kollision (liegen im Gebaeude).
+	ConfigureComponent(PitchedRoofs, CubeMesh, ResolveMaterial(RoofMaterial, DefaultRoofMaterial), false, true, BuildingCullDistance, MTAPropData::Num, false);
 
 	// Die Leuchtkrone der Landmarke liegt in LampHeads und soll weit sichtbar sein.
 	if (bSpawnLandmarks && LandmarkBlock != INDEX_NONE)
@@ -263,8 +305,19 @@ void AMTACityGenerator::Generate()
 	ApplyBatch(LampHeads, Ctx.Head);
 	ApplyBatch(TreeTrunks, Ctx.Trunk);
 	ApplyBatch(TreeCrowns, Ctx.Crown);
+	ApplyBatch(PitchedRoofs, Ctx.Pitched);
 
 	GeneratedBuildingCount = Ctx.Building.Transforms.Num();
+
+	// Parzellen in Weltkoordinaten ablegen (der Generator wird nur verschoben, nicht gedreht).
+	const FVector Origin = GetActorLocation();
+	CityLots = MoveTemp(Ctx.Lots);
+	for (FMTACityLot& Lot : CityLots)
+	{
+		Lot.Center += FVector2D(Origin.X, Origin.Y);
+		Lot.BaseZ += static_cast<float>(Origin.Z);
+		Lot.RoofTopZ += static_cast<float>(Origin.Z);
+	}
 
 	UE_LOG(LogMTACity, Log, TEXT("%s: Stadt erzeugt (Seed %d, %dx%d Bloecke): %d Gebaeudeteile, %d Laternen, %d Baeume, %.1f ms."),
 		*GetName(), Seed, BlocksX, BlocksY, GeneratedBuildingCount, LampPositions.Num(), Ctx.Trunk.Transforms.Num(),
@@ -359,6 +412,11 @@ void AMTACityGenerator::ResolveProfiles(TArray<FMTADistrictProfile>& OutProfiles
 			{
 				P.Palette = MTADistrict::MakeDefaultProfile(static_cast<EMTADistrict>(D)).Palette;
 			}
+			if (P.LookVersion < MTADistrict::CurrentLookVersion)
+			{
+				// Profil aus aelterem Level/Editor: Look-Felder (Dach, Neon, Moeblierung) vom Standard uebernehmen.
+				MTADistrict::CopyLookFields(MTADistrict::MakeDefaultProfile(static_cast<EMTADistrict>(D)), P);
+			}
 			P.MaxHeight = FMath::Max(P.MaxHeight, P.MinHeight);
 			OutProfiles.Add(MoveTemp(P));
 		}
@@ -374,7 +432,12 @@ FMTADistrictProfile AMTACityGenerator::GetDistrictProfile(EMTADistrict District)
 	const int32 D = static_cast<int32>(District);
 	if (DistrictProfiles.IsValidIndex(D))
 	{
-		return DistrictProfiles[D];
+		FMTADistrictProfile P = DistrictProfiles[D];
+		if (P.LookVersion < MTADistrict::CurrentLookVersion)
+		{
+			MTADistrict::CopyLookFields(MTADistrict::MakeDefaultProfile(District), P);
+		}
+		return P;
 	}
 	return MTADistrict::MakeDefaultProfile(District);
 }
@@ -442,6 +505,145 @@ int32 AMTACityGenerator::FindLandmarkBlock() const
 	return Best;
 }
 
+void AMTACityGenerator::ComputePlazaBlocks()
+{
+	DistrictPlazaBlocks.Init(FIntPoint(-1, -1), MTADistrict::Num());
+	if (!bReserveDistrictPlazas)
+	{
+		return;
+	}
+	for (const EMTADistrict District : PlazaDistricts)
+	{
+		const int32 D = static_cast<int32>(District);
+		if (!DistrictPlazaBlocks.IsValidIndex(D))
+		{
+			continue;
+		}
+		// Schwerpunkt der Bezirksbloecke; der naechstgelegene Block wird Platz (deterministisch).
+		FVector2D Sum = FVector2D::ZeroVector;
+		int32 Count = 0;
+		for (int32 BY = 0; BY < BlocksY; ++BY)
+		{
+			for (int32 BX = 0; BX < BlocksX; ++BX)
+			{
+				const int32 Index = BX + BY * BlocksX;
+				if (BlockDistricts.IsValidIndex(Index) && BlockDistricts[Index] == District && Index != LandmarkBlockIndex)
+				{
+					Sum += FVector2D(BX, BY);
+					++Count;
+				}
+			}
+		}
+		if (Count == 0)
+		{
+			continue;
+		}
+		const FVector2D Mean = Sum / Count;
+		double Best = TNumericLimits<double>::Max();
+		for (int32 BY = 0; BY < BlocksY; ++BY)
+		{
+			for (int32 BX = 0; BX < BlocksX; ++BX)
+			{
+				const int32 Index = BX + BY * BlocksX;
+				if (!BlockDistricts.IsValidIndex(Index) || BlockDistricts[Index] != District || Index == LandmarkBlockIndex)
+				{
+					continue;
+				}
+				const double Dist = FVector2D::DistSquared(FVector2D(BX, BY), Mean);
+				if (Dist < Best - 1.0e-6)
+				{
+					Best = Dist;
+					DistrictPlazaBlocks[D] = FIntPoint(BX, BY);
+				}
+			}
+		}
+	}
+}
+
+bool AMTACityGenerator::IsPlazaBlock(int32 BX, int32 BY) const
+{
+	return DistrictPlazaBlocks.Contains(FIntPoint(BX, BY));
+}
+
+void AMTACityGenerator::BuildPlaza(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, const FMTADistrictProfile& Profile, EMTADistrict District) const
+{
+	const float Inner = BlockPeriod - RoadWidth;
+	if (District == EMTADistrict::Greenmoor)
+	{
+		// Country-Club-Rasen (Wasserturm steht in der Mitte).
+		const float LawnSize = FMath::Max(200.f, Inner - 2.f * FMath::Min(SidewalkWidth, 400.f));
+		const float Data[MTAPropData::Num] = { Profile.FoliageColor.R, Profile.FoliageColor.G, Profile.FoliageColor.B,
+			static_cast<float>(static_cast<uint8>(District)), Profile.Wear };
+		Ctx.Park.Add(BoxTransform(FVector(Center.X, Center.Y, CurbHeight + 5.f), FVector(LawnSize, LawnSize, 10.f)), Data);
+	}
+	// Baumring am Rand, Mitte bleibt fuer die Landmarke frei.
+	const float R = Inner * 0.5f - 700.f;
+	for (int32 I = 0; I < 8; ++I)
+	{
+		const float A = I * UE_TWO_PI / 8.f + UE_PI / 8.f;
+		AddTree(Ctx, Rng, Center + FVector2D(FMath::Cos(A), FMath::Sin(A)) * R, Profile, District, District == EMTADistrict::Sunstrip);
+	}
+}
+
+float AMTACityGenerator::CoastStripStep() const
+{
+	const int32 StripsPerTile = FMath::Max(1, FMath::RoundToInt(GroundTileSize / FMath::Max(500.f, CoastStripWidth)));
+	return GroundTileSize / StripsPerTile;
+}
+
+float AMTACityGenerator::GetGroundHalfSize() const
+{
+	const int32 Tiles = FMath::Max(1, FMath::CeilToInt(2.f * GroundExtent / GroundTileSize));
+	return Tiles * GroundTileSize * 0.5f;
+}
+
+FVector2D AMTACityGenerator::GetCityHalfExtent() const
+{
+	return FVector2D(BlocksX * BlockPeriod * 0.5f, BlocksY * BlockPeriod * 0.5f);
+}
+
+float AMTACityGenerator::GetCoastLocalY(float LocalX, bool bStepped) const
+{
+	float X = LocalX;
+	if (bStepped)
+	{
+		// Mitte des Bodenstreifens, in dem LocalX liegt (gleiches Raster wie BuildGround).
+		const float GroundHalf = GetGroundHalfSize();
+		const float Step = CoastStripStep();
+		X = -GroundHalf + (FMath::FloorToFloat((LocalX + GroundHalf) / Step) + 0.5f) * Step;
+	}
+	const float BaseY = -(BlocksY * BlockPeriod * 0.5f + CoastOffset);
+	return BaseY - HeadlandOffset(FMath::Abs(X), BayHeadlandStart, BayHeadlandSlope);
+}
+
+float AMTACityGenerator::GetCoastWorldY(float WorldX, bool bStepped) const
+{
+	const FVector Origin = GetActorLocation();
+	return GetCoastLocalY(WorldX - static_cast<float>(Origin.X), bStepped) + static_cast<float>(Origin.Y);
+}
+
+bool AMTACityGenerator::GetDistrictPlaza(EMTADistrict District, FVector& OutCenter, float& OutInnerSize) const
+{
+	const int32 D = static_cast<int32>(District);
+	if (!DistrictPlazaBlocks.IsValidIndex(D) || DistrictPlazaBlocks[D].X < 0)
+	{
+		return false;
+	}
+	OutCenter = GetBlockCenterLocation(DistrictPlazaBlocks[D].X, DistrictPlazaBlocks[D].Y);
+	OutInnerSize = BlockPeriod - RoadWidth;
+	return true;
+}
+
+bool AMTACityGenerator::GetLandmarkTowerLocation(FVector& OutBase) const
+{
+	if (LandmarkBlockIndex == INDEX_NONE || BlocksX <= 0)
+	{
+		return false;
+	}
+	OutBase = GetBlockCenterLocation(LandmarkBlockIndex % BlocksX, LandmarkBlockIndex / BlocksX);
+	return true;
+}
+
 FVector2D AMTACityGenerator::LocalBlockCenter(int32 BX, int32 BY) const
 {
 	return FVector2D(LocalRoadCenter(0, BX) + BlockPeriod * 0.5f, LocalRoadCenter(1, BY) + BlockPeriod * 0.5f);
@@ -486,13 +688,49 @@ void AMTACityGenerator::BuildGround(FBuildContext& Ctx) const
 
 	const int32 Tiles = FMath::Max(1, FMath::CeilToInt(2.f * GroundExtent / GroundTileSize));
 	const float Start = -Tiles * GroundTileSize * 0.5f + GroundTileSize * 0.5f;
+	const float HalfTile = GroundTileSize * 0.5f;
+	const int32 StripsPerTile = FMath::Max(1, FMath::RoundToInt(GroundTileSize / FMath::Max(500.f, CoastStripWidth)));
+	const float StripW = GroundTileSize / StripsPerTile;
 	for (int32 Y = 0; Y < Tiles; ++Y)
 	{
 		for (int32 X = 0; X < Tiles; ++X)
 		{
 			// Oberkante bei Z = 0, 100 cm dick (verhindert Durchrutschen bei hohen Geschwindigkeiten).
 			const FVector Center(Start + X * GroundTileSize, Start + Y * GroundTileSize, -50.f);
-			Ctx.Ground.Add(BoxTransform(Center, FVector(GroundTileSize, GroundTileSize, 100.f)), GroundData);
+			if (!bGenerateCoast)
+			{
+				Ctx.Ground.Add(BoxTransform(Center, FVector(GroundTileSize, GroundTileSize, 100.f)), GroundData);
+				continue;
+			}
+
+			// Kueste: Meer liegt westlich der Linie. Die Linie liegt am weitesten oestlich bei |X| minimal.
+			const float X0 = static_cast<float>(Center.X) - HalfTile;
+			const float X1 = static_cast<float>(Center.X) + HalfTile;
+			const float Y0 = static_cast<float>(Center.Y) - HalfTile;
+			const float Y1 = static_cast<float>(Center.Y) + HalfTile;
+			const float CoastEast = GetCoastLocalY(FMath::Clamp(0.f, X0, X1), false);
+			const float CoastWest = FMath::Min(GetCoastLocalY(X0, false), GetCoastLocalY(X1, false));
+			if (Y0 >= CoastEast + 1.f)
+			{
+				Ctx.Ground.Add(BoxTransform(Center, FVector(GroundTileSize, GroundTileSize, 100.f)), GroundData);
+				continue;
+			}
+			if (Y1 <= CoastWest - StripW)
+			{
+				continue; // komplett Meer
+			}
+			// Angeschnittene Kachel: in Streifen entlang X zerlegen, jeder Streifen endet an der (gestuften) Kueste.
+			for (int32 S = 0; S < StripsPerTile; ++S)
+			{
+				const float SX = X0 + (S + 0.5f) * StripW;
+				const float Cut = FMath::Max(Y0, GetCoastLocalY(SX, true));
+				if (Cut >= Y1 - 1.f)
+				{
+					continue;
+				}
+				const float Len = Y1 - Cut;
+				Ctx.Ground.Add(BoxTransform(FVector(SX, Cut + Len * 0.5f, -50.f), FVector(StripW, Len, 100.f)), GroundData);
+			}
 		}
 	}
 
@@ -525,6 +763,12 @@ void AMTACityGenerator::BuildBlock(FBuildContext& Ctx, int32 BX, int32 BY, bool 
 		BuildStreetTrees(Ctx, Rng, Center, Profile, District);
 		return;
 	}
+	if (IsPlazaBlock(BX, BY))
+	{
+		// Reservierter Platz: Landmarke setzt AMTAWorldDetail.
+		BuildPlaza(Ctx, Rng, Center, Profile, District);
+		return;
+	}
 
 	// Landnutzung: Park, Industrie oder Bebauung (Reihenfolge fest, damit der Seed stabil bleibt).
 	const float ParkRoll = Rng.FRand();
@@ -536,7 +780,14 @@ void AMTACityGenerator::BuildBlock(FBuildContext& Ctx, int32 BX, int32 BY, bool 
 	}
 	if (IndustryRoll < Profile.IndustrialChance)
 	{
+		const int32 FirstLot = Ctx.Lots.Num();
 		BuildIndustrialBlock(Ctx, Rng, Center, Profile, District);
+		// Blockindex nachtragen (BuildIndustrialBlock kennt nur die Blockmitte).
+		for (int32 I = FirstLot; I < Ctx.Lots.Num(); ++I)
+		{
+			Ctx.Lots[I].Block = FIntPoint(BX, BY);
+			Ctx.Lots[I].Seed = BlockSeed(Seed, BX, BY, 200 + I - FirstLot);
+		}
 		BuildStreetTrees(Ctx, Rng, Center, Profile, District);
 		return;
 	}
@@ -547,7 +798,8 @@ void AMTACityGenerator::BuildBlock(FBuildContext& Ctx, int32 BX, int32 BY, bool 
 	struct FLot { FVector2D C; double W; double D; };
 	TArray<FLot, TInlineAllocator<9>> Lots;
 
-	switch (PickWeighted(Rng, Profile.LotSplitWeights))
+	const int32 Split = PickWeighted(Rng, Profile.LotSplitWeights);
+	switch (Split)
 	{
 	case 0: // ein grosses Gebaeude
 		Lots.Add({ Center, B * Rng.FRandRange(0.74f, 1.f), B * Rng.FRandRange(0.74f, 1.f) });
@@ -585,12 +837,14 @@ void AMTACityGenerator::BuildBlock(FBuildContext& Ctx, int32 BX, int32 BY, bool 
 		break;
 	}
 
-	for (const FLot& Lot : Lots)
+	for (int32 LotIndex = 0; LotIndex < Lots.Num(); ++LotIndex)
 	{
+		const FLot& Lot = Lots[LotIndex];
 		// Zufallswerte immer ziehen (auch bei leeren Parzellen), damit die Folge stabil bleibt.
 		const bool bEmpty = Rng.FRand() < Profile.EmptyLotChance;
 		const float H = ComputeBuildingHeight(Rng, Lot.C, Profile);
 		const FLinearColor Tint = Profile.Palette[Rng.RandHelper(Profile.Palette.Num())];
+		FMTACityLot Record = MakeLot(Lot.C, Center, Lot.W, Lot.D, BX, BY, District, LotIndex, Split == 0);
 		if (bEmpty)
 		{
 			// Leere Parzelle: in gruenen Bezirken ein Gartenbaum, sonst Brache.
@@ -598,6 +852,10 @@ void AMTACityGenerator::BuildBlock(FBuildContext& Ctx, int32 BX, int32 BY, bool 
 			{
 				AddTree(Ctx, Rng, Lot.C, Profile, District, District == EMTADistrict::Sunstrip);
 			}
+			Record.bEmpty = true;
+			Record.Height = 0.f;
+			Record.RoofTopZ = CurbHeight;
+			Ctx.Lots.Add(Record);
 			continue;
 		}
 		EMTABuildingStyle Style = Profile.PrimaryStyle;
@@ -605,52 +863,189 @@ void AMTACityGenerator::BuildBlock(FBuildContext& Ctx, int32 BX, int32 BY, bool 
 		{
 			Style = EMTABuildingStyle::GlassSteel;
 		}
-		AddBuilding(Ctx, Rng, Lot.C, Lot.W, Lot.D, H, Tint, Profile, Style, CurbHeight);
+		Record.Height = H;
+		Record.Style = Style;
+		AddBuilding(Ctx, Rng, Lot.C, Lot.W, Lot.D, H, Tint, Profile, District, Style, CurbHeight, &Record);
+		Ctx.Lots.Add(Record);
 	}
 	BuildStreetTrees(Ctx, Rng, Center, Profile, District);
 }
 
 void AMTACityGenerator::AddBuilding(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, float Width, float Depth, float Height,
-	const FLinearColor& Tint, const FMTADistrictProfile& Profile, EMTABuildingStyle Style, float ZBase) const
+	const FLinearColor& Tint, const FMTADistrictProfile& Profile, EMTADistrict District, EMTABuildingStyle Style, float ZBase,
+	FMTACityLot* OutLot) const
 {
-	auto PushBox = [&](const FVector2D& C, float W, float D, float H, float Z0, const FLinearColor& Color, float TotalHeight)
+	// Bezirks-Look: Neon-Ladenband nur bei einem Teil der Gebaeude, Staerke variiert.
+	const float NeonRoll = Rng.FRand();
+	const float Neon = (NeonRoll < Profile.NeonShare && Style != EMTABuildingStyle::Villa) ? Rng.FRandRange(0.5f, 1.f) : 0.f;
+	const float Detail = FMath::Clamp(Profile.FacadeDetail + Rng.FRandRange(-0.15f, 0.15f), 0.f, 1.f);
+
+	auto PushBox = [&](const FVector2D& C, float W, float D, float H, float Z0, const FLinearColor& Color, float TotalHeight, float BoxNeon)
 	{
 		float Data[MTABuildingData::Num];
-		Data[MTABuildingData::TintR] = Color.R;
-		Data[MTABuildingData::TintG] = Color.G;
-		Data[MTABuildingData::TintB] = Color.B;
-		Data[MTABuildingData::HeightMeters] = TotalHeight / 100.f;
-		Data[MTABuildingData::WindowSeed] = static_cast<float>(Rng.RandRange(0, 9999));
-		Data[MTABuildingData::Wear] = FMath::Clamp(Profile.Wear + Rng.FRandRange(-0.1f, 0.1f), 0.f, 1.f);
-		Data[MTABuildingData::LitRatio] = Profile.LitWindowRatio;
-		Data[MTABuildingData::Style] = static_cast<float>(static_cast<uint8>(Style));
+		FillBuildingData(Data, Color, TotalHeight, static_cast<float>(Rng.RandRange(0, 9999)),
+			FMath::Clamp(Profile.Wear + Rng.FRandRange(-0.1f, 0.1f), 0.f, 1.f), Profile.LitWindowRatio, Style, District,
+			BoxNeon, Detail, Profile.AccentColor);
 		Ctx.Building.Add(BoxTransform(FVector(C.X, C.Y, Z0 + H * 0.5f), FVector(W, D, H)), Data);
 	};
 
-	PushBox(Center, Width, Depth, Height, ZBase, Tint, Height);
+	PushBox(Center, Width, Depth, Height, ZBase, Tint, Height, Neon);
 	const float Top = ZBase + Height;
+	float RoofTop = Top;
+	bool bFlat = true;
 
 	const bool bTower = Height > 3800.f && Style != EMTABuildingStyle::Industrial && Style != EMTABuildingStyle::Villa;
 	if (bTower)
 	{
 		// Zurueckgesetztes Obergeschoss + Antenne (wie im Godot-Prototyp).
+		const bool bSetback = Profile.RoofStyle == EMTARoofStyle::Setback;
 		const float TierH = FMath::Max(FloorHeight, FMath::RoundToFloat(Height * 0.22f / FloorHeight) * FloorHeight);
-		PushBox(Center, Width * 0.7f, Depth * 0.7f, TierH, Top, Darken(Tint, 0.92f), Height + TierH);
+		PushBox(Center, Width * 0.7f, Depth * 0.7f, TierH, Top, Darken(Tint, 0.92f), Height + TierH, 0.f);
+		float CrownTop = Top + TierH;
+		if (bSetback && Height > 6000.f)
+		{
+			// Core: dritte, schmale Stufe -> unverwechselbare Treppen-Silhouette.
+			const float Tier2 = FMath::Max(FloorHeight, FMath::RoundToFloat(Height * 0.1f / FloorHeight) * FloorHeight);
+			PushBox(Center, Width * 0.45f, Depth * 0.45f, Tier2, CrownTop, Darken(Tint, 0.85f), Height + TierH + Tier2, 0.f);
+			CrownTop += Tier2;
+		}
+		if (bSetback)
+		{
+			// Lichtkrone: schmales emissives Band unter der Dachkante der obersten Stufe (LampHeads-Material, nachts an).
+			const float Inset = Height > 6000.f ? 0.45f : 0.7f;
+			const float CrownData[MTAPropData::Num] = { Profile.AccentColor.R, Profile.AccentColor.G, Profile.AccentColor.B,
+				static_cast<float>(static_cast<uint8>(District)), 0.f };
+			Ctx.Head.Add(BoxTransform(FVector(Center.X, Center.Y, CrownTop - 90.f), FVector(Width * Inset + 16.f, Depth * Inset + 16.f, 60.f)), CrownData);
+		}
 		const float AntennaH = Rng.FRandRange(800.f, 1600.f);
-		Ctx.Antenna.Add(FTransform(FRotator::ZeroRotator, FVector(Center.X, Center.Y, Top + TierH + AntennaH * 0.5f),
+		Ctx.Antenna.Add(FTransform(FRotator::ZeroRotator, FVector(Center.X, Center.Y, CrownTop + AntennaH * 0.5f),
 			FVector(0.45f, 0.45f, AntennaH / ShapeSize)));
+		RoofTop = CrownTop + AntennaH;
 	}
 	else
 	{
-		// Klimageraet/Aufbau auf dem Dach.
-		const FVector2D Offset(Width * Rng.FRandRange(-0.25f, 0.25f), Depth * Rng.FRandRange(-0.25f, 0.25f));
-		Ctx.Roof.Add(BoxTransform(FVector(Center.X + Offset.X, Center.Y + Offset.Y, Top + 80.f), FVector(Width * 0.25f, Depth * 0.2f, 160.f)));
-		if (Style == EMTABuildingStyle::Plaster && Rng.FRand() < 0.35f)
+		const float Wear = Profile.Wear;
+		const bool bGable = Style == EMTABuildingStyle::Villa
+			|| (Profile.RoofStyle == EMTARoofStyle::Gable && Style == EMTABuildingStyle::Plaster && Height <= 2500.f
+				&& Rng.FRand() < Profile.PitchedRoofChance);
+		const bool bSaw = Style == EMTABuildingStyle::Industrial && Profile.RoofStyle == EMTARoofStyle::Sawtooth;
+		const float Shade = Rng.FRandRange(0.85f, 1.1f);
+		const FLinearColor RoofCol = Darken(Profile.RoofColor, Shade);
+		if (bGable || bSaw)
 		{
-			// Wassertank auf aelteren Wohnhaeusern (Zylinder).
-			Ctx.Chimney.Add(FTransform(FRotator::ZeroRotator, FVector(Center.X - Offset.X, Center.Y - Offset.Y, Top + 150.f), FVector(2.4f, 2.4f, 3.f)));
+			AddGableRoof(Ctx, Center, Width, Depth, Top, RoofCol, District, Wear, bSaw);
+			RoofTop = bSaw ? Top + FMath::Max(Width, Depth) / FMath::Clamp(FMath::RoundToFloat(FMath::Max(Width, Depth) / 700.f), 2.f, 8.f) * 0.52f
+			               : Top + FMath::Min(Width, Depth) * 0.52f;
+			bFlat = false;
+		}
+		else
+		{
+			// Klimageraet/Aufbau auf dem Dach.
+			const FVector2D Offset(Width * Rng.FRandRange(-0.25f, 0.25f), Depth * Rng.FRandRange(-0.25f, 0.25f));
+			Ctx.Roof.Add(BoxTransform(FVector(Center.X + Offset.X, Center.Y + Offset.Y, Top + 80.f), FVector(Width * 0.25f, Depth * 0.2f, 160.f)));
+			if (Style == EMTABuildingStyle::Plaster && Rng.FRand() < 0.35f)
+			{
+				// Wassertank auf aelteren Wohnhaeusern (Zylinder).
+				Ctx.Chimney.Add(FTransform(FRotator::ZeroRotator, FVector(Center.X - Offset.X, Center.Y - Offset.Y, Top + 150.f), FVector(2.4f, 2.4f, 3.f)));
+			}
+			// Dach-Kleinkram je Bezirk: 0-3 Antennenstaebe.
+			const int32 Sticks = FMath::FloorToInt(Profile.RooftopClutter * 3.f * Rng.FRand() + 0.3f);
+			for (int32 I = 0; I < Sticks; ++I)
+			{
+				const float AH = Rng.FRandRange(250.f, 700.f);
+				const FVector2D P(Center.X + Width * Rng.FRandRange(-0.4f, 0.4f), Center.Y + Depth * Rng.FRandRange(-0.4f, 0.4f));
+				Ctx.Antenna.Add(FTransform(FRotator::ZeroRotator, FVector(P.X, P.Y, Top + AH * 0.5f), FVector(0.12f, 0.12f, AH / ShapeSize)));
+			}
+			RoofTop = Top + 160.f;
 		}
 	}
+
+	if (OutLot)
+	{
+		OutLot->RoofTopZ = RoofTop;
+		OutLot->bFlatRoof = bFlat;
+		OutLot->bTower = bTower;
+		OutLot->bIndustrial = Style == EMTABuildingStyle::Industrial;
+		OutLot->Style = Style;
+		OutLot->Height = Height;
+	}
+}
+
+void AMTACityGenerator::AddGableRoof(FBuildContext& Ctx, const FVector2D& Center, float Width, float Depth, float Top, const FLinearColor& Color,
+	EMTADistrict District, float Wear, bool bSawtooth) const
+{
+	// Ein um 45 Grad um die Firstachse gerollter Wuerfel ergibt im Querschnitt eine Raute; die untere Haelfte liegt
+	// im Gebaeude, sichtbar bleibt ein 45-Grad-Satteldach (TRS-Transformationen koennen nicht scheren).
+	const float Data[MTAPropData::Num] = { Color.R, Color.G, Color.B, static_cast<float>(static_cast<uint8>(District)), Wear };
+	const bool bAlongX = Width >= Depth;
+	const float Long = bAlongX ? Width : Depth;
+	const float Span = bAlongX ? Depth : Width;
+	if (!bSawtooth)
+	{
+		// First entlang der langen Seite, 4 % Ueberstand.
+		const float S = Span / Sqrt2 * 1.04f;
+		const FRotator Rot(0.f, bAlongX ? 0.f : 90.f, 45.f);
+		Ctx.Pitched.Add(FTransform(Rot, FVector(Center.X, Center.Y, Top), FVector(Long * 1.02f, S, S) / ShapeSize), Data);
+		return;
+	}
+	// Sheddach: mehrere kleine Firste quer zur langen Seite.
+	const int32 N = FMath::Clamp(FMath::RoundToInt(Long / 700.f), 2, 8);
+	const float Step = Long / N;
+	const float S = Step / Sqrt2;
+	for (int32 I = 0; I < N; ++I)
+	{
+		const float Along = -Long * 0.5f + Step * (I + 0.5f);
+		const FVector2D P = bAlongX ? Center + FVector2D(Along, 0.f) : Center + FVector2D(0.f, Along);
+		// First quer zur langen Seite: bei bAlongX verlaeuft er entlang Y.
+		const FRotator Rot(0.f, bAlongX ? 90.f : 0.f, 45.f);
+		Ctx.Pitched.Add(FTransform(Rot, FVector(P.X, P.Y, Top), FVector(Span, S, S) / ShapeSize), Data);
+	}
+}
+
+FMTACityLot AMTACityGenerator::MakeLot(const FVector2D& LotCenter, const FVector2D& BlockCenter, double W, double D, int32 BX, int32 BY,
+	EMTADistrict District, int32 LotIndex, bool bSingleLot) const
+{
+	FMTACityLot L;
+	L.Center = LotCenter;
+	L.Size = FVector2D(W, D);
+	L.BaseZ = CurbHeight;
+	L.RoofTopZ = CurbHeight;
+	L.District = District;
+	L.Block = FIntPoint(BX, BY);
+	L.Seed = BlockSeed(Seed, BX, BY, 100 + LotIndex);
+
+	// Strassenfront: Achsen, auf denen die Parzelle aus der Blockmitte verschoben ist, zeigen zur Strasse.
+	const FVector2D Off = LotCenter - BlockCenter;
+	const bool bX = FMath::Abs(Off.X) > 1.0;
+	const bool bY = FMath::Abs(Off.Y) > 1.0;
+	const FVector2D DirX(Off.X >= 0.0 ? 1.0 : -1.0, 0.0);
+	const FVector2D DirY(0.0, Off.Y >= 0.0 ? 1.0 : -1.0);
+	if (bX && bY)
+	{
+		L.StreetDir = FMath::Abs(Off.X) >= FMath::Abs(Off.Y) ? DirX : DirY;
+		L.SecondStreetDir = FMath::Abs(Off.X) >= FMath::Abs(Off.Y) ? DirY : DirX;
+	}
+	else if (bX)
+	{
+		L.StreetDir = DirX;
+	}
+	else if (bY)
+	{
+		L.StreetDir = DirY;
+	}
+	else if (bSingleLot)
+	{
+		// Ein Gebaeude fuellt den Block: Front deterministisch je Block, alle Seiten liegen an Strassen.
+		const bool bUseX = ((BX + BY) & 1) == 0;
+		const double Sign = (BX & 1) == 0 ? 1.0 : -1.0;
+		L.StreetDir = bUseX ? FVector2D(Sign, 0.0) : FVector2D(0.0, Sign);
+		L.SecondStreetDir = bUseX ? FVector2D(0.0, Sign) : FVector2D(Sign, 0.0);
+	}
+	else
+	{
+		L.bHasFrontage = false; // Mitte eines 3x3-Blocks
+	}
+	return L;
 }
 
 void AMTACityGenerator::BuildPark(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, const FMTADistrictProfile& Profile, EMTADistrict District) const
@@ -688,7 +1083,9 @@ void AMTACityGenerator::BuildIndustrialBlock(FBuildContext& Ctx, FRandomStream& 
 		const float D = bAlongX ? HallDepth : Span * 0.94f;
 		const float H = FMath::RoundToFloat(Rng.FRandRange(800.f, 1500.f) / 100.f) * 100.f;
 		const FLinearColor Tint = Profile.Palette[Rng.RandHelper(Profile.Palette.Num())];
-		AddBuilding(Ctx, Rng, C, W, D, H, Tint, Profile, EMTABuildingStyle::Industrial, CurbHeight);
+		FMTACityLot Record = MakeLot(C, Center, W, D, 0, 0, District, I, false);
+		AddBuilding(Ctx, Rng, C, W, D, H, Tint, Profile, District, EMTABuildingStyle::Industrial, CurbHeight, &Record);
+		Ctx.Lots.Add(Record);
 	}
 
 	// Hof: 1-3 Schornsteine und 0-2 Tanks.
@@ -725,14 +1122,8 @@ void AMTACityGenerator::BuildLandmarkTower(FBuildContext& Ctx, const FVector2D& 
 	{
 		float Data[MTABuildingData::Num];
 		const FLinearColor C = Darken(Tint, Factor);
-		Data[MTABuildingData::TintR] = C.R;
-		Data[MTABuildingData::TintG] = C.G;
-		Data[MTABuildingData::TintB] = C.B;
-		Data[MTABuildingData::HeightMeters] = 190.f;
-		Data[MTABuildingData::WindowSeed] = 4242.f;
-		Data[MTABuildingData::Wear] = 0.f;
-		Data[MTABuildingData::LitRatio] = 0.75f;
-		Data[MTABuildingData::Style] = static_cast<float>(static_cast<uint8>(EMTABuildingStyle::GlassSteel));
+		FillBuildingData(Data, C, 19000.f, 4242.f, 0.f, 0.75f, EMTABuildingStyle::GlassSteel, EMTADistrict::Core,
+			0.f, 1.f, Core.AccentColor);
 		Ctx.Building.Add(BoxTransform(FVector(Center.X, Center.Y, Z0 + H * 0.5f), FVector(W, W, H)), Data);
 	};
 

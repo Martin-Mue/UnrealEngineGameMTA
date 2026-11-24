@@ -4,7 +4,8 @@
 Inhalt: AMTACityGenerator (Boden-Kacheln, Gehwege, Gebaeude, Parks, Laternen), DirectionalLight (Sonne,
 Atmosphaeren-Sonnenlicht), SkyAtmosphere, SkyLight (Echtzeit-Capture), ExponentialHeightFog (volumetrisch),
 VolumetricCloud, PostProcessVolume (unbound: Lumen-GI/-Reflexionen, Bloom, Auto-Exposure, leichte
-Farbkorrektur), PlayerStart bei (-400, -4000, 200), AMTATimeOfDay, WorldSettings-GameMode AMTA6GameMode.
+Farbkorrektur), PlayerStart bei (-400, -4000, 200), AMTATimeOfDay, WorldSettings-GameMode AMTA6GameMode,
+AMTAWorldDetail (Meer/Kueste/Berge/Landmarken/Moeblierung, Label "WorldDetail", nach der Stadt erzeugt).
 
 Voraussetzungen: C++-Modul MTA6 gebaut (sonst fehlen AMTACityGenerator/AMTATimeOfDay -> Ersatzboden),
 vorher build_materials.py ausgefuehrt. Das Skript ist idempotent: alle von ihm erzeugten Aktoren tragen
@@ -193,7 +194,7 @@ def build_city():
     for prop, mat_name in (("building_material", "M_MTA_Building"), ("ground_material", "M_MTA_Ground"),
                            ("park_material", "M_MTA_Park"), ("lamp_material", "M_MTA_LampEmissive"),
                            ("metal_material", "M_MTA_Metal"), ("tree_trunk_material", "M_MTA_TreeTrunk"),
-                           ("foliage_material", "M_MTA_Foliage")):
+                           ("foliage_material", "M_MTA_Foliage"), ("roof_material", "M_MTA_Roof")):
         mat = load_material(mat_name)
         if mat:
             set_prop(gen, prop, mat)
@@ -204,6 +205,32 @@ def build_city():
     except Exception as exc:  # noqa: BLE001
         warn("Generate() nicht aufrufbar (%s) - OnConstruction erzeugt die Stadt beim Laden." % exc)
     return gen
+
+
+def build_world_detail(gen):
+    """AMTAWorldDetail: Meer, Kueste, Berge, Landmarken, Moeblierung, Eingangsstandorte (nach der Stadt)."""
+    cls = load_class("/Script/MTA6.MTAWorldDetail")
+    if cls is None or gen is None:
+        warn("AMTAWorldDetail nicht angelegt (Klasse oder Stadtgenerator fehlt).")
+        return None
+    detail = spawn(cls, gen.get_actor_location(), label="WorldDetail")
+    if detail is None:
+        return None
+    set_prop(detail, "city", gen)
+    for prop, mat_name in (("water_material", "M_MTA_Water"), ("concrete_material", "M_MTA_Concrete"),
+                           ("painted_metal_material", "M_MTA_PaintedMetal"), ("neon_material", "M_MTA_Neon"),
+                           ("signage_material", "M_MTA_Signage"), ("mountain_material", "M_MTA_Mountain"),
+                           ("road_material", "M_MTA_Road"), ("trunk_material", "M_MTA_TreeTrunk"),
+                           ("foliage_material", "M_MTA_Foliage")):
+        mat = load_material(mat_name)
+        if mat:
+            set_prop(detail, prop, mat)
+    set_prop(detail, "seed", 6)
+    try:
+        detail.call_method("Generate")
+    except Exception as exc:  # noqa: BLE001
+        warn("WorldDetail.Generate() nicht aufrufbar (%s) - BeginPlay erzeugt die Details." % exc)
+    return detail
 
 
 def build_time_of_day(gen):
@@ -248,6 +275,7 @@ def main():
     build_lighting()
     build_post_process()
     gen = build_city()
+    build_world_detail(gen)
     build_time_of_day(gen)
     spawn(unreal.PlayerStart, PLAYER_START, unreal.Rotator(roll=0.0, pitch=0.0, yaw=90.0), "PlayerStart")  # Blick nach +Y entlang Strasse X=0
     ok_gm = set_game_mode()

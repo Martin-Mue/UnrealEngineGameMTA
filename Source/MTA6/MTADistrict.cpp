@@ -1,4 +1,4 @@
-#include "MTADistrict.h"
+﻿#include "MTADistrict.h"
 
 #define LOCTEXT_NAMESPACE "MTADistrict"
 
@@ -30,6 +30,11 @@ namespace MTADistrict
 			P.FoliageColor = Hex(0x3C6B2E);
 			P.Wear = 0.05f; P.LitWindowRatio = 0.6f;
 			P.LampColor = FLinearColor(0.8f, 0.9f, 1.f); P.LampDensity = 1.f;
+			// Look 2: gestufte Glastuerme mit Lichtkrone, kaltes Blau-Weiss, maximale Aegis-Dichte.
+			P.HeightBias = 0.7f;
+			P.RoofStyle = EMTARoofStyle::Setback; P.PitchedRoofChance = 0.f; P.RoofColor = Hex(0x2E3640);
+			P.AccentColor = FLinearColor(0.35f, 0.75f, 1.f); P.NeonShare = 0.3f; P.FacadeDetail = 0.7f; P.RooftopClutter = 0.25f;
+			P.AegisCameraDensity = 1.f; P.StreetFurnitureDensity = 0.9f; P.TrafficLightShare = 1.f; P.GraffitiShare = 0.04f; P.BillboardShare = 0.08f;
 			break;
 
 		case EMTADistrict::Saltmarket:
@@ -44,6 +49,10 @@ namespace MTADistrict
 			P.FoliageColor = Hex(0x4A5E2C);
 			P.Wear = 0.7f; P.LitWindowRatio = 0.3f;
 			P.LampColor = FLinearColor(1.f, 0.6f, 0.25f); P.LampDensity = 0.7f;
+			// Look 2: Ziegel-Lagerhaeuser mit flachen Satteldaechern, Kameras nur an Toren.
+			P.RoofStyle = EMTARoofStyle::Gable; P.PitchedRoofChance = 0.35f; P.RoofColor = Hex(0x5A3A2C);
+			P.AccentColor = FLinearColor(1.f, 0.45f, 0.1f); P.NeonShare = 0.15f; P.FacadeDetail = 0.8f; P.RooftopClutter = 0.4f;
+			P.AegisCameraDensity = 0.2f; P.StreetFurnitureDensity = 0.45f; P.TrafficLightShare = 0.7f; P.GraffitiShare = 0.35f; P.BillboardShare = 0.12f;
 			break;
 
 		case EMTADistrict::LanternHill:
@@ -58,6 +67,11 @@ namespace MTADistrict
 			P.FoliageColor = Hex(0x3F6A2A);
 			P.Wear = 0.45f; P.LitWindowRatio = 0.65f;
 			P.LampColor = FLinearColor(1.f, 0.75f, 0.45f); P.LampDensity = 1.f;
+			// Look 2: Terrakotta-Satteldaecher, Balkone, Antennenwald, viel warmes Neon, Kameras gehackt.
+			P.LotSplitWeights = FVector4(0.0, 0.5, 2.0, 5.0);
+			P.RoofStyle = EMTARoofStyle::Gable; P.PitchedRoofChance = 0.55f; P.RoofColor = Hex(0x9C4A2E);
+			P.AccentColor = FLinearColor(1.f, 0.55f, 0.2f); P.NeonShare = 0.55f; P.FacadeDetail = 0.9f; P.RooftopClutter = 0.9f;
+			P.AegisCameraDensity = 0.35f; P.StreetFurnitureDensity = 0.6f; P.TrafficLightShare = 0.5f; P.GraffitiShare = 0.5f; P.BillboardShare = 0.05f;
 			break;
 
 		case EMTADistrict::Greenmoor:
@@ -72,6 +86,10 @@ namespace MTADistrict
 			P.FoliageColor = Hex(0x2F7A2A);
 			P.Wear = 0.05f; P.LitWindowRatio = 0.35f;
 			P.LampColor = FLinearColor(1.f, 0.9f, 0.75f); P.LampDensity = 0.8f;
+			// Look 2: Villen mit Schieferdach, Fensterlaeden, kein Neon, private Kameras an Toren.
+			P.RoofStyle = EMTARoofStyle::Gable; P.PitchedRoofChance = 1.f; P.RoofColor = Hex(0x3C4650);
+			P.AccentColor = FLinearColor(0.5f, 1.f, 0.6f); P.NeonShare = 0.f; P.FacadeDetail = 0.8f; P.RooftopClutter = 0.05f;
+			P.AegisCameraDensity = 0.45f; P.StreetFurnitureDensity = 0.35f; P.TrafficLightShare = 0.2f; P.GraffitiShare = 0.f; P.BillboardShare = 0.f;
 			break;
 
 		case EMTADistrict::Rustline:
@@ -86,6 +104,10 @@ namespace MTADistrict
 			P.FoliageColor = Hex(0x4B5A2A);
 			P.Wear = 0.9f; P.LitWindowRatio = 0.15f;
 			P.LampColor = FLinearColor(1.f, 0.55f, 0.2f); P.LampDensity = 0.5f;
+			// Look 2: Sheddaecher, Wellblech-Rippen, Rost, flackerndes Natrium-Neon, Aegis fast blind.
+			P.RoofStyle = EMTARoofStyle::Sawtooth; P.PitchedRoofChance = 0.f; P.RoofColor = Hex(0x5C4A3C);
+			P.AccentColor = FLinearColor(1.f, 0.4f, 0.05f); P.NeonShare = 0.1f; P.FacadeDetail = 0.9f; P.RooftopClutter = 0.5f;
+			P.AegisCameraDensity = 0.06f; P.StreetFurnitureDensity = 0.2f; P.TrafficLightShare = 0.35f; P.GraffitiShare = 0.7f; P.BillboardShare = 0.15f;
 			break;
 
 		case EMTADistrict::Sunstrip:
@@ -100,6 +122,10 @@ namespace MTADistrict
 			P.FoliageColor = Hex(0x5E7F22);
 			P.Wear = 0.2f; P.LitWindowRatio = 0.55f;
 			P.LampColor = FLinearColor(1.f, 0.8f, 0.7f); P.LampDensity = 1.f;
+			// Look 2: Art-Deco-Baender, Pastell, sehr viel Pink/Tuerkis-Neon, Werbung allgegenwaertig.
+			P.RoofStyle = EMTARoofStyle::Flat; P.PitchedRoofChance = 0.f; P.RoofColor = Hex(0xE8E0D0);
+			P.AccentColor = FLinearColor(1.f, 0.2f, 0.65f); P.NeonShare = 0.8f; P.FacadeDetail = 0.8f; P.RooftopClutter = 0.2f;
+			P.AegisCameraDensity = 0.75f; P.StreetFurnitureDensity = 0.8f; P.TrafficLightShare = 0.9f; P.GraffitiShare = 0.12f; P.BillboardShare = 0.45f;
 			break;
 
 		default:
@@ -107,7 +133,39 @@ namespace MTADistrict
 			P.Palette = { FLinearColor(0.6f, 0.6f, 0.6f) };
 			break;
 		}
+		P.LookVersion = CurrentLookVersion;
 		return P;
+	}
+
+	void CopyLookFields(const FMTADistrictProfile& Source, FMTADistrictProfile& Target)
+	{
+		Target.RoofStyle = Source.RoofStyle;
+		Target.PitchedRoofChance = Source.PitchedRoofChance;
+		Target.RoofColor = Source.RoofColor;
+		Target.AccentColor = Source.AccentColor;
+		Target.NeonShare = Source.NeonShare;
+		Target.FacadeDetail = Source.FacadeDetail;
+		Target.RooftopClutter = Source.RooftopClutter;
+		Target.AegisCameraDensity = Source.AegisCameraDensity;
+		Target.StreetFurnitureDensity = Source.StreetFurnitureDensity;
+		Target.TrafficLightShare = Source.TrafficLightShare;
+		Target.GraffitiShare = Source.GraffitiShare;
+		Target.BillboardShare = Source.BillboardShare;
+		Target.LookVersion = Source.LookVersion;
+	}
+
+	const TCHAR* ShortName(EMTADistrict District)
+	{
+		switch (District)
+		{
+		case EMTADistrict::Core:        return TEXT("Core");
+		case EMTADistrict::Saltmarket:  return TEXT("Saltmarket");
+		case EMTADistrict::LanternHill: return TEXT("LanternHill");
+		case EMTADistrict::Greenmoor:   return TEXT("Greenmoor");
+		case EMTADistrict::Rustline:    return TEXT("Rustline");
+		case EMTADistrict::Sunstrip:    return TEXT("Sunstrip");
+		default:                        return TEXT("Unknown");
+		}
 	}
 
 	EMTADistrict ClassifyNormalized(float U, float V)

@@ -30,6 +30,16 @@ enum class EMTABuildingStyle : uint8
 	Villa       UMETA(DisplayName = "Villa/Einfamilienhaus")
 };
 
+/** Vorherrschende Dachform eines Bezirks (Silhouette am Horizont). */
+UENUM(BlueprintType)
+enum class EMTARoofStyle : uint8
+{
+	Flat      UMETA(DisplayName = "Flachdach mit Aufbauten"),
+	Gable     UMETA(DisplayName = "Satteldach"),
+	Sawtooth  UMETA(DisplayName = "Sheddach (Industrie)"),
+	Setback   UMETA(DisplayName = "Gestufte Tuerme mit Lichtkrone")
+};
+
 /**
  * Gestaltungsprofil eines Bezirks. Steuert Hoehen, Dichte, Palette, Park-/Industrieanteil
  * und Licht. Alle Laengen in cm (Unreal-Einheiten).
@@ -109,6 +119,63 @@ struct MTA6_API FMTADistrictProfile
 	/** Laternenabstand-Faktor: 1 = jede Position, 0.5 = jede zweite (dunkle Viertel). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Light", meta = (ClampMin = "0", ClampMax = "1"))
 	float LampDensity = 1.f;
+
+	// ------------------------------------------------------------ Bezirks-Look (Version 2)
+
+	/**
+	 * Version der Look-Felder unten. Profile mit kleinerer Version (z. B. aus alten Leveln geladen oder
+	 * im Editor neu angelegt) bekommen die Look-Felder aus MakeDefaultProfile (Generator: ResolveProfiles).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2", AdvancedDisplay)
+	int32 LookVersion = 0;
+
+	/** Dachform (Silhouette). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2")
+	EMTARoofStyle RoofStyle = EMTARoofStyle::Flat;
+
+	/** Anteil niedriger Gebaeude mit Satteldach (nur RoofStyle Gable; Villen immer). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2", meta = (ClampMin = "0", ClampMax = "1"))
+	float PitchedRoofChance = 0.f;
+
+	/** Dachfarbe (Ziegel, Schiefer, Blech). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2")
+	FLinearColor RoofColor = FLinearColor(0.25f, 0.22f, 0.2f);
+
+	/** Neon-Akzentfarbe (Ladenbaender, Leuchtschilder, Promenade). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2")
+	FLinearColor AccentColor = FLinearColor(1.f, 0.3f, 0.6f);
+
+	/** Anteil der Gebaeude mit Neon-Ladenband/Leuchtschildern (0..1). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2", meta = (ClampMin = "0", ClampMax = "1"))
+	float NeonShare = 0.2f;
+
+	/** Fassadendetail 0..1 (Balkone, Ziegelfugen, Rippen, Fensterlaeden - bezirksabhaengig im Material). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2", meta = (ClampMin = "0", ClampMax = "1"))
+	float FacadeDetail = 0.5f;
+
+	/** Dach-Kleinkram 0..1 (Antennen, Kisten). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Look2", meta = (ClampMin = "0", ClampMax = "1"))
+	float RooftopClutter = 0.3f;
+
+	/** Wahrscheinlichkeit eines Aegis-Kameramasts je Kreuzung (Weltkonzept 8.2: Aegis-Dichte). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Street", meta = (ClampMin = "0", ClampMax = "1"))
+	float AegisCameraDensity = 0.5f;
+
+	/** Dichte der Strassenmoeblierung 0..1 (Baenke, Muelleimer, Poller). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Street", meta = (ClampMin = "0", ClampMax = "1"))
+	float StreetFurnitureDensity = 0.5f;
+
+	/** Anteil der Kreuzungen mit Ampeln (Rest: Stoppschild). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Street", meta = (ClampMin = "0", ClampMax = "1"))
+	float TrafficLightShare = 1.f;
+
+	/** Anteil der Fassaden mit Graffiti/Plakaten. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Street", meta = (ClampMin = "0", ClampMax = "1"))
+	float GraffitiShare = 0.2f;
+
+	/** Anteil der Flachdach-Gebaeude mit Werbetafel. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "District|Street", meta = (ClampMin = "0", ClampMax = "1"))
+	float BillboardShare = 0.1f;
 };
 
 /** Hilfsfunktionen fuer Bezirke (reines C++, keine Abhaengigkeit zu anderen Modulteilen). */
@@ -116,6 +183,15 @@ namespace MTADistrict
 {
 	/** Liefert das Standardprofil eines Bezirks gemaess Weltkonzept Kapitel 8.2. */
 	MTA6_API FMTADistrictProfile MakeDefaultProfile(EMTADistrict District);
+
+	/** Aktuelle Version der Look-Felder (FMTADistrictProfile::LookVersion). */
+	inline constexpr int32 CurrentLookVersion = 2;
+
+	/** Kopiert die Look-Felder (Version 2) von Source nach Target (Rest bleibt unveraendert). */
+	MTA6_API void CopyLookFields(const FMTADistrictProfile& Source, FMTADistrictProfile& Target);
+
+	/** Kurzer Anzeigename ohne Lokalisierung (Berichte, Debug). */
+	MTA6_API const TCHAR* ShortName(EMTADistrict District);
 
 	/**
 	 * Rastervorgabe: ordnet normierte Kartenkoordinaten einem Bezirk zu.

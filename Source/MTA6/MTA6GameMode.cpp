@@ -10,6 +10,9 @@
 #include "Serialization/JsonReader.h"
 #include "Serialization/JsonSerializer.h"
 #include "MTAAudioAmbienceSubsystem.h"
+#include "MTACharacterScreen.h"
+#include "MTASaveManager.h"
+#include "Sound/SoundBase.h"
 #include "MTAInteriorSubsystem.h"
 #include "MTABuildingEntry.h"
 #include "MTADiscoverySubsystem.h"
@@ -24,6 +27,9 @@
 #include "TimerManager.h"
 #include "MTACityGenerator.h"
 #include "MTADialogueNPC.h"
+#include "MTAWorldDetail.h"
+#include "MTALivingNPC.h"
+#include "MTALivingWorld.h"
 #include "MTADialogueSubsystem.h"
 #include "MTANPCSubsystem.h"
 #include "MTAMenuController.h"
@@ -80,96 +86,27 @@ void AMTA6GameMode::SpawnWorldAI()
 	OnGatherMinimapBlips.AddUObject(this, &AMTA6GameMode::GatherAIBlips);
 }
 
-namespace
-{
-	/** Bezirks-Kennung aus npcs.json -> Enum des Stadtgenerators. */
-	EMTADistrict DistrictFromId(FName Id)
-	{
-		if (Id == FName("saltmarket")) return EMTADistrict::Saltmarket;
-		if (Id == FName("lantern")) return EMTADistrict::LanternHill;
-		if (Id == FName("greenmoor")) return EMTADistrict::Greenmoor;
-		if (Id == FName("rustline")) return EMTADistrict::Rustline;
-		if (Id == FName("sunstrip")) return EMTADistrict::Sunstrip;
-		return EMTADistrict::Core;
-	}
-}
-
 void AMTA6GameMode::SpawnDialogueNPCs()
 {
-	UWorld* World = GetWorld();
-	UGameInstance* GI = GetGameInstance();
-	UMTANPCSubsystem* Npcs = GI ? GI->GetSubsystem<UMTANPCSubsystem>() : nullptr;
-	UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
-	if (!World || !Npcs || !Dialog)
+	// Lebendige Welt: 65 Profile plus Strassenfiguren mit Tagesablauf, Budget 80 sichtbare Figuren.
+	if (AMTALivingWorldManager* Living = AMTALivingWorldManager::GetOrSpawn(this))
 	{
-		return;
+		UE_LOG(LogTemp, Display, TEXT("MTA6: Lebendige Welt gestartet (%d Figuren)"), Living->GetAgentCount());
 	}
-	const AMTACityGenerator* City = AMTACityGenerator::FindCityGenerator(this);
-
-	TMap<EMTADistrict, int32> UsedPerDistrict;
-	int32 Spawned = 0;
-	FActorSpawnParameters Params;
-	Params.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
-
-	for (const FName& Id : Npcs->GetAllNPCIds())
-	{
-		FMTANPCProfile Profile;
-		if (Dialog->GetDialogueForNPC(Id).IsNone() || !Npcs->GetProfile(Id, Profile))
-		{
-			continue;
-		}
-
-		FVector Loc;
-		if (Spawned < 3)
-		{
-			// Die ersten drei stehen direkt beim Start, damit man sofort ein Gespraech ausprobieren kann.
-			const FVector Forward = StartRotation.Vector();
-			const FVector Right = FRotationMatrix(StartRotation).GetUnitAxis(EAxis::Y);
-			Loc = StartLocation + Forward * 1000.f + Right * (-450.f + 300.f * Spawned) + FVector(0.f, 0.f, 20.f);
-		}
-		else if (City)
-		{
-			// Sonst am Gehweg einer Kreuzung im eigenen Bezirk
-			const EMTADistrict D = DistrictFromId(Profile.District);
-			int32 Pick = UsedPerDistrict.FindOrAdd(D)++;
-			FVector Spot = FVector::ZeroVector;
-			bool bFound = false;
-			for (int32 BX = 0; BX < MTACity::Blocks && !bFound; ++BX)
-			{
-				for (int32 BY = 0; BY < MTACity::Blocks; ++BY)
-				{
-					if (City->GetBlockDistrict(BX, BY) == D && Pick-- == 0)
-					{
-						Spot = City->GetIntersectionLocation(BX, BY) + FVector(MTACity::SidewalkOffset + 150.f, MTACity::SidewalkOffset + 150.f, 20.f);
-						bFound = true;
-						break;
-					}
-				}
-			}
-			if (!bFound)
-			{
-				continue;
-			}
-			Loc = Spot;
-		}
-		else
-		{
-			continue;
-		}
-
-		if (AMTADialogueNPC* Npc = World->SpawnActor<AMTADialogueNPC>(AMTADialogueNPC::StaticClass(), Loc, FRotator(0.f, FMath::FRandRange(0.f, 360.f), 0.f), Params))
-		{
-			Npc->SetupNPC(Id, Profile.DisplayName);
-			++Spawned;
-		}
-	}
-	UE_LOG(LogTemp, Display, TEXT("MTA6: %d ansprechbare NPCs erzeugt"), Spawned);
 }
 
 void AMTA6GameMode::SetupWorldSystems()
 {
 	UGameInstance* GI = GetGameInstance();
 	Weather = AMTAWeatherManager::GetOrSpawn(this);
+	// Umgebungsklang: importierte Schleifen (/Game/Audio/Generated/amb_*) spielen lassen
+	if (UWorld* World = GetWorld())
+	{
+		if (UMTAAmbienceSubsystem* Ambience = World->GetSubsystem<UMTAAmbienceSubsystem>())
+		{
+			Ambience->SetPlaybackEnabled(true);
+		}
+	}
 	if (GI)
 	{
 		if (UMTARadioSubsystem* Radio = GI->GetSubsystem<UMTARadioSubsystem>())
@@ -308,33 +245,40 @@ void AMTA6GameMode::RunSelfTest()
 	Check(TEXT("Menue vorhanden"), Menu != nullptr);
 	Check(TEXT("Stadtgenerator vorhanden"), AMTACityGenerator::FindCityGenerator(this) != nullptr);
 
-	// 2) NPC-Gespraech: zur ersten Figur gehen, Interaktion ausloesen, Gespraech durchklicken
-	TArray<AMTADialogueNPC*> Npcs;
-	for (TActorIterator<AMTADialogueNPC> It(World); It; ++It) { Npcs.Add(*It); }
-	Check(TEXT("16 ansprechbare NPCs"), Npcs.Num() == 16);
+	// 2) Lebendige Welt und NPC-Gespraech
+	AMTALivingWorldManager* Living = AMTALivingWorldManager::Get(this);
+	Check(TEXT("Lebendige Welt vorhanden"), Living != nullptr);
 	UMTADialogueSubsystem* Dialog = GI ? GI->GetSubsystem<UMTADialogueSubsystem>() : nullptr;
-	if (Hero && Npcs.Num() > 0 && Dialog)
+	if (Living)
 	{
-		Hero->SetActorLocation(Npcs[0]->GetActorLocation() + FVector(-150.f, 0.f, 30.f));
-		IMTAInteractable::Execute_Interact(Npcs[0], Hero);
-		Check(TEXT("Gespraech startet"), Dialog->IsInConversation());
-		int32 Steps = 0;
-		while (Dialog->IsInConversation() && Steps < 40)
+		const FString LivingReport = Living->RunLivingWorldSelfTest();
+		Check(TEXT("Lebendige Welt Selbsttest"), LivingReport.Contains(TEXT("ERGEBNIS: 0 Fehler")));
+	}
+	if (Hero && Living && Dialog)
+	{
+		// Eine ansprechbare Dialogfigur neben die Spielfigur holen und das Gespraech durchklicken
+		AMTALivingNPC* Npc = Living->BringDialogueNPCTo(Hero->GetActorLocation() + Hero->GetActorForwardVector() * 150.f);
+		Check(TEXT("Dialogfigur geholt"), Npc != nullptr);
+		if (Npc)
 		{
-			const FMTADialogueView View = Dialog->GetCurrentView();
-			if (View.bIsChoice && View.Options.Num() > 0)
+			IMTAInteractable::Execute_Interact(Npc, Hero);
+			if (!Dialog->IsInConversation())
 			{
-				// Die letzte Antwort ist meist der Abschied; die erste kreist oft im Themenmenue.
-				Dialog->ChooseOption(View.Options.Last().Index);
+				// Figur hat laut Tagesablauf gerade keine Zeit: Dialog direkt starten
+				Dialog->StartDialogue(Dialog->GetDialogueForNPC(Npc->NPCId), Npc->NPCId);
 			}
-			else
+			Check(TEXT("Gespraech startet"), Dialog->IsInConversation());
+			int32 Steps = 0;
+			while (Dialog->IsInConversation() && Steps < 40)
 			{
-				Dialog->Continue();
+				const FMTADialogueView View = Dialog->GetCurrentView();
+				if (View.bIsChoice && View.Options.Num() > 0) { Dialog->ChooseOption(View.Options.Last().Index); }
+				else { Dialog->Continue(); }
+				++Steps;
 			}
-			++Steps;
+			UE_LOG(LogTemp, Display, TEXT("SELFTEST Gespraech: %d Schritte bis zum Ende"), Steps);
+			Check(TEXT("Gespraech endet"), !Dialog->IsInConversation());
 		}
-		UE_LOG(LogTemp, Display, TEXT("SELFTEST Gespraech: %d Schritte bis zum Ende"), Steps);
-		Check(TEXT("Gespraech endet"), !Dialog->IsInConversation());
 	}
 
 	// 2b) Weltsysteme und begehbare Gebaeude
@@ -351,6 +295,22 @@ void AMTA6GameMode::RunSelfTest()
 	{
 		const bool bEntered = Interiors->EnterInterior(Cast<APawn>(Hero), Entries[0], 0);
 		UE_LOG(LogTemp, Display, TEXT("SELFTEST Betreten (Gebaeude %s): %s"), *Entries[0]->GetName(), bEntered ? TEXT("ja") : TEXT("nein (z. B. verschlossen)"));
+	}
+
+	// 2b2) Importierte Audio-Assets
+	Check(TEXT("Radio-Musik importiert"), LoadObject<USoundBase>(nullptr, TEXT("/Game/Audio/Generated/radio_neon_tide_a.radio_neon_tide_a")) != nullptr);
+	Check(TEXT("Umgebungsklang importiert"), LoadObject<USoundBase>(nullptr, TEXT("/Game/Audio/Generated/amb_city.amb_city")) != nullptr);
+
+	// 2b3) Welt-Details (Meer, Berge, Landmarken, Moebel, begehbare Gebaeude)
+	if (AMTAWorldDetail* Detail = AMTAWorldDetail::FindWorldDetail(this))
+	{
+		const FString WorldReport = Detail->RunWorldSelfTest();
+		UE_LOG(LogTemp, Display, TEXT("SELFTEST Welt: %s"), *WorldReport.Left(240));
+		Check(TEXT("Welt-Details Selbsttest"), WorldReport.StartsWith(TEXT("WORLD SELFTEST OK")));
+	}
+	else
+	{
+		Check(TEXT("Welt-Details vorhanden"), false);
 	}
 
 	// 2c) Einfuehrung und Kodex
@@ -370,12 +330,21 @@ void AMTA6GameMode::RunSelfTest()
 
 	// 3) Speichern und Laden
 	Money = 4321;
-	const bool bSaved = SaveGameToSlot(true);
+	const bool bSaved = SaveGameToSlot(false, 1);
 	Money = 1;
-	const bool bLoaded = LoadGameFromSlot();
+	const bool bLoaded = LoadGameFromSlot(1);
 	Check(TEXT("Speichern"), bSaved);
 	Check(TEXT("Laden"), bLoaded);
 	Check(TEXT("Geld nach Laden"), Money == 4321);
+
+	// 3b) Kompletter Speicher-Selbsttest des SaveManagers (alle Subsysteme, Migration, beschaedigte Dateien)
+	if (UMTASaveManager* SaveMgr = GI ? GI->GetSubsystem<UMTASaveManager>() : nullptr)
+	{
+		const FString Report = SaveMgr->RunSaveSelfTest();
+		UE_LOG(LogTemp, Display, TEXT("%s"), *Report);
+		Check(TEXT("SaveManager-Selbsttest"), Report.Contains(TEXT(": 0 Fehler,")));
+	}
+	Check(TEXT("Charakter-Oberflaeche"), CharacterScreen != nullptr);
 
 	// 4) Story
 	UMTAStorySubsystem* Story = GI ? GI->GetSubsystem<UMTAStorySubsystem>() : nullptr;
@@ -406,16 +375,31 @@ void AMTA6GameMode::SpawnMenu()
 	Menu->QuerySlots.BindUObject(this, &AMTA6GameMode::FillSlotInfos);
 	MapStore = NewObject<UMTAMapDataStore>(this);
 	Menu->SetMapDataProvider(MapStore);
+
+	// Charakter-Oberflaeche (Taste I)
+	CharacterScreen = World->SpawnActor<AMTACharacterScreenController>(AMTACharacterScreenController::StaticClass(), FTransform::Identity, Params);
+	if (CharacterScreen)
+	{
+		CharacterScreen->SetMenuController(Menu);
+	}
 }
 
 void AMTA6GameMode::HandleMenuSave(FString Slot)
 {
-	SaveGameToSlot(false);
+	const int32 Index = UMTASaveManager::NameToSlot(Slot);
+	if (Index > UMTASaveManager::AutosaveSlot)   // der Autosave-Platz ist im Speichern-Dialog gesperrt
+	{
+		SaveGameToSlot(false, Index);
+	}
 }
 
 void AMTA6GameMode::HandleMenuLoad(FString Slot)
 {
-	LoadGameFromSlot();
+	const int32 Index = UMTASaveManager::NameToSlot(Slot);
+	if (Index >= 0)
+	{
+		LoadGameFromSlot(Index);
+	}
 }
 
 void AMTA6GameMode::HandleMenuNew()
@@ -430,13 +414,14 @@ void AMTA6GameMode::HandleMenuQuit()
 
 void AMTA6GameMode::FillSlotInfos(TArray<FMTASaveSlotInfo>& OutSlots)
 {
-	// Ein Speicherplatz (UMTASaveGame::SlotName); weitere Slots folgen mit dem SaveManager.
-	FMTASaveSlotInfo Info;
-	Info.SlotName = UMTASaveGame::SlotName();
-	Info.bExists = UGameplayStatics::DoesSaveGameExist(UMTASaveGame::SlotName(), UMTASaveGame::UserIndex);
-	Info.PlaytimeSeconds = GameTime;
-	Info.SavedAt = FDateTime::Now();
-	OutSlots.Add(Info);
+	// Autosave und drei manuelle Plaetze mit Spielzeit, Mission, Bezirk, Geld und Datum
+	if (UGameInstance* GI = GetGameInstance())
+	{
+		if (const UMTASaveManager* SaveMgr = GI->GetSubsystem<UMTASaveManager>())
+		{
+			SaveMgr->GetSlotInfos(OutSlots);
+		}
+	}
 }
 
 void AMTA6GameMode::HandlePlayerHitByAI(float Damage, float Impulse, FVector Dir)
@@ -502,7 +487,11 @@ void AMTA6GameMode::BeginPlay()
 	SpawnStartVehicle();
 	SpawnWorldAI();
 	SpawnDialogueNPCs();
-	SpawnEnterableBuildings();
+	// Welt-Details (Meer, Berge, Landmarken, Moebel) und die begehbaren Gebaeude (mindestens 60, hier 72)
+	if (AMTAWorldDetail* Detail = AMTAWorldDetail::FindOrSpawnWorldDetail(this))
+	{
+		Detail->SpawnEnterableBuildings(72);
+	}
 	SetupWorldSystems();
 	SpawnMenu();
 	LoadIntroData();
@@ -935,98 +924,126 @@ void AMTA6GameMode::Bust()
 
 // --- Speichern / Laden ------------------------------------------------------------------------
 
-bool AMTA6GameMode::SaveGameToSlot(bool bAutosave)
+void AMTA6GameMode::BuildSaveContext(FMTASaveContext& C) const
 {
-	UMTASaveGame* Save = Cast<UMTASaveGame>(UGameplayStatics::CreateSaveGameObject(UMTASaveGame::StaticClass()));
-	if (!Save)
+	C.Money = Money;
+	C.Hour = Hour;
+	C.PlaytimeSeconds = GameTime;
+	C.Heat = GetHeat();
+	if (const UMTAHeatSubsystem* HeatSub = GetHeatSubsystem())
+	{
+		C.District = HeatSub->GetCurrentDistrict(0);
+	}
+	if (const APawn* Pawn = UGameplayStatics::GetPlayerPawn(this, 0))
+	{
+		C.bHasPlayerTransform = true;
+		C.PlayerTransform = Pawn->GetActorTransform();
+	}
+	if (const AMTAVehiclePawn* Vehicle = GetPlayerVehicle())
+	{
+		C.bHasVehicle = true;
+		C.bInVehicle = true;
+		C.VehicleTransform = Vehicle->GetActorTransform();
+		C.VehicleHealth = Vehicle->Health;
+	}
+	if (MissionComponent)
+	{
+		C.MissionLabel = MissionComponent->GetMissionDisplayTitle();
+		C.bStoryMission = MissionComponent->IsStoryMission();
+		C.MissionTarget = MissionComponent->GetTargetLocation();
+		C.MissionTimeLeft = MissionComponent->GetTimeLeft();
+	}
+}
+
+bool AMTA6GameMode::SaveGameToSlot(bool bAutosave, int32 Slot)
+{
+	UGameInstance* GI = GetGameInstance();
+	UMTASaveManager* SaveMgr = GI ? GI->GetSubsystem<UMTASaveManager>() : nullptr;
+	if (!SaveMgr)
 	{
 		ShowToast(TEXT("Speichern fehlgeschlagen"));
 		return false;
 	}
-
-	Save->Version = UMTASaveGame::CurrentVersion;
-	Save->Money = Money;
-	Save->Heat = GetHeat();
-	Save->Hour = Hour;
-
-	if (const APawn* Pawn = UGameplayStatics::GetPlayerPawn(this, 0))
+	if (Slot < 0)
 	{
-		Save->VehicleTransform = Pawn->GetActorTransform();
-	}
-	if (const AMTAVehiclePawn* Vehicle = GetPlayerVehicle())
-	{
-		Save->VehicleHealth = Vehicle->Health;
-	}
-	if (MissionComponent)
-	{
-		Save->MissionTarget = MissionComponent->GetTargetLocation();
-		Save->MissionTimeLeft = MissionComponent->GetTimeLeft();
-	}
-	if (UGameInstance* GI = GetGameInstance())
-	{
-		if (const UMTAStorySubsystem* Story = GI->GetSubsystem<UMTAStorySubsystem>())
-		{
-			Save->StoryJson = Story->StateToJson();
-		}
+		Slot = bAutosave ? UMTASaveManager::AutosaveSlot : 1;
 	}
 
-	const bool bOk = UGameplayStatics::SaveGameToSlot(Save, UMTASaveGame::SlotName(), UMTASaveGame::UserIndex);
+	FMTASaveContext Ctx;
+	BuildSaveContext(Ctx);
+	const bool bOk = SaveMgr->SaveToSlot(Slot, Ctx);
 	if (!bOk)
 	{
-		ShowToast(TEXT("Speichern fehlgeschlagen"));
+		ShowToast(SaveMgr->GetLastError().IsEmpty() ? FString(TEXT("Speichern fehlgeschlagen")) : SaveMgr->GetLastError());
 	}
 	else if (!bAutosave)
 	{
-		ShowToast(TEXT("Gespeichert (F5)"));
+		ShowToast(TEXT("Gespeichert"));
 	}
 	return bOk;
 }
 
-bool AMTA6GameMode::LoadGameFromSlot()
+bool AMTA6GameMode::LoadGameFromSlot(int32 Slot)
 {
-	if (!UGameplayStatics::DoesSaveGameExist(UMTASaveGame::SlotName(), UMTASaveGame::UserIndex))
+	UGameInstance* GI = GetGameInstance();
+	UMTASaveManager* SaveMgr = GI ? GI->GetSubsystem<UMTASaveManager>() : nullptr;
+	if (!SaveMgr)
+	{
+		return false;
+	}
+	if (Slot < 0)
+	{
+		Slot = SaveMgr->GetNewestSlot();
+	}
+	if (Slot < 0)
 	{
 		ShowToast(TEXT("Kein Spielstand vorhanden"));
 		return false;
 	}
 
-	const UMTASaveGame* Save = Cast<UMTASaveGame>(UGameplayStatics::LoadGameFromSlot(UMTASaveGame::SlotName(), UMTASaveGame::UserIndex));
-	if (!Save || (Save->Version != 1 && Save->Version != UMTASaveGame::CurrentVersion))
+	FMTASaveContext Ctx;
+	if (!SaveMgr->LoadFromSlot(Slot, Ctx))
 	{
-		ShowToast(TEXT("Spielstand unbrauchbar"));
+		ShowToast(SaveMgr->GetLastError());
 		return false;
 	}
+	ApplySaveContext(Ctx);
+	OnGameLoaded.Broadcast();
+	ShowToast(SaveMgr->DidLastLoadUseBackup() ? SaveMgr->GetLastError() : FString(TEXT("Geladen")));
+	return true;
+}
 
-	Money = Save->Money;
-	SetHeat(Save->Heat);
-	SetHour(Save->Hour);
+void AMTA6GameMode::ApplySaveContext(const FMTASaveContext& Ctx)
+{
+	Money = Ctx.Money;
+	SetHeat(Ctx.Heat);
+	SetHour(Ctx.Hour);
+	GameTime = Ctx.PlaytimeSeconds;
 	LastCrimeTime = GameTime;
 	BustTimer = 0.f;
 	WreckTimer = 0.f;
 
 	// Fahrzeug: Position etwas anheben, nur Gierwinkel uebernehmen, Physik stoppen
-	const FVector Loc = Save->VehicleTransform.GetLocation() + FVector(0.f, 0.f, 30.f);
-	const FRotator Rot(0.f, Save->VehicleTransform.Rotator().Yaw, 0.f);
-	if (AMTAVehiclePawn* Vehicle = GetPlayerVehicle())
+	if (Ctx.bHasVehicle)
 	{
-		Vehicle->Repair();
-		Vehicle->Health = FMath::Clamp(Save->VehicleHealth, 1.f, Vehicle->MaxHealth);
-		Vehicle->TeleportVehicle(Loc, Rot);
-	}
-	else if (APawn* Pawn = UGameplayStatics::GetPlayerPawn(this, 0))
-	{
-		Pawn->SetActorLocationAndRotation(Loc, Rot, false, nullptr, ETeleportType::TeleportPhysics);
-	}
-
-	// Story-Zustand (Version 1 hatte keinen)
-	if (UGameInstance* GI = GetGameInstance())
-	{
-		if (UMTAStorySubsystem* Story = GI->GetSubsystem<UMTAStorySubsystem>())
+		const FVector Loc = Ctx.VehicleTransform.GetLocation() + FVector(0.f, 0.f, 30.f);
+		const FRotator Rot(0.f, Ctx.VehicleTransform.Rotator().Yaw, 0.f);
+		if (AMTAVehiclePawn* Vehicle = GetPlayerVehicle())
 		{
-			if (Save->StoryJson.IsEmpty() || !Story->StateFromJson(Save->StoryJson))
-			{
-				Story->ResetState();
-			}
+			Vehicle->Repair();
+			Vehicle->Health = FMath::Clamp(Ctx.VehicleHealth, 1.f, Vehicle->MaxHealth);
+			Vehicle->TeleportVehicle(Loc, Rot);
+		}
+		else if (APawn* Pawn = UGameplayStatics::GetPlayerPawn(this, 0))
+		{
+			Pawn->SetActorLocationAndRotation(Loc, Rot, false, nullptr, ETeleportType::TeleportPhysics);
+		}
+	}
+	else if (Ctx.bHasPlayerTransform)
+	{
+		if (APawn* Pawn = UGameplayStatics::GetPlayerPawn(this, 0))
+		{
+			Pawn->SetActorLocationAndRotation(Ctx.PlayerTransform.GetLocation() + FVector(0.f, 0.f, 30.f), Ctx.PlayerTransform.Rotator(), false, nullptr, ETeleportType::TeleportPhysics);
 		}
 	}
 
@@ -1034,13 +1051,9 @@ bool AMTA6GameMode::LoadGameFromSlot()
 	{
 		MissionComponent->CloseDialog();
 		MissionComponent->StartNextMission();
-		if (!MissionComponent->IsStoryMission() && !Save->MissionTarget.IsNearlyZero())
+		if (!MissionComponent->IsStoryMission() && !Ctx.MissionTarget.IsNearlyZero())
 		{
-			MissionComponent->RestoreCourier(Save->MissionTarget, Save->MissionTimeLeft);
+			MissionComponent->RestoreCourier(Ctx.MissionTarget, Ctx.MissionTimeLeft);
 		}
 	}
-
-	OnGameLoaded.Broadcast();
-	ShowToast(TEXT("Geladen (F9)"));
-	return true;
 }

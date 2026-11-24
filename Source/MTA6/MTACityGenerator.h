@@ -53,8 +53,85 @@ namespace MTABuildingData
 	inline constexpr int32 Wear = 5;
 	inline constexpr int32 LitRatio = 6;
 	inline constexpr int32 Style = 7;      // EMTABuildingStyle als float
-	inline constexpr int32 Num = 8;
+	inline constexpr int32 District = 8;   // EMTADistrict als float (bezirkstypisches Fassadendetail)
+	inline constexpr int32 Neon = 9;       // Staerke des Neon-Ladenbands 0..1 (0 = keins)
+	inline constexpr int32 Detail = 10;    // Fassadendetail 0..1 (Balkone, Fugen, Rippen, Laeden)
+	inline constexpr int32 AccentR = 11;   // Neon-Akzentfarbe RGB (11..13)
+	inline constexpr int32 AccentG = 12;
+	inline constexpr int32 AccentB = 13;
+	inline constexpr int32 Num = 14;
 }
+
+/**
+ * Parzelle eines vom Generator erzeugten Gebaeudes (Ergebnis, Weltkoordinaten).
+ * Grundlage fuer AMTAWorldDetail (Leuchtschilder, Graffiti, Werbetafeln, Eingaenge).
+ */
+USTRUCT(BlueprintType)
+struct MTA6_API FMTACityLot
+{
+	GENERATED_BODY()
+
+	/** Mittelpunkt (Welt X/Y). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	FVector2D Center = FVector2D::ZeroVector;
+
+	/** Grundflaeche X/Y (cm), achsparallel. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	FVector2D Size = FVector2D::ZeroVector;
+
+	/** Welt-Z des Sockels (Gehweg-Oberkante). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	float BaseZ = 0.f;
+
+	/** Hoehe des Hauptkoerpers (cm). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	float Height = 0.f;
+
+	/** Hoechster Punkt inkl. Aufsatz/Dach (Welt-Z). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	float RoofTopZ = 0.f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	EMTADistrict District = EMTADistrict::Core;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	EMTABuildingStyle Style = EMTABuildingStyle::Plaster;
+
+	/** Block (X = Index entlang X, Y = entlang Y). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	FIntPoint Block = FIntPoint::ZeroValue;
+
+	/** Einheitsachse zur Strasse (Fassaden-/Eingangsseite). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	FVector2D StreetDir = FVector2D(1.0, 0.0);
+
+	/** Zweite Strassenseite bei Eckparzellen (sonst Nullvektor). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	FVector2D SecondStreetDir = FVector2D::ZeroVector;
+
+	/** false = Innenparzelle ohne Strassenfront (Mitte eines 3x3-Blocks). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	bool bHasFrontage = true;
+
+	/** Leere Parzelle (Brache, Garten); Size/Center gelten trotzdem. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	bool bEmpty = false;
+
+	/** Flachdach (Werbetafeln, Antennen moeglich). */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	bool bFlatRoof = true;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	bool bIndustrial = false;
+
+	/** Hochhaus mit zurueckgesetztem Obergeschoss. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	bool bTower = false;
+
+	/** Deterministischer Seed der Parzelle. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Lot")
+	int32 Seed = 0;
+};
 
 /** Custom-Data fuer Laternenkoepfe, Baumkronen, Parks, Gehwege: RGB-Farbe + Bezirk + Verschleiss. */
 namespace MTAPropData
@@ -164,6 +241,39 @@ public:
 	UFUNCTION(BlueprintPure, Category = "MTA|City|Lights")
 	const TArray<FVector>& GetLampPositions() const { return LampPositions; }
 
+	// ---------------------------------------------------------------- Parzellen, Plaetze, Kueste (fuer AMTAWorldDetail)
+
+	/** Alle Gebaeude-Parzellen der letzten Generierung (Weltkoordinaten). */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Lots")
+	const TArray<FMTACityLot>& GetCityLots() const { return CityLots; }
+
+	/** Halbe Ausdehnung des Blockrasters (lokal, cm; ohne Strassenrand). */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Layout")
+	FVector2D GetCityHalfExtent() const;
+
+	/** Halbe Kantenlaenge der tatsaechlich belegten Bodenflaeche (ganze Kacheln, cm). */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Ground")
+	float GetGroundHalfSize() const;
+
+	/**
+	 * Kuestenlinie (lokales Y) an der lokalen X-Position. Meer liegt westlich (kleineres Y).
+	 * bStepped = Wert des Bodenstreifens, wie BuildGround ihn abschneidet (Kaimauern folgen dieser Linie).
+	 */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Coast")
+	float GetCoastLocalY(float LocalX, bool bStepped = false) const;
+
+	/** Wie GetCoastLocalY, aber in Weltkoordinaten. */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Coast")
+	float GetCoastWorldY(float WorldX, bool bStepped = false) const;
+
+	/** Mitte und Innenmass (cm) des reservierten Platzes eines Bezirks (Landmarke). false = keiner. */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Districts")
+	bool GetDistrictPlaza(EMTADistrict District, FVector& OutCenter, float& OutInnerSize) const;
+
+	/** Fusspunkt des Aurelia Tower (Welt). false, wenn keine Landmarke erzeugt wurde. */
+	UFUNCTION(BlueprintPure, Category = "MTA|City|Districts")
+	bool GetLandmarkTowerLocation(FVector& OutBase) const;
+
 	// ---------------------------------------------------------------- Parameter: Raster
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Layout")
@@ -202,6 +312,36 @@ public:
 	/** Landmarke Aurelia Tower im Core-Block naechst DowntownCenter erzeugen. */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Layout")
 	bool bSpawnLandmarks = true;
+
+	/** Je Bezirk aus PlazaDistricts einen Block als Platz freihalten (Landmarken von AMTAWorldDetail). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Layout")
+	bool bReserveDistrictPlazas = true;
+
+	/** Bezirke mit reserviertem Platz (Standard: Lantern Hill = Glockenturm, Greenmoor = Wasserturm). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Layout", meta = (EditCondition = "bReserveDistrictPlazas"))
+	TArray<EMTADistrict> PlazaDistricts;
+
+	// ---------------------------------------------------------------- Parameter: Kueste
+
+	/** Boden westlich der Kuestenlinie weglassen (dort liegt das Meer von AMTAWorldDetail). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Coast")
+	bool bGenerateCoast = true;
+
+	/** Abstand Blockraster-Westrand -> Kaimauer (cm). Standard 80 m = Promenade/Kai-Streifen. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Coast", meta = (ClampMin = "1000"))
+	float CoastOffset = 8000.f;
+
+	/** Ab diesem Nord/Sued-Abstand (lokales |X|, cm) biegt die Kueste zu Landzungen nach Westen (Bucht). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Coast", meta = (ClampMin = "0"))
+	float BayHeadlandStart = 52000.f;
+
+	/** Steigung der Landzungen (cm West je cm Nord/Sued). */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Coast", meta = (ClampMin = "0", ClampMax = "3"))
+	float BayHeadlandSlope = 0.55f;
+
+	/** Breite der Bodenstreifen an der Kueste (cm); kleinere Werte = feinere Kuestenlinie. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Coast", meta = (ClampMin = "500"))
+	float CoastStripWidth = 2000.f;
 
 	// ---------------------------------------------------------------- Parameter: Hoehenprofil
 
@@ -307,6 +447,10 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Assets")
 	TObjectPtr<UMaterialInterface> FoliageMaterial;
 
+	/** Sattel-/Sheddaecher (Farbe per Custom-Data). Leer = M_MTA_Roof. */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "City|Assets")
+	TObjectPtr<UMaterialInterface> RoofMaterial;
+
 	// ---------------------------------------------------------------- Parameter: Boden
 
 	/** Boden-Kacheln erzeugen (Kollision fuer Fahrzeuge). */
@@ -384,6 +528,18 @@ public:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "City|Result")
 	int32 GeneratedBuildingCount = 0;
 
+	/** Gebaeude-Parzellen (Welt), siehe GetCityLots. */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "City|Result", AdvancedDisplay)
+	TArray<FMTACityLot> CityLots;
+
+	/** Reservierter Platz je Bezirk, Index = EMTADistrict; (-1,-1) = keiner. */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "City|Result", AdvancedDisplay)
+	TArray<FIntPoint> DistrictPlazaBlocks;
+
+	/** Blockindex (BX + BY * BlocksX) des Aurelia Tower, INDEX_NONE = keiner. */
+	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "City|Result", AdvancedDisplay)
+	int32 LandmarkBlockIndex = INDEX_NONE;
+
 protected:
 	virtual void OnConstruction(const FTransform& Transform) override;
 	virtual void BeginPlay() override;
@@ -427,6 +583,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "City|Components")
 	TObjectPtr<UHierarchicalInstancedStaticMeshComponent> TreeCrowns;
 
+	/** Sattel- und Sheddaecher (um 45 Grad gerollte Wuerfel, untere Haelfte im Gebaeude). */
+	UPROPERTY(VisibleAnywhere, Category = "City|Components")
+	TObjectPtr<UHierarchicalInstancedStaticMeshComponent> PitchedRoofs;
+
 	/** Laufzeit-Pool der Laternen-Spots (nicht gespeichert). */
 	UPROPERTY(Transient)
 	TArray<TObjectPtr<USpotLightComponent>> LampLightPool;
@@ -445,8 +605,10 @@ private:
 	/** Laufzeitdaten einer Generierung. */
 	struct FBuildContext
 	{
-		FInstanceBatch Ground, Sidewalk, Park, Building, Roof, Antenna, Chimney, Pole, Head, Trunk, Crown;
+		FInstanceBatch Ground, Sidewalk, Park, Building, Roof, Antenna, Chimney, Pole, Head, Trunk, Crown, Pitched;
 		TArray<FMTADistrictProfile> Profiles;
+		/** Parzellen in lokalen Koordinaten (Generate rechnet sie in Welt um). */
+		TArray<FMTACityLot> Lots;
 	};
 
 	void ConfigureComponent(UHierarchicalInstancedStaticMeshComponent* Comp, UStaticMesh* Mesh, UMaterialInterface* Material,
@@ -462,8 +624,20 @@ private:
 	void BuildPark(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, const FMTADistrictProfile& Profile, EMTADistrict District) const;
 	void BuildIndustrialBlock(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, const FMTADistrictProfile& Profile, EMTADistrict District) const;
 	void BuildLandmarkTower(FBuildContext& Ctx, const FVector2D& Center) const;
+	void BuildPlaza(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, const FMTADistrictProfile& Profile, EMTADistrict District) const;
+	/** Baut ein Gebaeude; OutLot (optional) bekommt Dachform und Dachhoehe (lokal). */
 	void AddBuilding(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, float Width, float Depth, float Height,
-		const FLinearColor& Tint, const FMTADistrictProfile& Profile, EMTABuildingStyle Style, float ZBase) const;
+		const FLinearColor& Tint, const FMTADistrictProfile& Profile, EMTADistrict District, EMTABuildingStyle Style, float ZBase,
+		FMTACityLot* OutLot) const;
+	void AddGableRoof(FBuildContext& Ctx, const FVector2D& Center, float Width, float Depth, float Top, const FLinearColor& Color,
+		EMTADistrict District, float Wear, bool bSawtooth) const;
+	/** Parzellen-Datensatz (lokal) mit Strassenfront relativ zur Blockmitte. */
+	FMTACityLot MakeLot(const FVector2D& LotCenter, const FVector2D& BlockCenter, double W, double D, int32 BX, int32 BY,
+		EMTADistrict District, int32 LotIndex, bool bSingleLot) const;
+	void ComputePlazaBlocks();
+	bool IsPlazaBlock(int32 BX, int32 BY) const;
+	/** Breite der Kuestenstreifen, ganzzahlig in die Bodenkachel eingepasst (cm). */
+	float CoastStripStep() const;
 	void AddTree(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Pos, const FMTADistrictProfile& Profile, EMTADistrict District, bool bPalm) const;
 	void BuildStreetTrees(FBuildContext& Ctx, FRandomStream& Rng, const FVector2D& Center, const FMTADistrictProfile& Profile, EMTADistrict District) const;
 	void BuildLamps(FBuildContext& Ctx);

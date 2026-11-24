@@ -61,7 +61,7 @@ private:
 
 	// --- NPC-Gespraeche und Interaktions-Prompt -------------------------------------------------
 	void DrawInteractionPrompt();
-	class AMTADialogueNPC* FindNearbyNPC() const;
+	class AActor* FindNearbyNPC() const;
 	void DrawConversation();
 	void UpdateConversationInput();
 

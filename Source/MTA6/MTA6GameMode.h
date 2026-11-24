@@ -6,6 +6,7 @@
 #include "MTAMinimapTypes.h"
 #include "MTA6GameMode.generated.h"
 
+struct FMTASaveContext;
 class UMTAMissionComponent;
 class UMTAHeatSubsystem;
 class AMTAVehiclePawn;
@@ -289,11 +290,19 @@ public:
 
 	/** F5 bzw. Autosave (bAutosave: keine eigene Toast-Meldung). */
 	UFUNCTION(BlueprintCallable, Category = "MTA6|Save")
-	bool SaveGameToSlot(bool bAutosave = false);
+	bool SaveGameToSlot(bool bAutosave = false, int32 Slot = -1);   // -1: Autosave -> Platz 0, sonst Platz 1
 
 	/** F9. */
 	UFUNCTION(BlueprintCallable, Category = "MTA6|Save")
-	bool LoadGameFromSlot();
+	bool LoadGameFromSlot(int32 Slot = -1);                         // -1: neuester Platz
+
+	/** Sammelt bzw. verteilt den Spielzustand des GameModes fuer den SaveManager. */
+	void BuildSaveContext(FMTASaveContext& OutCtx) const;
+	void ApplySaveContext(const FMTASaveContext& Ctx);
+
+	/** Charakter-Oberflaeche (Taste I): Faehigkeiten, Garage, Inventar, Konto, Fraktionen. */
+	UPROPERTY()
+	TObjectPtr<class AMTACharacterScreenController> CharacterScreen;
 
 private:
 	void GatherMinimapBlips();
