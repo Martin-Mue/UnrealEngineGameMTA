@@ -254,6 +254,15 @@ public:
 	UFUNCTION(BlueprintPure, Category = "MTA6|Mission")
 	UMTAMissionComponent* GetMissionComponent() const { return MissionComponent; }
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|Mission")
+	TObjectPtr<class UMTAMissionRunner> MissionRunner;
+
+	UFUNCTION(BlueprintPure, Category = "MTA6|Mission")
+	UMTAMissionRunner* GetMissionRunner() const { return MissionRunner; }
+
+	/** Briefing-Merker zuruecksetzen (nach Abschluss/Abbruch). */
+	void ResetBriefingMemory() { LastBriefedMissionId.Reset(); }
+
 	UFUNCTION(BlueprintPure, Category = "MTA6|Mission")
 	bool IsDialogOpen() const;
 

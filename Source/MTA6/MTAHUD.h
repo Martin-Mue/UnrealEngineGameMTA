@@ -59,6 +59,11 @@ private:
 	void UpdateInputLock(AMTA6GameMode* GM);
 	void DrawStoryPage(AMTA6GameMode* GM);
 
+	// --- Auftragsliste (Tab) und Zielanzeige ------------------------------------------------------
+	void UpdateMissionListInput(AMTA6GameMode* GM);
+	void DrawMissionList(AMTA6GameMode* GM);
+	void DrawMissionObjective(AMTA6GameMode* GM, float& Y);
+
 	// --- NPC-Gespraeche und Interaktions-Prompt -------------------------------------------------
 	void DrawInteractionPrompt();
 	class AActor* FindNearbyNPC() const;

@@ -14,6 +14,7 @@
 #include "Engine/World.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
+#include "Misc/Crc.h"
 #include "UObject/ConstructorHelpers.h"
 
 namespace
@@ -103,7 +104,9 @@ void AMTALivingNPC::BindAgent(AMTALivingWorldManager* InManager, int32 InAgentIn
 	SpeechText.Reset();
 	SpeechTimeLeft = 0.f;
 
-	SetActorScale3D(FVector(InScale));
+	// Aussehen aus Kennung und Fraktion (Fraktion steht im Agenten-Datensatz des Managers).
+	const FMTALivingAgent* AgentData = InManager ? InManager->GetAgent(InAgentIndex) : nullptr;
+	ApplyLookFromId(InId, AgentData ? AgentData->Faction : NAME_None, InScale);
 	SetWalkSpeed(InWalkSpeed);
 
 	if (NameLabel)
@@ -132,6 +135,103 @@ void AMTALivingNPC::BindAgent(AMTALivingWorldManager* InManager, int32 InAgentIn
 	bNameInRange = false;
 	bSpeechInRange = false;
 	UpdateLabelVisibility();
+}
+
+bool AMTALivingNPC::GetFactionLook(FName InFaction, FLinearColor& OutAccent, FLinearColor& OutBodyTint, float& OutBodyBlend)
+{
+	// Fraktions-IDs wie in story.json. Akzent = Logo/Brust, BodyBlend = Anteil der Koerpertoenung.
+	const FString Key = InFaction.ToString().ToLower();
+	if (Key == TEXT("aurelia"))
+	{
+		OutAccent = FLinearColor(0.62f, 0.65f, 0.70f);    // silber
+		OutBodyTint = FLinearColor(0.02f, 0.04f, 0.14f);  // dunkelblau
+		OutBodyBlend = 0.8f;
+		return true;
+	}
+	if (Key == TEXT("kcg"))
+	{
+		OutAccent = FLinearColor(0.08f, 0.08f, 0.09f);    // schwarz/anthrazit
+		OutBodyTint = FLinearColor(0.012f, 0.012f, 0.014f); // schwarz
+		OutBodyBlend = 0.85f;
+		return true;
+	}
+	if (Key == TEXT("union"))
+	{
+		OutAccent = FLinearColor(1.0f, 0.32f, 0.02f);     // orange
+		OutBodyTint = FLinearColor(0.75f, 0.24f, 0.02f);
+		OutBodyBlend = 0.3f;
+		return true;
+	}
+	if (Key == TEXT("collective"))
+	{
+		OutAccent = FLinearColor(0.0f, 0.62f, 0.56f);     // tuerkis
+		OutBodyTint = FLinearColor(0.0f, 0.42f, 0.38f);
+		OutBodyBlend = 0.3f;
+		return true;
+	}
+	if (Key == TEXT("wrenchers"))
+	{
+		OutAccent = FLinearColor(0.72f, 0.02f, 0.02f);    // rot
+		OutBodyTint = FLinearColor(0.45f, 0.02f, 0.02f);
+		OutBodyBlend = 0.3f;
+		return true;
+	}
+	return false;
+}
+
+void AMTALivingNPC::ApplyLookFromId(FName InId, FName InFaction, float InScale)
+{
+	// Deterministisch: CRC der kleingeschriebenen Kennung (FName-Hashes sind nicht sitzungsstabil).
+	const FString Key = InId.ToString().ToLower();
+	const uint32 Hash = FCrc::StrCrc32(*Key);
+
+	// Kleidungs-/Koerperfarben (lineare Werte, gedeckt, keine Rollenzuordnung).
+	static const FLinearColor BodyPalette[] = {
+		FLinearColor(0.42f, 0.36f, 0.28f), FLinearColor(0.10f, 0.12f, 0.16f), FLinearColor(0.30f, 0.30f, 0.32f),
+		FLinearColor(0.05f, 0.10f, 0.25f), FLinearColor(0.22f, 0.27f, 0.12f), FLinearColor(0.35f, 0.08f, 0.08f),
+		FLinearColor(0.60f, 0.55f, 0.45f), FLinearColor(0.15f, 0.25f, 0.35f), FLinearColor(0.45f, 0.20f, 0.30f),
+		FLinearColor(0.70f, 0.70f, 0.72f), FLinearColor(0.08f, 0.08f, 0.08f), FLinearColor(0.40f, 0.30f, 0.10f) };
+	static const FLinearColor AccentPalette[] = {
+		FLinearColor(0.80f, 0.80f, 0.80f), FLinearColor(0.70f, 0.55f, 0.10f), FLinearColor(0.10f, 0.35f, 0.70f),
+		FLinearColor(0.15f, 0.55f, 0.25f), FLinearColor(0.60f, 0.15f, 0.40f), FLinearColor(0.05f, 0.05f, 0.05f) };
+
+	FLinearColor BodyCol = BodyPalette[Hash % UE_ARRAY_COUNT(BodyPalette)];
+	FLinearColor AccentCol = AccentPalette[(Hash >> 8) % UE_ARRAY_COUNT(AccentPalette)];
+
+	FLinearColor FactionAccent;
+	FLinearColor FactionTint;
+	float FactionBlend = 0.f;
+	if (GetFactionLook(InFaction, FactionAccent, FactionTint, FactionBlend))
+	{
+		AccentCol = FactionAccent;
+		// Leichte Streuung, damit Fraktionsmitglieder nicht uniform wirken.
+		const float Jitter = static_cast<float>((Hash >> 20) % 21u) / 100.f - 0.1f;
+		BodyCol = FMath::Lerp(BodyCol, FactionTint, FMath::Clamp(FactionBlend + Jitter, 0.f, 1.f));
+		LookFaction = InFaction;
+	}
+	else
+	{
+		LookFaction = NAME_None;
+	}
+	LookBodyColor = BodyCol;
+	LookAccentColor = AccentCol;
+
+	// Groesse 0.93-1.07 (vom Manager vorgegeben, hier nur begrenzt); Statur nur am Mesh (Kapsel bleibt).
+	SetActorScale3D(FVector(FMath::Clamp(InScale, 0.93f, 1.07f)));
+
+	if (USkeletalMeshComponent* Body = GetMesh())
+	{
+		const float Build = 0.94f + static_cast<float>((Hash >> 12) % 13u) / 100.f;
+		Body->SetRelativeScale3D(FVector(Build, Build, 1.f));
+
+		// Mannequin-Material (M_UE4Man_Body / M_UE4Man_ChestLogo): BodyColor bzw. PlasticColor
+		// (Grundfarbe), LogoColor (Brustlogo = Akzent). Fehlende Parameter werden ignoriert.
+		const FVector BodyVec(BodyCol.R, BodyCol.G, BodyCol.B);
+		const FVector AccentVec(AccentCol.R, AccentCol.G, AccentCol.B);
+		Body->SetVectorParameterValueOnMaterials(TEXT("BodyColor"), BodyVec);
+		Body->SetVectorParameterValueOnMaterials(TEXT("PlasticColor"), BodyVec);
+		Body->SetVectorParameterValueOnMaterials(TEXT("LogoColor"), AccentVec);
+	}
 }
 
 void AMTALivingNPC::UnbindAgent()

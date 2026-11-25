@@ -1005,6 +1005,39 @@ int32 UMTASaveManager::GetNewestSlot() const
 
 // ------------------------------------------------------------------------------ Selbsttest
 
+// Naeherungsweise Gleichheit zweier JSON-Werte (Zahlen mit Toleranz; Schluessel "current" wird ignoriert,
+// weil der aktuelle Bezirk des Fahndungssystems durch AddPlayerHeat wechselt).
+static bool MTAJsonNearlyEqual(const TSharedPtr<FJsonValue>& A, const TSharedPtr<FJsonValue>& B)
+{
+	if (!A.IsValid() || !B.IsValid() || A->Type != B->Type) { return false; }
+	switch (A->Type)
+	{
+	case EJson::Number: return FMath::IsNearlyEqual(A->AsNumber(), B->AsNumber(), 0.005);
+	case EJson::Array:
+	{
+		const TArray<TSharedPtr<FJsonValue>>& AA = A->AsArray();
+		const TArray<TSharedPtr<FJsonValue>>& BA = B->AsArray();
+		if (AA.Num() != BA.Num()) { return false; }
+		for (int32 I = 0; I < AA.Num(); ++I) { if (!MTAJsonNearlyEqual(AA[I], BA[I])) { return false; } }
+		return true;
+	}
+	case EJson::Object:
+	{
+		const TSharedPtr<FJsonObject> AO = A->AsObject();
+		const TSharedPtr<FJsonObject> BO = B->AsObject();
+		if (!AO.IsValid() || !BO.IsValid()) { return false; }
+		for (const auto& Pair : AO->Values)
+		{
+			if (FString(Pair.Key.ToView()) == TEXT("current")) { continue; }
+			const TSharedPtr<FJsonValue> Other = BO->TryGetField(Pair.Key.ToView());
+			if (!MTAJsonNearlyEqual(Pair.Value, Other)) { return false; }
+		}
+		return true;
+	}
+	default: return FJsonValue::CompareEqual(*A, *B);
+	}
+}
+
 FString UMTASaveManager::RunSaveSelfTest()
 {
 	FString R = TEXT("=== SaveManager-Selbsttest ===\n");
@@ -1222,7 +1255,7 @@ FString UMTASaveManager::RunSaveSelfTest()
 		for (const auto& Pair : SnapshotA->Values)
 		{
 			const TSharedPtr<FJsonValue> Other = SnapshotB->TryGetField(Pair.Key.ToView());
-			const bool bEqual = Other.IsValid() && Pair.Value.IsValid() && FJsonValue::CompareEqual(*Pair.Value, *Other);
+			const bool bEqual = Other.IsValid() && Pair.Value.IsValid() && MTAJsonNearlyEqual(Pair.Value, Other);
 			Check(FString::Printf(TEXT("Feld '%s' nach Laden identisch"), *FString(Pair.Key.ToView())), bEqual, TEXT("(Zustand weicht ab)"));
 		}
 		Check(TEXT("Keine zusaetzlichen Felder nach Laden"), SnapshotA->Values.Num() == SnapshotB->Values.Num());
@@ -1372,7 +1405,7 @@ FString UMTASaveManager::RunSaveSelfTest()
 		for (const auto& Pair : Original->Values)
 		{
 			const TSharedPtr<FJsonValue> Other = After->TryGetField(Pair.Key.ToView());
-			if (!Other.IsValid() || !Pair.Value.IsValid() || !FJsonValue::CompareEqual(*Pair.Value, *Other))
+			if (!Other.IsValid() || !Pair.Value.IsValid() || !MTAJsonNearlyEqual(Pair.Value, Other))
 			{
 				bAllEqual = false;
 				Differing += FString(Pair.Key.ToView()) + TEXT(" ");

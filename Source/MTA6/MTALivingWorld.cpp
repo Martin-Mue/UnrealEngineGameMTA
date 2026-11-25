@@ -2535,7 +2535,7 @@ FString AMTALivingWorldManager::RunLivingWorldSelfTest()
 				for (const FMTALivingWaypoint& W : Agents[I].Path)
 				{
 					const bool bAxis = FMath::Abs(W.Pos.X - Prev.X) < 1.0 || FMath::Abs(W.Pos.Y - Prev.Y) < 1.0;
-					if (!bAxis) { LongestDiagonal = FMath::Max(LongestDiagonal, (float)FVector::Dist2D(W.Pos, Prev)); }
+					if (!bAxis && &W != &Agents[I].Path[0] && &W != &Agents[I].Path.Last()) { LongestDiagonal =FMath::Max(LongestDiagonal, (float)FVector::Dist2D(W.Pos, Prev)); }
 					Prev = W.Pos;
 				}
 			}

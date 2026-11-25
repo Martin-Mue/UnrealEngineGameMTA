@@ -1,0 +1,127 @@
+{
+  "sampleRate": 44100,
+  "files": [
+    {
+      "file": "veh_engine_0800.wav",
+      "name": "veh_engine_0800",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 85995,
+      "seconds": 1.95,
+      "bytes": 172034,
+      "loop": true,
+      "seamJump": 0.39,
+      "rpm": 800,
+      "effectiveRpm": 800.0,
+      "cycles": 13
+    },
+    {
+      "file": "veh_engine_2000.wav",
+      "name": "veh_engine_2000",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 87318,
+      "seconds": 1.98,
+      "bytes": 174680,
+      "loop": true,
+      "seamJump": 0.08,
+      "rpm": 2000,
+      "effectiveRpm": 2000.0,
+      "cycles": 33
+    },
+    {
+      "file": "veh_engine_3500.wav",
+      "name": "veh_engine_3500",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 87696,
+      "seconds": 1.9886,
+      "bytes": 175436,
+      "loop": true,
+      "seamJump": 1.62,
+      "rpm": 3500,
+      "effectiveRpm": 3500.0,
+      "cycles": 58
+    },
+    {
+      "file": "veh_engine_5500.wav",
+      "name": "veh_engine_5500",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 88521,
+      "seconds": 2.0073,
+      "bytes": 177086,
+      "loop": true,
+      "seamJump": 1.97,
+      "rpm": 5500,
+      "effectiveRpm": 5499.983,
+      "cycles": 92
+    },
+    {
+      "file": "veh_tire_squeal.wav",
+      "name": "veh_tire_squeal",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 88200,
+      "seconds": 2.0,
+      "bytes": 176444,
+      "loop": true,
+      "seamJump": 2.27
+    },
+    {
+      "file": "veh_wind.wav",
+      "name": "veh_wind",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 176400,
+      "seconds": 4.0,
+      "bytes": 352844,
+      "loop": true,
+      "seamJump": 0.77
+    },
+    {
+      "file": "veh_horn.wav",
+      "name": "veh_horn",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 44100,
+      "seconds": 1.0,
+      "bytes": 88244,
+      "loop": true,
+      "seamJump": 4.83
+    },
+    {
+      "file": "veh_siren.wav",
+      "name": "veh_siren",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 176400,
+      "seconds": 4.0,
+      "bytes": 352844,
+      "loop": true,
+      "seamJump": 3.69
+    },
+    {
+      "file": "veh_collision.wav",
+      "name": "veh_collision",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 61739,
+      "seconds": 1.4,
+      "bytes": 123522,
+      "loop": false,
+      "seamJump": null
+    },
+    {
+      "file": "veh_door.wav",
+      "name": "veh_door",
+      "kind": "vehicle",
+      "channels": 1,
+      "samples": 26460,
+      "seconds": 0.6,
+      "bytes": 52964,
+      "loop": false,
+      "seamJump": null
+    }
+  ]
+}

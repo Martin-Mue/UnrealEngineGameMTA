@@ -10,7 +10,11 @@
 #include "GameFramework/PlayerController.h"
 #include "Materials/MaterialInterface.h"
 #include "Materials/MaterialInstanceDynamic.h"
+#include "Materials/MaterialParameters.h"
 #include "UObject/ConstructorHelpers.h"
+#include "UObject/SoftObjectPath.h"
+
+DEFINE_LOG_CATEGORY_STATIC(LogMTAWorldAIModels, Log, All);
 
 // Hinweis: Polizei-Funktionen (UpdatePoliceDispatch, UpdatePoliceUnit, ...) liegen in MTAPoliceLogic.cpp.
 
@@ -30,20 +34,40 @@ AMTAWorldAIManager::AMTAWorldAIManager()
 	static ConstructorHelpers::FObjectFinder<UStaticMesh> CylinderFinder(TEXT("/Engine/BasicShapes/Cylinder.Cylinder"));
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> ShapeMatFinder(TEXT("/Engine/BasicShapes/BasicShapeMaterial.BasicShapeMaterial"));
 
+	static ConstructorHelpers::FObjectFinder<UStaticMesh> SphereFinder(TEXT("/Engine/BasicShapes/Sphere.Sphere"));
+
 	if (CubeFinder.Succeeded())
 	{
 		VehicleBodyMesh = CubeFinder.Object;
 		VehicleCabinMesh = CubeFinder.Object;
 		SirenMesh = CubeFinder.Object;
+		CubeShapeMesh = CubeFinder.Object;
 	}
 	if (CylinderFinder.Succeeded())
 	{
 		PedestrianMesh = CylinderFinder.Object;
 	}
+	if (SphereFinder.Succeeded())
+	{
+		PedestrianHeadMesh = SphereFinder.Object;
+	}
 	if (ShapeMatFinder.Succeeded())
 	{
 		FallbackColorMaterial = ShapeMatFinder.Object;
 	}
+
+	// Fahrzeugmodelle aus den Epic-Vorlagen (weich referenziert: fehlen sie, bleibt der Platzhalter).
+	SportsBodyAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Vehicles/SportsCar/SM_SportsCar.SM_SportsCar")));
+	SportsGlassAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Vehicles/SportsCar/SM_SportsCar_Glass.SM_SportsCar_Glass")));
+	SportsWheelAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Vehicles/SportsCar/SM_SportsCar_Wheel.SM_SportsCar_Wheel")));
+	OffroadBodyAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Vehicles/OffroadCar/SM_Offroad_Body.SM_Offroad_Body")));
+	OffroadWheelAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/Vehicles/OffroadCar/SM_Offroad_Tire.SM_Offroad_Tire")));
+	ConceptBodyAsset = TSoftObjectPtr<UStaticMesh>(FSoftObjectPath(TEXT("/Game/ConceptCar/Car/SM_AutomotiveTP_Car.SM_AutomotiveTP_Car")));
+
+	// Hauttoene der Massen-Passanten (hell bis dunkel).
+	PedestrianSkinColors = {
+		FLinearColor(0.80f, 0.60f, 0.48f), FLinearColor(0.64f, 0.45f, 0.33f),
+		FLinearColor(0.42f, 0.28f, 0.19f), FLinearColor(0.24f, 0.15f, 0.10f) };
 
 	// Farben wie im Godot-Prototyp.
 	TrafficColors = {
@@ -104,8 +128,10 @@ void AMTAWorldAIManager::Tick(float DeltaSeconds)
 
 void AMTAWorldAIManager::InitAgents()
 {
-	NumTrafficSlots = FMath::Max(0, Traffic.NumTrafficVehicles);
-	NumPoliceSlots = FMath::Max(0, Police.MaxPolice);
+	// Obergrenze aller Fahrzeuge (Leistung): Polizei behaelt ihre Slots, der Verkehr wird gekuerzt.
+	const int32 VehicleCap = MaxTotalVehicles > 0 ? MaxTotalVehicles : TNumericLimits<int32>::Max();
+	NumPoliceSlots = FMath::Clamp(Police.MaxPolice, 0, VehicleCap);
+	NumTrafficSlots = FMath::Clamp(Traffic.NumTrafficVehicles, 0, FMath::Max(0, VehicleCap - NumPoliceSlots));
 	FirstPoliceSlot = NumTrafficSlots;
 
 	Vehicles.Resize(NumTrafficSlots + NumPoliceSlots);
@@ -179,18 +205,30 @@ FTransform AMTAWorldAIManager::HiddenTransform()
 	return FTransform(FQuat::Identity, FVector(0.0, 0.0, -100000.0), FVector(0.001));
 }
 
-UInstancedStaticMeshComponent* AMTAWorldAIManager::CreateInstancer(const FName& Name, UStaticMesh* Mesh, const FLinearColor& Color, int32 Count, bool bShadows)
+uint32 AMTAWorldAIManager::HashIndex(uint32 X)
+{
+	// Ganzzahl-Hash (deterministisch, unabhaengig vom Zufallsstrom der Simulation).
+	X ^= X >> 16;
+	X *= 0x7feb352dU;
+	X ^= X >> 15;
+	X *= 0x846ca68bU;
+	X ^= X >> 16;
+	return X;
+}
+
+UInstancedStaticMeshComponent* AMTAWorldAIManager::CreateInstancer(const FName& InName, UStaticMesh* Mesh, const FLinearColor& Color, int32 Count, bool bShadows)
 {
 	if (!Mesh || Count <= 0)
 	{
 		return nullptr;
 	}
 
-	UInstancedStaticMeshComponent* Comp = NewObject<UInstancedStaticMeshComponent>(this, Name);
+	UInstancedStaticMeshComponent* Comp = NewObject<UInstancedStaticMeshComponent>(this, InName);
 	Comp->SetMobility(EComponentMobility::Movable);
 	Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	Comp->SetCanEverAffectNavigation(false);
 	Comp->SetCastShadow(bShadows);
+	Comp->bCastFarShadow = false;
 	Comp->SetStaticMesh(Mesh);
 	Comp->SetupAttachment(GetRootComponent());
 	Comp->RegisterComponent();
@@ -226,46 +264,432 @@ UInstancedStaticMeshComponent* AMTAWorldAIManager::CreateInstancer(const FName& 
 	return Comp;
 }
 
-void AMTAWorldAIManager::InitVisuals()
+UInstancedStaticMeshComponent* AMTAWorldAIManager::CreateModelInstancer(const FName& InName, UStaticMesh* Mesh, int32 Count, bool bShadows, const FIntPoint& Cull)
 {
-	// --- Zivilverkehr: eine Komponente je Farbgruppe -------------------------------------------
-	const int32 NumTrafficColors = FMath::Max(1, TrafficColors.Num());
-	TArray<int32> GroupCounts;
-	GroupCounts.Init(0, NumTrafficColors);
-	for (int32 I = 0; I < NumTrafficSlots; ++I)
+	if (!Mesh || Count <= 0)
 	{
-		const int32 C = I % NumTrafficColors;
-		Vehicles.ColorIndex[I] = static_cast<uint8>(C);
-		Vehicles.InstanceIndex[I] = GroupCounts[C]++;
-	}
-	TrafficBodyISMs.SetNum(NumTrafficColors);
-	TrafficXfBuffers.SetNum(NumTrafficColors);
-	for (int32 C = 0; C < NumTrafficColors; ++C)
-	{
-		const FLinearColor Col = TrafficColors.IsValidIndex(C) ? TrafficColors[C] : FLinearColor::Gray;
-		TrafficBodyISMs[C] = CreateInstancer(*FString::Printf(TEXT("TrafficBody_%d"), C), VehicleBodyMesh, Col, GroupCounts[C], bAgentsCastShadows);
-		TrafficXfBuffers[C].SetNum(GroupCounts[C]);
+		return nullptr;
 	}
 
-	// --- Polizei ----------------------------------------------------------------------------------
-	for (int32 I = FirstPoliceSlot; I < Vehicles.Num(); ++I)
+	UInstancedStaticMeshComponent* Comp = NewObject<UInstancedStaticMeshComponent>(this, InName);
+	Comp->SetMobility(EComponentMobility::Movable);
+	Comp->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	Comp->SetCanEverAffectNavigation(false);
+	Comp->SetCastShadow(bShadows);
+	// Keine fernen Kaskaden: Fahrzeugschatten nur im Nahbereich.
+	Comp->bCastFarShadow = false;
+	Comp->SetStaticMesh(Mesh);
+	Comp->SetupAttachment(GetRootComponent());
+	Comp->RegisterComponent();
+	AddInstanceComponent(Comp);
+	Comp->SetCullDistances(Cull.X, Cull.Y);
+
+	const FTransform Hidden = HiddenTransform();
+	for (int32 N = 0; N < Count; ++N)
+	{
+		Comp->AddInstance(Hidden, /*bWorldSpace*/ true);
+	}
+	Comp->MarkRenderStateDirty();
+	return Comp;
+}
+
+// =============================================================================================
+// Fahrzeugmodelle (Epic-Vorlagen)
+// =============================================================================================
+
+bool AMTAWorldAIManager::FindPaintSlot(const UStaticMesh* Mesh, int32& OutSlot, FName& OutParam)
+{
+	OutSlot = INDEX_NONE;
+	OutParam = NAME_None;
+	if (!Mesh)
+	{
+		return false;
+	}
+
+	// Lack-Slot ueber den Materialnamen (MI_SportsCarBody, MI_OffroadCar_Main, MI_CarPaint), dann den
+	// Farbparameter im Material suchen (M_SportsCarBase: "Paint Tint", M_CarPaint: "PaintColor").
+	static const TCHAR* SlotHints[] = { TEXT("CarPaint"), TEXT("SportsCarBody"), TEXT("OffroadCar_Main"), TEXT("Body"), TEXT("Paint"), TEXT("Main") };
+	static const TCHAR* ParamNames[] = { TEXT("Paint Tint"), TEXT("PaintColor"), TEXT("Paint Color"), TEXT("BodyColor"), TEXT("Color"), TEXT("BaseColor"), TEXT("Tint") };
+
+	const TArray<FStaticMaterial>& Mats = Mesh->GetStaticMaterials();
+	for (const TCHAR* Hint : SlotHints)
+	{
+		for (int32 S = 0; S < Mats.Num(); ++S)
+		{
+			const UMaterialInterface* Mat = Mats[S].MaterialInterface;
+			if (!Mat)
+			{
+				continue;
+			}
+			if (!Mat->GetName().Contains(Hint) && !Mats[S].MaterialSlotName.ToString().Contains(Hint))
+			{
+				continue;
+			}
+			for (const TCHAR* Param : ParamNames)
+			{
+				FLinearColor Value;
+				if (Mat->GetVectorParameterValue(FHashedMaterialParameterInfo(FName(Param)), Value))
+				{
+					OutSlot = S;
+					OutParam = FName(Param);
+					return true;
+				}
+			}
+		}
+	}
+	return false;
+}
+
+bool AMTAWorldAIManager::ComputeModelFit(EMTATrafficBodyModel Model, UStaticMesh* Body, UStaticMesh* Wheel, FMTATrafficModelFit& Out) const
+{
+	Out = FMTATrafficModelFit();
+	if (!Body)
+	{
+		return false;
+	}
+	const FBox BodyBox = Body->GetBoundingBox();
+	const FVector BodySize = BodyBox.GetSize();
+	if (!BodyBox.IsValid || BodySize.X < 1.0 || BodySize.Y < 1.0 || BodySize.Z < 1.0)
+	{
+		return false;
+	}
+
+	const bool bSports = Model == EMTATrafficBodyModel::Sports;
+	const bool bOffroad = Model == EMTATrafficBodyModel::Offroad;
+	const FVector2D Target = bSports ? SportsTargetSize : (bOffroad ? OffroadTargetSize : ConceptTargetSize);
+
+	// Vorlagen schauen in +X: Laenge entlang X, Breite entlang Y; Hoehe proportional mitskaliert.
+	const double Sx = Target.X / BodySize.X;
+	const double Sy = Target.Y / BodySize.Y;
+	const double Sz = 0.5 * (Sx + Sy);
+	Out.BodyScale = FVector(Sx, Sy, Sz);
+	Out.Length = static_cast<float>(Target.X);
+	Out.Width = static_cast<float>(Target.Y);
+	Out.RawLength = static_cast<float>(BodySize.X);
+
+	double GroundRefZ = BodyBox.Min.Z;   // Mesh-Z, das auf dem Boden (+ Bodenfreiheit) liegen soll
+	double Clearance = 0.0;              // Concept Car: Raeder im Mesh -> Unterkante = Reifen
+
+	if (Wheel)
+	{
+		const FBox WheelBox = Wheel->GetBoundingBox();
+		const FVector WheelSize = WheelBox.GetSize();
+		if (WheelBox.IsValid && WheelSize.Z > 1.0)
+		{
+			if (WheelSize.X > 150.0 || WheelSize.Y > 150.0)
+			{
+				// Ein Mesh mit allen vier Raedern: gleicher Pivot wie die Karosserie.
+				Out.bWheelSet = true;
+				GroundRefZ = FMath::Min(GroundRefZ, WheelBox.Min.Z);
+			}
+			else
+			{
+				// Einzelrad: 4 Instanzen. Achse = schmalste horizontale Ausdehnung.
+				Out.bSeparateWheels = true;
+				Out.bWheelAxleAlongX = WheelSize.X < WheelSize.Y;
+				const double MeshDiameter = FMath::Max(Out.bWheelAxleAlongX ? WheelSize.Y : WheelSize.X, WheelSize.Z);
+				const double MeshWidth = FMath::Min(WheelSize.X, WheelSize.Y);
+				const double Diameter = bSports ? WheelDiameter.X : WheelDiameter.Y;
+				const double Ws = Diameter / FMath::Max(MeshDiameter, 1.0);
+				Out.WheelScale = FVector(Ws);
+				Out.WheelMeshCenter = WheelBox.GetCenter();
+				Out.WheelRadius = static_cast<float>(Diameter * 0.5);
+				Clearance = bSports ? BodyClearance.X : BodyClearance.Y;
+
+				const FVector2D Axle = bSports ? SportsAxleFactor : OffroadAxleFactor;
+				const double Lat = Target.Y * 0.5 - MeshWidth * Ws * 0.5 - 3.0;
+				const double FrontX = Axle.X * Target.X;
+				const double RearX = -Axle.Y * Target.X;
+				const double R = Diameter * 0.5;
+				Out.WheelCenters[0] = FVector(FrontX, -Lat, R);  // vorn links
+				Out.WheelCenters[1] = FVector(FrontX, Lat, R);   // vorn rechts
+				Out.WheelCenters[2] = FVector(RearX, -Lat, R);   // hinten links
+				Out.WheelCenters[3] = FVector(RearX, Lat, R);    // hinten rechts
+			}
+		}
+	}
+
+	// Pivot: Mitte in X/Y, Bezugs-Unterkante auf Bodenfreiheit.
+	const FVector C = BodyBox.GetCenter();
+	Out.BodyOffset = FVector(-C.X * Sx, -C.Y * Sy, -GroundRefZ * Sz + Clearance);
+	Out.RoofZ = static_cast<float>(Out.BodyOffset.Z + BodyBox.Max.Z * Sz);
+
+	FindPaintSlot(Body, Out.PaintSlot, Out.PaintParam);
+	Out.bValid = true;
+	return true;
+}
+
+void AMTAWorldAIManager::LoadVehicleModels()
+{
+	const int32 NumModels = static_cast<int32>(EMTATrafficBodyModel::Count);
+	ModelBodyMeshes.Init(nullptr, NumModels);
+	ModelWheelMeshes.Init(nullptr, NumModels);
+	LoadedSportsGlass = nullptr;
+	for (int32 M = 0; M < NumModels; ++M)
+	{
+		ModelFits[M] = FMTATrafficModelFit();
+	}
+	// Platzhalter ist immer verfuegbar.
+	ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)].bValid = VehicleBodyMesh != nullptr;
+	ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)].Length = static_cast<float>(VehicleBodySize.X);
+	ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)].Width = static_cast<float>(VehicleBodySize.Y);
+
+	if (!bUseVehicleModels)
+	{
+		return;
+	}
+
+	auto LoadMesh = [](const TSoftObjectPtr<UStaticMesh>& Ref) -> UStaticMesh*
+	{
+		return Ref.IsNull() ? nullptr : Ref.LoadSynchronous();
+	};
+
+	const int32 SportsIdx = static_cast<int32>(EMTATrafficBodyModel::Sports);
+	const int32 OffroadIdx = static_cast<int32>(EMTATrafficBodyModel::Offroad);
+	const int32 ConceptIdx = static_cast<int32>(EMTATrafficBodyModel::Concept);
+
+	ModelBodyMeshes[SportsIdx] = LoadMesh(SportsBodyAsset);
+	ModelWheelMeshes[SportsIdx] = LoadMesh(SportsWheelAsset);
+	ModelBodyMeshes[OffroadIdx] = LoadMesh(OffroadBodyAsset);
+	ModelWheelMeshes[OffroadIdx] = LoadMesh(OffroadWheelAsset);
+	ModelBodyMeshes[ConceptIdx] = LoadMesh(ConceptBodyAsset);
+	LoadedSportsGlass = ModelBodyMeshes[SportsIdx] ? LoadMesh(SportsGlassAsset) : nullptr;
+
+	for (int32 M = 0; M < static_cast<int32>(EMTATrafficBodyModel::Box); ++M)
+	{
+		const EMTATrafficBodyModel Model = static_cast<EMTATrafficBodyModel>(M);
+		if (!ComputeModelFit(Model, ModelBodyMeshes[M], ModelWheelMeshes[M], ModelFits[M]))
+		{
+			UE_LOG(LogMTAWorldAIModels, Warning, TEXT("Welt-KI: Fahrzeugmodell %d nicht verfuegbar (Asset fehlt? tools/setup_template_assets.ps1)"), M);
+			ModelBodyMeshes[M] = nullptr;
+			ModelWheelMeshes[M] = nullptr;
+			continue;
+		}
+		if (ModelFits[M].PaintSlot == INDEX_NONE)
+		{
+			UE_LOG(LogMTAWorldAIModels, Warning, TEXT("Welt-KI: Fahrzeugmodell %d ohne Lack-Parameter, Farben fehlen"), M);
+		}
+		UE_LOG(LogMTAWorldAIModels, Log, TEXT("Welt-KI: Modell %d roh %.0f cm -> %.0f x %.0f cm, Dach %.0f cm, Lack-Slot %d (%s), Raeder %s"),
+			M, ModelFits[M].RawLength, ModelFits[M].Length, ModelFits[M].Width, ModelFits[M].RoofZ,
+			ModelFits[M].PaintSlot, *ModelFits[M].PaintParam.ToString(),
+			ModelFits[M].bSeparateWheels ? TEXT("einzeln") : (ModelFits[M].bWheelSet ? TEXT("Satz") : TEXT("im Mesh")));
+	}
+}
+
+UMaterialInstanceDynamic* AMTAWorldAIManager::MakePaintMID(EMTATrafficBodyModel Model, const FLinearColor& Color)
+{
+	const int32 M = static_cast<int32>(Model);
+	if (!ModelBodyMeshes.IsValidIndex(M) || !ModelBodyMeshes[M] || ModelFits[M].PaintSlot == INDEX_NONE)
+	{
+		return nullptr;
+	}
+	UMaterialInterface* BaseMat = ModelBodyMeshes[M]->GetMaterial(ModelFits[M].PaintSlot);
+	UMaterialInstanceDynamic* MID = BaseMat ? UMaterialInstanceDynamic::Create(BaseMat, this) : nullptr;
+	if (MID)
+	{
+		MID->SetVectorParameterValue(ModelFits[M].PaintParam, Color);
+	}
+	return MID;
+}
+
+EMTATrafficBodyModel AMTAWorldAIManager::PickModelForSlot(int32 Slot) const
+{
+	const float Weights[3] = {
+		static_cast<float>(ModelWeights.X), static_cast<float>(ModelWeights.Y), static_cast<float>(ModelWeights.Z) };
+	TArray<int32, TInlineAllocator<3>> Avail;
+	float Total = 0.f;
+	for (int32 M = 0; M < 3; ++M)
+	{
+		if (ModelBodyMeshes.IsValidIndex(M) && ModelBodyMeshes[M] && ModelFits[M].bValid && Weights[M] > 0.f)
+		{
+			Avail.Add(M);
+			Total += Weights[M];
+		}
+	}
+	if (Avail.Num() == 0 || Total <= 0.f)
+	{
+		return EMTATrafficBodyModel::Box;
+	}
+	// Jede verfuegbare Sorte kommt mindestens einmal vor, danach gewichtet.
+	if (Slot < Avail.Num())
+	{
+		return static_cast<EMTATrafficBodyModel>(Avail[Slot]);
+	}
+	float R = static_cast<float>(HashIndex(static_cast<uint32>(Slot) * 2654435761U + 17U) % 10000U) / 10000.f * Total;
+	for (const int32 M : Avail)
+	{
+		R -= Weights[M];
+		if (R <= 0.f)
+		{
+			return static_cast<EMTATrafficBodyModel>(M);
+		}
+	}
+	return static_cast<EMTATrafficBodyModel>(Avail.Last());
+}
+
+void AMTAWorldAIManager::InitVisuals()
+{
+	LoadVehicleModels();
+
+	const int32 NumModels = static_cast<int32>(EMTATrafficBodyModel::Count);
+	const int32 BoxIdx = static_cast<int32>(EMTATrafficBodyModel::Box);
+	const int32 SportsIdx = static_cast<int32>(EMTATrafficBodyModel::Sports);
+	const int32 NumVeh = Vehicles.Num();
+	// Gruppenindex muss in uint8 (ColorIndex) passen.
+	NumPaintColors = FMath::Clamp(TrafficColors.Num(), 1, 255 / NumModels);
+
+	VehicleModel.Init(static_cast<uint8>(BoxIdx), NumVeh);
+	WheelInstanceBase.Init(INDEX_NONE, NumVeh);
+	GlassInstance.Init(INDEX_NONE, NumVeh);
+	WheelSpin.Init(0.f, NumVeh);
+
+	TArray<int32> WheelCounts;
+	WheelCounts.Init(0, NumModels);
+	int32 GlassCount = 0;
+	bool bAnyBox = false;
+
+	auto AssignParts = [&](int32 I, int32 M)
+	{
+		VehicleModel[I] = static_cast<uint8>(M);
+		const FMTATrafficModelFit& Fit = ModelFits[M];
+		if (ModelWheelMeshes.IsValidIndex(M) && ModelWheelMeshes[M] && (Fit.bSeparateWheels || Fit.bWheelSet))
+		{
+			WheelInstanceBase[I] = WheelCounts[M];
+			WheelCounts[M] += Fit.bSeparateWheels ? 4 : 1;
+		}
+		if (M == SportsIdx && LoadedSportsGlass)
+		{
+			GlassInstance[I] = GlassCount++;
+		}
+		bAnyBox |= (M == BoxIdx);
+	};
+
+	// --- Zivilverkehr: eine Komponente je (Sorte, Lackfarbe) -----------------------------------
+	const int32 NumGroups = NumModels * NumPaintColors;
+	TArray<int32> GroupCounts;
+	GroupCounts.Init(0, NumGroups);
+	for (int32 I = 0; I < NumTrafficSlots; ++I)
+	{
+		const int32 M = static_cast<int32>(PickModelForSlot(I));
+		const int32 Color = static_cast<int32>(HashIndex(static_cast<uint32>(I) * 31U + 7U) % static_cast<uint32>(NumPaintColors));
+		const int32 G = M * NumPaintColors + Color;
+		Vehicles.ColorIndex[I] = static_cast<uint8>(G);
+		Vehicles.InstanceIndex[I] = GroupCounts[G]++;
+		AssignParts(I, M);
+	}
+	TrafficBodyISMs.Reset();
+	TrafficBodyISMs.SetNum(NumGroups);
+	TrafficXfBuffers.Reset();
+	TrafficXfBuffers.SetNum(NumGroups);
+	for (int32 G = 0; G < NumGroups; ++G)
+	{
+		if (GroupCounts[G] <= 0)
+		{
+			continue;
+		}
+		const int32 M = G / NumPaintColors;
+		const int32 C = G % NumPaintColors;
+		const FLinearColor Col = TrafficColors.IsValidIndex(C) ? TrafficColors[C] : FLinearColor::Gray;
+		const FName CompName = *FString::Printf(TEXT("TrafficBody_%d_%d"), M, C);
+		UInstancedStaticMeshComponent* Comp = nullptr;
+		if (M == BoxIdx)
+		{
+			Comp = CreateInstancer(CompName, VehicleBodyMesh, Col, GroupCounts[G], bAgentsCastShadows);
+			if (Comp)
+			{
+				Comp->SetCullDistances(VehicleCullDistance.X, VehicleCullDistance.Y);
+			}
+		}
+		else
+		{
+			Comp = CreateModelInstancer(CompName, ModelBodyMeshes[M], GroupCounts[G], bAgentsCastShadows, VehicleCullDistance);
+			UMaterialInstanceDynamic* Paint = Comp ? MakePaintMID(static_cast<EMTATrafficBodyModel>(M), Col) : nullptr;
+			if (Paint)
+			{
+				Comp->SetMaterial(ModelFits[M].PaintSlot, Paint);
+			}
+		}
+		TrafficBodyISMs[G] = Comp;
+		TrafficXfBuffers[G].SetNum(GroupCounts[G]);
+	}
+
+	// --- Polizei: Sportwagen, dunkler Lack, weisser Streifen, Sirenenbalken ------------------------
+	const bool bPoliceModel = ModelBodyMeshes.IsValidIndex(SportsIdx) && ModelBodyMeshes[SportsIdx] != nullptr;
+	for (int32 I = FirstPoliceSlot; I < NumVeh; ++I)
 	{
 		Vehicles.ColorIndex[I] = 0;
 		Vehicles.InstanceIndex[I] = I - FirstPoliceSlot;
+		AssignParts(I, bPoliceModel ? SportsIdx : BoxIdx);
 	}
-	PoliceBodyISM = CreateInstancer(TEXT("PoliceBody"), VehicleBodyMesh, PoliceColor, NumPoliceSlots, bAgentsCastShadows);
+	PolicePaintMID = nullptr;
+	PoliceStripeMID = nullptr;
+	if (bPoliceModel)
+	{
+		PoliceBodyISM = CreateModelInstancer(TEXT("PoliceBody"), ModelBodyMeshes[SportsIdx], NumPoliceSlots, bAgentsCastShadows, VehicleCullDistance);
+		PolicePaintMID = PoliceBodyISM ? MakePaintMID(EMTATrafficBodyModel::Sports, PoliceColor) : nullptr;
+		if (PolicePaintMID)
+		{
+			PoliceBodyISM->SetMaterial(ModelFits[SportsIdx].PaintSlot, PolicePaintMID);
+		}
+	}
+	else
+	{
+		PoliceBodyISM = CreateInstancer(TEXT("PoliceBody"), VehicleBodyMesh, PoliceColor, NumPoliceSlots, bAgentsCastShadows);
+		if (PoliceBodyISM)
+		{
+			PoliceBodyISM->SetCullDistances(VehicleCullDistance.X, VehicleCullDistance.Y);
+		}
+	}
+	// Streifen: zweite Materialinstanz (BasicShapeMaterial "Color" weiss) auf einem flachen Quader.
+	PoliceStripeISM = CreateInstancer(TEXT("PoliceStripe"), CubeShapeMesh, PoliceStripeColor, NumPoliceSlots, false);
+	if (PoliceStripeISM)
+	{
+		PoliceStripeISM->SetCullDistances(VehicleCullDistance.X, VehicleCullDistance.Y);
+		PoliceStripeMID = Cast<UMaterialInstanceDynamic>(PoliceStripeISM->GetMaterial(0));
+	}
 	SirenRedISM = CreateInstancer(TEXT("SirenRed"), SirenMesh, FLinearColor(1.f, 0.1f, 0.1f), NumPoliceSlots, false);
 	SirenBlueISM = CreateInstancer(TEXT("SirenBlue"), SirenMesh, FLinearColor(0.15f, 0.3f, 1.f), NumPoliceSlots, false);
+	for (UInstancedStaticMeshComponent* Siren : { SirenRedISM.Get(), SirenBlueISM.Get() })
+	{
+		if (Siren)
+		{
+			Siren->SetCullDistances(VehicleCullDistance.X, VehicleCullDistance.Y);
+		}
+	}
 	PoliceXfBuffer.SetNum(NumPoliceSlots);
+	StripeXfBuffer.SetNum(NumPoliceSlots);
 	SirenRedXfBuffer.SetNum(NumPoliceSlots);
 	SirenBlueXfBuffer.SetNum(NumPoliceSlots);
 
-	// --- Kabine fuer alle Fahrzeug-Slots (Index = Fahrzeugindex) -------------------------------
-	CabinISM = CreateInstancer(TEXT("VehicleCabin"), VehicleCabinMesh, CabinColor, Vehicles.Num(), bAgentsCastShadows);
-	CabinXfBuffer.SetNum(Vehicles.Num());
+	// --- Raeder je Sorte, Glas des Sportwagens (ohne Schatten) -----------------------------------
+	WheelISMs.Reset();
+	WheelISMs.SetNum(NumModels);
+	WheelXfBuffers.Reset();
+	WheelXfBuffers.SetNum(NumModels);
+	for (int32 M = 0; M < NumModels; ++M)
+	{
+		if (WheelCounts[M] > 0 && ModelWheelMeshes.IsValidIndex(M) && ModelWheelMeshes[M])
+		{
+			WheelISMs[M] = CreateModelInstancer(*FString::Printf(TEXT("TrafficWheels_%d"), M), ModelWheelMeshes[M], WheelCounts[M], false, VehicleCullDistance);
+			WheelXfBuffers[M].SetNum(WheelCounts[M]);
+		}
+	}
+	SportsGlassISM = GlassCount > 0 ? CreateModelInstancer(TEXT("SportsGlass"), LoadedSportsGlass, GlassCount, false, VehicleCullDistance) : nullptr;
+	GlassXfBuffer.SetNum(SportsGlassISM ? GlassCount : 0);
 
-	// --- Fussgaenger je Farbgruppe -----------------------------------------------------------------
-	const int32 NumPedColors = FMath::Max(1, PedestrianColors.Num());
+	// --- Kabine nur fuer Platzhalter-Fahrzeuge (Index = Fahrzeugindex) ---------------------------
+	CabinISM = bAnyBox ? CreateInstancer(TEXT("VehicleCabin"), VehicleCabinMesh, CabinColor, NumVeh, bAgentsCastShadows) : nullptr;
+	if (CabinISM)
+	{
+		CabinISM->SetCullDistances(VehicleCullDistance.X, VehicleCullDistance.Y);
+	}
+	CabinXfBuffer.SetNum(CabinISM ? NumVeh : 0);
+
+	// Schatten nur nah: je Karosserie-Komponente (Verkehr + Polizei als letzter Eintrag).
+	BodyNearestDistSq.Init(TNumericLimits<float>::Max(), TrafficBodyISMs.Num() + 1);
+
+	// --- Fussgaenger: Koerper je Kleidungsfarbe, Kopf je Hautton -----------------------------------
+	const int32 NumPedColors = FMath::Clamp(PedestrianColors.Num(), 1, 255);
 	TArray<int32> PedCounts;
 	PedCounts.Init(0, NumPedColors);
 	for (int32 I = 0; I < Peds.Num(); ++I)
@@ -274,14 +698,49 @@ void AMTAWorldAIManager::InitVisuals()
 		Peds.ColorIndex[I] = static_cast<uint8>(C);
 		Peds.InstanceIndex[I] = PedCounts[C]++;
 	}
+	PedISMs.Reset();
 	PedISMs.SetNum(NumPedColors);
+	PedXfBuffers.Reset();
 	PedXfBuffers.SetNum(NumPedColors);
 	for (int32 C = 0; C < NumPedColors; ++C)
 	{
 		const FLinearColor Col = PedestrianColors.IsValidIndex(C) ? PedestrianColors[C] : FLinearColor::White;
 		PedISMs[C] = CreateInstancer(*FString::Printf(TEXT("Pedestrian_%d"), C), PedestrianMesh, Col, PedCounts[C], bAgentsCastShadows);
+		if (PedISMs[C])
+		{
+			PedISMs[C]->SetCullDistances(PedestrianCullDistance.X, PedestrianCullDistance.Y);
+		}
 		PedXfBuffers[C].SetNum(PedCounts[C]);
 	}
+
+	const int32 NumSkins = FMath::Clamp(PedestrianSkinColors.Num(), 1, 255);
+	PedHeadGroup.Init(0, Peds.Num());
+	PedHeadInstance.Init(INDEX_NONE, Peds.Num());
+	TArray<int32> HeadCounts;
+	HeadCounts.Init(0, NumSkins);
+	for (int32 I = 0; I < Peds.Num(); ++I)
+	{
+		const int32 S = static_cast<int32>(HashIndex(static_cast<uint32>(I) * 13U + 5U) % static_cast<uint32>(NumSkins));
+		PedHeadGroup[I] = static_cast<uint8>(S);
+		PedHeadInstance[I] = HeadCounts[S]++;
+	}
+	PedHeadISMs.Reset();
+	PedHeadISMs.SetNum(NumSkins);
+	PedHeadXfBuffers.Reset();
+	PedHeadXfBuffers.SetNum(NumSkins);
+	for (int32 S = 0; S < NumSkins; ++S)
+	{
+		const FLinearColor Col = PedestrianSkinColors.IsValidIndex(S) ? PedestrianSkinColors[S] : FLinearColor(0.7f, 0.5f, 0.4f);
+		// Koepfe ohne Schatten (klein, viele): der Koerper wirft den Schatten.
+		PedHeadISMs[S] = CreateInstancer(*FString::Printf(TEXT("PedestrianHead_%d"), S), PedestrianHeadMesh, Col, HeadCounts[S], false);
+		if (PedHeadISMs[S])
+		{
+			PedHeadISMs[S]->SetCullDistances(PedestrianCullDistance.X, PedestrianCullDistance.Y);
+		}
+		PedHeadXfBuffers[S].SetNum(HeadCounts[S]);
+	}
+
+	bVisualsReady = true;
 }
 
 // =============================================================================================
@@ -832,47 +1291,145 @@ void AMTAWorldAIManager::UpdateBubble()
 // Darstellung
 // =============================================================================================
 
+void AMTAWorldAIManager::WriteWheelTransforms(int32 I, const FQuat& Rot, const FVector& Base, float FrameDt)
+{
+	if (!VehicleModel.IsValidIndex(I) || !WheelInstanceBase.IsValidIndex(I))
+	{
+		return;
+	}
+	const int32 M = VehicleModel[I];
+	const int32 B = WheelInstanceBase[I];
+	if (B == INDEX_NONE || !WheelXfBuffers.IsValidIndex(M))
+	{
+		return;
+	}
+	TArray<FTransform>& Buf = WheelXfBuffers[M];
+	const FMTATrafficModelFit& Fit = ModelFits[M];
+
+	if (Fit.bWheelSet)
+	{
+		// Radsatz teilt den Pivot mit der Karosserie.
+		if (Buf.IsValidIndex(B))
+		{
+			Buf[B] = FTransform(Rot, Base + Rot.RotateVector(Fit.BodyOffset), Fit.BodyScale);
+		}
+		return;
+	}
+	if (!Buf.IsValidIndex(B + 3))
+	{
+		return;
+	}
+
+	// Raddrehung aus dem Tempo (Grad), nur Darstellung.
+	if (Fit.WheelRadius > 1.f && WheelSpin.IsValidIndex(I))
+	{
+		const float DegPerCm = 180.f / (UE_PI * Fit.WheelRadius);
+		WheelSpin[I] = FMath::Fmod(WheelSpin[I] + Vehicles.Speed[I] * FrameDt * DegPerCm, 360.f);
+	}
+	const float SpinDeg = WheelSpin.IsValidIndex(I) ? WheelSpin[I] : 0.f;
+	const FQuat Spin = FRotator(-SpinDeg, 0.f, 0.f).Quaternion();
+	const FQuat AxleFix = Fit.bWheelAxleAlongX ? FRotator(0.f, 90.f, 0.f).Quaternion() : FQuat::Identity;
+	const FQuat Mirror = FRotator(0.f, 180.f, 0.f).Quaternion();
+	const FVector ScaledCenter = Fit.WheelMeshCenter * Fit.WheelScale;
+
+	for (int32 W = 0; W < 4; ++W)
+	{
+		// Mesh ist fuer links modelliert (sonst bFlipWheelSides): rechte Seite gespiegelt per 180 Grad.
+		const bool bRight = (W % 2) == 1;
+		const bool bMirror = bFlipWheelSides ? !bRight : bRight;
+		const FQuat WheelRot = Rot * Spin * (bMirror ? Mirror : FQuat::Identity) * AxleFix;
+		const FVector Center = Base + Rot.RotateVector(Fit.WheelCenters[W]);
+		Buf[B + W] = FTransform(WheelRot, Center - WheelRot.RotateVector(ScaledCenter), Fit.WheelScale);
+	}
+}
+
 void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 {
+	if (!bVisualsReady)
+	{
+		return;
+	}
 	const float Alpha = 1.f - FMath::Exp(-FrameDt * Traffic.VisualSmoothing);
 	const float LodDistSq = FMath::Square(Traffic.LodDistance);
 	const FTransform Hidden = HiddenTransform();
 
-	const FVector BodyScale = VehicleBodySize / 100.0;   // Engine-Wuerfel = 100 cm
-	const FVector CabinScale = VehicleCabinSize / 100.0;
-	const double Clearance = 20.0;
-	const double BodyZ = Clearance + VehicleBodySize.Z * 0.5;
-	const double CabinZ = Clearance + VehicleBodySize.Z + VehicleCabinSize.Z * 0.5;
-	const double SirenZ = Clearance + VehicleBodySize.Z + VehicleCabinSize.Z + 10.0;
-	const FVector SirenScale(0.4, 0.7, 0.18);
+	// Platzhalter-Masse (Sorte Box, Engine-Wuerfel = 100 cm)
+	const FVector BoxBodyScale = VehicleBodySize / 100.0;
+	const FVector BoxCabinScale = VehicleCabinSize / 100.0;
+	const double BoxClearance = 20.0;
+	const double BoxBodyZ = BoxClearance + VehicleBodySize.Z * 0.5;
+	const double BoxCabinZ = BoxClearance + VehicleBodySize.Z + VehicleCabinSize.Z * 0.5;
+	const double BoxRoofZ = BoxClearance + VehicleBodySize.Z + VehicleCabinSize.Z;
 
 	const bool bSirenOn = CachedHeat > 0.f;
 	const bool bRedPhase = IsSirenPhaseRed();
+	const int32 BoxIdx = static_cast<int32>(EMTATrafficBodyModel::Box);
+	const int32 PoliceShadowSlot = TrafficBodyISMs.Num();
+
+	for (float& D : BodyNearestDistSq)
+	{
+		D = TNumericLimits<float>::Max();
+	}
+
+	auto HideVehicleParts = [this, &Hidden](int32 I)
+	{
+		if (CabinXfBuffer.IsValidIndex(I))
+		{
+			CabinXfBuffer[I] = Hidden;
+		}
+		if (GlassInstance.IsValidIndex(I) && GlassXfBuffer.IsValidIndex(GlassInstance[I]))
+		{
+			GlassXfBuffer[GlassInstance[I]] = Hidden;
+		}
+		if (VehicleModel.IsValidIndex(I) && WheelInstanceBase.IsValidIndex(I) && WheelInstanceBase[I] != INDEX_NONE
+			&& WheelXfBuffers.IsValidIndex(VehicleModel[I]))
+		{
+			TArray<FTransform>& Buf = WheelXfBuffers[VehicleModel[I]];
+			const int32 N = ModelFits[VehicleModel[I]].bSeparateWheels ? 4 : 1;
+			for (int32 W = 0; W < N; ++W)
+			{
+				if (Buf.IsValidIndex(WheelInstanceBase[I] + W))
+				{
+					Buf[WheelInstanceBase[I] + W] = Hidden;
+				}
+			}
+		}
+	};
 
 	// --- Fahrzeuge ------------------------------------------------------------------------------
 	for (int32 I = 0; I < Vehicles.Num(); ++I)
 	{
 		const bool bPolice = Vehicles.Kind[I] == EMTAAgentKind::Police;
 		const int32 Inst = Vehicles.InstanceIndex[I];
+		const int32 M = VehicleModel.IsValidIndex(I) ? VehicleModel[I] : BoxIdx;
+		const FMTATrafficModelFit& Fit = ModelFits[M];
+		const bool bBox = M == BoxIdx;
 
 		if (!Vehicles.bActive[I])
 		{
 			if (bPolice && PoliceXfBuffer.IsValidIndex(Inst))
 			{
 				PoliceXfBuffer[Inst] = Hidden;
+				StripeXfBuffer[Inst] = Hidden;
 				SirenRedXfBuffer[Inst] = Hidden;
 				SirenBlueXfBuffer[Inst] = Hidden;
 			}
-			if (CabinXfBuffer.IsValidIndex(I))
+			else if (!bPolice)
 			{
-				CabinXfBuffer[I] = Hidden;
+				const int32 G = Vehicles.ColorIndex[I];
+				if (TrafficXfBuffers.IsValidIndex(G) && TrafficXfBuffers[G].IsValidIndex(Inst))
+				{
+					TrafficXfBuffers[G][Inst] = Hidden;
+				}
 			}
+			HideVehicleParts(I);
 			continue;
 		}
 
 		const FVector Target(Vehicles.SimLoc[I].X, Vehicles.SimLoc[I].Y, GroundZ);
 		const float TargetYaw = MTAAI::YawFromDir(Vehicles.SimDir[I]);
-		const bool bFar = bHasPlayer && FVector2f::DistSquared(Vehicles.SimLoc[I], PlayerLoc2D) > LodDistSq;
+		const float PlayerDistSq = bHasPlayer ? FVector2f::DistSquared(Vehicles.SimLoc[I], PlayerLoc2D) : 0.f;
+		const bool bFar = bHasPlayer && PlayerDistSq > LodDistSq;
 		if (Vehicles.bSnapVisual[I] || bFar)
 		{
 			Vehicles.VisLoc[I] = Target;
@@ -887,12 +1444,37 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 
 		const FQuat Rot = FRotator(0.f, Vehicles.VisYaw[I], 0.f).Quaternion();
 		const FVector Base = Vehicles.VisLoc[I];
-		const FTransform BodyXf(Rot, Base + FVector(0.0, 0.0, BodyZ), BodyScale);
-		const FTransform CabinXf(Rot, Base + Rot.RotateVector(FVector(-20.0, 0.0, CabinZ)), CabinScale);
 
-		if (CabinXfBuffer.IsValidIndex(I))
+		// Karosserie: Vorlagen-Mesh mit Pivot-Korrektur oder Platzhalter-Wuerfel mit Kabine.
+		FTransform BodyXf;
+		double RoofZ = BoxRoofZ;
+		double RoofX = -10.0;
+		double BodyLength = VehicleBodySize.X;
+		double BodyWidth = VehicleBodySize.Y;
+		if (bBox)
 		{
-			CabinXfBuffer[I] = CabinXf;
+			BodyXf = FTransform(Rot, Base + FVector(0.0, 0.0, BoxBodyZ), BoxBodyScale);
+			if (CabinXfBuffer.IsValidIndex(I))
+			{
+				CabinXfBuffer[I] = FTransform(Rot, Base + Rot.RotateVector(FVector(-20.0, 0.0, BoxCabinZ)), BoxCabinScale);
+			}
+		}
+		else
+		{
+			BodyXf = FTransform(Rot, Base + Rot.RotateVector(Fit.BodyOffset), Fit.BodyScale);
+			RoofZ = Fit.RoofZ;
+			RoofX = PoliceRoofXFactor * Fit.Length;
+			BodyLength = Fit.Length;
+			BodyWidth = Fit.Width;
+			if (CabinXfBuffer.IsValidIndex(I))
+			{
+				CabinXfBuffer[I] = Hidden;
+			}
+			if (GlassInstance.IsValidIndex(I) && GlassXfBuffer.IsValidIndex(GlassInstance[I]))
+			{
+				GlassXfBuffer[GlassInstance[I]] = BodyXf; // gleicher Pivot wie SM_SportsCar
+			}
+			WriteWheelTransforms(I, Rot, Base, FrameDt);
 		}
 
 		if (bPolice)
@@ -902,10 +1484,22 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 				continue;
 			}
 			PoliceXfBuffer[Inst] = BodyXf;
-			// Sirenenbalken: rot links, blau rechts. Blinken: die inaktive Phase wird ausgeblendet,
-			// zusaetzlich Emissiv in Custom-Data[3] fuer Materialien mit PerInstanceCustomData.
-			const FTransform RedXf(Rot, Base + Rot.RotateVector(FVector(-10.0, -45.0, SirenZ)), SirenScale);
-			const FTransform BlueXf(Rot, Base + Rot.RotateVector(FVector(-10.0, 45.0, SirenZ)), SirenScale);
+			if (BodyNearestDistSq.IsValidIndex(PoliceShadowSlot))
+			{
+				BodyNearestDistSq[PoliceShadowSlot] = FMath::Min(BodyNearestDistSq[PoliceShadowSlot], PlayerDistSq);
+			}
+
+			// Weisser Seitenstreifen: flacher Quader in Guertelhoehe, minimal breiter als die Flanke.
+			const double StripeZ = bBox ? BoxClearance + VehicleBodySize.Z * 0.6 : RoofZ * PoliceStripePlacement.X;
+			const FVector StripeScale(BodyLength * 0.6 / 100.0, BodyWidth * (bBox ? 1.01 : PoliceStripePlacement.Y) / 100.0, 0.09);
+			StripeXfBuffer[Inst] = FTransform(Rot, Base + Rot.RotateVector(FVector(0.0, 0.0, StripeZ)), StripeScale);
+
+			// Sirenenbalken auf dem Dach: rot links, blau rechts. Blinken: die inaktive Phase wird
+			// ausgeblendet, zusaetzlich Emissiv in Custom-Data[3] fuer Materialien mit PerInstanceCustomData.
+			const FVector SirenScale(0.22, 0.5, 0.09);
+			const double SirenZ = RoofZ + 4.5;
+			const FTransform RedXf(Rot, Base + Rot.RotateVector(FVector(RoofX, -26.0, SirenZ)), SirenScale);
+			const FTransform BlueXf(Rot, Base + Rot.RotateVector(FVector(RoofX, 26.0, SirenZ)), SirenScale);
 			const bool bShowRed = !bSirenOn || bRedPhase;
 			const bool bShowBlue = !bSirenOn || !bRedPhase;
 			SirenRedXfBuffer[Inst] = bShowRed ? RedXf : Hidden;
@@ -921,16 +1515,21 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 		}
 		else
 		{
-			const int32 C = Vehicles.ColorIndex[I];
-			if (TrafficXfBuffers.IsValidIndex(C) && TrafficXfBuffers[C].IsValidIndex(Inst))
+			const int32 G = Vehicles.ColorIndex[I];
+			if (TrafficXfBuffers.IsValidIndex(G) && TrafficXfBuffers[G].IsValidIndex(Inst))
 			{
-				TrafficXfBuffers[C][Inst] = BodyXf;
+				TrafficXfBuffers[G][Inst] = BodyXf;
+			}
+			if (BodyNearestDistSq.IsValidIndex(G))
+			{
+				BodyNearestDistSq[G] = FMath::Min(BodyNearestDistSq[G], PlayerDistSq);
 			}
 		}
 	}
 
-	// --- Fussgaenger ----------------------------------------------------------------------------
-	const FVector PedScale(PedestrianSize.X / 100.0, PedestrianSize.X / 100.0, PedestrianSize.Y / 100.0);
+	// --- Fussgaenger: schlanker Koerper + Kopf, Proportion je Index variiert ------------------------
+	const double MeanDiameter = PedestrianSize.X;
+	const double MeanHeight = PedestrianSize.Y;
 	for (int32 I = 0; I < Peds.Num(); ++I)
 	{
 		const FVector Target(Peds.SimLoc[I].X, Peds.SimLoc[I].Y, GroundZ);
@@ -948,16 +1547,37 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 			Peds.VisYaw[I] += FMath::FindDeltaAngleDegrees(Peds.VisYaw[I], TargetYaw) * Alpha;
 		}
 
+		// Deterministische Proportion: Groesse 0.93-1.07, Statur 0.86-1.14, Kopf 0.95-1.05.
+		const uint32 H = HashIndex(static_cast<uint32>(I) + 1000U);
+		const double HeightScale = 0.93 + static_cast<double>(H % 15U) / 100.0;
+		const double BuildScale = 0.86 + static_cast<double>((H >> 8) % 29U) / 100.0;
+		const double HeadD = PedestrianHeadSize * (0.95 + static_cast<double>((H >> 16) % 11U) / 100.0);
+		const double TotalH = MeanHeight * HeightScale;
+		const double BodyH = FMath::Max(40.0, TotalH - HeadD * 0.92);
+		const double BodyW = MeanDiameter * BuildScale;          // Schulterbreite (Y)
+		const double BodyDepth = BodyW * 0.72;                     // flacher von vorn nach hinten (X)
+
 		const bool bDown = Peds.Stun[I] > 0.f;
-		const FRotator Rot(bDown ? 90.f : 0.f, Peds.VisYaw[I], 0.f);
-		const double Z = bDown ? PedestrianSize.X * 0.5 : PedestrianSize.Y * 0.5;
-		const FTransform Xf(Rot.Quaternion(), Peds.VisLoc[I] + FVector(0.0, 0.0, Z), PedScale);
+		const FQuat Rot = FRotator(bDown ? 90.f : 0.f, Peds.VisYaw[I], 0.f).Quaternion();
+		const FVector Base = Peds.VisLoc[I] + FVector(0.0, 0.0, bDown ? BodyDepth * 0.5 : 0.0);
+		const FTransform BodyXf(Rot, Base + Rot.RotateVector(FVector(0.0, 0.0, BodyH * 0.5)),
+			FVector(BodyDepth / 100.0, BodyW / 100.0, BodyH / 100.0));
+		const FTransform HeadXf(Rot, Base + Rot.RotateVector(FVector(0.0, 0.0, BodyH + HeadD * 0.42)), FVector(HeadD / 100.0));
 
 		const int32 C = Peds.ColorIndex[I];
 		const int32 Inst = Peds.InstanceIndex[I];
 		if (PedXfBuffers.IsValidIndex(C) && PedXfBuffers[C].IsValidIndex(Inst))
 		{
-			PedXfBuffers[C][Inst] = Xf;
+			PedXfBuffers[C][Inst] = BodyXf;
+		}
+		if (PedHeadGroup.IsValidIndex(I))
+		{
+			const int32 S = PedHeadGroup[I];
+			const int32 HeadInst = PedHeadInstance[I];
+			if (PedHeadXfBuffers.IsValidIndex(S) && PedHeadXfBuffers[S].IsValidIndex(HeadInst))
+			{
+				PedHeadXfBuffers[S][HeadInst] = HeadXf;
+			}
 		}
 	}
 
@@ -969,18 +1589,48 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 			Comp->BatchUpdateInstancesTransforms(0, Xfs, /*bWorldSpace*/ true, /*bMarkRenderStateDirty*/ true, /*bTeleport*/ true);
 		}
 	};
-	for (int32 C = 0; C < TrafficBodyISMs.Num(); ++C)
+	for (int32 G = 0; G < TrafficBodyISMs.Num(); ++G)
 	{
-		Upload(TrafficBodyISMs[C], TrafficXfBuffers[C]);
+		Upload(TrafficBodyISMs[G], TrafficXfBuffers[G]);
+	}
+	for (int32 M = 0; M < WheelISMs.Num(); ++M)
+	{
+		Upload(WheelISMs[M], WheelXfBuffers[M]);
 	}
 	for (int32 C = 0; C < PedISMs.Num(); ++C)
 	{
 		Upload(PedISMs[C], PedXfBuffers[C]);
 	}
+	for (int32 S = 0; S < PedHeadISMs.Num(); ++S)
+	{
+		Upload(PedHeadISMs[S], PedHeadXfBuffers[S]);
+	}
+	Upload(SportsGlassISM, GlassXfBuffer);
 	Upload(CabinISM, CabinXfBuffer);
 	Upload(PoliceBodyISM, PoliceXfBuffer);
+	Upload(PoliceStripeISM, StripeXfBuffer);
 	Upload(SirenRedISM, SirenRedXfBuffer);
 	Upload(SirenBlueISM, SirenBlueXfBuffer);
+
+	// --- Schatten nur nah: Karosserie-Komponenten ohne nahes Fahrzeug werfen keinen Schatten -------
+	if (bAgentsCastShadows)
+	{
+		const float ShadowSq = FMath::Square(FMath::Max(0.f, VehicleShadowDistance));
+		auto UpdateShadow = [](UInstancedStaticMeshComponent* Comp, bool bWant)
+		{
+			if (Comp && static_cast<bool>(Comp->CastShadow) != bWant)
+			{
+				Comp->SetCastShadow(bWant);
+			}
+		};
+		for (int32 G = 0; G < TrafficBodyISMs.Num(); ++G)
+		{
+			const bool bNear = !bHasPlayer || (BodyNearestDistSq.IsValidIndex(G) && BodyNearestDistSq[G] <= ShadowSq);
+			UpdateShadow(TrafficBodyISMs[G], bNear);
+		}
+		const bool bPoliceNear = !bHasPlayer || (BodyNearestDistSq.IsValidIndex(PoliceShadowSlot) && BodyNearestDistSq[PoliceShadowSlot] <= ShadowSq);
+		UpdateShadow(PoliceBodyISM, bPoliceNear);
+	}
 }
 
 // =============================================================================================
@@ -1047,4 +1697,182 @@ FName AMTAWorldAIManager::GetDistrictAt(const FVector& Location) const
 	const int32 Row = Location.Y < 0.0 ? 0 : 1;
 	const int32 Idx = FMath::Min(Row * 3 + Col, FallbackDistrictNames.Num() - 1);
 	return FallbackDistrictNames[Idx];
+}
+
+// =============================================================================================
+// Modelltest
+// =============================================================================================
+
+FString AMTAWorldAIManager::RunModelSelfTest()
+{
+	TArray<FString> Lines;
+	int32 Errors = 0;
+	auto Check = [&Lines, &Errors](bool bOk, const FString& What)
+	{
+		Lines.Add(FString::Printf(TEXT("%s %s"), bOk ? TEXT("OK    ") : TEXT("FEHLER"), *What));
+		if (!bOk)
+		{
+			++Errors;
+		}
+	};
+	Lines.Add(TEXT("MODELLTEST Welt-KI: Fahrzeugmodelle und Passanten"));
+
+	// --- 1) Assets laden, Materialien vorhanden (unabhaengig vom Spielzustand) ----------------------
+	struct FModelAssetCheck
+	{
+		const TCHAR* Label;
+		const TSoftObjectPtr<UStaticMesh>* Ref;
+	};
+	const FModelAssetCheck AssetChecks[] = {
+		{ TEXT("Sportwagen Karosserie"), &SportsBodyAsset },
+		{ TEXT("Sportwagen Glas"), &SportsGlassAsset },
+		{ TEXT("Sportwagen Rad"), &SportsWheelAsset },
+		{ TEXT("Gelaendewagen Karosserie"), &OffroadBodyAsset },
+		{ TEXT("Gelaendewagen Rad"), &OffroadWheelAsset },
+		{ TEXT("Concept Car"), &ConceptBodyAsset } };
+	for (const FModelAssetCheck& AC : AssetChecks)
+	{
+		UStaticMesh* Mesh = AC.Ref->IsNull() ? nullptr : AC.Ref->LoadSynchronous();
+		Check(Mesh != nullptr, FString::Printf(TEXT("%s laedt (%s)"), AC.Label, *AC.Ref->ToString()));
+		if (!Mesh)
+		{
+			continue;
+		}
+		int32 MissingMats = 0;
+		const TArray<FStaticMaterial>& Mats = Mesh->GetStaticMaterials();
+		for (const FStaticMaterial& SM : Mats)
+		{
+			MissingMats += SM.MaterialInterface ? 0 : 1;
+		}
+		Check(Mats.Num() > 0 && MissingMats == 0,
+			FString::Printf(TEXT("%s: %d Materialslots, %d ohne Material"), AC.Label, Mats.Num(), MissingMats));
+	}
+
+	// --- 2) Einpassung je Sorte: Lack-Parameter, Masse, Raeder -------------------------------------
+	const TCHAR* ModelNames[] = { TEXT("Sportwagen"), TEXT("Gelaendewagen"), TEXT("Concept Car") };
+	const TSoftObjectPtr<UStaticMesh>* BodyRefs[] = { &SportsBodyAsset, &OffroadBodyAsset, &ConceptBodyAsset };
+	const TSoftObjectPtr<UStaticMesh>* WheelRefs[] = { &SportsWheelAsset, &OffroadWheelAsset, nullptr };
+	for (int32 M = 0; M < 3; ++M)
+	{
+		UStaticMesh* Body = BodyRefs[M]->IsNull() ? nullptr : BodyRefs[M]->LoadSynchronous();
+		UStaticMesh* Wheel = (WheelRefs[M] && !WheelRefs[M]->IsNull()) ? WheelRefs[M]->LoadSynchronous() : nullptr;
+		FMTATrafficModelFit Fit;
+		const bool bFit = ComputeModelFit(static_cast<EMTATrafficBodyModel>(M), Body, Wheel, Fit);
+		Check(bFit, FString::Printf(TEXT("%s: Einpassung aus Bounds"), ModelNames[M]));
+		if (!bFit)
+		{
+			continue;
+		}
+		Check(Fit.PaintSlot != INDEX_NONE, FString::Printf(TEXT("%s: Lack-Slot %d, Parameter '%s'"),
+			ModelNames[M], Fit.PaintSlot, *Fit.PaintParam.ToString()));
+		const float ScaledLength = static_cast<float>(Fit.RawLength * Fit.BodyScale.X);
+		Check(ScaledLength >= 380.f && ScaledLength <= 520.f, FString::Printf(TEXT("%s: Laenge %.0f cm (Mesh roh %.0f cm)"),
+			ModelNames[M], ScaledLength, Fit.RawLength));
+		Check(Fit.Width >= 160.f && Fit.Width <= 220.f, FString::Printf(TEXT("%s: Breite %.0f cm"), ModelNames[M], Fit.Width));
+		Check(Fit.RoofZ >= 90.f && Fit.RoofZ <= 240.f, FString::Printf(TEXT("%s: Dachhoehe %.0f cm"), ModelNames[M], Fit.RoofZ));
+		if (WheelRefs[M])
+		{
+			Check(Fit.bSeparateWheels || Fit.bWheelSet, FString::Printf(TEXT("%s: Raeder (%s)"), ModelNames[M],
+				Fit.bSeparateWheels ? TEXT("4 Instanzen") : (Fit.bWheelSet ? TEXT("Satz") : TEXT("fehlen"))));
+		}
+	}
+
+	// --- 3) Instanzen (erst nach BeginPlay) -----------------------------------------------------------
+	Check(bVisualsReady, TEXT("Darstellung initialisiert (BeginPlay gelaufen)"));
+	if (bVisualsReady)
+	{
+		const int32 NumModels = static_cast<int32>(EMTATrafficBodyModel::Count);
+		const int32 SportsIdx = static_cast<int32>(EMTATrafficBodyModel::Sports);
+		const int32 BoxIdx = static_cast<int32>(EMTATrafficBodyModel::Box);
+		TArray<int32> InstCounts;
+		InstCounts.Init(0, NumModels);
+		TArray<bool> LengthChecked;
+		LengthChecked.Init(false, NumModels);
+		int32 NumComponents = 0;
+		for (int32 G = 0; G < TrafficBodyISMs.Num(); ++G)
+		{
+			UInstancedStaticMeshComponent* Comp = TrafficBodyISMs[G];
+			if (!Comp)
+			{
+				continue;
+			}
+			++NumComponents;
+			const int32 M = G / FMath::Max(1, NumPaintColors);
+			const int32 N = Comp->GetInstanceCount();
+			if (InstCounts.IsValidIndex(M))
+			{
+				InstCounts[M] += N;
+			}
+			// Laenge einer echten Instanz: Mesh-Bounds x Instanz-Skalierung.
+			FTransform Xf;
+			if (M != BoxIdx && LengthChecked.IsValidIndex(M) && !LengthChecked[M] && N > 0 && Comp->GetStaticMesh()
+				&& Comp->GetInstanceTransform(0, Xf, true))
+			{
+				LengthChecked[M] = true;
+				const float InstLength = static_cast<float>(Comp->GetStaticMesh()->GetBoundingBox().GetSize().X * Xf.GetScale3D().X);
+				Check(InstLength >= 380.f && InstLength <= 520.f, FString::Printf(TEXT("%s: Instanzlaenge %.0f cm"), ModelNames[M], InstLength));
+			}
+		}
+		for (int32 M = 0; M < 3; ++M)
+		{
+			Check(InstCounts[M] > 0, FString::Printf(TEXT("%s: %d Verkehrs-Instanzen"), ModelNames[M], InstCounts[M]));
+		}
+		Check(InstCounts[BoxIdx] == 0, FString::Printf(TEXT("keine Platzhalter-Wuerfel im Verkehr (%d)"), InstCounts[BoxIdx]));
+		Check(MaxTotalVehicles <= 0 || Vehicles.Num() <= MaxTotalVehicles,
+			FString::Printf(TEXT("Fahrzeuge gesamt %d (Grenze %d), Karosserie-Komponenten %d"), Vehicles.Num(), MaxTotalVehicles, NumComponents));
+		for (int32 M = 0; M < 2; ++M)
+		{
+			const bool bHasWheels = WheelISMs.IsValidIndex(M) && WheelISMs[M] && WheelISMs[M]->GetInstanceCount() > 0;
+			Check(bHasWheels, FString::Printf(TEXT("%s: Rad-Instanzen %d"), ModelNames[M], bHasWheels ? WheelISMs[M]->GetInstanceCount() : 0));
+		}
+		Check(SportsGlassISM != nullptr && SportsGlassISM->GetInstanceCount() > 0, TEXT("Sportwagen: Glas-Instanzen"));
+
+		// Polizei: Sportwagen-Mesh, dunkle Lack-MID, weisse Streifen-MID, Sirenen
+		const bool bPoliceBody = PoliceBodyISM && PoliceBodyISM->GetInstanceCount() == NumPoliceSlots;
+		Check(bPoliceBody, FString::Printf(TEXT("Polizei: %d Karosserie-Instanzen"), PoliceBodyISM ? PoliceBodyISM->GetInstanceCount() : 0));
+		if (PoliceBodyISM)
+		{
+			Check(ModelBodyMeshes.IsValidIndex(SportsIdx) && ModelBodyMeshes[SportsIdx] && PoliceBodyISM->GetStaticMesh() == ModelBodyMeshes[SportsIdx],
+				TEXT("Polizei: Sportwagen-Mesh"));
+			const int32 PaintSlot = ModelFits[SportsIdx].PaintSlot;
+			const bool bPaintSet = PolicePaintMID && PaintSlot != INDEX_NONE && PoliceBodyISM->GetMaterial(PaintSlot) == PolicePaintMID.Get();
+			Check(bPaintSet, TEXT("Polizei: Lack-Materialinstanz gesetzt"));
+			if (bPaintSet)
+			{
+				FLinearColor Paint = FLinearColor::White;
+				PolicePaintMID->GetVectorParameterValue(FHashedMaterialParameterInfo(ModelFits[SportsIdx].PaintParam), Paint);
+				Check(Paint.GetLuminance() < 0.25f, FString::Printf(TEXT("Polizei: Lack dunkel (Luminanz %.2f)"), Paint.GetLuminance()));
+			}
+		}
+		const bool bStripe = PoliceStripeISM && PoliceStripeISM->GetInstanceCount() == NumPoliceSlots
+			&& (PoliceStripeMID ? PoliceStripeISM->GetMaterial(0) == PoliceStripeMID.Get() : AgentMaterial != nullptr);
+		Check(bStripe, TEXT("Polizei: Streifen mit zweiter Materialinstanz"));
+		if (bStripe && PoliceStripeMID)
+		{
+			FLinearColor Stripe = FLinearColor::Black;
+			PoliceStripeMID->GetVectorParameterValue(FHashedMaterialParameterInfo(FName(TEXT("Color"))), Stripe);
+			Check(Stripe.GetLuminance() > 0.6f, FString::Printf(TEXT("Polizei: Streifen hell (Luminanz %.2f)"), Stripe.GetLuminance()));
+		}
+		Check(SirenRedISM && SirenBlueISM && SirenRedISM->GetInstanceCount() == NumPoliceSlots && SirenBlueISM->GetInstanceCount() == NumPoliceSlots,
+			TEXT("Polizei: Sirenenbalken-Instanzen"));
+
+		// Passanten: Koerper + Kopf je Figur
+		int32 BodyInst = 0;
+		int32 HeadInst = 0;
+		for (const TObjectPtr<UInstancedStaticMeshComponent>& Comp : PedISMs)
+		{
+			BodyInst += Comp ? Comp->GetInstanceCount() : 0;
+		}
+		for (const TObjectPtr<UInstancedStaticMeshComponent>& Comp : PedHeadISMs)
+		{
+			HeadInst += Comp ? Comp->GetInstanceCount() : 0;
+		}
+		Check(BodyInst == Peds.Num() && HeadInst == Peds.Num(),
+			FString::Printf(TEXT("Passanten: %d Koerper, %d Koepfe fuer %d Figuren"), BodyInst, HeadInst, Peds.Num()));
+	}
+
+	Lines.Add(FString::Printf(TEXT("MODELLTEST ERGEBNIS: %d Fehler"), Errors));
+	const FString Report = FString::Join(Lines, TEXT("\n"));
+	UE_LOG(LogMTAWorldAIModels, Display, TEXT("%s"), *Report);
+	return Report;
 }

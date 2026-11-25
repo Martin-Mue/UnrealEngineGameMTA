@@ -1,4 +1,5 @@
 #include "MTAMissionComponent.h"
+#include "MTAMissionRunner.h"
 
 #include "MTA6GameMode.h"
 #include "MTAMinimapTypes.h"
@@ -91,6 +92,36 @@ void UMTAMissionComponent::BeginPlay()
 		}
 	}
 	// Die erste Mission wird im ersten Tick gewaehlt, wenn der Spieler-Pawn existiert.
+
+	Runner = UMTAMissionRunner::Get(this);
+	if (Runner)
+	{
+		Runner->OnMissionFinished.AddUniqueDynamic(this, &UMTAMissionComponent::HandleRunnerFinished);
+	}
+}
+
+void UMTAMissionComponent::HandleRunnerFinished(bool bSuccess)
+{
+	if (!bSuccess || !Runner || !Runner->WasLastFinishedFromStory())
+	{
+		return;
+	}
+	UMTAStorySubsystem* Story = GetStory();
+	if (!Story)
+	{
+		return;
+	}
+	const FString Id = Runner->GetLastFinishedMissionId();
+	for (const FMTAMission& M : Story->GetAvailableMissions())
+	{
+		if (M.Id == Id)
+		{
+			CurrentMission = M;
+			bHasStoryMission = true;
+			BeginStoryDialog();   // Text -> Entscheidungen -> FinishStoryMission (Abschluss, Geld, Fahndung)
+			return;
+		}
+	}
 }
 
 void UMTAMissionComponent::EndPlay(const EEndPlayReason::Type EndPlayReason)
@@ -116,6 +147,22 @@ void UMTAMissionComponent::TickComponent(float DeltaTime, ELevelTick TickType, F
 	{
 		bInitialized = true;
 		StartNextMission();
+	}
+
+	if (Runner)
+	{
+		// Ziel und Zeit kommen vom Runner; eigener Marker bleibt verborgen, keine Ankunftspruefung mehr
+		FVector Obj;
+		if (Runner->GetPrimaryObjectiveLocation(Obj))
+		{
+			TargetLocation = Obj;
+		}
+		TimeLeft = Runner->GetTimeLeft();
+		if (MarkerActor)
+		{
+			MarkerActor->SetActorHiddenInGame(true);
+		}
+		return;
 	}
 
 	// Ohne Mesh-Asset: Debug-Zylinder als Ersatzmarker (nur in Nicht-Shipping-Builds sichtbar)
@@ -179,6 +226,14 @@ void UMTAMissionComponent::PlaceMarker()
 
 void UMTAMissionComponent::StartNextMission()
 {
+	if (Runner)
+	{
+		// Auftraege waehlt der Spieler ueber die Auftragsliste (Tab); keine automatische Auswahl mehr
+		bHasStoryMission = false;
+		CurrentMission = FMTAMission();
+		OnMissionChanged.Broadcast();
+		return;
+	}
 	// 1. Story-Mission, falls verfuegbar (Liste ist bereits nach Hauptstory/Akt sortiert)
 	if (UMTAStorySubsystem* Story = GetStory())
 	{

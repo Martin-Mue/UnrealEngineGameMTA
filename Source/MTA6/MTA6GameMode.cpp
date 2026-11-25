@@ -37,6 +37,8 @@
 #include "MTAWorldAIManager.h"
 #include "Kismet/KismetSystemLibrary.h"
 #include "MTAMissionComponent.h"
+#include "MTAMissionRunner.h"
+#include "MTAAudioVehicleComponent.h"
 #include "MTASaveGame.h"
 #include "MTAStorySubsystem.h"
 #include "MTAVehiclePawn.h"
@@ -59,6 +61,7 @@ AMTA6GameMode::AMTA6GameMode()
 	VehiclePawnClassPath = FSoftClassPath(TEXT("/Game/Vehicles/BP_MTAVehicle.BP_MTAVehicle_C"));
 
 	MissionComponent = CreateDefaultSubobject<UMTAMissionComponent>(TEXT("MissionComponent"));
+	MissionRunner = CreateDefaultSubobject<UMTAMissionRunner>(TEXT("MissionRunner"));
 }
 
 void AMTA6GameMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
@@ -350,6 +353,28 @@ void AMTA6GameMode::RunSelfTest()
 	UMTAStorySubsystem* Story = GI ? GI->GetSubsystem<UMTAStorySubsystem>() : nullptr;
 	Check(TEXT("Story verfuegbare Missionen"), Story && Story->GetAvailableMissions().Num() > 0);
 
+	// 5) Missionssystem (simulierte Auftraege aller Typen, Fehlschlaege, Durchspielen der Story-Missionen)
+	if (MissionRunner)
+	{
+		const FString MissionReport = MissionRunner->RunMissionSelfTest();
+		UE_LOG(LogTemp, Display, TEXT("%s"), *MissionReport);
+		Check(TEXT("Missionssystem"), MissionReport.Contains(TEXT("MISSIONTEST ERGEBNIS")) && !MissionReport.Contains(TEXT(": FEHLER")));
+	}
+
+	// 6) Fahrzeug- und Figurenmodelle der Welt-KI
+	if (WorldAI)
+	{
+		const FString ModelReport = WorldAI->RunModelSelfTest();
+		UE_LOG(LogTemp, Display, TEXT("%s"), *ModelReport);
+		Check(TEXT("Modelle"), ModelReport.Contains(TEXT("MODELLTEST ERGEBNIS: 0 Fehler")));
+	}
+
+	{
+		const FString AudioReport = UMTAVehicleAudioComponent::RunVehicleAudioSelfTest();
+		UE_LOG(LogTemp, Display, TEXT("%s"), *AudioReport);
+		Check(TEXT("Fahrzeugsound"), AudioReport.Contains(TEXT("FAHRZEUGSOUND ERGEBNIS: 0 Fehler")));
+	}
+
 	UE_LOG(LogTemp, Display, TEXT("SELFTEST ERGEBNIS: %d Fehler"), Failures);
 	FPlatformMisc::RequestExit(false);
 }
@@ -404,6 +429,7 @@ void AMTA6GameMode::HandleMenuLoad(FString Slot)
 
 void AMTA6GameMode::HandleMenuNew()
 {
+	if (MissionRunner) { MissionRunner->Abort(); }
 	UGameplayStatics::OpenLevel(this, FName(TEXT("Kestrel_Bay")));
 }
 
@@ -683,20 +709,30 @@ TArray<FString> AMTA6GameMode::GetCodexCategoryNames() const
 
 void AMTA6GameMode::CheckMissionBriefing()
 {
-	if (!MissionComponent || IsStoryPageOpen() || IsDialogOpen())
+	if (!MissionRunner || IsStoryPageOpen() || IsDialogOpen())
 	{
 		return;
 	}
-	const FMTAMission Mission = MissionComponent->GetCurrentMission();
-	if (Mission.Id.IsEmpty() || Mission.Id == LastBriefedMissionId)
+	if (MissionRunner->GetState() == EMTAMissionRunState::Idle)
+	{
+		LastBriefedMissionId.Reset();   // naechster Auftrag (auch Neustart) zeigt wieder ein Briefing
+	}
+	if (MissionRunner->GetState() != EMTAMissionRunState::Briefing)
 	{
 		return;
 	}
-	LastBriefedMissionId = Mission.Id;
+	const FMTAMissionSpec& Spec = MissionRunner->GetActiveMissionRef();
+	if (Spec.Id == LastBriefedMissionId)
+	{
+		return;
+	}
+	LastBriefedMissionId = Spec.Id;
 	FMTAStoryPage Page;
-	Page.Title = Mission.Title;
-	Page.Body = Mission.Text + TEXT("\n\nZiel: Fahre zum gelben Marker. Die Entfernung steht links oben im Anzeigefeld.");
-	ShowStoryPages({ Page }, TEXT("NEUER AUFTRAG"));
+	Page.Title = Spec.Title;
+	Page.Body = Spec.Text + TEXT("\n\nAuftrag: ") + UMTAMissionRunner::GetTypeDisplayName(Spec.Type)
+		+ TEXT("   Belohnung: ") + Spec.RewardText
+		+ TEXT("\nErstes Ziel: ") + (Spec.Steps.Num() > 0 ? Spec.Steps[0].Label : FString());
+	ShowStoryPages({ Page }, TEXT("AUFTRAG"));
 }
 
 // --- Geld / Fahndung / Zeit -------------------------------------------------------------
@@ -1047,6 +1083,7 @@ void AMTA6GameMode::ApplySaveContext(const FMTASaveContext& Ctx)
 		}
 	}
 
+	if (MissionRunner) { MissionRunner->Abort(); }
 	if (MissionComponent)
 	{
 		MissionComponent->CloseDialog();

@@ -5,13 +5,59 @@
 #include "MTATrafficTypes.h"
 #include "MTAPoliceTypes.h"
 #include "MTAWorldAITypes.h"
+#include "UObject/SoftObjectPtr.h"
 #include "MTAWorldAIManager.generated.h"
 
 class APawn;
 class UStaticMesh;
 class UMaterialInterface;
+class UMaterialInstanceDynamic;
 class UInstancedStaticMeshComponent;
 class UMTAHeatSubsystem;
+
+/** Karosserie-Sorte eines Verkehrsfahrzeugs (intern, ohne Reflection). Box = Platzhalter-Wuerfel. */
+enum class EMTATrafficBodyModel : uint8
+{
+	Sports = 0,
+	Offroad = 1,
+	Concept = 2,
+	Box = 3,
+	Count = 4
+};
+
+/**
+ * Aus GetBoundingBox() berechnete Einpassung eines Vorlagen-Fahrzeugs auf Zielmasse (intern).
+ * Alle Versaetze sind fahrzeuglokal (X = Fahrtrichtung, Z = Boden), Einheiten cm.
+ */
+struct FMTATrafficModelFit
+{
+	bool bValid = false;
+	/** Skalierung der Karosserie (X Laenge, Y Breite, Z Mittelwert). */
+	FVector BodyScale = FVector::OneVector;
+	/** Versatz des Mesh-Pivots, damit die Karosserie mittig und auf Bodenhoehe steht. */
+	FVector BodyOffset = FVector::ZeroVector;
+	/** Masse nach Skalierung. */
+	float Length = 0.f;
+	float Width = 0.f;
+	float RoofZ = 0.f;
+	/** Rohlaenge des Meshes (unskaliert) fuer den Selbsttest. */
+	float RawLength = 0.f;
+	/** Materialslot des Lacks und der gefundene Farbparameter (NAME_None = keiner gefunden). */
+	int32 PaintSlot = INDEX_NONE;
+	FName PaintParam;
+
+	/** Raeder als eigene Instanzen (4 je Fahrzeug) oder als ein Satz (1 je Fahrzeug, Pivot wie Karosserie). */
+	bool bSeparateWheels = false;
+	bool bWheelSet = false;
+	FVector WheelScale = FVector::OneVector;
+	/** Mesh-Mittelpunkt des Rads (unskaliert) fuer die Pivot-Korrektur. */
+	FVector WheelMeshCenter = FVector::ZeroVector;
+	/** Achse des Rads liegt im Mesh entlang X -> 90 Grad gieren. */
+	bool bWheelAxleAlongX = false;
+	float WheelRadius = 30.f;
+	/** Radmitten fahrzeuglokal: VL, VR, HL, HR. */
+	FVector WheelCenters[4] = { FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector };
+};
 
 /**
  * Welt-KI (Module M5 Verkehr/Fussgaenger und M6 Polizei): EIN Actor simuliert alle Agenten
@@ -52,10 +98,19 @@ class UMTAHeatSubsystem;
  * POLIZEI: siehe MTAPoliceTypes.h (EMTAPoliceState) und MTAPoliceLogic.cpp.
  * =============================================================================================
  *
- * Darstellung: ohne Assets lauffaehig (/Engine/BasicShapes/Cube und Cylinder mit
- * BasicShapeMaterial-Instanzen je Farbgruppe). Per-Instance-Custom-Data: [0..2] = Farbe RGB,
- * [3] = Emissiv (Sirene). Ein eigenes Material mit PerInstanceCustomData kann ueber
- * AgentMaterial gesetzt werden; Meshes ueber die Mesh-UPROPERTYs (spaeter Skeletal/Mass).
+ * Darstellung Fahrzeuge: echte Modelle aus den Epic-Vorlagen (tools/setup_template_assets.ps1):
+ *   Sportwagen  /Game/Vehicles/SportsCar/SM_SportsCar (+ _Glass, + _Wheel als 4 Rad-Instanzen)
+ *   Gelaende    /Game/Vehicles/OffroadCar/SM_Offroad_Body (+ SM_Offroad_Tire als 4 Rad-Instanzen)
+ *   Concept Car /Game/ConceptCar/Car/SM_AutomotiveTP_Car (Raeder im Mesh)
+ * Einpassung aus GetBoundingBox() auf TargetSize je Sorte (Vorlagen schauen in +X), Pivot mittig,
+ * Unterkante auf Bodenfreiheit. Lack: eine UMaterialInstanceDynamic je (Sorte, Farbe) auf dem
+ * Lack-Slot (Parameter "Paint Tint" bzw. "PaintColor", wird zur Laufzeit im Material gesucht),
+ * daher eine Instanzkomponente je (Sorte, Farbe). Polizei: Sportwagen mit dunklem Lack, weisser
+ * Seitenstreifen (zweite Materialinstanz), Sirenenbalken auf dem Dach. Fehlt ein Asset, faellt
+ * die Sorte weg; fehlen alle, wird wie frueher mit Engine-Wuerfeln gezeichnet (Sorte Box).
+ * Darstellung Fussgaenger: schlanker Zylinder (Koerper, je Kleidungsfarbe) + Kugel (Kopf, je
+ * Hautton), Groesse/Breite deterministisch je Index variiert.
+ * Per-Instance-Custom-Data (nur Grundformen): [0..2] = Farbe RGB, [3] = Emissiv (Sirene).
  */
 UCLASS(Blueprintable)
 class MTA6_API AMTAWorldAIManager : public AActor
@@ -104,6 +159,14 @@ public:
 	/** Bezirk an einer Weltposition (DistrictResolver oder Standardraster 3x2). */
 	UFUNCTION(BlueprintPure, Category = "MTA6|AI")
 	FName GetDistrictAt(const FVector& Location) const;
+
+	/**
+	 * Modelltest ohne Eingabe: Fahrzeug-Meshes und Materialien laden, Lackparameter vorhanden,
+	 * Instanzen aller Sorten vorhanden, Laengen plausibel (380-520 cm), Polizei-Materialien gesetzt.
+	 * Letzte Zeile: "MODELLTEST ERGEBNIS: n Fehler". Erst nach BeginPlay aussagekraeftig.
+	 */
+	UFUNCTION(BlueprintCallable, Category = "MTA6|AI")
+	FString RunModelSelfTest();
 
 	/** Optional: C++-Rueckruf fuer die echte Bezirkskarte (vom CityGenerator/GameMode gesetzt). */
 	TFunction<FName(const FVector&)> DistrictResolver;
@@ -180,17 +243,114 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
 	FVector VehicleCabinSize = FVector(230.f, 170.f, 60.f);
 
-	/** Fussgaenger: Durchmesser, Hoehe. */
+	/** Fussgaenger: Koerperdurchmesser, Gesamthoehe inkl. Kopf (Mittelwerte, je Index variiert). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
-	FVector2D PedestrianSize = FVector2D(52.0, 175.0);
+	FVector2D PedestrianSize = FVector2D(38.0, 174.0);
+
+	/** Kopf der Fussgaenger (Standard: Engine-Kugel). Leer = kein Kopf. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
+	TObjectPtr<UStaticMesh> PedestrianHeadMesh;
+
+	/** Kopfdurchmesser (cm). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
+	float PedestrianHeadSize = 23.f;
+
+	/** Hauttoene der Koepfe (je Ton eine Instanzkomponente). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
+	TArray<FLinearColor> PedestrianSkinColors;
 
 	/** Bodenhoehe der Agenten (Z, cm). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
 	float GroundZ = 0.f;
 
-	/** Schatten der Agenten (Kosten!). */
+	/** Schatten der Agenten (Kosten!). Fahrzeuge werfen nur nahe Schatten (VehicleShadowDistance). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
 	bool bAgentsCastShadows = true;
+
+	// --- Fahrzeugmodelle (Epic-Vorlagen) ---------------------------------------------------------
+
+	/** Obergrenze aller Fahrzeuge (Verkehr + Polizei); der Verkehr wird ggf. gekuerzt. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	int32 MaxTotalVehicles = 60;
+
+	/** Echte Modelle verwenden (aus = Platzhalter-Wuerfel wie frueher). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	bool bUseVehicleModels = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	TSoftObjectPtr<UStaticMesh> SportsBodyAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	TSoftObjectPtr<UStaticMesh> SportsGlassAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	TSoftObjectPtr<UStaticMesh> SportsWheelAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	TSoftObjectPtr<UStaticMesh> OffroadBodyAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	TSoftObjectPtr<UStaticMesh> OffroadWheelAsset;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	TSoftObjectPtr<UStaticMesh> ConceptBodyAsset;
+
+	/** Zielmasse (cm) Laenge x Breite je Sorte: Sportwagen, Gelaendewagen, Concept Car. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D SportsTargetSize = FVector2D(440.0, 190.0);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D OffroadTargetSize = FVector2D(450.0, 195.0);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D ConceptTargetSize = FVector2D(440.0, 190.0);
+
+	/** Bodenfreiheit der Karosserie-Unterkante bei separaten Raedern (cm): Sportwagen, Gelaende. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D BodyClearance = FVector2D(12.0, 26.0);
+
+	/** Raddurchmesser (cm): Sportwagen, Gelaende. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D WheelDiameter = FVector2D(66.0, 78.0);
+
+	/** Achsposition als Anteil der Laenge ab Mitte (vorn, hinten), z. B. 0.31 = 31 % nach vorn. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D SportsAxleFactor = FVector2D(0.315, 0.300);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D OffroadAxleFactor = FVector2D(0.300, 0.290);
+
+	/** Rad-Mesh ist fuer die rechte statt die linke Seite modelliert (Felge zeigt sonst nach innen). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	bool bFlipWheelSides = false;
+
+	/** Gewicht der Sorten im Verkehr: Sportwagen, Gelaende, Concept Car. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector ModelWeights = FVector(0.3, 0.3, 0.4);
+
+	/** Lack der Polizei und Farbe des Seitenstreifens. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FLinearColor PoliceStripeColor = FLinearColor(0.95f, 0.95f, 0.95f);
+
+	/** Streifen: Hoehe ueber Boden als Anteil der Dachhoehe, Breitenfaktor (Abstand zur Flanke). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FVector2D PoliceStripePlacement = FVector2D(0.42, 0.985);
+
+	/** Dachmitte (Sirenenbalken) als Anteil der Laenge ab Mitte (negativ = hinten). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	float PoliceRoofXFactor = -0.07f;
+
+	/** Instanz-Cull-Distanz (cm) Fahrzeuge: Beginn/Ende der Ausblendung. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FIntPoint VehicleCullDistance = FIntPoint(16000, 20000);
+
+	/** Instanz-Cull-Distanz (cm) Fussgaenger. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	FIntPoint PedestrianCullDistance = FIntPoint(7000, 9000);
+
+	/** Fahrzeugschatten nur, wenn ein Fahrzeug der Komponente naeher als dieser Abstand ist (cm). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Models")
+	float VehicleShadowDistance = 4000.f;
 
 protected:
 	// --- Simulation (MTAWorldAIManager.cpp) -----------------------------------------------------
@@ -261,17 +421,24 @@ protected:
 	TObjectPtr<UMTAHeatSubsystem> HeatSubsystem;
 
 	// --- Instanzkomponenten -------------------------------------------------------------------
+	/** Karosserie je Gruppe G = Sorte * NumPaintColors + Farbe (leer, wenn die Gruppe ungenutzt ist). */
 	UPROPERTY(Transient)
-	TArray<TObjectPtr<UInstancedStaticMeshComponent>> TrafficBodyISMs;   // je Farbgruppe
+	TArray<TObjectPtr<UInstancedStaticMeshComponent>> TrafficBodyISMs;
 
 	UPROPERTY(Transient)
-	TArray<TObjectPtr<UInstancedStaticMeshComponent>> PedISMs;           // je Farbgruppe
+	TArray<TObjectPtr<UInstancedStaticMeshComponent>> PedISMs;           // Koerper je Kleidungsfarbe
 
 	UPROPERTY(Transient)
-	TObjectPtr<UInstancedStaticMeshComponent> CabinISM;                  // alle Fahrzeug-Slots
+	TArray<TObjectPtr<UInstancedStaticMeshComponent>> PedHeadISMs;       // Kopf je Hautton
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInstancedStaticMeshComponent> CabinISM;                  // nur Sorte Box, Index = Fahrzeugindex
 
 	UPROPERTY(Transient)
 	TObjectPtr<UInstancedStaticMeshComponent> PoliceBodyISM;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInstancedStaticMeshComponent> PoliceStripeISM;           // weisser Streifen, Index = Polizei-Slot
 
 	UPROPERTY(Transient)
 	TObjectPtr<UInstancedStaticMeshComponent> SirenRedISM;
@@ -279,14 +446,77 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<UInstancedStaticMeshComponent> SirenBlueISM;
 
+	/** Raeder je Sorte (Sportwagen inkl. Polizei, Gelaende); Concept Car hat die Raeder im Mesh. */
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<UInstancedStaticMeshComponent>> WheelISMs;
+
+	/** Scheiben/Lichter des Sportwagens (Verkehr + Polizei). */
+	UPROPERTY(Transient)
+	TObjectPtr<UInstancedStaticMeshComponent> SportsGlassISM;
+
+	/** Geladene Meshes je Sorte (Index EMTATrafficBodyModel), null = Sorte nicht verfuegbar. */
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<UStaticMesh>> ModelBodyMeshes;
+
+	UPROPERTY(Transient)
+	TArray<TObjectPtr<UStaticMesh>> ModelWheelMeshes;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UStaticMesh> LoadedSportsGlass;
+
+	/** Engine-Wuerfel fuer den Polizeistreifen (unabhaengig von den Mesh-UPROPERTYs). */
+	UPROPERTY(Transient)
+	TObjectPtr<UStaticMesh> CubeShapeMesh;
+
+	/** Lack-Instanzen der Polizei (fuer den Selbsttest gemerkt). */
+	UPROPERTY(Transient)
+	TObjectPtr<UMaterialInstanceDynamic> PolicePaintMID;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UMaterialInstanceDynamic> PoliceStripeMID;
+
+	/** Einpassung je Sorte. */
+	FMTATrafficModelFit ModelFits[static_cast<int32>(EMTATrafficBodyModel::Count)];
+
+	/** Je Fahrzeug-Slot: Sorte, erster Rad-Instanzindex, Glas-Instanzindex, Raddrehung (Grad). */
+	TArray<uint8> VehicleModel;
+	TArray<int32> WheelInstanceBase;
+	TArray<int32> GlassInstance;
+	TArray<float> WheelSpin;
+
+	/** Je Fussgaenger: Kopf-Gruppe und Index darin. */
+	TArray<uint8> PedHeadGroup;
+	TArray<int32> PedHeadInstance;
+
+	int32 NumPaintColors = 1;
+	bool bVisualsReady = false;
+
 	// Wiederverwendete Puffer (keine Allokation pro Frame)
 	TArray<TArray<FTransform>> TrafficXfBuffers;
 	TArray<TArray<FTransform>> PedXfBuffers;
+	TArray<TArray<FTransform>> PedHeadXfBuffers;
+	TArray<TArray<FTransform>> WheelXfBuffers;
+	TArray<FTransform> GlassXfBuffer;
 	TArray<FTransform> CabinXfBuffer;
 	TArray<FTransform> PoliceXfBuffer;
+	TArray<FTransform> StripeXfBuffer;
 	TArray<FTransform> SirenRedXfBuffer;
 	TArray<FTransform> SirenBlueXfBuffer;
+	/** Je Karosserie-Komponente: naechster Abstand^2 zum Spieler in diesem Frame (Schatten nur nah). */
+	TArray<float> BodyNearestDistSq;
 
-	UInstancedStaticMeshComponent* CreateInstancer(const FName& Name, UStaticMesh* Mesh, const FLinearColor& Color, int32 Count, bool bShadows);
+	UInstancedStaticMeshComponent* CreateInstancer(const FName& InName, UStaticMesh* Mesh, const FLinearColor& Color, int32 Count, bool bShadows);
+	/** Instanzer fuer Vorlagen-Meshes: Materialien des Meshes, optional Lack-MID auf PaintSlot. */
+	UInstancedStaticMeshComponent* CreateModelInstancer(const FName& InName, UStaticMesh* Mesh, int32 Count, bool bShadows, const FIntPoint& Cull);
+	/** Laedt die Vorlagen-Meshes und berechnet die Einpassung je Sorte. */
+	void LoadVehicleModels();
+	bool ComputeModelFit(EMTATrafficBodyModel Model, UStaticMesh* Body, UStaticMesh* Wheel, FMTATrafficModelFit& Out) const;
+	/** Lack-Slot und Farbparameter eines Karosserie-Meshes suchen. */
+	static bool FindPaintSlot(const UStaticMesh* Mesh, int32& OutSlot, FName& OutParam);
+	UMaterialInstanceDynamic* MakePaintMID(EMTATrafficBodyModel Model, const FLinearColor& Color);
+	/** Verfuegbare Sorte fuer einen Verkehrs-Slot (deterministisch aus dem Index, gewichtet). */
+	EMTATrafficBodyModel PickModelForSlot(int32 Slot) const;
+	void WriteWheelTransforms(int32 I, const FQuat& Rot, const FVector& Base, float FrameDt);
+	static uint32 HashIndex(uint32 X);
 	static FTransform HiddenTransform();
 };

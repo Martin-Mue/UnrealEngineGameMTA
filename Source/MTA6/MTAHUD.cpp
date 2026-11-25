@@ -9,6 +9,7 @@
 #include "MTAInteractionComponent.h"
 #include "MTAMinimapTypes.h"
 #include "MTAMissionComponent.h"
+#include "MTAMissionRunner.h"
 #include "MTAStorySubsystem.h"
 #include "MTAVehiclePawn.h"
 
@@ -70,6 +71,8 @@ void AMTAHUD::DrawHUD()
 	DrawMinimap(GM);
 	DrawToastAndOverlays(GM);
 	DrawDialog(GM);
+	UpdateMissionListInput(GM);
+	DrawMissionList(GM);
 
 	UpdateConversationInput();
 	DrawInteractionPrompt();
@@ -474,6 +477,110 @@ void AMTAHUD::WrapText(const FString& Text, float MaxWidth, float Scale, TArray<
 	}
 }
 
+// --- Auftraege ---------------------------------------------------------------------------------
+
+void AMTAHUD::UpdateMissionListInput(AMTA6GameMode* GM)
+{
+	UMTAMissionRunner* Runner = GM->GetMissionRunner();
+	if (!PlayerOwner || !Runner || GM->IsStoryPageOpen() || GM->IsDialogOpen())
+	{
+		return;
+	}
+	if (PlayerOwner->WasInputKeyJustPressed(EKeys::Tab))
+	{
+		Runner->ToggleSelection();
+		return;
+	}
+	if (!Runner->IsSelectionOpen())
+	{
+		return;
+	}
+	if (PlayerOwner->WasInputKeyJustPressed(EKeys::Escape) || PlayerOwner->WasInputKeyJustPressed(EKeys::BackSpace))
+	{
+		Runner->CloseSelection();
+		return;
+	}
+	if (Runner->HasActiveMission())
+	{
+		if (PlayerOwner->WasInputKeyJustPressed(EKeys::Zero))
+		{
+			Runner->SelectByIndex(-1);   // Abbruch
+		}
+		return;
+	}
+	static const FKey Keys[9] = { EKeys::One, EKeys::Two, EKeys::Three, EKeys::Four, EKeys::Five, EKeys::Six, EKeys::Seven, EKeys::Eight, EKeys::Nine };
+	for (int32 i = 0; i < 9; ++i)
+	{
+		if (PlayerOwner->WasInputKeyJustPressed(Keys[i]))
+		{
+			Runner->SelectByIndex(i);
+			return;
+		}
+	}
+}
+
+void AMTAHUD::DrawMissionList(AMTA6GameMode* GM)
+{
+	const UMTAMissionRunner* Runner = GM->GetMissionRunner();
+	if (!Runner || !Runner->IsSelectionOpen())
+	{
+		return;
+	}
+	const float W = FMath::Min(1000.f * UIScale, Canvas->ClipX - 80.f * UIScale);
+	const float X = (Canvas->ClipX - W) * 0.5f;
+	float Y = Canvas->ClipY * 0.18f;
+	DrawRect(FLinearColor(0.f, 0.f, 0.02f, 0.82f), X - 20.f * UIScale, Y - 20.f * UIScale, W + 40.f * UIScale, Canvas->ClipY * 0.64f);
+	Y += DrawShadowText(TEXT("AUFTRAEGE"), X, Y, ColAccent, 1.3f * UIScale) + 12.f * UIScale;
+	if (Runner->HasActiveMission())
+	{
+		Y += DrawShadowText(TEXT("Laufend: ") + Runner->GetTitleText(), X, Y, ColText, 0.9f * UIScale);
+		DrawShadowText(TEXT("[0] Auftrag abbrechen    [Esc] Schliessen"), X, Y + 10.f * UIScale, ColDanger, 0.8f * UIScale);
+		return;
+	}
+	const TArray<FMTAMissionOffer> Offers = Runner->GetSelectionOffers();
+	for (const FMTAMissionOffer& O : Offers)
+	{
+		Y += DrawShadowText(O.DisplayLine, X, Y, O.bMain ? ColAccent : ColText, 0.85f * UIScale) + 4.f * UIScale;
+	}
+	if (Offers.Num() == 0)
+	{
+		Y += DrawShadowText(TEXT("Keine Auftraege verfuegbar."), X, Y, ColText, 0.85f * UIScale);
+	}
+	DrawShadowText(TEXT("[1-9] Annehmen    [Esc] Schliessen"), X, Y + 14.f * UIScale, FLinearColor(0.85f, 0.85f, 0.85f, 1.f), 0.8f * UIScale);
+}
+
+void AMTAHUD::DrawMissionObjective(AMTA6GameMode* GM, float& Y)
+{
+	const float S = 0.9f * UIScale;
+	const float X = 20.f * UIScale;
+	const UMTAMissionRunner* Runner = GM->GetMissionRunner();
+	if (!Runner || Runner->GetState() == EMTAMissionRunState::Idle)
+	{
+		Y += DrawShadowText(TEXT("Auftrag: keiner  [Tab] Auftragsliste"), X, Y, ColText, S);
+		return;
+	}
+	const EMTAMissionRunState RunState = Runner->GetState();
+	const FLinearColor C = RunState == EMTAMissionRunState::Failed ? ColDanger : (RunState == EMTAMissionRunState::Success ? ColAccent : ColText);
+	Y += DrawShadowText(Runner->GetTitleText(), X, Y, ColAccent, S);
+	Y += DrawShadowText(Runner->GetObjectiveText(), X, Y, C, S);
+	FString Line = Runner->GetStatusText();
+	const FString Progress = Runner->GetProgressText();
+	if (!Progress.IsEmpty())
+	{
+		Line += (Line.IsEmpty() ? TEXT("") : TEXT("   ")) + Progress;
+	}
+	const float TimeLeft = Runner->GetTimeLeft();
+	if (TimeLeft >= 0.f)
+	{
+		const int32 Sec = FMath::CeilToInt(TimeLeft);
+		Line += FString::Printf(TEXT("%sZeit %d:%02d"), Line.IsEmpty() ? TEXT("") : TEXT("   "), Sec / 60, Sec % 60);
+	}
+	if (!Line.IsEmpty())
+	{
+		Y += DrawShadowText(Line, X, Y, TimeLeft >= 0.f && TimeLeft < 15.f ? ColDanger : ColText, S);
+	}
+}
+
 // --- Statusblock -------------------------------------------------------------------------------
 
 void AMTAHUD::DrawStatus(AMTA6GameMode* GM)
@@ -496,18 +603,7 @@ void AMTAHUD::DrawStatus(AMTA6GameMode* GM)
 	const FString StarText = FString::ChrN(Stars, TEXT('*')) + FString::ChrN(5 - Stars, TEXT('-'));
 	Y += DrawShadowText(TEXT("Fahndung: ") + StarText, X, Y, Stars > 0 ? ColDanger : ColText, S);
 
-	if (const UMTAMissionComponent* Mission = GM->GetMissionComponent())
-	{
-		Y += DrawShadowText(TEXT("Auftrag: ") + Mission->GetMissionDisplayTitle(), X, Y, ColText, S);
-
-		FString TimeText;
-		if (!Mission->IsStoryMission())
-		{
-			TimeText = Mission->GetTimeLeft() > 0.f ? FString::Printf(TEXT("%d s"), FMath::FloorToInt(Mission->GetTimeLeft())) : FString(TEXT("ohne Bonus"));
-		}
-		const float Dist = Mission->GetDistanceToTarget();
-		Y += DrawShadowText(FString::Printf(TEXT("Ziel: %d m   %s"), FMath::Max(0, FMath::FloorToInt(Dist / 100.f)), *TimeText), X, Y, ColText, S);
-	}
+	DrawMissionObjective(GM, Y);
 
 	// Fraktionsstaende
 	const UGameInstance* GI = GetGameInstance();
@@ -531,7 +627,7 @@ void AMTAHUD::DrawStatus(AMTA6GameMode* GM)
 
 	if (bShowHelpLine)
 	{
-		const FString Help = TEXT("W/S Gas/Bremse   A/D Lenken   Leertaste Handbremse   R Zuruecksetzen   F5 Speichern   F9 Laden");
+		const FString Help = TEXT("W/S Gas/Bremse   A/D Lenken   Leertaste Handbremse   R Zuruecksetzen   Tab Auftraege   E Sprechen   F5 Speichern   F9 Laden");
 		DrawShadowText(Help, X, Canvas->ClipY - 36.f * UIScale, FLinearColor(1.f, 1.f, 1.f, 0.8f), 0.6f * UIScale);
 	}
 }
@@ -748,16 +844,31 @@ void AMTAHUD::DrawMinimap(AMTA6GameMode* GM)
 	}
 
 	// Missionsziel, am Rand geklemmt
-	if (const UMTAMissionComponent* Mission = GM->GetMissionComponent())
+	if (const UMTAMissionRunner* MapRunner = GM->GetMissionRunner())
 	{
-		const FVector Target = Mission->GetTargetLocation();
-		FVector2D D(Target.X - CarLoc.X, Target.Y - CarLoc.Y);
-		const float Lim = MinimapWorldRadius * 0.88f;
-		if (D.Size() > Lim)
+		for (const FMTAMissionMarker& M : MapRunner->GetObjectiveMarkers())
 		{
-			D = D.GetSafeNormal() * Lim;
+			FVector2D D(M.Location.X - CarLoc.X, M.Location.Y - CarLoc.Y);
+			const float Lim = MinimapWorldRadius * 0.88f;
+			const bool bClamp = M.Kind == EMTAMissionMarkerKind::Objective || M.Kind == EMTAMissionMarkerKind::Target || M.Kind == EMTAMissionMarkerKind::SafeZone;
+			if (D.Size() > Lim)
+			{
+				if (!bClamp) { continue; }
+				D = D.GetSafeNormal() * Lim;
+			}
+			FLinearColor MC = ColAccent;
+			float R = 6.f;
+			switch (M.Kind)
+			{
+			case EMTAMissionMarkerKind::NextObjective: MC = FLinearColor(0.2f, 0.85f, 1.f, 0.6f); R = 4.f; break;
+			case EMTAMissionMarkerKind::Target:        MC = ColDanger; R = 7.f; break;
+			case EMTAMissionMarkerKind::Escort:        MC = FLinearColor(0.6f, 0.15f, 0.15f, 1.f); R = 4.f; break;
+			case EMTAMissionMarkerKind::Opponent:      MC = FLinearColor(0.3f, 0.5f, 1.f, 1.f); R = 4.f; break;
+			case EMTAMissionMarkerKind::SafeZone:      MC = FLinearColor(0.3f, 0.45f, 1.f, 1.f); R = 7.f; break;
+			default: break;
+			}
+			AddCircle(ToMap(CarLoc.X + D.X, CarLoc.Y + D.Y), R * UIScale, MC, Tris);
 		}
-		AddCircle(ToMap(CarLoc.X + D.X, CarLoc.Y + D.Y), 6.f * UIScale, ColAccent, Tris);
 	}
 
 	// Spielerpfeil

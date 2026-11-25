@@ -8,6 +8,7 @@ class USpringArmComponent;
 class UCameraComponent;
 class UChaosVehicleMovementComponent;
 class AMTA6GameMode;
+class UMTAVehicleAudioComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FMTAVehicleDamagedSignature, float, NewHealth);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FMTAVehicleWreckedSignature);
@@ -37,6 +38,10 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|Camera")
 	TObjectPtr<UCameraComponent> Camera;
+
+	/** Motor-, Reifen-, Wind-, Hupen- und Aufprallklang; hoerbar nur, solange der Spieler faehrt. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|Audio")
+	TObjectPtr<UMTAVehicleAudioComponent> VehicleAudio;
 
 	// --- Fahrzeugdaten -------------------------------------------------------------
 
@@ -80,6 +85,19 @@ public:
 	/** Seitlicher Abstand zur Strassenachse beim Zuruecksetzen (rechte Spur, cm). */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|Vehicle")
 	float ResetLaneOffset = 400.f;
+
+	// --- Klang ----------------------------------------------------------------------
+
+	/** Rutschgeschwindigkeit eines Rades (Chaos SkidMagnitude, cm/s), bei der der Schlupf als voll gilt. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|Audio")
+	float AudioSkidFullCms = 1000.f;
+
+	/** Querbeschleunigung (in g), ab der die Reifen zu quietschen beginnen bzw. voll quietschen. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|Audio")
+	float AudioLateralGStart = 0.7f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|Audio")
+	float AudioLateralGFull = 1.3f;
 
 	// --- Kamera ---------------------------------------------------------------------
 
@@ -159,6 +177,8 @@ private:
 	void OnSteer(float Value);
 	void OnHandbrakePressed();
 	void OnHandbrakeReleased();
+	void OnHornPressed();
+	void OnHornReleased();
 	void OnResetPressed();
 	void OnSavePressed();
 	void OnLoadPressed();
@@ -171,6 +191,7 @@ private:
 
 	void UpdateDriving(float DeltaSeconds);
 	void UpdateCamera(float DeltaSeconds);
+	void UpdateVehicleAudio(float DeltaSeconds);
 	AMTA6GameMode* GetMTAGameMode() const;
 	bool IsInputBlocked() const;
 
@@ -179,6 +200,7 @@ private:
 	float SteerInput = 0.f;
 	float SmoothedSteer = 0.f;
 	bool bHandbrake = false;
+	bool bHornHeld = false;
 
 	float ShakeTrauma = 0.f;
 	float HitCooldownLeft = 0.f;

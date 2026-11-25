@@ -14,9 +14,13 @@ node_modules/
 
 # Erzeugte Audiodateien (reproduzierbar mit tools/audio/gen_all.py)
 Content/Audio/Generated/*.wav
+# Fahrzeugklaenge (reproduzierbar mit tools/audio/make_vehicle_sounds.py)
+Content/Audio/Generated/Vehicle/*.wav
 
-# Epic-Vorlageninhalte (Sportwagen, Mannequin): nicht einchecken, per tools/setup_template_assets.ps1 kopieren
+# Epic-Vorlageninhalte (Sportwagen, Gelaendewagen, Concept Car, Mannequin): nicht einchecken,
+# per tools/setup_template_assets.ps1 kopieren
 Content/Vehicles/
+Content/ConceptCar/
 Content/Mannequin/
 
 # Importierte Audio-Assets (gross, per tools/ue_audio/import_audio.py reproduzierbar)

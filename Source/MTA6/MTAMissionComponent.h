@@ -97,6 +97,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MTA6|Mission")
 	void StartNextMission();
 
+	/** Wird vom Missions-Runner nach Abschluss eines Auftrags gerufen (bei Erfolg einer Story-Mission: Dialog + Abschluss). */
+	UFUNCTION()
+	void HandleRunnerFinished(bool bSuccess);
+
 	/** Nach dem Laden: Kurierziel und Restzeit wiederherstellen (nur ohne Story-Mission). */
 	UFUNCTION(BlueprintCallable, Category = "MTA6|Mission")
 	void RestoreCourier(const FVector& Target, float InTimeLeft);
@@ -172,6 +176,9 @@ private:
 
 	bool bHasStoryMission = false;
 	bool bInitialized = false;
+
+	UPROPERTY(Transient)
+	TObjectPtr<class UMTAMissionRunner> Runner;
 	FMTAMission CurrentMission;
 	FVector TargetLocation = FVector::ZeroVector;
 	float TimeLeft = 0.f;

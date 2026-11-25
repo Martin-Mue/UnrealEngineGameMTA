@@ -56,6 +56,26 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|NPC")
 	FName AppearanceArchetype;
 
+	/** Aktuelles Aussehen (aus der Kennung abgeleitet): Koerper-/Kleidungsfarbe, Akzent, Fraktion. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|NPC")
+	FLinearColor LookBodyColor = FLinearColor::White;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|NPC")
+	FLinearColor LookAccentColor = FLinearColor::White;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "MTA6|NPC")
+	FName LookFaction;
+
+	/**
+	 * Vielfalt am Mannequin: Farben (Material-Parameter BodyColor/PlasticColor, LogoColor als Akzent)
+	 * deterministisch aus der Kennung, Fraktionsfarbe als Akzent, Statur (Breite 0.94-1.06) am Mesh,
+	 * Groesse ueber die Actor-Skalierung (0.93-1.07). Wird von BindAgent aufgerufen.
+	 */
+	void ApplyLookFromId(FName InId, FName InFaction, float InScale);
+
+	/** Fraktionsfarben: Akzent (Logo) und Koerpertoenung; false = keine bekannte Fraktion. */
+	static bool GetFactionLook(FName InFaction, FLinearColor& OutAccent, FLinearColor& OutBodyTint, float& OutBodyBlend);
+
 	/** Bindet den Actor an einen Agenten und macht ihn sichtbar. */
 	void BindAgent(AMTALivingWorldManager* InManager, int32 InAgentIndex, FName InId, const FString& InName,
 		bool bInKeyNPC, bool bInHasDialogue, float InWalkSpeed, float InScale);

@@ -3041,14 +3041,16 @@ FString UMTAMissionRunner::RunMissionSelfTest()
 		int32 Dummy = 0;
 		float DummySecs = 0.f;
 		// bis nach dem Abholen fahren, dann Schaden
-		for (int32 i = 0; i < 400 && State == EMTAMissionRunState::Running && StepIndex == 0; ++i)
+		for (int32 i = 0; i < 400 && HasActiveMission() && StepIndex == 0; ++i)
 		{
 			SetSimPlayer(Spec.Steps[0].Location, FVector::ZeroVector);
 			StepMission(0.1f);
 		}
+		SimProbe.bInVehicle = true;
 		SimProbe.VehicleHealth = 0.4f;
 		DriveSelfTest(1.f, EMTAMissionSelfTestDrive::Idle, Dummy, DummySecs);
-		Check(TEXT("fail_fracht"), State == EMTAMissionRunState::Failed && FailReason == EMTAMissionFailReason::CargoDamaged, MTAMRFailText(FailReason));
+		Check(TEXT("fail_fracht"), State == EMTAMissionRunState::Failed && FailReason == EMTAMissionFailReason::CargoDamaged,
+			FString::Printf(TEXT("%s state=%d step=%d cargo=%d limit=%.2f base=%.2f"), *FString(MTAMRFailText(FailReason)), (int32)State, StepIndex, bCargoLoaded ? 1 : 0, Spec.DamageLimit, CargoHealthBaseline));
 	}
 
 	// --- 4) Auswahl-API ------------------------------------------------------------------

@@ -5,6 +5,7 @@
 #include "MTAMinimapTypes.h"
 
 #include "MTAVehicleWheels.h"
+#include "MTAAudioVehicleComponent.h"
 
 #include "Animation/AnimInstance.h"
 #include "Camera/CameraComponent.h"
@@ -15,6 +16,7 @@
 #include "Engine/SkeletalMesh.h"
 #include "Engine/World.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "InputCoreTypes.h"
 #include "UObject/ConstructorHelpers.h"
 
 AMTAVehiclePawn::AMTAVehiclePawn(const FObjectInitializer& ObjectInitializer)
@@ -83,6 +85,9 @@ AMTAVehiclePawn::AMTAVehiclePawn(const FObjectInitializer& ObjectInitializer)
 	Camera->bUsePawnControlRotation = false;
 	Camera->SetFieldOfView(FOVMin);
 
+	// Fahrzeugklang: Standard-Assets aus /Game/MTA6/Audio/Vehicle, aktiv nur mit Spieler am Steuer
+	VehicleAudio = CreateDefaultSubobject<UMTAVehicleAudioComponent>(TEXT("VehicleAudio"));
+
 	AutoPossessPlayer = EAutoReceiveInput::Disabled;
 }
 
@@ -113,6 +118,12 @@ void AMTAVehiclePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComp
 	PlayerInputComponent->BindAction(TEXT("Choice3"), IE_Pressed, this, &AMTAVehiclePawn::OnChoice3);
 	PlayerInputComponent->BindAction(TEXT("Choice4"), IE_Pressed, this, &AMTAVehiclePawn::OnChoice4);
 	PlayerInputComponent->BindAction(TEXT("Confirm"), IE_Pressed, this, &AMTAVehiclePawn::OnConfirm);
+
+	// Hupe direkt ueber Tasten (keine Eintraege in DefaultInput.ini noetig): H bzw. linker Stick druecken
+	PlayerInputComponent->BindKey(EKeys::H, IE_Pressed, this, &AMTAVehiclePawn::OnHornPressed);
+	PlayerInputComponent->BindKey(EKeys::H, IE_Released, this, &AMTAVehiclePawn::OnHornReleased);
+	PlayerInputComponent->BindKey(EKeys::Gamepad_LeftThumbstick, IE_Pressed, this, &AMTAVehiclePawn::OnHornPressed);
+	PlayerInputComponent->BindKey(EKeys::Gamepad_LeftThumbstick, IE_Released, this, &AMTAVehiclePawn::OnHornReleased);
 }
 
 void AMTAVehiclePawn::OnThrottle(float Value) { ThrottleInput = FMath::Clamp(Value, 0.f, 1.f); }
@@ -120,6 +131,8 @@ void AMTAVehiclePawn::OnBrake(float Value) { BrakeInput = FMath::Clamp(Value, 0.
 void AMTAVehiclePawn::OnSteer(float Value) { SteerInput = FMath::Clamp(Value, -1.f, 1.f); }
 void AMTAVehiclePawn::OnHandbrakePressed() { bHandbrake = true; }
 void AMTAVehiclePawn::OnHandbrakeReleased() { bHandbrake = false; }
+void AMTAVehiclePawn::OnHornPressed() { bHornHeld = true; }
+void AMTAVehiclePawn::OnHornReleased() { bHornHeld = false; }
 
 void AMTAVehiclePawn::OnResetPressed()
 {
@@ -200,7 +213,60 @@ void AMTAVehiclePawn::Tick(float DeltaSeconds)
 	HitCooldownLeft = FMath::Max(0.f, HitCooldownLeft - DeltaSeconds);
 	UpdateDriving(DeltaSeconds);
 	UpdateCamera(DeltaSeconds);
+	UpdateVehicleAudio(DeltaSeconds);
 	LastVelocity = GetVelocity();
+}
+
+void AMTAVehiclePawn::UpdateVehicleAudio(float DeltaSeconds)
+{
+	if (!VehicleAudio)
+	{
+		return;
+	}
+	// Ohne Spieler am Steuer schaltet sich die Komponente selbst stumm; Eingaben dann nicht berechnen.
+	if (!IsPlayerControlled())
+	{
+		bHornHeld = false;
+		VehicleAudio->SetHorn(false);
+		return;
+	}
+
+	const FVector Velocity = GetVelocity();
+	const float Speed = Velocity.Size();
+	VehicleAudio->SetSpeed(Speed);
+	VehicleAudio->SetEngineRunning(!bWrecked);
+	VehicleAudio->SetHorn(bHornHeld && !IsInputBlocked());
+
+	UChaosWheeledVehicleMovementComponent* Move = Cast<UChaosWheeledVehicleMovementComponent>(GetVehicleMovementComponent());
+	float SkidSlip = 0.f;
+	if (Move)
+	{
+		VehicleAudio->SetRPM(Move->GetEngineRotationSpeed());
+		for (int32 W = 0; W < Move->GetNumWheels(); ++W)
+		{
+			const FWheelStatus& Wheel = Move->GetWheelState(W);
+			if (Wheel.bInContact && Wheel.bIsSkidding && AudioSkidFullCms > 0.f)
+			{
+				SkidSlip = FMath::Max(SkidSlip, Wheel.SkidMagnitude / AudioSkidFullCms);
+			}
+		}
+	}
+	VehicleAudio->SetLoad(IsInputBlocked() ? 0.f : ThrottleInput);
+
+	// Driftwinkel (Seitwaertsanteil der Geschwindigkeit) und Querbeschleunigung ergaenzen den Radschlupf
+	float DriftSlip = 0.f;
+	float LateralSlip = 0.f;
+	if (Speed > 300.f)
+	{
+		const FVector Right = GetActorRightVector();
+		DriftSlip = FMath::Abs(FVector::DotProduct(Velocity / Speed, Right)) * 1.6f;
+		if (DeltaSeconds > KINDA_SMALL_NUMBER)
+		{
+			const float LatG = FMath::Abs(FVector::DotProduct(Velocity - LastVelocity, Right)) / DeltaSeconds / 981.f;
+			LateralSlip = FMath::Clamp((LatG - AudioLateralGStart) / FMath::Max(0.05f, AudioLateralGFull - AudioLateralGStart), 0.f, 1.f);
+		}
+	}
+	VehicleAudio->SetSlip(FMath::Clamp(FMath::Max3(SkidSlip, DriftSlip, LateralSlip), 0.f, 1.f));
 }
 
 void AMTAVehiclePawn::UpdateDriving(float DeltaSeconds)
@@ -282,14 +348,21 @@ void AMTAVehiclePawn::NotifyHit(UPrimitiveComponent* MyComp, AActor* Other, UPri
 	Super::NotifyHit(MyComp, Other, OtherComp, bSelfMoved, HitLocation, HitNormal, NormalImpulse, Hit);
 
 	// Bodenkontakte ignorieren
-	if (HitNormal.Z > 0.7f || HitCooldownLeft > 0.f)
+	if (HitNormal.Z > 0.7f)
 	{
 		return;
 	}
 
 	// Aufprallgeschwindigkeit aus der Geschwindigkeit des letzten Frames (nach dem Kontakt ist sie schon reduziert)
 	const float ImpactSpeed = FVector::DotProduct(LastVelocity, -HitNormal);
-	if (ImpactSpeed < DamageSpeedThreshold)
+
+	// Aufprallklang auch unterhalb der Schadensschwelle (eigene Sperrzeit in der Komponente)
+	if (VehicleAudio)
+	{
+		VehicleAudio->NotifyImpactSpeed(ImpactSpeed);
+	}
+
+	if (HitCooldownLeft > 0.f || ImpactSpeed < DamageSpeedThreshold)
 	{
 		return;
 	}
