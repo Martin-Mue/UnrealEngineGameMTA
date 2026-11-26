@@ -572,7 +572,7 @@ float3 col = Tint;
 float a = 0.0;
 if (kind == 1)
 {
-    a = Opac * (1.0 - fres) * (1.0 - fres);
+    a = 0.3 * Opac * (1.0 - fres) * (1.0 - fres);
     col = Tint * 1.1;
 }
 else
@@ -1038,7 +1038,7 @@ def build_waterfall(mpc):
               ("CamPos", g.camera_pos()), ("T", g.time()),
               ("Tint", g.custom_data3(0, (0.75, 0.88, 0.95))), ("Opac", g.custom_data(3, 0.7)),
               ("Speed", g.custom_data(4, 1.0)), ("Kind", g.custom_data(5, 0.0)), ("Phase", g.custom_data(6, 0.0)),
-              ("Night", g.mpc_param(mpc, "Night", 0.0)), ("Lum", g.scalar_param("WaterfallLuminance", 1.2))]
+              ("Night", g.mpc_param(mpc, "Night", 0.0)), ("Lum", g.scalar_param("WaterfallLuminance", 0.5))]
     c = g.custom("MTA Waterfall", HLSL_WATERFALL, 3, inputs, [("Opacity", 1)])
     g.out(c, "", "MP_EMISSIVE_COLOR")
     g.out(c, "Opacity", "MP_OPACITY")

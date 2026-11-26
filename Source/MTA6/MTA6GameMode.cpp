@@ -535,7 +535,46 @@ void AMTA6GameMode::BeginPlay()
 	SetupWorldSystems();
 	SpawnMenu();
 	LoadIntroData();
-	if (!FParse::Param(FCommandLine::Get(), TEXT("MTA6SelfTest")))
+	if (FParse::Param(FCommandLine::Get(), TEXT("MTA6Shots")))
+	{
+		// Bildkontrolle: feste Kamerapunkte anfahren und Screenshots speichern (Saved/Screenshots), danach beenden
+		FTimerHandle ShotHandle;
+		GetWorldTimerManager().SetTimer(ShotHandle, FTimerDelegate::CreateWeakLambda(this, [this]()
+		{
+			UWorld* ShotWorld = GetWorld();
+			APawn* Pawn = UGameplayStatics::GetPlayerPawn(this, 0);
+			APlayerController* PC = UGameplayStatics::GetPlayerController(this, 0);
+			if (!ShotWorld || !Pawn || !PC) { return; }
+			static int32 ShotIndex = 0;
+			static FVector CityStart = Pawn->GetActorLocation();
+			AMTAWildernessBuilder* Wild = AMTAWildernessBuilder::FindWildernessBuilder(this);
+			TArray<TPair<FVector, FVector>> Views;   // Standort, Blickziel
+			Views.Add({ CityStart + FVector(0.f, 0.f, 150.f), CityStart + FVector(3000.f, 0.f, 150.f) });
+			if (Wild)
+			{
+				const FVector Fall = Wild->GetWaterfallLocation();
+				const FVector Park = Wild->GetParkingLocation();
+				const FVector Cave = Wild->GetSecretEntranceLocation();
+				Views.Add({ Park + FVector(0.f, 0.f, 200.f), Fall });
+				Views.Add({ Fall + (Park - Fall).GetSafeNormal2D() * 3500.f + FVector(0.f, 0.f, 500.f), Fall + FVector(0.f, 0.f, 800.f) });
+				Views.Add({ Fall + (Park - Fall).GetSafeNormal2D() * 1200.f + FVector(0.f, 0.f, 250.f), Cave + FVector(0.f, 0.f, 150.f) });
+				Views.Add({ Cave + FVector(0.f, 0.f, 180.f), Cave + (Cave - Fall).GetSafeNormal2D() * 800.f + FVector(0.f, 0.f, 150.f) });
+			}
+			if (ShotIndex >= Views.Num())
+			{
+				FPlatformMisc::RequestExit(false);
+				return;
+			}
+			const TPair<FVector, FVector>& V = Views[ShotIndex];
+			Pawn->SetActorLocationAndRotation(V.Key, FRotator::ZeroRotator, false, nullptr, ETeleportType::TeleportPhysics);
+			PC->SetControlRotation((V.Value - V.Key).Rotation());
+			Hour = 14.f;
+			PC->ConsoleCommand(FString::Printf(TEXT("HighResShot 1600x900 filename=\"E:/Projekte/GTA 6/Saved/MTA6_shot_%d.png\""), ShotIndex), false);
+			UE_LOG(LogTemp, Display, TEXT("SHOT %d bei %s"), ShotIndex, *V.Key.ToString());
+			++ShotIndex;
+		}), 6.f, true, 25.f);
+	}
+	if (!FParse::Param(FCommandLine::Get(), TEXT("MTA6SelfTest")) && !FParse::Param(FCommandLine::Get(), TEXT("MTA6Shots")))
 	{
 		// Einfuehrung kurz nach dem Start zeigen
 		GetWorldTimerManager().SetTimer(IntroHandle, this, &AMTA6GameMode::ShowIntro, 1.5f, false);
