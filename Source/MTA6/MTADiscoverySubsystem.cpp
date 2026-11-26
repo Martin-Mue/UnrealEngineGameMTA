@@ -524,6 +524,16 @@ void UMTADiscoverySubsystem::UnregisterRegion(FName RegionId)
 	Regions.Remove(RegionId);
 }
 
+void UMTADiscoverySubsystem::RefreshAnchors()
+{
+	// Naechster ResolveLocation-Aufruf sucht die Tag-Anker erneut (Ergebnis wird sonst je Welt zwischengespeichert).
+	for (FMTADiscoveryRuntime& R : Runtime)
+	{
+		R.bAnchorResolved = false;
+		R.bHasAnchor = false;
+	}
+}
+
 void UMTADiscoverySubsystem::RefreshStorySnapshot()
 {
 	StorySnapshot.Reset();

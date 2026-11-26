@@ -95,6 +95,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "MTA6|Discovery")
 	void UnregisterRegion(FName RegionId);
 
+	/** Anker-Actors (Tag = Id) neu suchen, z. B. nachdem zur Laufzeit Anker gespawnt wurden (Wildnis-Builder). */
+	UFUNCTION(BlueprintCallable, Category = "MTA6|Discovery")
+	void RefreshAnchors();
+
 	// --- Spielerereignisse -----------------------------------------------------------------------
 
 	/** Pruefdurchlauf mit expliziter Position (wird bei bAutoTrackPlayer automatisch aufgerufen). */

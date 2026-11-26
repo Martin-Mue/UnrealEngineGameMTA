@@ -38,6 +38,7 @@
 #include "Kismet/KismetSystemLibrary.h"
 #include "MTAMissionComponent.h"
 #include "MTAMissionRunner.h"
+#include "MTAWildernessBuilder.h"
 #include "MTAAudioVehicleComponent.h"
 #include "MTASaveGame.h"
 #include "MTAStorySubsystem.h"
@@ -375,6 +376,17 @@ void AMTA6GameMode::RunSelfTest()
 		Check(TEXT("Fahrzeugsound"), AudioReport.Contains(TEXT("FAHRZEUGSOUND ERGEBNIS: 0 Fehler")));
 	}
 
+	if (AMTAWildernessBuilder* Wild = AMTAWildernessBuilder::FindWildernessBuilder(this))
+	{
+		const FString WildReport = Wild->RunWildernessSelfTest();
+		UE_LOG(LogTemp, Display, TEXT("%s"), *WildReport);
+		Check(TEXT("Wildnis"), WildReport.Contains(TEXT("WILDNISTEST ERGEBNIS: 0 Fehler")));
+	}
+	else
+	{
+		Check(TEXT("Wildnis vorhanden"), false);
+	}
+
 	UE_LOG(LogTemp, Display, TEXT("SELFTEST ERGEBNIS: %d Fehler"), Failures);
 	FPlatformMisc::RequestExit(false);
 }
@@ -518,6 +530,8 @@ void AMTA6GameMode::BeginPlay()
 	{
 		Detail->SpawnEnterableBuildings(72);
 	}
+	// Wildnis Verdanta (nach den Welt-Details, die Platzsuche prueft Strassen und Wasser)
+	AMTAWildernessBuilder::FindOrSpawn(this);
 	SetupWorldSystems();
 	SpawnMenu();
 	LoadIntroData();

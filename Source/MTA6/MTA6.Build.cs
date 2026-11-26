@@ -13,7 +13,9 @@ public class MTA6 : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[]
 		{
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput",
-			"ChaosVehicles", "Json", "JsonUtilities", "UMG", "Slate", "SlateCore"
+			"ChaosVehicles", "Json", "JsonUtilities", "UMG", "Slate", "SlateCore",
+			// Wildnis-Gelaende (AMTAWildernessBuilder)
+			"ProceduralMeshComponent"
 		});
 	}
 }

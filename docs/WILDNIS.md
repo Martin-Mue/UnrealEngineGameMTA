@@ -100,4 +100,6 @@ Dazu die Sammlung „Vermessungspflöcke“ (8).
 3. PCG-Vegetation je Biom, Performance-Budget (Nanite-Foliage, HLOD), Wetter-Varianten.
 4. Höhle, Tür, Server-Raum, Audio, Story-Anbindung.
 
+Umsetzung 25.11.2026: kompakte, spielbare Fassung (600 × 640 m nördlich hinter Greenmoor) als `AMTAWildernessBuilder` (Wasserfall, Höhle, Brücke, Wachturm, Wrack, Lagerfeuer, Aussichtsfels, 8 neue Entdeckungen), siehe `docs/INTEGRATION_WILDNIS.md`. Die große Planung oben bleibt Ausbauziel.
+
 Risiken: Foliage-Dichte vs. Performance (RX 5700 XT) → `FoliageDensityScale` und HLOD; Wasserfall-Optik ohne Water-Plugin → Mesh + Material + Niagara-Nebel genügt; Spieler finden den Eingang nicht → drei unabhängige Wege zum Hinweis-Zustand (Feldstation, Echos, Morgenlicht).

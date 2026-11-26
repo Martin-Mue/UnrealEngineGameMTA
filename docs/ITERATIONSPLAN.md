@@ -68,6 +68,7 @@ Arbeitspakete (jeweils eigener Fach-Agent, getrennte Dateien):
 | I NPC-Leben | 60 Schlüsselfiguren, Dialoge, Tagesabläufe, Beziehungen, Gerüchte | in Arbeit |
 | J Innenräume | begehbare Häuser, Läden, Möbel, Eingänge | in Arbeit |
 | K Entdeckungen/Wildnis | 90 Geheimnisse, Weltereignisse, Wald/Wasserfall (Design + Gerüst) | in Arbeit |
+| K2 Wildnis Verdanta (Builder) | `AMTAWildernessBuilder`: prozedurales Gelände (ProceduralMesh), Wald (HISM), Wasserfall mit Höhle/Geheimeingang, 8 neue Entdeckungen, Selbsttest; Integration: `docs/INTEGRATION_WILDNIS.md` | Code fertig, ungebaut (GameMode-Aufruf + Materialskript ausstehend) |
 | L Spielfiguren | Aussehen, Garderobe, Charaktererstellung, MetaHuman-Pipeline | in Arbeit |
 | M Mehrspieler/MMO | Server, Replikation, Persistenz | später (nach stabiler Einzelspieler-Basis) |
 | N Integration | Bauen, Fehler beheben, Level erzeugen, spielbare Version | nach den Berichten |

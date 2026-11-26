@@ -20,7 +20,7 @@ Kestrel Bay belohnt Neugier, nicht Abarbeiten. Jeder Bezirk hat **16 handgeschri
 | | Anzahl |
 |---|---|
 | Entdeckungen Stadt | 96 (je Bezirk 16) |
-| Entdeckungen Wildnis Verdanta | 12 |
+| Entdeckungen Wildnis Verdanta | 20 (12 Planung + 8 aus dem Wildnis-Builder) |
 | Arten | 22 (Dachgarten, Wandbild, Aussichtspunkt, Tunnel, Stunt, verlassene Station, Hacker-Terminal, Konzert, Schmugglerhöhle, Schwarzmarkt, Stadtlegende, Tier, Echo, Zeitkapsel, Liebesbrief, Geisterschiff, versteckte Werkstatt, Gedenkort, Kuriosität, Ruine, Wasserfall, Höhle) |
 | Rätselketten | 11 (6 bezirksintern, 3 stadtweit, 1 Zeitkapsel, 1 Wildnis) |
 | Sammlungen | 7 (6 Bezirke + Verdanta, zusammen 72 Objekte) |

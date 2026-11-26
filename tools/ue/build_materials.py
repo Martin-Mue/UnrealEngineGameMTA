@@ -20,6 +20,8 @@ Erzeugt unter /Game/MTA6/Materials/:
   M_MTA_Signage       Plakate, Graffiti, Werbetafeln, Aegis-Logo, Laden-/Strassenschilder, Tueren
   M_MTA_Mountain      Berge: Gras/Fels/Schnee nach Neigung und Hoehe, Dunst nach Entfernung
   M_MTA_Road          Kuestenstrasse/Route 9 (Markierungen ueber die lokale Position)
+  M_MTA_Terrain       Wildnis-Gelaende (Vertex-Farbe: Waldboden/Schotter/Erde, Fels nach Neigung)
+  M_MTA_Waterfall     Wasserfall/Gischt (transluzent, unlit, Panner, Fresnel, Emissive)
 
 Die Logik steckt bewusst in HLSL-Custom-Nodes: ein Knoten je Material statt dutzender Einzelknoten
 ist robuster gegen API-Unterschiede und spiegelt die Godot-Shader 1:1.
@@ -535,6 +537,59 @@ return Grass * (0.9 + 0.12 * stripe) * (0.92 + 0.16 * n);
 """
 
 
+# Wildnis-Gelaende (AMTAWildernessBuilder, ProceduralMesh): Grundfarbe aus Vertex-Farbe (Waldboden, Moos,
+# Schotter, Erde, Flusskies), Fels nach Hangneigung, Variation world-aligned, Naesse ueber MPC.
+# Eingaben: WP, N, VC (Vertex-Farbe RGB), VA (Vertex-Alpha: 1 = Weg, dort kein Fels), Wet.
+HLSL_TERRAIN = HLSL_HASH + """
+float3 wp = WP / 100.0;
+float3 nn = normalize(N);
+float slope = 1.0 - saturate(nn.z);
+float n = Hs.H(floor(wp.xy * 1.3)) * 0.35 + Hs.H(floor(wp.xy * 0.22) + 5.0) * 0.4 + Hs.H(floor(wp.xy * 4.0) + 9.0) * 0.25;
+float3 col = VC * (0.82 + 0.36 * n);
+float3 rock = float3(0.30, 0.29, 0.27) * (0.8 + 0.4 * Hs.H(floor(wp.xy * 0.7) + floor(wp.z * 0.5)));
+float rockMask = saturate((slope - 0.45) * 4.0 + (n - 0.5) * 0.6) * (1.0 - saturate(VA));
+col = lerp(col, rock, rockMask);
+Rough = lerp(0.95, 0.75, rockMask);
+float w = saturate(Wet);
+col *= lerp(1.0, 0.65, w);
+Rough = lerp(Rough, 0.2, w * 0.8);
+return col;
+"""
+
+# Wasserfall (unlit, transluzent, zweiseitig): Wasserbaender (Kind 0), Gischt-Kugeln (Kind 1), Flaechen (Kind 2).
+# Fliessen ueber Zeit (Panner + lokale Position), Fresnel an den Raendern, Emissive statt Beleuchtung.
+# Custom-Data wie im Builder: CD 0-2 Farbe, CD 3 Deckkraft, CD 4 Geschwindigkeit, CD 5 Art, CD 6 Phase.
+# Eingaben: LP (lokal, -50..50), PUV (Panner), WP, N, CamPos, T, Tint, Opac, Speed, Kind, Phase, Night, Lum.
+HLSL_WATERFALL = """
+float3 nn = normalize(N);
+float3 v = normalize(CamPos - WP);
+float fres = pow(1.0 - saturate(abs(dot(nn, v))), 3.0);
+int kind = (int)(Kind + 0.5);
+float across = LP.y / 100.0 + 0.5;
+float along = LP.z / 100.0 + 0.5 + T * Speed * 0.8 + Phase;
+float fine = frac(sin(dot(floor(PUV * float2(23.0, 9.0)), float2(12.9898, 78.233))) * 43758.5453);
+float3 col = Tint;
+float a = 0.0;
+if (kind == 1)
+{
+    a = Opac * (1.0 - fres) * (1.0 - fres);
+    col = Tint * 1.1;
+}
+else
+{
+    float s1 = frac(sin(floor(across * 9.0) * 12.9898 + Phase * 7.0) * 43758.5453);
+    float st = frac(along * (1.3 + s1) + s1 * 3.0);
+    float streak = smoothstep(0.0, 0.25, st) * smoothstep(1.0, 0.55, st);
+    float edge = smoothstep(0.0, 0.12, across) * smoothstep(1.0, 0.88, across);
+    a = Opac * edge * saturate(0.35 + 0.55 * streak + 0.25 * fine);
+    col = lerp(Tint * 0.8, float3(0.95, 0.98, 1.0), streak * 0.6 + fres * 0.4);
+    if (kind == 2) { a = Opac * (0.6 + 0.3 * fine); }
+}
+Opacity = saturate(a);
+return col * (0.6 + 0.4 * saturate(1.0 - Night * 0.7)) * Lum;
+"""
+
+
 # ----------------------------------------------------------------------------- Bausteine
 
 def float_type(n):
@@ -646,8 +701,10 @@ class Graph(object):
         set_prop(expr, "description", description)
         set_prop(expr, "code", code)
         set_prop(expr, "output_type", float_type(out_type))
+        # Eingaenge: (Name, Ausdruck) oder (Name, Ausdruck, Ausgangsname des Ausdrucks, z. B. "A").
+        inputs = [item if len(item) == 3 else (item[0], item[1], "") for item in inputs]
         custom_inputs = []
-        for name, _src in inputs:
+        for name, _src, _out in inputs:
             ci = unreal.CustomInput()
             ci.set_editor_property("input_name", name)
             custom_inputs.append(ci)
@@ -659,11 +716,11 @@ class Graph(object):
             co.set_editor_property("output_type", float_type(comps))
             outs.append(co)
         set_prop(expr, "additional_outputs", outs)
-        for name, src in inputs:
+        for name, src, src_out in inputs:
             if src is None:
                 self.ok = False
                 continue
-            if not MEL.connect_material_expressions(src, "", expr, name):
+            if not MEL.connect_material_expressions(src, src_out, expr, name):
                 error("Verbindung -> %s.%s fehlgeschlagen (%s)" % (description, name, self.mat.get_name()))
                 self.ok = False
         return expr
@@ -949,6 +1006,45 @@ def build_road(mpc):
     return finish_material(mat, g)
 
 
+def build_terrain(mpc):
+    """Gelaende der Wildnis (ProceduralMesh, kein Instancing): Vertex-Farbe + Hangneigung."""
+    mat = begin_material("M_MTA_Terrain", instanced=False)
+    if mat is None:
+        return False
+    g = Graph(mat)
+    vc = g.node(unreal.MaterialExpressionVertexColor)
+    inputs = [("WP", g.world_pos()), ("N", g.normal_ws()), ("VC", vc), ("VA", vc, "A"),
+              ("Wet", g.mpc_param(mpc, "Wetness", 0.0))]
+    c = g.custom("MTA Terrain", HLSL_TERRAIN, 3, inputs, [("Rough", 1)])
+    g.out(c, "", "MP_BASE_COLOR")
+    g.out(c, "Rough", "MP_ROUGHNESS")
+    return finish_material(mat, g)
+
+
+def build_waterfall(mpc):
+    """Wasserfall: transluzent, unlit, zweiseitig, Panner + Fresnel + Emissive (Custom-Data wie AMTAWildernessBuilder)."""
+    mat = begin_material("M_MTA_Waterfall")
+    if mat is None:
+        return False
+    set_prop(mat, "blend_mode", enum_value(unreal.BlendMode, "BLEND_TRANSLUCENT", "BLEND_Translucent"))
+    set_prop(mat, "shading_model", enum_value(unreal.MaterialShadingModel, "MSM_UNLIT", "MSM_Unlit"))
+    set_prop(mat, "two_sided", True)
+    g = Graph(mat)
+    panner = g.node(unreal.MaterialExpressionPanner)
+    if panner:
+        set_prop(panner, "speed_x", 0.0)
+        set_prop(panner, "speed_y", 1.2)
+    inputs = [("LP", g.local_pos()), ("PUV", panner), ("WP", g.world_pos()), ("N", g.normal_ws()),
+              ("CamPos", g.camera_pos()), ("T", g.time()),
+              ("Tint", g.custom_data3(0, (0.75, 0.88, 0.95))), ("Opac", g.custom_data(3, 0.7)),
+              ("Speed", g.custom_data(4, 1.0)), ("Kind", g.custom_data(5, 0.0)), ("Phase", g.custom_data(6, 0.0)),
+              ("Night", g.mpc_param(mpc, "Night", 0.0)), ("Lum", g.scalar_param("WaterfallLuminance", 1.2))]
+    c = g.custom("MTA Waterfall", HLSL_WATERFALL, 3, inputs, [("Opacity", 1)])
+    g.out(c, "", "MP_EMISSIVE_COLOR")
+    g.out(c, "Opacity", "MP_OPACITY")
+    return finish_material(mat, g)
+
+
 def main():
     info("build_materials.py startet (Ziel %s)" % MATERIAL_DIR)
     if not ensure_directory(MATERIAL_DIR):
@@ -973,6 +1069,9 @@ def main():
         "M_MTA_Signage": build_signage(mpc),
         "M_MTA_Mountain": build_mountain(mpc),
         "M_MTA_Road": build_road(mpc),
+        # Wildnis Verdanta (AMTAWildernessBuilder)
+        "M_MTA_Terrain": build_terrain(mpc),
+        "M_MTA_Waterfall": build_waterfall(mpc),
     }
     failed = [k for k, v in results.items() if not v]
     if mpc is None:
