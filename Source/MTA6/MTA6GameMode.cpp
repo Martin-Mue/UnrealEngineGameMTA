@@ -550,6 +550,9 @@ void AMTA6GameMode::BeginPlay()
 			AMTAWildernessBuilder* Wild = AMTAWildernessBuilder::FindWildernessBuilder(this);
 			TArray<TPair<FVector, FVector>> Views;   // Standort, Blickziel
 			Views.Add({ CityStart + FVector(0.f, 0.f, 150.f), CityStart + FVector(3000.f, 0.f, 150.f) });
+			Views.Add({ CityStart + FVector(-2500.f, 0.f, 450.f), CityStart + FVector(4000.f, 0.f, 150.f) });
+			Views.Add({ CityStart + FVector(6000.f, 0.f, 300.f), CityStart + FVector(-2000.f, 0.f, 200.f) });
+			Views.Add({ CityStart + FVector(0.f, 4000.f, 3500.f), CityStart + FVector(0.f, 4600.f, 0.f) });
 			if (Wild)
 			{
 				const FVector Fall = Wild->GetWaterfallLocation();

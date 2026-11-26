@@ -51,6 +51,17 @@ HLSL_HASH = """
 struct FMTAHash
 {
     float H(float2 p) { return frac(sin(dot(p, float2(127.1, 311.7))) * 43758.5453); }
+    float Vn(float2 p)
+    {
+        float2 i = floor(p);
+        float2 f = frac(p);
+        f = f * f * (3.0 - 2.0 * f);
+        float a = H(i);
+        float b = H(i + float2(1.0, 0.0));
+        float c = H(i + float2(0.0, 1.0));
+        float d = H(i + float2(1.0, 1.0));
+        return lerp(lerp(a, b, f.x), lerp(c, d, f.x), f.y);
+    }
 };
 FMTAHash Hs;
 """
@@ -544,9 +555,11 @@ HLSL_TERRAIN = HLSL_HASH + """
 float3 wp = WP / 100.0;
 float3 nn = normalize(N);
 float slope = 1.0 - saturate(nn.z);
-float n = Hs.H(floor(wp.xy * 1.3)) * 0.35 + Hs.H(floor(wp.xy * 0.22) + 5.0) * 0.4 + Hs.H(floor(wp.xy * 4.0) + 9.0) * 0.25;
+float n = Hs.Vn(wp.xy * 1.3) * 0.35 + Hs.Vn(wp.xy * 0.22 + 5.0) * 0.4 + Hs.Vn(wp.xy * 4.0 + 9.0) * 0.25;
 float3 col = VC * (0.82 + 0.36 * n);
-float3 rock = float3(0.30, 0.29, 0.27) * (0.8 + 0.4 * Hs.H(floor(wp.xy * 0.7) + floor(wp.z * 0.5)));
+float2 rq = float2((wp.x + wp.y) * 0.6, wp.z * 0.9);
+float strata = Hs.Vn(float2(wp.z * 1.6, (wp.x + wp.y) * 0.12));
+float3 rock = lerp(float3(0.26, 0.25, 0.23), float3(0.38, 0.35, 0.31), strata) * (0.7 + 0.45 * Hs.Vn(rq) + 0.2 * Hs.Vn(rq * 3.7 + 11.0));
 float rockMask = saturate((slope - 0.45) * 4.0 + (n - 0.5) * 0.6) * (1.0 - saturate(VA));
 col = lerp(col, rock, rockMask);
 Rough = lerp(0.95, 0.75, rockMask);
@@ -808,7 +821,7 @@ def build_building(mpc):
               ("Wear", g.custom_data(5, 0.3)), ("Lit", g.custom_data(6, 0.45)),
               ("Style", g.custom_data(7, 1.0)),
               ("Night", g.mpc_param(mpc, "Night", 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0)),
-              ("WinLum", g.scalar_param("WindowLuminance", 40.0)),
+              ("WinLum", g.scalar_param("WindowLuminance", 9.0)),
               # Bezirks-Look (MTABuildingData 8..13 in MTACityGenerator.h)
               ("District", g.custom_data(8, 0.0)), ("Neon", g.custom_data(9, 0.0)),
               ("Detail", g.custom_data(10, 0.5)), ("Accent", g.custom_data3(11, (1.0, 0.3, 0.6))),

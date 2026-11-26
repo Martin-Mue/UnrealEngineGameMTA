@@ -165,7 +165,7 @@ def build_post_process():
     ov("auto_exposure_min_brightness", -2.0)
     ov("auto_exposure_max_brightness", 15.0)
     ov("auto_exposure_bias", 0.0)
-    ov("bloom_intensity", 0.6)
+    ov("bloom_intensity", 0.25)
     # Leichte Farbkorrektur (Godot: Kontrast 1.08, Saettigung 1.12, ACES).
     ov("color_saturation", unreal.Vector4(1.08, 1.08, 1.08, 1.0))
     ov("color_contrast", unreal.Vector4(1.05, 1.05, 1.05, 1.0))

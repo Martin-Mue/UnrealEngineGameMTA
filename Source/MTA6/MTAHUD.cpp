@@ -10,6 +10,7 @@
 #include "MTAMinimapTypes.h"
 #include "MTAMissionComponent.h"
 #include "MTAMissionRunner.h"
+#include "MTAWildernessBuilder.h"
 #include "MTAStorySubsystem.h"
 #include "MTAVehiclePawn.h"
 
@@ -869,6 +870,19 @@ void AMTAHUD::DrawMinimap(AMTA6GameMode* GM)
 			}
 			AddCircle(ToMap(CarLoc.X + D.X, CarLoc.Y + D.Y), R * UIScale, MC, Tris);
 		}
+	}
+
+	// Wildnis Verdanta: gruener Punkt (am Rand geklemmt, damit man die Richtung sieht)
+	if (const AMTAWildernessBuilder* Wild = AMTAWildernessBuilder::FindWildernessBuilder(this))
+	{
+		const FVector WC = Wild->GetWildernessCenter();
+		FVector2D D(WC.X - CarLoc.X, WC.Y - CarLoc.Y);
+		const float Lim = MinimapWorldRadius * 0.88f;
+		if (D.Size() > Lim)
+		{
+			D = D.GetSafeNormal() * Lim;
+		}
+		AddCircle(ToMap(CarLoc.X + D.X, CarLoc.Y + D.Y), 5.f * UIScale, FLinearColor(0.2f, 0.75f, 0.3f, 1.f), Tris);
 	}
 
 	// Spielerpfeil
