@@ -50,7 +50,10 @@ AMTAWorldAIManager::AMTAWorldAIManager()
 	if (SphereFinder.Succeeded())
 	{
 		PedestrianHeadMesh = SphereFinder.Object;
+		VehicleLightMesh = SphereFinder.Object;
 	}
+	// Scheinwerfer/Ruecklichter: emissives Projekt-Material (tools/ue/build_materials.py, HLSL_LAMP).
+	VehicleLightMaterialAsset = TSoftObjectPtr<UMaterialInterface>(FSoftObjectPath(TEXT("/Game/MTA6/Materials/M_MTA_LampEmissive.M_MTA_LampEmissive")));
 	if (ShapeMatFinder.Succeeded())
 	{
 		FallbackColorMaterial = ShapeMatFinder.Object;
@@ -69,10 +72,12 @@ AMTAWorldAIManager::AMTAWorldAIManager()
 		FLinearColor(0.80f, 0.60f, 0.48f), FLinearColor(0.64f, 0.45f, 0.33f),
 		FLinearColor(0.42f, 0.28f, 0.19f), FLinearColor(0.24f, 0.15f, 0.10f) };
 
-	// Farben wie im Godot-Prototyp.
+	// Helle, satte Lackfarben (linear), damit die Autos nachts im Laternenlicht erkennbar bleiben:
+	// Weiss, Silber, Rot, Blau, Gelb, Orange, Gruen, Tuerkis. Keine fast schwarzen Toene (nur Polizei).
 	TrafficColors = {
-		FLinearColor(0.23f, 0.43f, 0.88f), FLinearColor(0.94f, 0.94f, 0.94f), FLinearColor(0.13f, 0.13f, 0.13f),
-		FLinearColor(0.88f, 0.75f, 0.19f), FLinearColor(0.23f, 0.66f, 0.38f), FLinearColor(0.53f, 0.55f, 0.58f) };
+		FLinearColor(0.92f, 0.92f, 0.90f), FLinearColor(0.62f, 0.64f, 0.68f), FLinearColor(0.85f, 0.06f, 0.05f),
+		FLinearColor(0.08f, 0.26f, 0.92f), FLinearColor(0.95f, 0.76f, 0.08f), FLinearColor(0.95f, 0.36f, 0.04f),
+		FLinearColor(0.12f, 0.70f, 0.20f), FLinearColor(0.06f, 0.70f, 0.66f) };
 	PedestrianColors = {
 		FLinearColor(0.8f, 0.25f, 0.25f), FLinearColor(0.25f, 0.45f, 0.8f), FLinearColor(0.25f, 0.7f, 0.45f),
 		FLinearColor(0.8f, 0.75f, 0.25f), FLinearColor(0.6f, 0.3f, 0.75f), FLinearColor(0.9f, 0.9f, 0.9f),
@@ -414,6 +419,10 @@ bool AMTAWorldAIManager::ComputeModelFit(EMTATrafficBodyModel Model, UStaticMesh
 	Out.BodyOffset = FVector(-C.X * Sx, -C.Y * Sy, -GroundRefZ * Sz + Clearance);
 	Out.RoofZ = static_cast<float>(Out.BodyOffset.Z + BodyBox.Max.Z * Sz);
 
+	// Lichter: Unterkante der Karosserie (nach Einpassung) bis Dach.
+	const double BottomZ = Out.BodyOffset.Z + BodyBox.Min.Z * Sz;
+	ComputeLightPlacement(Out, BottomZ, FMath::Max(10.0, static_cast<double>(Out.RoofZ) - BottomZ), false);
+
 	FindPaintSlot(Body, Out.PaintSlot, Out.PaintParam);
 	Out.bValid = true;
 	return true;
@@ -433,6 +442,8 @@ void AMTAWorldAIManager::LoadVehicleModels()
 	ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)].bValid = VehicleBodyMesh != nullptr;
 	ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)].Length = static_cast<float>(VehicleBodySize.X);
 	ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)].Width = static_cast<float>(VehicleBodySize.Y);
+	// Platzhalter-Wuerfel: Unterkante 20 cm (wie in UpdateVisuals), Hoehe = Karosseriehoehe, glatte Enden.
+	ComputeLightPlacement(ModelFits[static_cast<int32>(EMTATrafficBodyModel::Box)], 20.0, VehicleBodySize.Z, true);
 
 	if (!bUseVehicleModels)
 	{
@@ -474,6 +485,19 @@ void AMTAWorldAIManager::LoadVehicleModels()
 			ModelFits[M].PaintSlot, *ModelFits[M].PaintParam.ToString(),
 			ModelFits[M].bSeparateWheels ? TEXT("einzeln") : (ModelFits[M].bWheelSet ? TEXT("Satz") : TEXT("im Mesh")));
 	}
+}
+
+void AMTAWorldAIManager::ComputeLightPlacement(FMTATrafficModelFit& Fit, double BottomZ, double Height, bool bFlatEnds) const
+{
+	// Fahrtrichtung +X: Scheinwerfer vorn, Ruecklichter hinten; linke Seite (Y negativ) wird gespeichert.
+	const double HalfL = Fit.Length * 0.5;
+	const double HalfW = Fit.Width * 0.5;
+	// Abgerundete Vorlagen-Karosserien: Einzug, damit das Licht in der Ecke sitzt und nicht davor schwebt.
+	// Wuerfel: Licht ragt knapp aus der flachen Stirnseite.
+	const double HeadInset = bFlatEnds ? FMath::Min(HeadLightPlacement.X, HeadLightSize.X * 0.3) : HeadLightPlacement.X;
+	const double TailInset = bFlatEnds ? FMath::Min(TailLightPlacement.X, TailLightSize.X * 0.3) : TailLightPlacement.X;
+	Fit.HeadLightLocal = FVector(HalfL - HeadInset, -HalfW * HeadLightPlacement.Y, BottomZ + Height * HeadLightPlacement.Z);
+	Fit.TailLightLocal = FVector(-HalfL + TailInset, -HalfW * TailLightPlacement.Y, BottomZ + Height * TailLightPlacement.Z);
 }
 
 UMaterialInstanceDynamic* AMTAWorldAIManager::MakePaintMID(EMTATrafficBodyModel Model, const FLinearColor& Color)
@@ -589,7 +613,10 @@ void AMTAWorldAIManager::InitVisuals()
 		}
 		const int32 M = G / NumPaintColors;
 		const int32 C = G % NumPaintColors;
-		const FLinearColor Col = TrafficColors.IsValidIndex(C) ? TrafficColors[C] : FLinearColor::Gray;
+		const FLinearColor BaseCol = TrafficColors.IsValidIndex(C) ? TrafficColors[C] : FLinearColor::Gray;
+		// Lack aufhellen ("Paint Tint" multipliziert die Textur, Werte > 1 erlaubt).
+		const float Bright = FMath::Clamp(PaintBrightness, 0.1f, 4.f);
+		const FLinearColor Col(BaseCol.R * Bright, BaseCol.G * Bright, BaseCol.B * Bright, 1.f);
 		const FName CompName = *FString::Printf(TEXT("TrafficBody_%d_%d"), M, C);
 		UInstancedStaticMeshComponent* Comp = nullptr;
 		if (M == BoxIdx)
@@ -687,6 +714,9 @@ void AMTAWorldAIManager::InitVisuals()
 
 	// Schatten nur nah: je Karosserie-Komponente (Verkehr + Polizei als letzter Eintrag).
 	BodyNearestDistSq.Init(TNumericLimits<float>::Max(), TrafficBodyISMs.Num() + 1);
+
+	// --- Scheinwerfer und Ruecklichter (je 2 pro Fahrzeug) ---------------------------------------
+	InitVehicleLights();
 
 	// --- Fussgaenger: Koerper je Kleidungsfarbe, Kopf je Hautton -----------------------------------
 	const int32 NumPedColors = FMath::Clamp(PedestrianColors.Num(), 1, 255);
@@ -1343,6 +1373,180 @@ void AMTAWorldAIManager::WriteWheelTransforms(int32 I, const FQuat& Rot, const F
 	}
 }
 
+namespace MTAVehicleLights
+{
+	/** Custom-Data einer Licht-Instanz: [0..2] Farbe (M_MTA_LampEmissive: LampColor), [3] Emissiv (AgentMaterial). */
+	static void WriteLightData(UInstancedStaticMeshComponent* Comp, int32 Index, const FLinearColor& Color, float Emissive)
+	{
+		if (!Comp || Index < 0 || Index >= Comp->GetInstanceCount())
+		{
+			return;
+		}
+		const float Data[4] = { Color.R, Color.G, Color.B, Emissive };
+		Comp->SetCustomData(Index, MakeArrayView(Data, 4), /*bMarkRenderStateDirty*/ false);
+	}
+
+	static FLinearColor ScaleRGB(const FLinearColor& Color, float Factor)
+	{
+		return FLinearColor(Color.R * Factor, Color.G * Factor, Color.B * Factor, 1.f);
+	}
+}
+
+void AMTAWorldAIManager::InitVehicleLights()
+{
+	const int32 NumVeh = Vehicles.Num();
+	const int32 NumLights = NumVeh * 2;
+
+	LightPrevSpeed.SetNum(NumVeh);
+	for (int32 I = 0; I < NumVeh; ++I)
+	{
+		LightPrevSpeed[I] = Vehicles.Speed[I];
+	}
+	BrakeHold.Init(0.f, NumVeh);
+	TailLightState.Init(0, NumVeh);
+	HeadLightState.Init(0, NumVeh);
+
+	// Emissives Projekt-Material; Leuchtstaerke ueber "LampLuminance" (Laternen: 600, Autos dezenter).
+	VehicleLightMID = nullptr;
+	UMaterialInterface* LightMat = VehicleLightMaterialAsset.IsNull() ? nullptr : VehicleLightMaterialAsset.LoadSynchronous();
+	if (LightMat)
+	{
+		VehicleLightMID = UMaterialInstanceDynamic::Create(LightMat, this);
+		if (VehicleLightMID)
+		{
+			VehicleLightMID->SetScalarParameterValue(FName(TEXT("LampLuminance")), VehicleLightLuminance);
+		}
+	}
+	else
+	{
+		UE_LOG(LogMTAWorldAIModels, Warning, TEXT("Welt-KI: Lichtmaterial %s fehlt (tools/ue/build_materials.py), Fahrzeuglichter nicht emissiv"),
+			*VehicleLightMaterialAsset.ToString());
+	}
+
+	HeadLightISM = NumLights > 0 ? CreateInstancer(TEXT("VehicleHeadLights"), VehicleLightMesh, HeadLightColor, NumLights, false) : nullptr;
+	TailLightISM = NumLights > 0 ? CreateInstancer(TEXT("VehicleTailLights"), VehicleLightMesh, TailLightColor, NumLights, false) : nullptr;
+	for (UInstancedStaticMeshComponent* Comp : { HeadLightISM.Get(), TailLightISM.Get() })
+	{
+		if (!Comp)
+		{
+			continue;
+		}
+		Comp->SetCullDistances(VehicleCullDistance.X, VehicleCullDistance.Y);
+		if (VehicleLightMID)
+		{
+			Comp->SetMaterial(0, VehicleLightMID);
+		}
+	}
+
+	// Grundzustand: Scheinwerfer warmweiss (Polizei kaltweiss), Ruecklichter gedimmt rot.
+	for (int32 I = 0; I < NumVeh; ++I)
+	{
+		const bool bPolice = Vehicles.Kind[I] == EMTAAgentKind::Police;
+		const FLinearColor Head = bPolice ? PoliceHeadLightColor : HeadLightColor;
+		for (int32 S = 0; S < 2; ++S)
+		{
+			MTAVehicleLights::WriteLightData(HeadLightISM, I * 2 + S, Head, 2.f);
+			MTAVehicleLights::WriteLightData(TailLightISM, I * 2 + S, TailLightColor, 1.f);
+		}
+	}
+	for (UInstancedStaticMeshComponent* Comp : { HeadLightISM.Get(), TailLightISM.Get() })
+	{
+		if (Comp)
+		{
+			Comp->MarkRenderStateDirty();
+		}
+	}
+
+	const FTransform Hidden = HiddenTransform();
+	HeadLightXfBuffer.Init(Hidden, HeadLightISM ? NumLights : 0);
+	TailLightXfBuffer.Init(Hidden, TailLightISM ? NumLights : 0);
+}
+
+void AMTAWorldAIManager::HideVehicleLights(int32 I)
+{
+	const FTransform Hidden = HiddenTransform();
+	for (int32 S = 0; S < 2; ++S)
+	{
+		if (HeadLightXfBuffer.IsValidIndex(I * 2 + S))
+		{
+			HeadLightXfBuffer[I * 2 + S] = Hidden;
+		}
+		if (TailLightXfBuffer.IsValidIndex(I * 2 + S))
+		{
+			TailLightXfBuffer[I * 2 + S] = Hidden;
+		}
+	}
+}
+
+void AMTAWorldAIManager::WriteLightTransforms(int32 I, const FQuat& Rot, const FVector& Base, const FMTATrafficModelFit& Fit)
+{
+	// Gleiche Basis/Drehung wie Karosserie und Raeder; Kugel (100 cm) auf Lichtgroesse abgeflacht.
+	const FVector HeadScale = HeadLightSize / 100.0;
+	const FVector TailScale = TailLightSize / 100.0;
+	for (int32 S = 0; S < 2; ++S)
+	{
+		const double SideSign = S == 0 ? 1.0 : -1.0;
+		if (HeadLightXfBuffer.IsValidIndex(I * 2 + S))
+		{
+			const FVector Local(Fit.HeadLightLocal.X, Fit.HeadLightLocal.Y * SideSign, Fit.HeadLightLocal.Z);
+			HeadLightXfBuffer[I * 2 + S] = FTransform(Rot, Base + Rot.RotateVector(Local), HeadScale);
+		}
+		if (TailLightXfBuffer.IsValidIndex(I * 2 + S))
+		{
+			const FVector Local(Fit.TailLightLocal.X, Fit.TailLightLocal.Y * SideSign, Fit.TailLightLocal.Z);
+			TailLightXfBuffer[I * 2 + S] = FTransform(Rot, Base + Rot.RotateVector(Local), TailScale);
+		}
+	}
+}
+
+void AMTAWorldAIManager::UpdateLightState(int32 I, float FrameDt, bool bPolice, bool bSirenOn, bool bRedPhase)
+{
+	if (!LightPrevSpeed.IsValidIndex(I) || !BrakeHold.IsValidIndex(I))
+	{
+		return;
+	}
+
+	// Bremslicht: Tempo sinkt (Sim mit fester Rate -> Haltezeit gegen Flackern), steht oder wartet.
+	const float Spd = Vehicles.Speed[I];
+	if (Spd < LightPrevSpeed[I] - 5.f)
+	{
+		BrakeHold[I] = 0.4f;
+	}
+	else
+	{
+		BrakeHold[I] = FMath::Max(0.f, BrakeHold[I] - FrameDt);
+	}
+	LightPrevSpeed[I] = Spd;
+	const bool bBrake = BrakeHold[I] > 0.f || FMath::Abs(Spd) < 50.f || Vehicles.Wait[I] > 0.f;
+
+	const uint8 Tail = bBrake ? 1 : 0;
+	if (TailLightISM && TailLightState[I] != Tail)
+	{
+		TailLightState[I] = Tail;
+		const FLinearColor Col = bBrake ? BrakeLightColor : TailLightColor;
+		for (int32 S = 0; S < 2; ++S)
+		{
+			MTAVehicleLights::WriteLightData(TailLightISM, I * 2 + S, Col, bBrake ? 3.f : 1.f);
+		}
+	}
+
+	// Polizei im Einsatz: Frontlichter wechselseitig (links in der roten, rechts in der blauen Phase).
+	const bool bFlash = bPolice && bSirenOn && Vehicles.PoliceState[I] != EMTAPoliceState::Calm;
+	const uint8 Head = bFlash ? (bRedPhase ? 1 : 2) : 0;
+	if (HeadLightISM && HeadLightState[I] != Head)
+	{
+		HeadLightState[I] = Head;
+		const FLinearColor Base = bPolice ? PoliceHeadLightColor : HeadLightColor;
+		for (int32 S = 0; S < 2; ++S)
+		{
+			const bool bDim = (Head == 1 && S == 1) || (Head == 2 && S == 0);
+			const bool bBright = (Head == 1 && S == 0) || (Head == 2 && S == 1);
+			const float Factor = bDim ? 0.15f : (bBright ? 1.8f : 1.f);
+			MTAVehicleLights::WriteLightData(HeadLightISM, I * 2 + S, MTAVehicleLights::ScaleRGB(Base, Factor), 2.f * Factor);
+		}
+	}
+}
+
 void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 {
 	if (!bVisualsReady)
@@ -1373,6 +1577,7 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 
 	auto HideVehicleParts = [this, &Hidden](int32 I)
 	{
+		HideVehicleLights(I);
 		if (CabinXfBuffer.IsValidIndex(I))
 		{
 			CabinXfBuffer[I] = Hidden;
@@ -1476,6 +1681,10 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 			}
 			WriteWheelTransforms(I, Rot, Base, FrameDt);
 		}
+
+		// Scheinwerfer/Ruecklichter mit der Karosserie mitbewegen, Brems-/Blinkzustand nachfuehren.
+		WriteLightTransforms(I, Rot, Base, Fit);
+		UpdateLightState(I, FrameDt, bPolice, bSirenOn, bRedPhase);
 
 		if (bPolice)
 		{
@@ -1611,6 +1820,8 @@ void AMTAWorldAIManager::UpdateVisuals(float FrameDt)
 	Upload(PoliceStripeISM, StripeXfBuffer);
 	Upload(SirenRedISM, SirenRedXfBuffer);
 	Upload(SirenBlueISM, SirenBlueXfBuffer);
+	Upload(HeadLightISM, HeadLightXfBuffer);
+	Upload(TailLightISM, TailLightXfBuffer);
 
 	// --- Schatten nur nah: Karosserie-Komponenten ohne nahes Fahrzeug werfen keinen Schatten -------
 	if (bAgentsCastShadows)
@@ -1855,6 +2066,62 @@ FString AMTAWorldAIManager::RunModelSelfTest()
 		}
 		Check(SirenRedISM && SirenBlueISM && SirenRedISM->GetInstanceCount() == NumPoliceSlots && SirenBlueISM->GetInstanceCount() == NumPoliceSlots,
 			TEXT("Polizei: Sirenenbalken-Instanzen"));
+
+		// Lack: keine fast schwarzen Verkehrsfarben (nachts sonst unsichtbar).
+		{
+			const float Bright = FMath::Clamp(PaintBrightness, 0.1f, 4.f);
+			int32 DarkColors = 0;
+			float MinLum = TNumericLimits<float>::Max();
+			for (const FLinearColor& C : TrafficColors)
+			{
+				const float Lum = C.GetLuminance() * Bright;
+				MinLum = FMath::Min(MinLum, Lum);
+				DarkColors += Lum < 0.15f ? 1 : 0;
+			}
+			Check(TrafficColors.Num() > 0 && DarkColors == 0, FString::Printf(TEXT("Verkehr: %d Lackfarben x %.2f, dunkelste Luminanz %.2f, %d zu dunkel"),
+				TrafficColors.Num(), Bright, TrafficColors.Num() > 0 ? MinLum : 0.f, DarkColors));
+		}
+
+		// Fahrzeuglichter: je Fahrzeug 2 Scheinwerfer + 2 Ruecklichter, emissives Material, Lage vorn/hinten.
+		{
+			const int32 NumVehAll = Vehicles.Num();
+			const int32 HeadN = HeadLightISM ? HeadLightISM->GetInstanceCount() : 0;
+			const int32 TailN = TailLightISM ? TailLightISM->GetInstanceCount() : 0;
+			Check(HeadLightISM != nullptr && TailLightISM != nullptr, TEXT("Fahrzeuglichter: Scheinwerfer- und Ruecklicht-Komponenten vorhanden"));
+			Check(HeadN == 2 * NumVehAll && TailN == 2 * NumVehAll && HeadN + TailN == 4 * NumVehAll,
+				FString::Printf(TEXT("Fahrzeuglichter: %d Scheinwerfer + %d Ruecklichter = %d (erwartet 4 x %d Fahrzeuge = %d)"),
+					HeadN, TailN, HeadN + TailN, NumVehAll, 4 * NumVehAll));
+			Check(VehicleLightMID != nullptr && HeadLightISM && TailLightISM
+				&& HeadLightISM->GetMaterial(0) == VehicleLightMID.Get() && TailLightISM->GetMaterial(0) == VehicleLightMID.Get(),
+				FString::Printf(TEXT("Fahrzeuglichter: emissives Material (%s)"), *VehicleLightMaterialAsset.ToString()));
+
+			// Erstes aktives Fahrzeug: Scheinwerfer vor (+X), Ruecklichter hinter der Fahrzeugmitte.
+			int32 Probe = INDEX_NONE;
+			for (int32 I = 0; I < NumVehAll; ++I)
+			{
+				if (Vehicles.bActive[I])
+				{
+					Probe = I;
+					break;
+				}
+			}
+			FTransform HeadXf;
+			FTransform TailXf;
+			if (Probe != INDEX_NONE && HeadN == 2 * NumVehAll && TailN == 2 * NumVehAll
+				&& HeadLightISM->GetInstanceTransform(Probe * 2, HeadXf, true) && TailLightISM->GetInstanceTransform(Probe * 2, TailXf, true))
+			{
+				const FQuat VehRot = FRotator(0.f, Vehicles.VisYaw[Probe], 0.f).Quaternion();
+				const FVector HeadLocal = VehRot.UnrotateVector(HeadXf.GetLocation() - Vehicles.VisLoc[Probe]);
+				const FVector TailLocal = VehRot.UnrotateVector(TailXf.GetLocation() - Vehicles.VisLoc[Probe]);
+				Check(HeadLocal.X > 100.0 && TailLocal.X < -100.0 && HeadLocal.Z > 10.0 && TailLocal.Z > 10.0,
+					FString::Printf(TEXT("Fahrzeuglichter: Lage Fahrzeug %d vorn (%.0f, %.0f, %.0f), hinten (%.0f, %.0f, %.0f)"), Probe,
+						HeadLocal.X, HeadLocal.Y, HeadLocal.Z, TailLocal.X, TailLocal.Y, TailLocal.Z));
+			}
+			else
+			{
+				Check(false, TEXT("Fahrzeuglichter: Lage pruefbar (aktives Fahrzeug mit Licht-Instanzen)"));
+			}
+		}
 
 		// Passanten: Koerper + Kopf je Figur
 		int32 BodyInst = 0;

@@ -57,6 +57,9 @@ struct FMTATrafficModelFit
 	float WheelRadius = 30.f;
 	/** Radmitten fahrzeuglokal: VL, VR, HL, HR. */
 	FVector WheelCenters[4] = { FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector, FVector::ZeroVector };
+	/** Mitte des linken Scheinwerfers / Ruecklichts fahrzeuglokal (rechts = Y gespiegelt). */
+	FVector HeadLightLocal = FVector::ZeroVector;
+	FVector TailLightLocal = FVector::ZeroVector;
 };
 
 /**
@@ -111,6 +114,10 @@ struct FMTATrafficModelFit
  * Darstellung Fussgaenger: schlanker Zylinder (Koerper, je Kleidungsfarbe) + Kugel (Kopf, je
  * Hautton), Groesse/Breite deterministisch je Index variiert.
  * Per-Instance-Custom-Data (nur Grundformen): [0..2] = Farbe RGB, [3] = Emissiv (Sirene).
+ * Fahrzeuglichter: je Fahrzeug 2 Scheinwerfer + 2 Ruecklichter als abgeflachte Kugeln (keine
+ * Lichtquellen), Material M_MTA_LampEmissive (Custom-Data [0..2] = LampColor, nachts emissiv ueber
+ * MPC "Night"); Instanzindex = Fahrzeugindex * 2 + Seite (0 links, 1 rechts). Bremslicht heller beim
+ * Verzoegern/Stehen, Polizei: weisse Frontlichter, bei Sirene wechselseitig blinkend.
  */
 UCLASS(Blueprintable)
 class MTA6_API AMTAWorldAIManager : public AActor
@@ -162,7 +169,8 @@ public:
 
 	/**
 	 * Modelltest ohne Eingabe: Fahrzeug-Meshes und Materialien laden, Lackparameter vorhanden,
-	 * Instanzen aller Sorten vorhanden, Laengen plausibel (380-520 cm), Polizei-Materialien gesetzt.
+	 * Instanzen aller Sorten vorhanden, Laengen plausibel (380-520 cm), Polizei-Materialien gesetzt,
+	 * Lackfarben nicht zu dunkel, Scheinwerfer + Ruecklichter = 4 x Fahrzeuge (Lage vorn/hinten).
 	 * Letzte Zeile: "MODELLTEST ERGEBNIS: n Fehler". Erst nach BeginPlay aussagekraeftig.
 	 */
 	UFUNCTION(BlueprintCallable, Category = "MTA6|AI")
@@ -230,8 +238,58 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
 	TArray<FLinearColor> PedestrianColors;
 
+	/** Lack der Polizei: dunkles Blau (Selbsttest erwartet Luminanz < 0.25), nachts per Streifen/Lichtern erkennbar. */
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
-	FLinearColor PoliceColor = FLinearColor(0.06f, 0.06f, 0.09f);
+	FLinearColor PoliceColor = FLinearColor(0.07f, 0.1f, 0.24f);
+
+	/**
+	 * Multiplikator auf TrafficColors fuer den Lack. "Paint Tint" multipliziert die Lacktextur, daher sind
+	 * Werte > 1 sinnvoll, damit die Autos nachts im Laternenlicht hell bleiben (Grundfarbe klemmt bei 1).
+	 */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual", meta = (ClampMin = "0.1", ClampMax = "4.0"))
+	float PaintBrightness = 1.5f;
+
+	// --- Fahrzeuglichter (instanziert, keine Lichtquellen) --------------------------------------------
+
+	/** Form der Scheinwerfer/Ruecklichter (Standard: Engine-Kugel, abgeflacht). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	TObjectPtr<UStaticMesh> VehicleLightMesh;
+
+	/** Emissives Material mit Custom-Data [0..2] = Farbe (Standard: M_MTA_LampEmissive). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	TSoftObjectPtr<UMaterialInterface> VehicleLightMaterialAsset;
+
+	/** Skalarparameter "LampLuminance" der Licht-Materialinstanz (Laternen nutzen 600). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	float VehicleLightLuminance = 150.f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FLinearColor HeadLightColor = FLinearColor(1.f, 0.9f, 0.68f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FLinearColor PoliceHeadLightColor = FLinearColor(0.88f, 0.94f, 1.f);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FLinearColor TailLightColor = FLinearColor(0.4f, 0.012f, 0.008f);
+
+	/** Bremslicht (heller als TailLightColor). */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FLinearColor BrakeLightColor = FLinearColor(1.f, 0.04f, 0.025f);
+
+	/** Scheinwerfer: Einzug ab Fahrzeugende (cm), Anteil der halben Breite, Anteil der Karosseriehoehe. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FVector HeadLightPlacement = FVector(16.0, 0.66, 0.42);
+
+	/** Ruecklicht: Einzug ab Fahrzeugende (cm), Anteil der halben Breite, Anteil der Karosseriehoehe. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FVector TailLightPlacement = FVector(12.0, 0.7, 0.55);
+
+	/** Groesse (cm) Tiefe x Breite x Hoehe eines Scheinwerfers bzw. Ruecklichts. */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FVector HeadLightSize = FVector(16.0, 28.0, 11.0);
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Lights")
+	FVector TailLightSize = FVector(14.0, 30.0, 9.0);
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "MTA6|AI|Visual")
 	FLinearColor CabinColor = FLinearColor(0.05f, 0.07f, 0.1f);
@@ -475,6 +533,17 @@ protected:
 	UPROPERTY(Transient)
 	TObjectPtr<UMaterialInstanceDynamic> PoliceStripeMID;
 
+	/** Scheinwerfer und Ruecklichter, Index = Fahrzeugindex * 2 + Seite (Verkehr + Polizei). */
+	UPROPERTY(Transient)
+	TObjectPtr<UInstancedStaticMeshComponent> HeadLightISM;
+
+	UPROPERTY(Transient)
+	TObjectPtr<UInstancedStaticMeshComponent> TailLightISM;
+
+	/** Materialinstanz der Lichter (null = Lampenmaterial fehlt, Rueckfall auf Grundform-Material). */
+	UPROPERTY(Transient)
+	TObjectPtr<UMaterialInstanceDynamic> VehicleLightMID;
+
 	/** Einpassung je Sorte. */
 	FMTATrafficModelFit ModelFits[static_cast<int32>(EMTATrafficBodyModel::Count)];
 
@@ -502,6 +571,13 @@ protected:
 	TArray<FTransform> StripeXfBuffer;
 	TArray<FTransform> SirenRedXfBuffer;
 	TArray<FTransform> SirenBlueXfBuffer;
+	TArray<FTransform> HeadLightXfBuffer;
+	TArray<FTransform> TailLightXfBuffer;
+	/** Je Fahrzeug: Tempo im letzten Frame, Restzeit Bremslicht, zuletzt geschriebener Lichtzustand. */
+	TArray<float> LightPrevSpeed;
+	TArray<float> BrakeHold;
+	TArray<uint8> TailLightState;
+	TArray<uint8> HeadLightState;
 	/** Je Karosserie-Komponente: naechster Abstand^2 zum Spieler in diesem Frame (Schatten nur nah). */
 	TArray<float> BodyNearestDistSq;
 
@@ -517,6 +593,14 @@ protected:
 	/** Verfuegbare Sorte fuer einen Verkehrs-Slot (deterministisch aus dem Index, gewichtet). */
 	EMTATrafficBodyModel PickModelForSlot(int32 Slot) const;
 	void WriteWheelTransforms(int32 I, const FQuat& Rot, const FVector& Base, float FrameDt);
+	/** Licht-Lagen einer Sorte aus Laenge/Breite, Unterkante und Hoehe der Karosserie. */
+	void ComputeLightPlacement(FMTATrafficModelFit& Fit, double BottomZ, double Height, bool bFlatEnds) const;
+	/** Lichter erzeugen (nach den Karosserien, Vehicles.Num() bekannt). */
+	void InitVehicleLights();
+	/** Transformationen und Zustand (Bremse, Polizei-Blinken) der Lichter eines Fahrzeugs. */
+	void WriteLightTransforms(int32 I, const FQuat& Rot, const FVector& Base, const FMTATrafficModelFit& Fit);
+	void UpdateLightState(int32 I, float FrameDt, bool bPolice, bool bSirenOn, bool bRedPhase);
+	void HideVehicleLights(int32 I);
 	static uint32 HashIndex(uint32 X);
 	static FTransform HiddenTransform();
 };

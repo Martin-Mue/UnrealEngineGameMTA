@@ -40,9 +40,18 @@ Der Manager sucht den Lack-Slot und den Parameter zur Laufzeit (`FindPaintSlot`)
   - Sportwagen und Gelände bekommen je 4 Rad-Instanzen. Sie drehen sich mit dem Tempo.
   - Lage über `SportsAxleFactor`/`OffroadAxleFactor` und `WheelDiameter`.
   - Steht die Felge innen, `bFlipWheelSides` setzen.
-- Lack: eine `UMaterialInstanceDynamic` je (Sorte, Farbe) aus `TrafficColors`, also eine Instanzkomponente je Gruppe. Das sind höchstens 18 Karosserie-Komponenten, dazu 2 Rad-Komponenten und 1 Glas-Komponente.
+- Lack: eine `UMaterialInstanceDynamic` je (Sorte, Farbe) aus `TrafficColors`, also eine Instanzkomponente je Gruppe. Das sind höchstens 24 Karosserie-Komponenten (3 Sorten × 8 Farben), dazu 2 Rad-Komponenten und 1 Glas-Komponente.
+  - Palette hell und satt (Weiß, Silber, Rot, Blau, Gelb, Orange, Grün, Türkis), keine fast schwarzen Töne.
+  - `PaintBrightness` (Standard 1.5, 0.1–4) multipliziert die Farbe vor dem Setzen. `Paint Tint` multipliziert die Lacktextur, Werte über 1 hellen sie also auf. Beim Concept Car (`PaintColor`) klemmt die Grundfarbe bei 1.
+- Lichter (keine echten Lichtquellen):
+  - Je Fahrzeug 2 Scheinwerfer (`HeadLightISM`) und 2 Rücklichter (`TailLightISM`) als abgeflachte Engine-Kugeln (`VehicleLightMesh`). Instanzindex = Fahrzeugindex × 2 + Seite.
+  - Material: `M_MTA_LampEmissive` (`VehicleLightMaterialAsset`) als MID mit `LampLuminance` = `VehicleLightLuminance` (Standard 150). Farbe per Custom-Data 0–2 (`LampColor`); leuchtet nur nachts (MPC `Night`).
+  - Lage aus den Bounds: `HeadLightPlacement`/`TailLightPlacement` (Einzug ab Fahrzeugende in cm, Anteil der halben Breite, Anteil der Karosseriehöhe), Größe `HeadLightSize`/`TailLightSize`. Die Lichter werden wie Räder und Sirenen jedes Frame mitbewegt.
+  - Bremslicht (`BrakeLightColor`, heller) beim Verzögern (0,4 s Haltezeit), im Stand und beim Warten.
+  - Polizei: kaltweiße Frontlichter (`PoliceHeadLightColor`), bei Sirene wechselseitig blinkend.
+  - Fehlt das Lampenmaterial, gibt es eine Warnung und die Lichter nutzen das Grundform-Material (nicht emissiv).
 - Polizei:
-  - Sportwagen mit `PoliceColor` (dunkel).
+  - Sportwagen mit `PoliceColor` (dunkelblau, Luminanz < 0,25).
   - Weißer Seitenstreifen als flacher Quader mit eigener Materialinstanz (`PoliceStripeColor`, Lage über `PoliceStripePlacement`).
   - Sirenenbalken (rot/blau, blinkend) auf dem Dach (`PoliceRoofXFactor`).
 - Leistung:
@@ -54,7 +63,7 @@ Der Manager sucht den Lack-Slot und den Parameter zur Laufzeit (`FindPaintSlot`)
 - Passanten:
   - Schlanker Zylinder als Körper (je Kleidungsfarbe) und eine Kugel als Kopf (je Hautton, `PedestrianSkinColors`).
   - Größe (0.93–1.07) und Statur werden deterministisch je Index variiert.
-- Selbsttest: `FString RunModelSelfTest()` (BlueprintCallable, am Manager). Letzte Zeile: `MODELLTEST ERGEBNIS: n Fehler`.
+- Selbsttest: `FString RunModelSelfTest()` (BlueprintCallable, am Manager). Prüft auch: keine zu dunkle Lackfarbe, Scheinwerfer + Rücklichter = 4 × Fahrzeuge, emissives Lichtmaterial gesetzt, Scheinwerfer vorn und Rücklichter hinten. Letzte Zeile: `MODELLTEST ERGEBNIS: n Fehler`.
 
 ## Figuren (`MTALivingNPC.*`)
 

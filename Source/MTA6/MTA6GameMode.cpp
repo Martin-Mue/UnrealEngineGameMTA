@@ -563,6 +563,29 @@ void AMTA6GameMode::BeginPlay()
 				Views.Add({ Fall + (Park - Fall).GetSafeNormal2D() * 1200.f + FVector(0.f, 0.f, 250.f), Cave + FVector(0.f, 0.f, 150.f) });
 				Views.Add({ Cave + FVector(0.f, 0.f, 180.f), Cave + (Cave - Fall).GetSafeNormal2D() * 800.f + FVector(0.f, 0.f, 150.f) });
 			}
+			if (WorldAI)
+			{
+				// Nahaufnahmen: naechstes Auto, naechster Polizeiwagen, zwei Passanten (Standort zur Aufnahmezeit)
+				TArray<FMTAMinimapAgent> Agents;
+				WorldAI->GetMinimapAgents(Agents, true);
+				auto AddClose = [&](EMTAAgentKind Kind, int32 Skip, float Dist, float Height)
+				{
+					int32 Seen = 0;
+					TArray<const FMTAMinimapAgent*> Sorted;
+					for (const FMTAMinimapAgent& A : Agents) { if (A.Kind == Kind) { Sorted.Add(&A); } }
+					Sorted.Sort([&](const FMTAMinimapAgent& L, const FMTAMinimapAgent& R) { return FVector::DistSquared(L.Location, CityStart) < FVector::DistSquared(R.Location, CityStart); });
+					if (!Sorted.IsValidIndex(Skip)) { return; }
+					const FMTAMinimapAgent& A = *Sorted[Skip];
+					const FVector Fwd = FRotator(0.f, A.YawDegrees, 0.f).Vector();
+					Views.Add({ A.Location - Fwd * Dist + FVector(0.f, 0.f, Height), A.Location + FVector(0.f, 0.f, 90.f) });
+					(void)Seen;
+				};
+				AddClose(EMTAAgentKind::Traffic, 0, 750.f, 180.f);
+				AddClose(EMTAAgentKind::Traffic, 3, 600.f, 120.f);
+				AddClose(EMTAAgentKind::Police, 0, 700.f, 160.f);
+				AddClose(EMTAAgentKind::Pedestrian, 0, 350.f, 80.f);
+				AddClose(EMTAAgentKind::Pedestrian, 5, 350.f, 80.f);
+			}
 			if (ShotIndex >= Views.Num())
 			{
 				FPlatformMisc::RequestExit(false);

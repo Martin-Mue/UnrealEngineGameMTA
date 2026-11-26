@@ -90,8 +90,8 @@ void AMTACharacter::BeginPlay()
 	// Eigener Look: dunkle Kleidung mit orangem Akzent (statt weissem Mannequin)
 	if (USkeletalMeshComponent* PlayerMesh = GetMesh())
 	{
-		PlayerMesh->SetVectorParameterValueOnMaterials(TEXT("BodyColor"), FVector(0.045f, 0.05f, 0.06f));
-		PlayerMesh->SetVectorParameterValueOnMaterials(TEXT("PlasticColor"), FVector(0.08f, 0.09f, 0.11f));
+		PlayerMesh->SetVectorParameterValueOnMaterials(TEXT("BodyColor"), FVector(0.22f, 0.26f, 0.32f));
+		PlayerMesh->SetVectorParameterValueOnMaterials(TEXT("PlasticColor"), FVector(0.3f, 0.32f, 0.36f));
 		PlayerMesh->SetVectorParameterValueOnMaterials(TEXT("LogoColor"), FVector(0.9f, 0.35f, 0.05f));
 	}
 	Stamina = MaxStamina;
