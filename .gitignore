@@ -25,3 +25,7 @@ Content/Mannequin/
 
 # Importierte Audio-Assets (gross, per tools/ue_audio/import_audio.py reproduzierbar)
 Content/Audio/Generated/*.uasset
+
+# Fototextur-Quellen (CC0, ambientCG; per tools/fetch_photo_textures.ps1 laden). Importierte .uasset unter
+# Content/MTA6/Textures/Photo werden eingecheckt.
+tools/photo_textures/

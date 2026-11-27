@@ -25,6 +25,13 @@ Erzeugt unter /Game/MTA6/Materials/:
 
 Die Logik steckt bewusst in HLSL-Custom-Nodes: ein Knoten je Material statt dutzender Einzelknoten
 ist robuster gegen API-Unterschiede und spiegelt die Godot-Shader 1:1.
+
+Fototexturen (CC0, ambientCG; vorher tools/ue/import_photo_textures.py ausfuehren, Doku docs/TEXTUREN.md):
+Ground, Building, Park, Concrete, Mountain, Road und Terrain sampeln echte TextureSampleParameter2D-Knoten (geteilter
+Wrap-Sampler). Ein kleiner UV-Custom-Node rechnet die world-aligned Kachel-UVs (Draufsicht bzw. Wand-/Fels-
+Seitenprojektionen, zweite Kachelgroesse x4.37 gegen Wiederholung); der Haupt-Custom-Node bekommt die
+Texturwerte als Eingaenge, mischt sie mit den prozeduralen Masken (Markierungen, Fenster, Neigung ...) und
+liefert die Normale im Weltraum (Material: tangent_space_normal = False). Tuning-Parameter: Gruppe "Photo".
 Custom-Data-Indizes muessen zu Source/MTA6/MTACityGenerator.h passen (MTABuildingData, MTAPropData,
 MTAGroundData in MTACityGenerator.cpp).
 
@@ -43,6 +50,13 @@ from mta_ue_common import (MATERIAL_DIR, MPC_PATH, enum_value, ensure_directory,
                            load_or_create_asset, save_asset, set_prop, warn)
 
 MEL = unreal.MaterialEditingLibrary
+
+# Fototexturen (CC0, ambientCG) - Import: tools/ue/import_photo_textures.py, Doku: docs/TEXTUREN.md
+PHOTO_DIR = "/Game/MTA6/Textures/Photo"
+
+
+def photo_path(pack, short):
+    return "%s/%s/T_%s_%s" % (PHOTO_DIR, pack, pack, short)
 
 # ----------------------------------------------------------------------------- HLSL
 
@@ -66,11 +80,44 @@ struct FMTAHash
 FMTAHash Hs;
 """
 
+# Tangentenraum-Normale (Fototextur, DirectX-Konvention) in den Weltraum drehen. T/B sind die Weltrichtungen,
+# in die U bzw. V der world-aligned Projektion zeigen (dP/du, dP/dv); sie werden auf die Flaeche projiziert.
+HLSL_NRM = """
+struct FMTANrm
+{
+    float3 W(float3 t, float3 T, float3 B, float3 N, float s)
+    {
+        float3 Tp = T - N * dot(T, N);
+        Tp *= rsqrt(max(dot(Tp, Tp), 1e-6));
+        float3 Bp = B - N * dot(B, N);
+        Bp *= rsqrt(max(dot(Bp, Bp), 1e-6));
+        return normalize(Tp * (t.x * s) + Bp * (t.y * s) + N * max(t.z, 0.05));
+    }
+};
+FMTANrm Nm;
+"""
+
+# Kachel-UVs fuer die Fototexturen (world-aligned, Draufsicht). Eingaben: WP, AT/CT/GT (Kachelgroesse m).
+# Zweite Kachelgroesse (x4.37, versetzt) gegen sichtbare Wiederholung. Concrete034 ist 2:1 (Breite = CT).
+HLSL_GROUND_UV = """
+float3 nn = normalize(N);
+// Seitenflaechen (Bordstein) als Wand projizieren, sonst Streifen durch gestreckte Draufsicht.
+float2 p = abs(nn.z) < 0.5 ? float2(abs(nn.x) > 0.5 ? WP.y : WP.x, -WP.z) / 100.0 : float2(WP.x, -WP.y) / 100.0;
+UVA2 = p / (AT * 4.37) + 0.61;
+UVC = p / float2(CT, CT * 0.5);
+UVG = p / GT;
+UVG2 = p / (GT * 4.37) + 0.37;
+return p / AT;
+"""
+
 # Boden: Port von GROUND_SHADER (godot/main.gd), Einheiten intern in Metern.
-# Eingaben: WP (Weltposition, cm), OX/OY (Stadtursprung), PER (Periode), RW (Strassenbreite),
-# HX/HY (halbe Stadtausdehnung), Wet (MPC). Ausgaben: return BaseColor, Rough.
-HLSL_GROUND = HLSL_HASH + """
+# Eingaben: WP (Weltposition, cm), N, OX/OY (Stadtursprung), PER (Periode), RW (Strassenbreite),
+# HX/HY (halbe Stadtausdehnung), Wet (MPC), Fototexturen (A* Asphalt031, C* Concrete034, G* Grass004:
+# BC Farbe, BC2 zweite Kachelgroesse, N Normale, R Rauheit, AO) und Tuning-Parameter.
+# Ausgaben: return BaseColor, Rough, Nrm (Weltnormale), AO.
+HLSL_GROUND = HLSL_HASH + HLSL_NRM + """
 float2 wp = WP.xy / 100.0;
+float3 nn = normalize(N);
 float2 org = float2(OX, OY) / 100.0;
 float P = max(PER / 100.0, 1.0);
 float hw = RW / 200.0;
@@ -82,16 +129,27 @@ float2 d = min(m, P - m);
 bool inside = abs(p.x) < hext.x + hw && abs(p.y) < hext.y + hw;
 bool roadx = d.x < hw;
 bool roady = d.y < hw;
-float3 col = float3(0.16, 0.27, 0.12);
-Rough = 1.0;
+// Grossflaechige, weiche Helligkeitsvariation (Value-Noise statt Bloecke) gegen Kachelwiederholung.
+float macro = Hs.Vn(wp * 0.07) * 0.6 + Hs.Vn(wp * 0.31 + 7.0) * 0.4;
+float3 asphalt = lerp(ABC, ABC2, 0.35) * AsphaltBright * (0.85 + 0.3 * macro);
+float3 conc = CBC * ConcreteBright * (0.9 + 0.2 * macro);
+float3 grass = lerp(GBC, GBC2, 0.4) * GrassTint * (0.8 + 0.4 * macro);
+float3 col = grass;
+float3 tn = GN;
+float ao = GAO;
+Rough = lerp(0.75, 1.0, GR);
 if (inside)
 {
-    col = float3(0.52, 0.52, 0.50);
-    Rough = 0.9;
+    col = conc;
+    tn = CN;
+    ao = 1.0;
+    Rough = lerp(0.6, 0.95, CR);
     if (roadx || roady)
     {
-        col = float3(0.11, 0.11, 0.12);
-        Rough = 0.8;
+        col = asphalt;
+        tn = AN;
+        ao = AAO;
+        Rough = lerp(0.55, 0.95, AR);
         if (!(roadx && roady))
         {
             float along = roadx ? q.y : q.x;
@@ -99,39 +157,76 @@ if (inside)
             float seg = fmod(fmod(along, P) + P, P);
             float s0 = hw + 4.0;
             float s1 = P - hw - 4.0;
-            if (across < 0.35 && seg > s0 && seg < s1) col = float3(0.9, 0.7, 0.1);
-            if (abs(across - (hw - 0.6)) < 0.15 && seg > hw + 1.0 && seg < P - hw - 1.0) col = float3(0.75, 0.75, 0.75);
+            float3 mc = float3(-1.0, -1.0, -1.0);
+            if (across < 0.35 && seg > s0 && seg < s1) mc = float3(0.9, 0.7, 0.1);
+            if (abs(across - (hw - 0.6)) < 0.15 && seg > hw + 1.0 && seg < P - hw - 1.0) mc = float3(0.75, 0.75, 0.75);
             bool zebra = (seg > hw && seg < hw + 3.0) || (seg > P - hw - 3.0 && seg < P - hw);
-            if (zebra && across < hw - 1.0 && fmod(across * 1.2, 2.0) < 1.0) col = float3(0.85, 0.85, 0.85);
+            if (zebra && across < hw - 1.0 && fmod(across * 1.2, 2.0) < 1.0) mc = float3(0.85, 0.85, 0.85);
+            if (mc.x >= 0.0)
+            {
+                // Farbe liegt auf dem Asphalt: Koernung schimmert durch, Normale halb geglaettet.
+                float al = dot(ABC, float3(0.3333, 0.3333, 0.3333));
+                col = mc * saturate(0.55 + 0.45 * al / 0.19) * MarkingBright;
+                tn = lerp(tn, float3(0.0, 0.0, 1.0), 0.5);
+                Rough = 0.55;
+            }
         }
     }
 }
-float n = Hs.H(floor(wp * 2.5)) * 0.5 + Hs.H(floor(wp * 0.4)) * 0.5;
-col *= 0.88 + 0.24 * n;
 if (inside && !(roadx || roady) && min(d.x, d.y) < hw + 0.5) col *= 0.7;
-Rough = Rough - 0.1 * n;
 float w = saturate(Wet);
 col *= lerp(1.0, 0.55, w);
 Rough = lerp(Rough, 0.12, w);
+float3 gT = abs(nn.z) < 0.5 ? (abs(nn.x) > 0.5 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0)) : float3(1.0, 0.0, 0.0);
+float3 gB = abs(nn.z) < 0.5 ? float3(0.0, 0.0, -1.0) : float3(0.0, -1.0, 0.0);
+Nrm = Nm.W(tn, gT, gB, nn, NormalStrength * (1.0 - 0.6 * w));
+AO = lerp(1.0, ao, AOStrength);
 return col;
 """
 
 # Gebaeude: Port von BUILDING_SHADER plus Stil, Verschleiss, Leuchtfenster-Anteil und Bezirks-Look (Version 2).
 # Eingaben: WP, N (Vertex-Normale Welt), Tint (RGB), HM (Hoehe m), Seed, Wear, Lit, Style, Night, Wet,
 # WinLum (Leuchtdichte der Fenster), District (CD 8), Neon (CD 9, Ladenband), Detail (CD 10), Accent (CD 11-13),
-# NeonLum. Ausgaben: return BaseColor, Rough, Metal, Emis (float3).
-HLSL_BUILDING = HLSL_HASH + """
+# NeonLum, Fototexturen (C* Concrete034 inkl. CBC2 zweite Kachelgroesse, B* Bricks097, M* Metal064) und
+# Tuning-Parameter. Ausgaben: return BaseColor, Rough, Metal, Emis (float3), Nrm (Weltnormale), AO.
+# Die Fenster-/Laden-/Bezirksmasken bleiben prozedural; nur Albedo/Rauheit/Normale der Wandflaechen
+# kommen aus den Fototexturen (Backstein oder Beton/Putz je Bezirk und Seed).
+HLSL_BUILDING_UV = """
+float3 wp = WP / 100.0;
+float3 nn = normalize(N);
+float u = abs(nn.x) > 0.5 ? wp.y : wp.x;
+float2 p = abs(nn.z) < 0.5 ? float2(u, -wp.z) : float2(wp.x, -wp.y);
+UVB = p / float2(BT, BT * 0.5);
+UVM = p / MT;
+UVC2 = p / float2(CT * 4.37, CT * 2.185) + 0.37;
+return p / float2(CT, CT * 0.5);
+"""
+
+HLSL_BUILDING = HLSL_HASH + HLSL_NRM + """
 float3 wp = WP / 100.0;
 float3 nn = normalize(N);
 float3 col = Tint;
 Rough = 0.85;
 Metal = 0.0;
+AO = 1.0;
+float3 tn = float3(0.0, 0.0, 1.0);
 float3 emWin = float3(0.0, 0.0, 0.0);
 float3 emNeon = float3(0.0, 0.0, 0.0);
 bool glass = Style < 0.5;
 bool industrial = Style > 1.5 && Style < 2.5;
 bool villa = Style > 2.5;
 int dist = (int)(District + 0.5);
+// Fassadenmaterial: Saltmarket immer Backstein, sonst Anteil je Bezirk (Seed), Glas/Stahl nie.
+float bShare = dist == 1 ? 1.0 : (dist == 3 ? 0.55 : (dist == 2 ? 0.4 : (dist == 4 ? 0.5 : (dist == 0 ? 0.12 : 0.0))));
+if (industrial) bShare = max(bShare, 0.5);
+bool brick = !glass && Hs.H(float2(Seed * 0.731 + 3.1, 19.0)) < saturate(bShare * BrickShare);
+float tl = max(dot(Tint, float3(0.3, 0.59, 0.11)), 0.05);
+float3 concCol = Tint * lerp(CBC, CBC2, 0.3) * ConcreteGain;
+float3 brickCol = BBC * BrickBright * lerp(float3(1.0, 1.0, 1.0), Tint / tl, 0.2);
+float3 wallCol = brick ? brickCol : concCol;
+float3 wallN = brick ? BN : CN;
+float wallR = brick ? lerp(0.7, 1.0, BR) : lerp(0.6, 0.95, CR);
+float wallAO = brick ? BAO : 1.0;
 if (abs(nn.z) < 0.5)
 {
     float u = abs(nn.x) > 0.5 ? wp.y : wp.x;
@@ -152,10 +247,13 @@ if (abs(nn.z) < 0.5)
         // Erdgeschoss-Ladenfront mit Neonband (Bezirks-Akzentfarbe, auch am Tag schwach sichtbar).
         float sc = floor(u / 5.0);
         float sf = frac(u / 5.0);
-        col = Tint * 0.55;
+        col = concCol * 0.55;
+        tn = CN;
+        Rough = wallR;
         if (sf > 0.06 && sf < 0.94 && wp.z > 0.45 && wp.z < 2.85)
         {
             col = float3(0.05, 0.07, 0.09);
+            tn = float3(0.0, 0.0, 1.0);
             Rough = 0.06;
             Metal = 0.5;
             emWin = float3(1.0, 0.85, 0.6) * (0.3 + 0.4 * Hs.H(float2(sc, Seed)));
@@ -183,11 +281,21 @@ if (abs(nn.z) < 0.5)
     }
     else
     {
-        if (glass) { col = Tint * 0.55; Rough = 0.3; Metal = 0.8; }
-        // Bezirkstypisches Fassadendetail: 0 Core Lisenen, 1 Saltmarket Ziegel, 2 Lantern Hill Balkone,
+        col = wallCol;
+        tn = wallN;
+        Rough = wallR;
+        AO = wallAO;
+        if (glass)
+        {
+            // Stahl-/Glasbruestungen: Toenung, leichte Walzstruktur aus Metal064 (Rauheit/Normale).
+            col = Tint * 0.55 * (0.85 + 0.3 * MR);
+            Rough = 0.3 + 0.2 * MR;
+            Metal = 0.8;
+            tn = lerp(float3(0.0, 0.0, 1.0), MN, 0.08);
+        }
+        // Bezirkstypisches Fassadendetail: 0 Core Lisenen, 1 Saltmarket Ziegel (Fototextur), 2 Lantern Hill Balkone,
         // 3 Greenmoor Fensterlaeden, 4 Rustline Wellblech + Rost, 5 Sunstrip Art-Deco-Baender.
         if (dist == 0 && glass && f.x < 0.05) { col = float3(0.7, 0.72, 0.75); Metal = 0.9; Rough = 0.25; }
-        else if (dist == 1) { float bz = frac(wp.z * 4.0); float bx = frac(u * 2.0 + 0.5 * step(0.5, frac(wp.z * 2.0))); if (bz < 0.08 || bx < 0.04) col *= 1.0 - 0.3 * Detail; }
         else if (dist == 2)
         {
             bool bal = Hs.H(cell + float2(5.0, Seed)) < Detail * 0.7;
@@ -195,7 +303,14 @@ if (abs(nn.z) < 0.5)
             if (bal && f.y > 0.1 && f.y < 0.3 && f.x > lo.x - 0.05 && f.x < hi.x + 0.05 && frac(u * 6.0) < 0.15) col = float3(0.12, 0.12, 0.12);
         }
         else if (dist == 3) { if (f.y > lo.y && f.y < hi.y && ((f.x > lo.x - 0.1 && f.x < lo.x) || (f.x > hi.x && f.x < hi.x + 0.1))) col = Accent * 0.3 + 0.08; }
-        else if (dist == 4) { col *= 1.0 - 0.2 * Detail * step(0.5, frac(u * 3.3)); col = lerp(col, float3(0.35, 0.16, 0.07), saturate(Wear * streak * 1.4) * Detail); }
+        else if (dist == 4)
+        {
+            col *= 1.0 - 0.2 * Detail * step(0.5, frac(u * 3.3));
+            float rust = saturate(Wear * streak * 1.4) * Detail;
+            col = lerp(col, MBC, rust);
+            Rough = lerp(Rough, MR, rust);
+            tn = lerp(tn, MN, rust);
+        }
         else if (dist == 5)
         {
             if (f.y < 0.1) col = lerp(col, float3(0.95, 0.95, 0.92), 0.7 * Detail);
@@ -208,12 +323,18 @@ if (abs(nn.z) < 0.5)
 }
 else
 {
-    col = float3(0.22, 0.22, 0.22) * (1.0 - 0.3 * Wear);
-    Rough = 0.9;
+    // Flachdach / Oberseiten: dunkler Beton (Draufsicht-Projektion).
+    col = lerp(CBC, CBC2, 0.3) * 0.45 * (1.0 - 0.3 * Wear);
+    tn = CN;
+    Rough = lerp(0.75, 1.0, CR);
 }
 float w = saturate(Wet);
 col *= lerp(1.0, 0.7, w);
 Rough = lerp(Rough, 0.1, w * 0.8);
+float3 bT = abs(nn.z) < 0.5 ? (abs(nn.x) > 0.5 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0)) : float3(1.0, 0.0, 0.0);
+float3 bB = abs(nn.z) < 0.5 ? float3(0.0, 0.0, -1.0) : float3(0.0, -1.0, 0.0);
+Nrm = Nm.W(tn, bT, bB, nn, NormalStrength * (1.0 - 0.5 * w));
+AO = lerp(1.0, AO, AOStrength);
 float night = saturate(Night);
 Emis = emWin * night * WinLum + emNeon * NeonLum * (0.1 + 0.9 * night);
 return col;
@@ -308,36 +429,56 @@ return float3(0.0, 0.0, Wv.h * 100.0 * fade * Amp);
 """
 
 # Beton/Putz/Sand/Planken/Salz/Erde (Kaimauern, Molen, Promenade, Strand, Landmarken).
-# Eingaben: WP, N, Tint (CD 0-2), Wear (CD 3), Pat (CD 4: 0 glatt, 1 Sand, 2 Pflaster, 3 Planken, 4 Salz, 6 Erde), Wet.
-HLSL_CONCRETE = HLSL_HASH + """
+# Eingaben: WP, N, Tint (CD 0-2), Wear (CD 3), Pat (CD 4: 0 glatt, 1 Sand, 2 Pflaster, 3 Planken, 4 Salz, 6 Erde), Wet,
+# Concrete034 (CBC/CBC2/CN/CR) und Ground037 (DBC/DN) je Flaechenausrichtung projiziert. Die Texturen liefern nur
+# Helligkeitsdetail (Graustufe), der Farbton bleibt die Custom-Data-Toenung. Ausgaben: return BaseColor, Rough, Nrm.
+HLSL_BOX_UV = """
+float3 wp = WP / 100.0;
+float3 nn = normalize(N);
+float u = abs(nn.x) > 0.5 ? wp.y : wp.x;
+float2 p = abs(nn.z) < 0.5 ? float2(u, -wp.z) : float2(wp.x, -wp.y);
+UVC2 = p / float2(CT * 4.37, CT * 2.185) + 0.37;
+UVD = p / DT;
+return p / float2(CT, CT * 0.5);
+"""
+
+HLSL_CONCRETE = HLSL_HASH + HLSL_NRM + """
 float3 wp = WP / 100.0;
 float3 nn = normalize(N);
 int pat = (int)(Pat + 0.5);
-float n1 = Hs.H(floor(wp.xy * 3.0) + floor(wp.z * 3.0));
-float n2 = Hs.H(floor(wp.xy * 0.35) + 17.0);
-float3 col = Tint * (0.9 + 0.12 * n1) * (0.92 + 0.12 * n2);
-Rough = 0.85;
+float3 lw = float3(0.3, 0.59, 0.11);
+float cl = dot(lerp(CBC, CBC2, 0.3), lw) / 0.48;
+float dl = dot(DBC, lw) / 0.28;
+float macro = Hs.Vn(wp.xy * 0.35 + wp.z * 0.2) * 0.6 + Hs.Vn(wp.xy * 0.07 + 17.0) * 0.4;
+float3 col = Tint * cl * (0.92 + 0.16 * macro);
+float3 tn = CN;
+Rough = lerp(0.65, 0.95, CR);
 bool top = nn.z > 0.5;
-if (pat == 1) { col = Tint * (0.88 + 0.2 * Hs.H(floor(wp.xy * 9.0))); Rough = 0.95; }
-else if (pat == 2) { float2 g = frac(wp.xy / 0.6); if (top && min(g.x, g.y) < 0.05) col *= 0.72; }
+if (pat == 1) { col = Tint * lerp(1.0, dl, 0.6) * (0.9 + 0.2 * macro); tn = lerp(float3(0.0, 0.0, 1.0), DN, 0.5); Rough = 0.95; }
+else if (pat == 2) { float2 g = frac(wp.xy / 0.6); if (top && min(g.x, g.y) < 0.05) { col *= 0.72; tn = float3(0.0, 0.0, 1.0); } }
 else if (pat == 3)
 {
+    col = Tint * (0.9 + 0.15 * Hs.H(float2(floor(wp.x / 0.25), floor(wp.y / 3.0)))) * (0.85 + 0.15 * cl);
     if (top && frac(wp.x / 0.25) < 0.08) col *= 0.45;
-    col *= 0.9 + 0.15 * Hs.H(float2(floor(wp.x / 0.25), floor(wp.y / 3.0)));
+    tn = lerp(float3(0.0, 0.0, 1.0), CN, 0.4);
     Rough = 0.8;
 }
 else if (pat == 4)
 {
-    col = Tint * (0.93 + 0.07 * Hs.H(floor(wp.xy * 0.8)));
-    if (frac(wp.x * 0.37 + wp.y * 0.21 + Hs.H(floor(wp.xy * 0.3))) < 0.02) col *= 0.8;
+    col = Tint * (0.93 + 0.07 * macro) * lerp(1.0, cl, 0.3);
+    if (frac(wp.x * 0.37 + wp.y * 0.21 + Hs.Vn(wp.xy * 0.3)) < 0.02) col *= 0.8;
+    tn = lerp(float3(0.0, 0.0, 1.0), CN, 0.3);
     Rough = 0.6;
 }
-else if (pat == 6) { col = lerp(Tint, Tint * float3(1.3, 1.1, 0.8), Hs.H(floor(wp.xy * 0.02))); Rough = 1.0; }
-float stain = Hs.H(floor(wp.xy * 0.5) + 3.0);
+else if (pat == 6) { col = lerp(Tint, Tint * float3(1.3, 1.1, 0.8), Hs.Vn(wp.xy * 0.02)) * lerp(1.0, dl, 0.7); tn = DN; Rough = 1.0; }
+float stain = Hs.Vn(wp.xy * 0.5 + 3.0);
 col *= 1.0 - Wear * (top ? 0.35 * stain : 0.15 + 0.15 * saturate(1.0 - frac(wp.z / 3.0)));
 float w = saturate(Wet);
 col *= lerp(1.0, 0.6, w);
 Rough = lerp(Rough, 0.12, w * 0.85);
+float3 bT = abs(nn.z) < 0.5 ? (abs(nn.x) > 0.5 ? float3(0.0, 1.0, 0.0) : float3(1.0, 0.0, 0.0)) : float3(1.0, 0.0, 0.0);
+float3 bB = abs(nn.z) < 0.5 ? float3(0.0, 0.0, -1.0) : float3(0.0, -1.0, 0.0);
+Nrm = Nm.W(tn, bT, bB, nn, NormalStrength * (1.0 - 0.5 * w));
 return col;
 """
 
@@ -480,49 +621,91 @@ return col;
 """
 
 # Berge: Gras/Fels nach Hangneigung, Schnee oberhalb der Schneegrenze, Dunst nach Entfernung und Hoehe
-# (Talnebel), nachts dunkler Dunst. Eingaben: WP, N, CamPos, Tint (CD 0-2), Snow (CD 3, m), Haze (CD 4), Night, Wet.
-HLSL_MOUNTAIN = HLSL_HASH + """
+# (Talnebel), nachts dunkler Dunst. Eingaben: WP, N, CamPos, Tint (CD 0-2), Snow (CD 3, m), Haze (CD 4), Night, Wet,
+# Fototexturen Rock064 in zwei Seitenprojektionen (RBX/RBY nah, RFX/RFY zweite Kachelgroesse, RNX/RNY, RRX/RRY) und
+# Grass004 (GBC/GN) in Draufsicht. Ausgaben: return BaseColor, Rough, Nrm (Weltnormale).
+# Kachel-UVs fuer Fels (zwei Seitenprojektionen X/Y) und Gras/Boden (Draufsicht), Groessen in m.
+HLSL_SIDE_UV = """
+float3 wp = WP / 100.0;
+float2 top = float2(wp.x, -wp.y);
+UVRY = float2(wp.x, -wp.z) / RT + 0.5;
+UVFX = float2(wp.y, -wp.z) / (RT * 4.37) + 0.21;
+UVFY = float2(wp.x, -wp.z) / (RT * 4.37) + 0.73;
+UVG = top / GT;
+UVG2 = top / (GT * 4.37) + 0.37;
+UVD = top / DT;
+return float2(wp.y, -wp.z) / RT;
+"""
+
+HLSL_MOUNTAIN = HLSL_HASH + HLSL_NRM + """
 float3 wp = WP / 100.0;
 float3 nn = normalize(N);
 float slope = 1.0 - saturate(nn.z);
-float n = Hs.H(floor(wp.xy / 25.0)) * 0.5 + Hs.H(floor(wp.xy / 7.0) + 3.0) * 0.3 + Hs.H(floor(wp.zz / 4.0) + 9.0) * 0.2;
-float3 grass = float3(0.16, 0.22, 0.1);
-float3 rock = float3(0.33, 0.31, 0.28);
+float n = Hs.Vn(wp.xy / 25.0) * 0.5 + Hs.Vn(wp.xy / 7.0 + 3.0) * 0.3 + Hs.Vn(wp.zz / 4.0 + 9.0) * 0.2;
+float wx = pow(abs(nn.x), 4.0);
+float wy = pow(abs(nn.y), 4.0);
+float ws = max(wx + wy, 1e-4);
+wx /= ws;
+wy /= ws;
+float3 rockTex = (lerp(RBX, RFX, 0.45) * wx + lerp(RBY, RFY, 0.45) * wy) * RockBright;
+float3 grass = GBC * GrassTint;
 float rockMask = saturate((slope - 0.3) * 3.0 + (n - 0.5) * 0.8 + saturate((wp.z - 250.0) / 200.0));
-float3 col = lerp(grass, rock, rockMask) * Tint * (0.85 + 0.3 * n);
+float3 col = lerp(grass, rockTex, rockMask) * Tint * (0.85 + 0.3 * n);
 float snowMask = saturate((wp.z - Snow) / 40.0 + (n - 0.5)) * saturate(1.2 - slope * 1.2);
 col = lerp(col, float3(0.85, 0.87, 0.9), snowMask);
+float3 nRock = normalize(Nm.W(RNX, float3(0.0, 1.0, 0.0), float3(0.0, 0.0, -1.0), nn, NormalStrength) * wx
+                       + Nm.W(RNY, float3(1.0, 0.0, 0.0), float3(0.0, 0.0, -1.0), nn, NormalStrength) * wy);
+float3 nGrass = Nm.W(GN, float3(1.0, 0.0, 0.0), float3(0.0, -1.0, 0.0), nn, NormalStrength);
+Nrm = normalize(lerp(lerp(nGrass, nRock, rockMask), nn, snowMask * 0.8));
 float dist = length(WP - CamPos) / 100.0;
 float haze = saturate(dist / 3000.0) * Haze * (0.55 + 0.45 * saturate(1.0 - wp.z / 600.0));
 float3 hazeCol = lerp(float3(0.58, 0.66, 0.76), float3(0.03, 0.04, 0.06), saturate(Night));
 col = lerp(col, hazeCol, saturate(haze));
-Rough = lerp(0.95, 0.6, snowMask);
+float rr = lerp(0.6, 0.95, RRX * wx + RRY * wy);
+Rough = lerp(lerp(0.95, rr, rockMask), 0.6, snowMask);
 col *= lerp(1.0, 0.75, saturate(Wet));
 return col;
 """
 
+# Draufsicht-UVs fuer Asphalt (Kuestenstrasse) und Rasen (Park). Eingaben: WP, T (Kachelgroesse m).
+HLSL_TOP_UV = """
+float2 p = float2(WP.x, -WP.y) / 100.0;
+UV2 = p / (T * 4.37) + 0.61;
+return p / T;
+"""
+
 # Kuestenstrasse/Route 9: Markierungen ueber die lokale Position des Segments (Laenge/Breite per Custom-Data).
-# Eingaben: WP, LP, Len (CD 3, cm), Wid (CD 4, cm), Kind (CD 5: 0 Kuestenstrasse, 1 Schnellstrasse), Wet.
-HLSL_ROAD = HLSL_HASH + """
+# Eingaben: WP, N, LP, Len (CD 3, cm), Wid (CD 4, cm), Kind (CD 5: 0 Kuestenstrasse, 1 Schnellstrasse), Wet,
+# Asphalt031 (ABC/ABC2/AN/AR). Ausgaben: return BaseColor, Rough, Nrm.
+HLSL_ROAD = HLSL_HASH + HLSL_NRM + """
 float along = (LP.x / 100.0) * Len / 100.0;
 float across = (LP.y / 100.0) * Wid / 100.0;
 float hw = Wid / 200.0;
-float n = Hs.H(floor(WP.xy / 40.0));
-float3 col = float3(0.12, 0.12, 0.13) * (0.88 + 0.22 * n);
-Rough = 0.8;
+float macro = Hs.Vn(WP.xy / 1400.0) * 0.6 + Hs.Vn(WP.xy / 3100.0 + 7.0) * 0.4;
+float3 col = lerp(ABC, ABC2, 0.35) * AsphaltBright * (0.85 + 0.3 * macro);
+float3 tn = AN;
+Rough = lerp(0.55, 0.95, AR);
+float3 mc = float3(-1.0, -1.0, -1.0);
 if (Kind < 0.5)
 {
-    if (abs(across) < 0.08 && frac(along / 6.0) < 0.5) col = float3(0.85, 0.65, 0.1);
+    if (abs(across) < 0.08 && frac(along / 6.0) < 0.5) mc = float3(0.85, 0.65, 0.1);
 }
 else
 {
-    if (abs(abs(across) - hw * 0.5) < 0.08 && frac(along / 9.0) < 0.4) col = float3(0.8, 0.8, 0.8);
-    if (abs(across) < 0.12) col = float3(0.85, 0.65, 0.1);
+    if (abs(abs(across) - hw * 0.5) < 0.08 && frac(along / 9.0) < 0.4) mc = float3(0.8, 0.8, 0.8);
+    if (abs(across) < 0.12) mc = float3(0.85, 0.65, 0.1);
 }
-if (abs(abs(across) - (hw - 0.3)) < 0.08) col = float3(0.78, 0.78, 0.78);
+if (abs(abs(across) - (hw - 0.3)) < 0.08) mc = float3(0.78, 0.78, 0.78);
+if (mc.x >= 0.0)
+{
+    col = mc * saturate(0.55 + 0.45 * dot(ABC, float3(0.3333, 0.3333, 0.3333)) / 0.19);
+    tn = lerp(tn, float3(0.0, 0.0, 1.0), 0.5);
+    Rough = 0.55;
+}
 float w = saturate(Wet);
 col *= lerp(1.0, 0.55, w);
 Rough = lerp(Rough, 0.1, w);
+Nrm = Nm.W(tn, float3(1.0, 0.0, 0.0), float3(0.0, -1.0, 0.0), normalize(N), NormalStrength * (1.0 - 0.6 * w));
 return col;
 """
 
@@ -535,37 +718,64 @@ return LampColor * 0.8;
 # Laub: Custom-Data-Farbe mit world-aligned Helligkeitsvariation.
 HLSL_FOLIAGE = HLSL_HASH + """
 float3 wp = WP / 100.0;
-float v = Hs.H(floor(wp.xy * 1.5) + floor(wp.z * 2.0)) * 0.25 + 0.85;
+// Weiches Value-Noise statt Hash-Bloecke (keine Wuerfelflecken auf den Kronen).
+float v = Hs.Vn(wp.xy * 1.5 + wp.z * 2.0) * 0.18 + Hs.Vn(wp.xy * 4.1 - wp.z * 3.3 + 5.0) * 0.1 + 0.84;
 return Leaf * v;
 """
 
-# Rasen: Maehstreifen alle 2 m, Farbe per Custom-Data.
-HLSL_PARK = HLSL_HASH + """
+# Rasen: Maehstreifen alle 2 m, Helligkeit per Custom-Data-Farbe, Grass004 (GBC/GBC2/GN/GR/GAO).
+# Ausgaben: return BaseColor, Rough, Nrm, AO.
+HLSL_PARK = HLSL_HASH + HLSL_NRM + """
 float2 wp = WP.xy / 100.0;
 float stripe = step(0.5, frac(wp.x / 4.0));
-float n = Hs.H(floor(wp * 3.0));
-return Grass * (0.9 + 0.12 * stripe) * (0.92 + 0.16 * n);
+float macro = Hs.Vn(wp * 0.09) * 0.6 + Hs.Vn(wp * 0.37 + 3.0) * 0.4;
+float gl = dot(Grass, float3(0.3, 0.59, 0.11));
+float3 col = lerp(GBC, GBC2, 0.4) * GrassTint * lerp(1.0, gl / 0.34, 0.5);
+col *= (0.9 + 0.12 * stripe) * (0.85 + 0.3 * macro);
+Rough = lerp(0.75, 1.0, GR);
+Nrm = Nm.W(GN, float3(1.0, 0.0, 0.0), float3(0.0, -1.0, 0.0), normalize(N), NormalStrength);
+AO = lerp(1.0, GAO, AOStrength);
+return col;
 """
 
 
-# Wildnis-Gelaende (AMTAWildernessBuilder, ProceduralMesh): Grundfarbe aus Vertex-Farbe (Waldboden, Moos,
-# Schotter, Erde, Flusskies), Fels nach Hangneigung, Variation world-aligned, Naesse ueber MPC.
-# Eingaben: WP, N, VC (Vertex-Farbe RGB), VA (Vertex-Alpha: 1 = Weg, dort kein Fels), Wet.
-HLSL_TERRAIN = HLSL_HASH + """
+# Wildnis-Gelaende (AMTAWildernessBuilder, ProceduralMesh): Vertex-Farbe waehlt Gras (gruenlich: Waldboden, Moos,
+# Stadtrasen) oder Erde (Schlamm, Schotter, Erde, Flusskies) und toent die Fototextur (VCInfluence), Fels (Rock064,
+# zwei Seitenprojektionen) nach Hangneigung, Naesse ueber MPC.
+# Eingaben: WP, N, VC (Vertex-Farbe RGB), VA (Vertex-Alpha: 1 = Weg, dort kein Fels), Wet, Fototexturen
+# G* Grass004, D* Ground037, R*X/R*Y Rock064. Ausgaben: return BaseColor, Rough, Nrm (Weltnormale), AO.
+HLSL_TERRAIN = HLSL_HASH + HLSL_NRM + """
 float3 wp = WP / 100.0;
 float3 nn = normalize(N);
 float slope = 1.0 - saturate(nn.z);
 float n = Hs.Vn(wp.xy * 1.3) * 0.35 + Hs.Vn(wp.xy * 0.22 + 5.0) * 0.4 + Hs.Vn(wp.xy * 4.0 + 9.0) * 0.25;
-float3 col = VC * (0.82 + 0.36 * n);
-float2 rq = float2((wp.x + wp.y) * 0.6, wp.z * 0.9);
-float strata = Hs.Vn(float2(wp.z * 1.6, (wp.x + wp.y) * 0.12));
-float3 rock = lerp(float3(0.26, 0.25, 0.23), float3(0.38, 0.35, 0.31), strata) * (0.7 + 0.45 * Hs.Vn(rq) + 0.2 * Hs.Vn(rq * 3.7 + 11.0));
+float gfrac = VC.g / max(VC.r + VC.g + VC.b, 1e-4);
+float gm = saturate((gfrac - 0.38) * 14.0 + (n - 0.5) * 0.8);
+// Referenz-Mittelwerte der (getoenten) Texturen: Vertex-Farbe / Referenz = Toenung je Untergrund.
+float3 grass = lerp(GBC, GBC2, 0.4) * GrassTint;
+grass *= lerp(float3(1.0, 1.0, 1.0), VC / float3(0.10, 0.17, 0.05), VCInfluence);
+float3 dirt = DBC * DirtTint;
+dirt *= lerp(float3(1.0, 1.0, 1.0), VC / float3(0.22, 0.20, 0.10), VCInfluence);
+float3 col = lerp(dirt, grass, gm) * (0.85 + 0.3 * n);
+float wx = pow(abs(nn.x), 4.0);
+float wy = pow(abs(nn.y), 4.0);
+float ws = max(wx + wy, 1e-4);
+wx /= ws;
+wy /= ws;
+float3 rock = (lerp(RBX, RFX, 0.4) * wx + lerp(RBY, RFY, 0.4) * wy) * RockBright;
 float rockMask = saturate((slope - 0.45) * 4.0 + (n - 0.5) * 0.6) * (1.0 - saturate(VA));
 col = lerp(col, rock, rockMask);
-Rough = lerp(0.95, 0.75, rockMask);
+float rGround = lerp(lerp(0.8, 1.0, DR), lerp(0.75, 1.0, GR), gm);
+Rough = lerp(rGround, lerp(0.6, 0.95, RRX * wx + RRY * wy), rockMask);
 float w = saturate(Wet);
 col *= lerp(1.0, 0.65, w);
 Rough = lerp(Rough, 0.2, w * 0.8);
+float s = NormalStrength * (1.0 - 0.5 * w);
+float3 nGround = Nm.W(lerp(DN, GN, gm), float3(1.0, 0.0, 0.0), float3(0.0, -1.0, 0.0), nn, s);
+float3 nRock = normalize(Nm.W(RNX, float3(0.0, 1.0, 0.0), float3(0.0, 0.0, -1.0), nn, s) * wx
+                       + Nm.W(RNY, float3(1.0, 0.0, 0.0), float3(0.0, 0.0, -1.0), nn, s) * wy);
+Nrm = normalize(lerp(nGround, nRock, rockMask));
+AO = lerp(1.0, lerp(lerp(DAO, GAO, gm), 1.0, rockMask), AOStrength);
 return col;
 """
 
@@ -692,6 +902,43 @@ class Graph(object):
             set_prop(expr, "group", group, quiet=True)
         return expr
 
+    def texture_param(self, name, path, uv_src=None, uv_out="", group="Photo"):
+        """TextureSampleParameter2D mit Fototextur (Sampler-Typ nach Kompression, geteilter Wrap-Sampler).
+
+        uv_src/uv_out: Ausdruck (meist der UV-Custom-Node) und dessen Ausgang fuer die Texturkoordinaten.
+        """
+        tex = unreal.EditorAssetLibrary.load_asset(path) if unreal.EditorAssetLibrary.does_asset_exist(path) else None
+        if tex is None:
+            error("Textur fehlt: %s (erst tools/ue/import_photo_textures.py ausfuehren)" % path)
+            self.ok = False
+            return None
+        expr = self.node(unreal.MaterialExpressionTextureSampleParameter2D)
+        if not expr:
+            return None
+        set_prop(expr, "parameter_name", name)
+        set_prop(expr, "texture", tex)
+        comp = str(tex.get_editor_property("compression_settings")).upper()
+        if "NORMAL" in comp:
+            stype = enum_value(unreal.MaterialSamplerType, "SAMPLERTYPE_NORMAL", "SAMPLERTYPE_Normal")
+        elif "MASK" in comp:
+            stype = enum_value(unreal.MaterialSamplerType, "SAMPLERTYPE_MASKS", "SAMPLERTYPE_Masks")
+        else:
+            stype = enum_value(unreal.MaterialSamplerType, "SAMPLERTYPE_COLOR", "SAMPLERTYPE_Color")
+        set_prop(expr, "sampler_type", stype)
+        # Geteilter Wrap-Sampler: zaehlt nicht gegen das 16-Sampler-Limit.
+        set_prop(expr, "sampler_source", enum_value(unreal.SamplerSourceMode, "SSM_WRAP_WORLD_GROUP_SETTINGS",
+                                                    "SSM_Wrap_WorldGroupSettings"))
+        set_prop(expr, "group", group, quiet=True)
+        if uv_src is not None:
+            if not MEL.connect_material_expressions(uv_src, uv_out, expr, "UVs"):
+                error("UV-Verbindung -> %s fehlgeschlagen (%s)" % (name, self.mat.get_name()))
+                self.ok = False
+        return expr
+
+    def photo(self, pack, short, uv_src, uv_out="", suffix=""):
+        """Fototextur T_<pack>_<short> als Parameter "<pack>_<short><suffix>"."""
+        return self.texture_param("%s_%s%s" % (pack, short, suffix), photo_path(pack, short), uv_src, uv_out)
+
     def mpc_param(self, mpc, name, fallback_value):
         """MPC-Parameter; fehlt die MPC, wird ein Konstant-Knoten mit Ersatzwert verwendet."""
         if mpc is None:
@@ -756,19 +1003,31 @@ def begin_material(name, instanced=True):
     if instanced:
         usage = enum_value(unreal.MaterialUsage, "MATUSAGE_INSTANCED_STATIC_MESHES", "MATUSAGE_InstancedStaticMeshes")
         try:
-            MEL.set_material_usage(asset, usage)
+            if hasattr(MEL, "set_base_material_usage"):
+                MEL.set_base_material_usage(asset, usage, True)
+            else:
+                MEL.set_material_usage(asset, usage)
         except Exception as exc:  # noqa: BLE001
             warn("Material-Usage ISM fuer %s nicht gesetzt: %s" % (name, exc))
     return asset
 
 
+def world_space_normal(mat):
+    """Die Custom-Nodes liefern die Normale im Weltraum (world-aligned Projektionen, keine Mesh-Tangenten noetig)."""
+    set_prop(mat, "tangent_space_normal", False)
+
+
 def finish_material(asset, graph):
     MEL.layout_material_expressions(asset)
-    MEL.recompile_material(asset)
+    compile_errors = MEL.recompile_material(asset) or []
+    for msg in compile_errors:
+        error("Kompilierfehler %s: %s" % (asset.get_name(), msg))
     saved = save_asset(asset)
     if not graph.ok:
         error("Material %s unvollstaendig aufgebaut" % asset.get_name())
-    return graph.ok and saved
+    # Hinweis: Im Commandlet (ohne RHI) werden keine Shader kompiliert; HLSL-Fehler der Custom-Nodes zeigen sich
+    # erst im Editor/Spiel (Log: LogShaderCompilers / "Failed to compile Material").
+    return graph.ok and saved and not compile_errors
 
 
 # ----------------------------------------------------------------------------- Assets
@@ -798,15 +1057,45 @@ def build_ground(mpc):
     mat = begin_material("M_MTA_Ground")
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
-    inputs = [("WP", g.world_pos()),
+    # Kachel-UVs (Asphalt 3 m, Beton 4 x 2 m, Rasen 2.5 m; jeweils zweite Groesse x4.37)
+    wp = g.world_pos()
+    nws = g.normal_ws()
+    uv = g.custom("MTA Ground UV", HLSL_GROUND_UV, 2,
+                  [("WP", wp), ("N", nws), ("AT", g.scalar_param("AsphaltTile", 3.0, "Photo")),
+                   ("CT", g.scalar_param("ConcreteTile", 4.0, "Photo")),
+                   ("GT", g.scalar_param("GrassTile", 2.5, "Photo"))],
+                  [("UVA2", 2), ("UVC", 2), ("UVG", 2), ("UVG2", 2)])
+    inputs = [("WP", wp), ("N", nws),
               ("OX", g.custom_data(0, 0.0)), ("OY", g.custom_data(1, 0.0)),
               ("PER", g.custom_data(2, 8000.0)), ("RW", g.custom_data(3, 1600.0)),
               ("HX", g.custom_data(4, 32000.0)), ("HY", g.custom_data(5, 32000.0)),
-              ("Wet", g.mpc_param(mpc, "Wetness", 0.0))]
-    c = g.custom("MTA Ground", HLSL_GROUND, 3, inputs, [("Rough", 1)])
+              ("Wet", g.mpc_param(mpc, "Wetness", 0.0)),
+              ("ABC", g.photo("Asphalt031", "BC", uv, "")),
+              ("ABC2", g.photo("Asphalt031", "BC", uv, "UVA2", "_Far")),
+              ("AN", g.photo("Asphalt031", "N", uv, "")),
+              ("AR", g.photo("Asphalt031", "R", uv, ""), "R"),
+              ("AAO", g.photo("Asphalt031", "AO", uv, ""), "R"),
+              ("CBC", g.photo("Concrete034", "BC", uv, "UVC")),
+              ("CN", g.photo("Concrete034", "N", uv, "UVC")),
+              ("CR", g.photo("Concrete034", "R", uv, "UVC"), "R"),
+              ("GBC", g.photo("Grass004", "BC", uv, "UVG")),
+              ("GBC2", g.photo("Grass004", "BC", uv, "UVG2", "_Far")),
+              ("GN", g.photo("Grass004", "N", uv, "UVG")),
+              ("GR", g.photo("Grass004", "R", uv, "UVG"), "R"),
+              ("GAO", g.photo("Grass004", "AO", uv, "UVG"), "R"),
+              ("AsphaltBright", g.scalar_param("AsphaltBrightness", 0.6, "Photo")),
+              ("ConcreteBright", g.scalar_param("ConcreteBrightness", 0.8, "Photo")),
+              ("GrassTint", g.vector_param("GrassTint", (1.15, 1.3, 1.9), "Photo")),
+              ("MarkingBright", g.scalar_param("MarkingBrightness", 1.0, "Photo")),
+              ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo")),
+              ("AOStrength", g.scalar_param("AOStrength", 1.0, "Photo"))]
+    c = g.custom("MTA Ground", HLSL_GROUND, 3, inputs, [("Rough", 1), ("Nrm", 3), ("AO", 1)])
     g.out(c, "", "MP_BASE_COLOR")
     g.out(c, "Rough", "MP_ROUGHNESS")
+    g.out(c, "Nrm", "MP_NORMAL")
+    g.out(c, "AO", "MP_AMBIENT_OCCLUSION")
     return finish_material(mat, g)
 
 
@@ -814,8 +1103,33 @@ def build_building(mpc):
     mat = begin_material("M_MTA_Building")
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
-    inputs = [("WP", g.world_pos()), ("N", g.normal_ws()),
+    wp = g.world_pos()
+    nws = g.normal_ws()
+    # Kachel-UVs je Flaechenausrichtung (Wand X/Y oder Draufsicht): Beton 4 x 2 m, Backstein 2.4 x 1.2 m, Metall 2 m
+    uv = g.custom("MTA Building UV", HLSL_BUILDING_UV, 2,
+                  [("WP", wp), ("N", nws), ("CT", g.scalar_param("ConcreteTile", 4.0, "Photo")),
+                   ("BT", g.scalar_param("BrickTile", 2.4, "Photo")),
+                   ("MT", g.scalar_param("MetalTile", 2.0, "Photo"))],
+                  [("UVC2", 2), ("UVB", 2), ("UVM", 2)])
+    photo_inputs = [("CBC", g.photo("Concrete034", "BC", uv, "")),
+                    ("CBC2", g.photo("Concrete034", "BC", uv, "UVC2", "_Far")),
+                    ("CN", g.photo("Concrete034", "N", uv, "")),
+                    ("CR", g.photo("Concrete034", "R", uv, ""), "R"),
+                    ("BBC", g.photo("Bricks097", "BC", uv, "UVB")),
+                    ("BN", g.photo("Bricks097", "N", uv, "UVB")),
+                    ("BR", g.photo("Bricks097", "R", uv, "UVB"), "R"),
+                    ("BAO", g.photo("Bricks097", "AO", uv, "UVB"), "R"),
+                    ("MBC", g.photo("Metal064", "BC", uv, "UVM")),
+                    ("MN", g.photo("Metal064", "N", uv, "UVM")),
+                    ("MR", g.photo("Metal064", "R", uv, "UVM"), "R"),
+                    ("ConcreteGain", g.scalar_param("ConcreteGain", 2.0, "Photo")),
+                    ("BrickBright", g.scalar_param("BrickBrightness", 1.0, "Photo")),
+                    ("BrickShare", g.scalar_param("BrickShare", 1.0, "Photo")),
+                    ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo")),
+                    ("AOStrength", g.scalar_param("AOStrength", 1.0, "Photo"))]
+    inputs = [("WP", wp), ("N", nws),
               ("Tint", g.custom_data3(0, (0.8, 0.8, 0.8))),
               ("HM", g.custom_data(3, 20.0)), ("Seed", g.custom_data(4, 0.0)),
               ("Wear", g.custom_data(5, 0.3)), ("Lit", g.custom_data(6, 0.45)),
@@ -825,12 +1139,15 @@ def build_building(mpc):
               # Bezirks-Look (MTABuildingData 8..13 in MTACityGenerator.h)
               ("District", g.custom_data(8, 0.0)), ("Neon", g.custom_data(9, 0.0)),
               ("Detail", g.custom_data(10, 0.5)), ("Accent", g.custom_data3(11, (1.0, 0.3, 0.6))),
-              ("NeonLum", g.scalar_param("NeonLuminance", 15.0))]
-    c = g.custom("MTA Building", HLSL_BUILDING, 3, inputs, [("Rough", 1), ("Metal", 1), ("Emis", 3)])
+              ("NeonLum", g.scalar_param("NeonLuminance", 15.0))] + photo_inputs
+    c = g.custom("MTA Building", HLSL_BUILDING, 3, inputs,
+                 [("Rough", 1), ("Metal", 1), ("Emis", 3), ("Nrm", 3), ("AO", 1)])
     g.out(c, "", "MP_BASE_COLOR")
     g.out(c, "Rough", "MP_ROUGHNESS")
     g.out(c, "Metal", "MP_METALLIC")
     g.out(c, "Emis", "MP_EMISSIVE_COLOR")
+    g.out(c, "Nrm", "MP_NORMAL")
+    g.out(c, "AO", "MP_AMBIENT_OCCLUSION")
     return finish_material(mat, g)
 
 
@@ -879,11 +1196,25 @@ def build_park():
     mat = begin_material("M_MTA_Park")
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
-    inputs = [("WP", g.world_pos()), ("Grass", g.custom_data3(0, (0.24, 0.42, 0.18)))]
-    c = g.custom("MTA Park", HLSL_PARK, 3, inputs, [])
+    wp = g.world_pos()
+    uv = g.custom("MTA Park UV", HLSL_TOP_UV, 2, [("WP", wp), ("T", g.scalar_param("GrassTile", 2.5, "Photo"))],
+                  [("UV2", 2)])
+    inputs = [("WP", wp), ("N", g.normal_ws()), ("Grass", g.custom_data3(0, (0.24, 0.42, 0.18))),
+              ("GBC", g.photo("Grass004", "BC", uv, "")),
+              ("GBC2", g.photo("Grass004", "BC", uv, "UV2", "_Far")),
+              ("GN", g.photo("Grass004", "N", uv, "")),
+              ("GR", g.photo("Grass004", "R", uv, ""), "R"),
+              ("GAO", g.photo("Grass004", "AO", uv, ""), "R"),
+              ("GrassTint", g.vector_param("GrassTint", (1.15, 1.3, 1.9), "Photo")),
+              ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo")),
+              ("AOStrength", g.scalar_param("AOStrength", 1.0, "Photo"))]
+    c = g.custom("MTA Park", HLSL_PARK, 3, inputs, [("Rough", 1), ("Nrm", 3), ("AO", 1)])
     g.out(c, "", "MP_BASE_COLOR")
-    g.out(g.scalar_param("Roughness", 1.0), "", "MP_ROUGHNESS")
+    g.out(c, "Rough", "MP_ROUGHNESS")
+    g.out(c, "Nrm", "MP_NORMAL")
+    g.out(c, "AO", "MP_AMBIENT_OCCLUSION")
     return finish_material(mat, g)
 
 
@@ -931,13 +1262,28 @@ def build_concrete(mpc):
     mat = begin_material("M_MTA_Concrete")
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
-    inputs = [("WP", g.world_pos()), ("N", g.normal_ws()),
+    wp = g.world_pos()
+    nws = g.normal_ws()
+    uv = g.custom("MTA Concrete UV", HLSL_BOX_UV, 2,
+                  [("WP", wp), ("N", nws), ("CT", g.scalar_param("ConcreteTile", 4.0, "Photo")),
+                   ("DT", g.scalar_param("DirtTile", 3.0, "Photo"))],
+                  [("UVC2", 2), ("UVD", 2)])
+    inputs = [("WP", wp), ("N", nws),
               ("Tint", g.custom_data3(0, (0.5, 0.49, 0.46))), ("Wear", g.custom_data(3, 0.4)),
-              ("Pat", g.custom_data(4, 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0))]
-    c = g.custom("MTA Concrete", HLSL_CONCRETE, 3, inputs, [("Rough", 1)])
+              ("Pat", g.custom_data(4, 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0)),
+              ("CBC", g.photo("Concrete034", "BC", uv, "")),
+              ("CBC2", g.photo("Concrete034", "BC", uv, "UVC2", "_Far")),
+              ("CN", g.photo("Concrete034", "N", uv, "")),
+              ("CR", g.photo("Concrete034", "R", uv, ""), "R"),
+              ("DBC", g.photo("Ground037", "BC", uv, "UVD")),
+              ("DN", g.photo("Ground037", "N", uv, "UVD")),
+              ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo"))]
+    c = g.custom("MTA Concrete", HLSL_CONCRETE, 3, inputs, [("Rough", 1), ("Nrm", 3)])
     g.out(c, "", "MP_BASE_COLOR")
     g.out(c, "Rough", "MP_ROUGHNESS")
+    g.out(c, "Nrm", "MP_NORMAL")
     return finish_material(mat, g)
 
 
@@ -994,28 +1340,65 @@ def build_mountain(mpc):
     mat = begin_material("M_MTA_Mountain")
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
-    inputs = [("WP", g.world_pos()), ("N", g.normal_ws()), ("CamPos", g.camera_pos()),
+    wp = g.world_pos()
+    uv = side_uv_node(g, wp, rock_tile=14.0, grass_tile=4.0)
+    inputs = [("WP", wp), ("N", g.normal_ws()), ("CamPos", g.camera_pos()),
               ("Tint", g.custom_data3(0, (0.9, 0.95, 0.85))), ("Snow", g.custom_data(3, 380.0)),
               ("Haze", g.custom_data(4, 0.6)),
-              ("Night", g.mpc_param(mpc, "Night", 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0))]
-    c = g.custom("MTA Mountain", HLSL_MOUNTAIN, 3, inputs, [("Rough", 1)])
+              ("Night", g.mpc_param(mpc, "Night", 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0)),
+              ("RBX", g.photo("Rock064", "BC", uv, "", "_X")),
+              ("RBY", g.photo("Rock064", "BC", uv, "UVRY", "_Y")),
+              ("RFX", g.photo("Rock064", "BC", uv, "UVFX", "_FarX")),
+              ("RFY", g.photo("Rock064", "BC", uv, "UVFY", "_FarY")),
+              ("RNX", g.photo("Rock064", "N", uv, "", "_X")),
+              ("RNY", g.photo("Rock064", "N", uv, "UVRY", "_Y")),
+              ("RRX", g.photo("Rock064", "R", uv, "", "_X"), "R"),
+              ("RRY", g.photo("Rock064", "R", uv, "UVRY", "_Y"), "R"),
+              ("GBC", g.photo("Grass004", "BC", uv, "UVG2")),
+              ("GN", g.photo("Grass004", "N", uv, "UVG2")),
+              ("RockBright", g.scalar_param("RockBrightness", 1.6, "Photo")),
+              ("GrassTint", g.vector_param("GrassTint", (1.15, 1.3, 1.9), "Photo")),
+              ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo"))]
+    c = g.custom("MTA Mountain", HLSL_MOUNTAIN, 3, inputs, [("Rough", 1), ("Nrm", 3)])
     g.out(c, "", "MP_BASE_COLOR")
     g.out(c, "Rough", "MP_ROUGHNESS")
+    g.out(c, "Nrm", "MP_NORMAL")
     return finish_material(mat, g)
+
+
+def side_uv_node(g, wp, rock_tile, grass_tile, dirt_tile=3.0):
+    """UV-Custom-Node fuer Fels (zwei Seitenprojektionen) und Boden (Draufsicht)."""
+    return g.custom("MTA Side UV", HLSL_SIDE_UV, 2,
+                    [("WP", wp), ("RT", g.scalar_param("RockTile", rock_tile, "Photo")),
+                     ("GT", g.scalar_param("GrassTile", grass_tile, "Photo")),
+                     ("DT", g.scalar_param("DirtTile", dirt_tile, "Photo"))],
+                    [("UVRY", 2), ("UVFX", 2), ("UVFY", 2), ("UVG", 2), ("UVG2", 2), ("UVD", 2)])
 
 
 def build_road(mpc):
     mat = begin_material("M_MTA_Road")
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
-    inputs = [("WP", g.world_pos()), ("LP", g.local_pos()),
+    wp = g.world_pos()
+    uv = g.custom("MTA Road UV", HLSL_TOP_UV, 2, [("WP", wp), ("T", g.scalar_param("AsphaltTile", 3.0, "Photo"))],
+                  [("UV2", 2)])
+    inputs = [("WP", wp), ("N", g.normal_ws()), ("LP", g.local_pos()),
               ("Len", g.custom_data(3, 4000.0)), ("Wid", g.custom_data(4, 1400.0)),
-              ("Kind", g.custom_data(5, 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0))]
-    c = g.custom("MTA Road", HLSL_ROAD, 3, inputs, [("Rough", 1)])
+              ("Kind", g.custom_data(5, 0.0)), ("Wet", g.mpc_param(mpc, "Wetness", 0.0)),
+              ("ABC", g.photo("Asphalt031", "BC", uv, "")),
+              ("ABC2", g.photo("Asphalt031", "BC", uv, "UV2", "_Far")),
+              ("AN", g.photo("Asphalt031", "N", uv, "")),
+              ("AR", g.photo("Asphalt031", "R", uv, ""), "R"),
+              ("AsphaltBright", g.scalar_param("AsphaltBrightness", 0.6, "Photo")),
+              ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo"))]
+    c = g.custom("MTA Road", HLSL_ROAD, 3, inputs, [("Rough", 1), ("Nrm", 3)])
     g.out(c, "", "MP_BASE_COLOR")
     g.out(c, "Rough", "MP_ROUGHNESS")
+    g.out(c, "Nrm", "MP_NORMAL")
     return finish_material(mat, g)
 
 
@@ -1024,13 +1407,41 @@ def build_terrain(mpc):
     mat = begin_material("M_MTA_Terrain", instanced=False)
     if mat is None:
         return False
+    world_space_normal(mat)
     g = Graph(mat)
     vc = g.node(unreal.MaterialExpressionVertexColor)
-    inputs = [("WP", g.world_pos()), ("N", g.normal_ws()), ("VC", vc), ("VA", vc, "A"),
-              ("Wet", g.mpc_param(mpc, "Wetness", 0.0))]
-    c = g.custom("MTA Terrain", HLSL_TERRAIN, 3, inputs, [("Rough", 1)])
+    wp = g.world_pos()
+    uv = side_uv_node(g, wp, rock_tile=10.0, grass_tile=2.5, dirt_tile=3.0)
+    inputs = [("WP", wp), ("N", g.normal_ws()), ("VC", vc), ("VA", vc, "A"),
+              ("Wet", g.mpc_param(mpc, "Wetness", 0.0)),
+              ("GBC", g.photo("Grass004", "BC", uv, "UVG")),
+              ("GBC2", g.photo("Grass004", "BC", uv, "UVG2", "_Far")),
+              ("GN", g.photo("Grass004", "N", uv, "UVG")),
+              ("GR", g.photo("Grass004", "R", uv, "UVG"), "R"),
+              ("GAO", g.photo("Grass004", "AO", uv, "UVG"), "R"),
+              ("DBC", g.photo("Ground037", "BC", uv, "UVD")),
+              ("DN", g.photo("Ground037", "N", uv, "UVD")),
+              ("DR", g.photo("Ground037", "R", uv, "UVD"), "R"),
+              ("DAO", g.photo("Ground037", "AO", uv, "UVD"), "R"),
+              ("RBX", g.photo("Rock064", "BC", uv, "", "_X")),
+              ("RBY", g.photo("Rock064", "BC", uv, "UVRY", "_Y")),
+              ("RFX", g.photo("Rock064", "BC", uv, "UVFX", "_FarX")),
+              ("RFY", g.photo("Rock064", "BC", uv, "UVFY", "_FarY")),
+              ("RNX", g.photo("Rock064", "N", uv, "", "_X")),
+              ("RNY", g.photo("Rock064", "N", uv, "UVRY", "_Y")),
+              ("RRX", g.photo("Rock064", "R", uv, "", "_X"), "R"),
+              ("RRY", g.photo("Rock064", "R", uv, "UVRY", "_Y"), "R"),
+              ("GrassTint", g.vector_param("GrassTint", (1.15, 1.3, 1.9), "Photo")),
+              ("DirtTint", g.vector_param("DirtTint", (0.75, 0.72, 0.9), "Photo")),
+              ("RockBright", g.scalar_param("RockBrightness", 1.4, "Photo")),
+              ("VCInfluence", g.scalar_param("VertexColorInfluence", 0.5, "Photo")),
+              ("NormalStrength", g.scalar_param("NormalStrength", 1.0, "Photo")),
+              ("AOStrength", g.scalar_param("AOStrength", 1.0, "Photo"))]
+    c = g.custom("MTA Terrain", HLSL_TERRAIN, 3, inputs, [("Rough", 1), ("Nrm", 3), ("AO", 1)])
     g.out(c, "", "MP_BASE_COLOR")
     g.out(c, "Rough", "MP_ROUGHNESS")
+    g.out(c, "Nrm", "MP_NORMAL")
+    g.out(c, "AO", "MP_AMBIENT_OCCLUSION")
     return finish_material(mat, g)
 
 
